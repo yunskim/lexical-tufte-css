@@ -705,3 +705,11 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - 왕복·URL allowlist 거부 테스트 작성. 실제 빌드·테스트 미실행; 발행 렌더러 및 iframe 비율·CSP 검증 전 F18 체크 보류.
 - `docs/LEXICAL_TUFTE_REFERENCES.ko.md`: Lexical + Tufte CSS 직접 통합 공개 사례 미발견(검색 범위 한정), Tufte CSS 원본·Pandoc·txt2tufte·classless 변형·Lexical UI 참고 사례와 적용 원칙 기록.
 - CI 없음. 다음: 새 노드들의 로컬 실행 검증 환경 복구 및 문서 계약 차이 수정이 우선.
+
+## 2026-10-16 — 신규 노드/validator 계약 감사
+
+- F18 EmbedNode aspectRatio 문자열→number(validator의 0.1..10) 수정 및 테스트 기대값 수정.
+- F17 code language 정규식에서 validator가 허용하지 않는 점(.) 제거.
+- F19 ImageQuilt 원본 width/height 필수 검사 및 부정 테스트 강화.
+- 에러 E026 및 예방 대책 M026 추가. 실제 빌드·테스트 실행 환경 미확보로 완료 체크 보류. CI 생략 유지.
+- 다음: 실행 환경 확보 후 pnpm check / node test를 순서대로 실행하고 발견된 실패 수정.
