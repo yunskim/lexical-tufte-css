@@ -17,3 +17,5 @@ export {FullwidthNode,$createFullwidthNode} from './FullwidthNode.js';
 export {TufteCodeNode,$createTufteCodeNode,type CodeWidth,type SerializedTufteCode} from './CodeBlockNode.js';
 export {ImageQuiltNode,$createImageQuiltNode,type SerializedImageQuilt} from './ImageQuiltNode.js';
 export {EmbedNode,$createEmbedNode,type EmbedProvider,type EmbedWrapper,type SerializedEmbed} from './EmbedNode.js';
+export {TUFTE_NODES,TUFTE_NODE_CLASSES,TUFTE_NODE_TYPES,TESTED_LEXICAL_VERSION} from './nodes.js';
+export {TufteCodeHighlightNode,$createTufteCodeHighlightNode,type SerializedTufteCodeHighlight} from './CodeHighlightNode.js';

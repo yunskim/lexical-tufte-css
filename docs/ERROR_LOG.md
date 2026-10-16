@@ -375,3 +375,24 @@
 ## 2026-10-16 통합 완료 전 오류 전수 점검
 
 E001–E049/M001–M042를 검토했다. E024의 경계 입력은 실제 Chromium 회귀, E026의 충돌 반례는 render 검사, E028–E041의 fixture·소유권·migration·SQLite·신규 노드 계약은 현재 check로 확인했다. 과거 ‘실행 대기’ 서술은 그 당시 이력이며 현재 판정은 통합 보고서를 따른다. E025/E027의 이전 환경은 변경하지 않았고 현재 별도 검증 환경에서 설치·실행에 성공했다. E018 DOM adapter 제한, E004/E005의 다른 환경/브라우저 범위, W001 경고 및 OS 실제 IME 미검증은 유지한다. 기능 확장/복구 UX/폰트/접근성 미구현을 오류 해결로 대신 표시하지 않는다.
+
+## E050 — 공식 code-highlight import가 명시적 null을 생략해 strict 왕복 실패
+
+- 발견: R02 추가 경계 점검. 유효 문서의 highlightType:null을 공식 Lexical에 넣으면 setter가 undefined로 바꿔 export에서 필드가 사라지고 LEXICAL_IMPORT_LOSSY가 반환됐다.
+- 원인: null은 저장된 값이며 undefined optional 속성과 달리 JSON에서도 유지되어야 한다. non-null token만 있는 golden은 이 차이를 검출하지 못했다.
+- 처리: 공식 편집 동작을 재사용하는 TufteCodeHighlightNode가 null을 보존하도록 setter/import를 구현하고 registry에 단일 클래스로 등록한다. null token을 전체 golden/실제 브라우저 재열기 검사에 추가한다.
+- 상태: verified (null 포함 golden 및 React 재열기, 전체178개/브라우저7개 통과). M043: 타입 목록뿐 아니라 nullable 값·기본값·부재의 의미 차이를 실제 런타임 왕복으로 검사한다.
+
+## E051 — public code package가 직렬화 타입을 재노출하지 않음
+
+- 발생: R02 nullable token adapter 첫 build, @lexical/code에서 SerializedCodeHighlightNode를 import해 TS2724.
+- 원인: 설치 소스에 존재하는 타입을 facade package가 public export한다고 가정했다.
+- 처리: 공개 Lexical SerializedTextNode와 스키마의 명시적 highlightType 계약으로 타입을 정의한다. 추가 내부 경로나 node_modules 패치는 쓰지 않는다.
+- 상태: verified (타입/빌드 및 전체 회귀 통과). M044: runtime 클래스 export와 type re-export를 구분하고 실제 소비자 typecheck/build로 확인한다. 선행 build 실패로 후속 테스트는 실행하지 않았다.
+
+## E052 — 같은 wire type을 가진 클래스에 공식 replacement 적용 실패
+
+- 발생: R02 nullable token 수정 후 generator에서 Type code-highlight ... does not match registered node CodeHighlightNode.
+- 원인: 공식 replacement descriptor가 동일 type의 registry entry를 원본 클래스로 덮어쓴다. 서로 다른 type을 쓰는 replacement 예제를 동일 wire type에 적용한 것이 잘못이었다.
+- 처리: registry에는 null 보존 클래스 하나만 등록하고 $createTufteCodeHighlightNode를 명시적 factory로 제공한다. 공식 CodeHighlightNode/factory와 같은 registry에서 혼용하지 않는다. native syntax highlighting plugin 연동은 지원했다고 주장하지 않는다.
+- 상태: verified (단일 클래스 registry로 전체 회귀 통과). M045: wire type별 등록 클래스는 하나로 유지하며 공식 plugin과의 호환성을 별도 검증한다.

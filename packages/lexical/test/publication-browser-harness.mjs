@@ -6,21 +6,19 @@ import {ListNode,ListItemNode} from '@lexical/list';
 import {HorizontalRuleNode} from '@lexical/react/LexicalHorizontalRuleNode';
 import {$generateHtmlFromNodes} from '@lexical/html';
 import {
- SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,
+ TUFTE_NODES,loadDocumentIntoEditor,SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,
  DefinitionListNode,DefinitionTermNode,DefinitionDescriptionNode,EpigraphNode,AttributionNode,CiteNode,SectionFooterNode,
  FullwidthNode,TufteCodeNode,ImageQuiltNode,EmbedNode,
  $createSectionNode,$createDefinitionListNode,$createDefinitionTermNode,$createDefinitionDescriptionNode,
  $createEpigraphNode,$createAttributionNode,$createCiteNode,$createSectionFooterNode,$createFullwidthNode,
  $createTufteCodeNode,$createImageQuiltNode,$createFigureNode,$createEmbedNode,exportEditorToDocument,
 } from '../src/index.js';
-export function mountPublicationHarness(){
+export function mountPublicationHarness(input){
  const host=document.createElement('div');host.contentEditable='true';host.setAttribute('aria-label','신규 노드 검증 편집기');document.body.replaceChildren(host);
- const editor=createEditor({namespace:'publication-regression',nodes:[
-  SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,HeadingNode,QuoteNode,LinkNode,ListNode,ListItemNode,HorizontalRuleNode,
-  DefinitionListNode,DefinitionTermNode,DefinitionDescriptionNode,EpigraphNode,AttributionNode,CiteNode,SectionFooterNode,FullwidthNode,TufteCodeNode,ImageQuiltNode,EmbedNode,
- ],onError(error){throw error;}});
+ const editor=createEditor({namespace:'publication-regression',nodes:TUFTE_NODES,onError(error){throw error;}});
  editor.setRootElement(host);const unregister=registerRichText(editor);
- editor.update(()=>{
+ if(input){const loaded=loadDocumentIntoEditor(editor,input);if(!loaded.ok)throw Error(JSON.stringify(loaded.diagnostics));}
+ else editor.update(()=>{
   $getRoot().append($createSectionNode().append(
    $createHeadingNode('h2').append($createTextNode('검증 제목')),
    $createDefinitionListNode().append($createDefinitionTermNode().append($createTextNode('검증 용어')),$createDefinitionDescriptionNode().append($createParagraphNode().append($createTextNode('검증 정의')))),
@@ -33,7 +31,7 @@ export function mountPublicationHarness(){
    $createEmbedNode('vimeo','https://player.vimeo.com/video/1234','검증 4:3','div','fullwidth',4/3),
   ));
  },{discrete:true});
- const base={schemaVersion:1,id:'publication-check',locale:'ko-KR',title:'신규 노드 검증',assets:[],lexicalState:editor.getEditorState().toJSON()};
+ const base=input??{schemaVersion:1,id:'publication-check',locale:'ko-KR',title:'신규 노드 검증',assets:[],lexicalState:editor.getEditorState().toJSON()};
  return {
   snapshot(){const result=exportEditorToDocument(editor,base);if(!result.ok)throw Error(JSON.stringify(result.diagnostics));return {document:JSON.parse(JSON.stringify(result.value)),html:editor.read(()=>$generateHtmlFromNodes(editor))};},
   dispose(){unregister();editor.setRootElement(null);host.remove();},

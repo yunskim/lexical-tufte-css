@@ -4,16 +4,16 @@
 
 ## 확인한 범위
 
-- document schema는 33개 타입이다. strict 왕복 테스트의 실제 등록 클래스와 Lexical 기본 노드에서 coverage를 파생하며 32개 타입을 등록한다(code-highlight 제외).
+- document schema는 33개 타입이다. strict 왕복 테스트의 공통 TUFTE_NODES와 Lexical 기본 노드에서 coverage를 파생하며 33개 타입 모두를 등록한다.
 - 추가된 정의목록·epigraph/출처/cite·section footer·fullwidth·code·ImageQuilt·embed의 실물 JSON 왕복/입력 거부는 lexical 67개 검사에 포함된다.
 - 새 publication 브라우저 harness는 정의목록/출처를 실제로 편집하고 코드 공백·방향/정렬·이미지 로딩·embed 비율/CSP를 5개 폭에서 검사한다.
-- 생성된 Lexical 0.52.0 golden은 paragraph/ordered list의 고정 출력이다. 모든 노드별 golden이나 과거/미래 npm 버전 호환성 증거는 아니다.
+- paragraph/list golden에 더해 실제 고정 런타임의 전체33종 document golden을 생성했다. nullable code token과 대표 속성·layout을 포함하고, 타입별 unknown field/future version 거부 및 상태 불변성을 검사한다. [R02 보고서](ROUNDTRIP_R02.ko.md) 참조. 과거/미래 npm 버전 호환성 증거는 아니다.
 
 ## 구현과 제품 지원의 차이
 
-기본 examples/editor UI는 기존 노트·그림·표 registry 중심이다. 새 Node 클래스의 export/단위 테스트 통과만으로 실제 UI에 모든 삽입·속성·키보드·복구 경로가 생기는 것은 아니다. P2.2/P2.3과 F표의 완료 체크는 유지하지 않는다.
+기본 examples/editor UI도 공통33종 registry를 사용해 전체 문서를 로드·저장할 수 있다. 새 Node 클래스의 export/단위 테스트 통과만으로 실제 UI에 모든 삽입·속성·키보드·복구 경로가 생기는 것은 아니다. P2.2/P2.3과 F표의 완료 체크는 유지하지 않는다.
 
-남은 우선순위: R02 전체 golden/registry, R03.d UI 문서 교체 history, R05 무효 구조 복구, 이후 P2.2 노드별 commands와 UI 연결. code-highlight·언어 메타데이터 등 발행 미지원 경로는 명시적으로 차단한다. 폰트는 P4, 접근성/다른 브라우저/OS IME는 P6에 남는다.
+남은 우선순위: R03.d UI 문서 교체 history, R05 무효 구조 복구, 이후 P2.2 노드별 commands와 UI 연결. code-highlight/언어 메타데이터 등 발행 미지원 경로는 명시적으로 차단한다. 폰트는 P4, 접근성/다른 브라우저/OS IME는 P6에 남는다.
 
 ## 노드별 수락 기준
 

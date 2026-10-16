@@ -777,3 +777,12 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - frozen install/typecheck/build/inventory72/diff check PASS. CI 실행/추가 없음. editor 번들516.28kB(gzip161.82kB) W001 유지.
 - 상세 [검증 보고서](VERIFICATION_2026-10-16.ko.md), [R14](LOCAL_VERIFICATION_R14.ko.md), [노드 범위](P2_NODE_COVERAGE.ko.md). 과거 ‘미실행’ 기록은 이력을 보존하고 현재 보고서로 갱신한다.
 - R01/R04/R06–R09/R12/R14 및 R03.a/b/c는 현행 지원 계약의 검증 범위에서 체크했다. R02/R03.d/R05/R10/R11/R13, P2.2–P7 및 전체 F표는 미완료. 웹폰트/OS IME/타 브라우저/접근성/provider 재생/블로그 운영을 검증했다고 주장하지 않는다.
+
+## 2026-10-16 — R02 전체 노드 왕복 완료
+
+- 기준 main457ed661f7e0ddc19c611e466c1a7b3f3b4e0f6d. TUFTE_NODES/CLASSES/TYPES/TESTED_LEXICAL_VERSION을 공개하고 예제 React 및 unit/browser 하네스를 같은33종 registry로 통일했다.
+- 실제0.52.0에서 전체 document golden을 생성했다. node type 전수·대표 enum/nullable/asset/table variant·두 차례 실물 왕복·v2 migration 및 타입별 unknown field/future version 원자적 거부를 검사한다. normal 테스트는 golden을 쓰지 않는다.
+- 추가 경계 점검에서 code-highlight null 소실(E050)을 발견해 전용 클래스/factory로 보존했다. facade 타입 미노출(E051)과 같은 type replacement 충돌(E052)도 수정·검증했다. M043–M045 적용.
+- pnpm check178/178(document47/lexical104/render27), skip/fail/todo0. browser7개 전체 PASS; 실제 예제에서33종 문서 열기→term 입력→저장→재열기 및 null token/note ID/구조 보존. frozen install/diff check PASS. CI 없음.
+- R02 체크 완료. 코드 syntax metadata 발행·공식 highlighter plugin 연동, 신규 삽입 명령/속성 UI, 복구 UX, 폰트/접근성은 별개 후속이다. editor JS557.00kB(gzip171.59kB) W001 유지.
+- 증거: [R02 보고서](ROUNDTRIP_R02.ko.md), src/nodes.ts, CodeHighlightNode.ts, all-nodes.test.mjs, 전체 golden, tests/all-nodes-browser.mjs. 다음 R03.d 실제 문서 교체 history integration.

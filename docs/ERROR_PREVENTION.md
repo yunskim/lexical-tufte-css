@@ -214,3 +214,27 @@ E024/M023의 beforeinput 이벤트 취소 시점은 discrete update 사용만으
 - 결과: frozen install, check140개(skip0), 브라우저6개, diff check PASS. 실제 SQLite 오류 주입과 사용자 입력 경로를 포함한다. 과거 환경 차단을 제품 성공으로 해석하지 않았다.
 - M036–M042의 적용 범위와 E042–E049의 해결 증거는 VERIFICATION_2026-10-16.ko.md를 따른다. M004/M017/M014의 환경·adapter·번들 후속은 유지한다.
 - 다음 점검: 다음 체크리스트 작업 시작/완료, 새 Lexical/CSS/renderer 변경, 오류 재발 및 P단계 전환. CI는 사용하지 않는다.
+
+## 2026-10-16 R02 시작 점검
+
+E001–E049/M001–M042를 확인했다. 새 worktree에서 시작하며 golden은 실제 고정 런타임 생성·명시적 업데이트만 허용한다. 저장 JSON/메모리 객체 차이(E044), schema 자산 참조(M026), 실제 registry 파생(M040), 미지원 출력과 편집 등록의 차이를 이번 검증에 적용한다. CI 없음. 다음 점검은 R02 완료 전.
+
+## M043 — null과 optional 부재의 저장 의미 분리
+
+- 관련 오류: E050. JSON에서 생략되는 undefined 비교를 보정하는 M015를 실제 null 삭제에 확대 적용하지 않는다. 저장된 null은 값으로 보존한다.
+- 전체 노드 fixture에는 nullable·비기본 enum·복수 layout/kind·자산 참조를 넣는다. 공식 노드가 값을 정규화하면 무손실 bridge를 완화하지 않고 계약에 맞는 명시적 node adapter와 회귀를 적용한다.
+- 적용: TufteCodeHighlightNode, 전체 노드 golden, 노드별 실패 원자성 및 React 저장/재열기 검사.
+
+## M044 — facade package의 실제 타입 export 확인
+
+- 관련 오류: E051/M027. 원본 소스의 타입 이름이 facade package에서도 공개된다고 가정하지 않는다. 공개 기본 타입과 명시적 스키마로 계약을 구성하고 typecheck/build 이후에만 후속 검증을 실행한다.
+- 실패 명령 뒤 과거 로그를 현재 검증 결과로 보고하지 않는다. 실행 결과/로그의 명령 단위를 구분한다.
+
+## M045 — 동일 wire type의 클래스 등록 충돌 방지
+
+- 관련 오류: E052. class replacement가 기존 type entry를 덮어쓰는 고정 버전 동작을 확인한다. 같은 type을 여러 클래스와 factory로 혼용하지 않는다.
+- 공통 TUFTE_NODES와 전용 token factory를 사용한다. 공식 highlighter plugin 연동은 별도 미검증 경계로 기록하고 현재 데이터 왕복 지원과 혼동하지 않는다.
+
+## 2026-10-16 R02 완료 점검
+
+E050–E052와 M043–M045를 코드·골든·검증에 적용했다. 과거 E044의 undefined 비교 대책을 null 삭제에 잘못 확대하지 않았고, validator/strict bridge를 완화하지 않았다. 전체178개(skip0), 브라우저7개, frozen/diff check 통과. 기존 M004/M017/W001의 브라우저·DOM adapter·번들 제한은 유지한다. 다음 R03.d 시작·완료 및 노드/버전 변경 시 다시 점검한다.

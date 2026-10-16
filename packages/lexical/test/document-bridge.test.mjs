@@ -6,7 +6,7 @@ import {dirname,join,parse} from 'node:path';
 import {createRequire} from 'node:module';
 import {createHeadlessEditor} from '@lexical/headless';
 import {$getRoot,$createParagraphNode,$createTextNode,CLEAR_HISTORY_COMMAND,COMMAND_PRIORITY_CRITICAL} from 'lexical';
-import {SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,$createTableLayoutNode,$createFigureNode,$createCaptionNode,$createInlineImageNode,$createSectionNode,$createNoteNode,$createTufteSpanNode,loadDocumentIntoEditor,loadMigratedDocumentIntoEditor,exportEditorToDocument,exportEditorToDocumentV2,DefinitionListNode,DefinitionTermNode,DefinitionDescriptionNode,$createDefinitionListNode,$createDefinitionTermNode,$createDefinitionDescriptionNode,EpigraphNode,AttributionNode,CiteNode,$createEpigraphNode,$createAttributionNode,$createCiteNode,SectionFooterNode,$createSectionFooterNode,FullwidthNode,$createFullwidthNode,TufteCodeNode,$createTufteCodeNode,ImageQuiltNode,$createImageQuiltNode,EmbedNode,$createEmbedNode} from '../dist/index.js';
+import {TUFTE_NODES,TUFTE_NODE_TYPES,SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,$createTableLayoutNode,$createFigureNode,$createCaptionNode,$createInlineImageNode,$createSectionNode,$createNoteNode,$createTufteSpanNode,loadDocumentIntoEditor,loadMigratedDocumentIntoEditor,exportEditorToDocument,exportEditorToDocumentV2,DefinitionListNode,DefinitionTermNode,DefinitionDescriptionNode,$createDefinitionListNode,$createDefinitionTermNode,$createDefinitionDescriptionNode,EpigraphNode,AttributionNode,CiteNode,$createEpigraphNode,$createAttributionNode,$createCiteNode,SectionFooterNode,$createSectionFooterNode,FullwidthNode,$createFullwidthNode,TufteCodeNode,$createTufteCodeNode,ImageQuiltNode,$createImageQuiltNode,EmbedNode,$createEmbedNode} from '../dist/index.js';
 import {LinkNode} from '@lexical/link';
 import {HeadingNode,QuoteNode,$createHeadingNode,$createQuoteNode} from '@lexical/rich-text';
 import {HorizontalRuleNode,$createHorizontalRuleNode} from '@lexical/react/LexicalHorizontalRuleNode';
@@ -15,7 +15,7 @@ import {NODE_SCHEMA,validateDocument} from '@lexical-tufte/document';
 import {ListNode,ListItemNode,$createListNode,$createListItemNode} from '@lexical/list';
 import {TableNode,TableRowNode,TableCellNode,$createTableNode,$createTableRowNode,$createTableCellNode} from '@lexical/table';
 const fixture=()=>JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document.json',import.meta.url),'utf8'));
-const editorNodes=[SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,TableNode,TableRowNode,TableCellNode,ListNode,ListItemNode,LinkNode,HeadingNode,QuoteNode,HorizontalRuleNode,DefinitionListNode,DefinitionTermNode,DefinitionDescriptionNode,EpigraphNode,AttributionNode,CiteNode,SectionFooterNode,FullwidthNode,TufteCodeNode,ImageQuiltNode,EmbedNode];
+const editorNodes=TUFTE_NODES;
 const editor=()=>createHeadlessEditor({namespace:'document-bridge-test',nodes:editorNodes,onError(e){throw e;}});
 test('R02 strict Lexical bridge fails closed when a registered node is missing',()=>{
  const source=editor();
@@ -164,9 +164,9 @@ test('R02 scroll table preserves cell headers and layout in Lexical roundtrip',(
 });
 
 test('R03 editor node registry and document schema coverage are explicit',()=>{
- const registered=['root','paragraph','text','linebreak','tab',...editorNodes.map(Node=>Node.getType())];
+ const registered=TUFTE_NODE_TYPES;
  const unsupported=Object.keys(NODE_SCHEMA).filter(type=>!registered.includes(type));
- assert.deepEqual(unsupported,['code-highlight']);
+ assert.deepEqual(unsupported,[]);
  assert.equal(new Set(registered).size,registered.length);
  for(const type of registered)assert.ok(Object.hasOwn(NODE_SCHEMA,type),type);
 });

@@ -7,9 +7,8 @@ import {ContentEditable} from '@lexical/react/LexicalContentEditable';
 import {HistoryPlugin} from '@lexical/react/LexicalHistoryPlugin';
 import {LexicalErrorBoundary} from '@lexical/react/LexicalErrorBoundary';
 import {TablePlugin} from '@lexical/react/LexicalTablePlugin';
-import {TableNode,TableRowNode,TableCellNode} from '@lexical/table';
 import {$loadLayoutFixture} from './layoutFixture.js';
-import {LinkNode, $createLinkNode} from '@lexical/link';
+import {$createLinkNode} from '@lexical/link';
 import {$generateHtmlFromNodes} from '@lexical/html';
 import {
   $getRoot, $getSelection, $isRangeSelection, $isElementNode, $isTextNode,
@@ -18,7 +17,7 @@ import {
   SELECTION_INSERT_CLIPBOARD_NODES_COMMAND, CUT_COMMAND, PASTE_COMMAND, KEY_BACKSPACE_COMMAND, KEY_DELETE_COMMAND, HISTORY_PUSH_TAG, UNDO_COMMAND, REDO_COMMAND,
   COMMAND_PRIORITY_HIGH, type LexicalNode,
 } from 'lexical';
-import {NoteNode, InlineImageNode, $createNoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, registerNoteEdgeTypingGuard, type NoteKind, SectionNode,FigureNode,CaptionNode,TableLayoutNode} from '@lexical-tufte/lexical';
+import {TUFTE_NODES,NoteNode, $createNoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, registerNoteEdgeTypingGuard, type NoteKind} from '@lexical-tufte/lexical';
 import './style.css';
 
 function containingNote(node: LexicalNode | null): NoteNode | null {
@@ -203,4 +202,4 @@ function EditorUI(){
     <p className="notice">프로토타입: 공개 발행·모바일 여백 배치·OS별 실제 IME와 다른 브라우저 검증은 후속 단계에서 진행합니다. 한글 웹폰트 자산 연결은 P4 대상입니다.</p>
   </>;
 }
-createRoot(document.getElementById('root')!).render(<LexicalComposer initialConfig={{namespace:'tufte-p1',nodes:[NoteNode,InlineImageNode,LinkNode,SectionNode,FigureNode,CaptionNode,TableLayoutNode,TableNode,TableRowNode,TableCellNode],editorState:seed,onError(error){throw error;},theme:{text:{bold:'text-bold',italic:'text-italic',code:'text-code'}}}}><EditorUI/></LexicalComposer>);
+createRoot(document.getElementById('root')!).render(<LexicalComposer initialConfig={{namespace:'tufte-p1',nodes:TUFTE_NODES,editorState:seed,onError(error){throw error;},theme:{text:{bold:'text-bold',italic:'text-italic',code:'text-code'}}}}><EditorUI/></LexicalComposer>);

@@ -280,3 +280,9 @@ test('F17 code block preserves validated direction/alignment classes',()=>{
  const d=fixture();d.lexicalState.root.children[0].children.push({type:'tufte-code',version:1,width:'fullwidth',language:null,direction:'rtl',format:'right',children:[{type:'text',version:1,text:'  code',format:0}]});
  const r=renderArticle(d);assert.equal(r.ok,true,JSON.stringify(r.diagnostics));assert.match(r.html,/<pre dir="rtl" class="fullwidth tufte-align-right"><code>  code<\/code><\/pre>/);
 });
+
+test('R02 complete editor golden does not bypass unsupported publication capabilities',()=>{
+ const doc=JSON.parse(readFileSync(new URL('../../lexical/test/golden/lexical-0.52.0-all-nodes.json',import.meta.url),'utf8'));
+ assert.equal(validateDocument(doc).ok,true);const r=renderArticle(doc);assert.equal(r.ok,false);assert.equal(r.html,null);
+ assert.ok(r.diagnostics.some(d=>d.path.endsWith('highlightType')));assert.ok(r.diagnostics.every(d=>d.code==='UNSUPPORTED_RENDER_PROPERTY'));
+});
