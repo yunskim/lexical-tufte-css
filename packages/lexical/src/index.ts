@@ -29,3 +29,5 @@ export {registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND} from './inlineComman
 export {registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_TUFTE_DEFINITION_PAIR_COMMAND} from './definitionCommands.js';
 
 export {registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,type TufteListKind} from './listCommands.js';
+
+export {registerQuotationCommands,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,type TufteQuotationKind} from './quotationCommands.js';
