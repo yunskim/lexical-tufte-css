@@ -684,3 +684,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - index 공개 API 등록, paragraph/quote를 포함한 fullwidth 구조의 strict document roundtrip 테스트 추가.
 - 실제 빌드·테스트 실행 및 Tufte CSS 반응형 시각 검증은 미완료. F15 및 P2.2/P2.3 완료 체크 보류. CI 없음.
 - 다음 순서: F17 코드 블록 노드 및 공백·탭·언어 정보 보존.
+
+## 2026-10-16 — F17 code block node
+
+- `packages/lexical/src/CodeBlockNode.ts`: `tufte-code`의 width(body/fullwidth), language, JSON import/export와 편집용 pre DOM 추가.
+- 공개 API 및 선행 공백·탭·개행을 포함한 왕복 테스트 추가.
+- `@lexical/code`의 실제 TabNode/LineBreakNode와 구문 강조 노드 호환성 및 pre>code 발행 구조는 별도 검증 필요. 빌드·테스트 실행 미확인, F17 완료 체크 보류. CI 없음.
+- 다음: F19 ImageQuilt 노드와 자산·크기 계약.
