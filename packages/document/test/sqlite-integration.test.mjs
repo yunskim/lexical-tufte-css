@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {DatabaseSync} from 'node:sqlite';
-import {SqlitePostRevisionStoreV2,createPostBackupV2,restorePostBackupV2} from '../dist/index.js';
+import {SqlitePostRevisionStoreV2,createPostBackupV2,restorePostBackupV2,readSqlitePostSnapshotV2} from '../dist/index.js';
 
 const schema=readFileSync(new URL('../sql/001_posts_v2.sql',import.meta.url),'utf8');
 const document=()=>JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document-v2.json',import.meta.url),'utf8'));
@@ -65,5 +65,30 @@ test('real SQLite backup restore uses a new revision and rejects stale replay',a
   const stale=await restorePostBackupV2(store,backup.value,edited,2);
   assert.equal(stale.ok,false);
   assert.equal(db.prepare('SELECT revision FROM posts_v2 WHERE id=?').get(doc.id).revision,3);
+ }finally{db.close();}
+});
+
+test('single-row SQLite snapshot matches stored keys and revision',async()=>{
+ const db=new DatabaseSync(':memory:');
+ try{
+  db.exec(schema);
+  const doc=document();
+  const store=new SqlitePostRevisionStoreV2(adapter(db));
+  assert.equal((await store.insert({document:doc,metadata:metadata()})).ok,true);
+  const readAdapter={prepare(sql){return {bind(...values){return {
+   async first(){return db.prepare(sql).get(...values)??null;}
+  };}};}};
+  const found=await readSqlitePostSnapshotV2(readAdapter,doc.id);
+  assert.equal(found.ok,true,JSON.stringify(found.diagnostics));
+  assert.equal(found.value.metadata.revision,1);
+  const missing=await readSqlitePostSnapshotV2(readAdapter,'not-found');
+  assert.equal(missing.ok,false);
+  assert.ok(missing.diagnostics.some(d=>d.code==='POST_NOT_FOUND'));
+  const changed=await store.compareAndSwap({document:doc,metadata:metadata(2,'latest')},1);
+  assert.equal(changed.ok,true);
+  const latest=await readSqlitePostSnapshotV2(readAdapter,doc.id);
+  assert.equal(latest.ok,true);
+  assert.equal(latest.value.metadata.revision,2);
+  assert.equal(latest.value.metadata.summary,'latest');
  }finally{db.close();}
 });
