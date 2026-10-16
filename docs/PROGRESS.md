@@ -853,3 +853,11 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - `examples/editor/src/main.tsx`: registerInlineCommands/registerDefinitionCommands 등록 및 툴바에서 span kind 전환·정의목록 삽입·항목 추가 호출. 기존 mouseDown selection 보존 규약 적용.
 - 로컬 환경에서 pnpm/저장소 checkout 미확보로 이번 커밋의 빌드·브라우저 테스트 실행은 아직 미검증. CI 없음. P2.2.b 체크 보류.
 - 다음: 테스트 실제 실행, 명령 동작·undo/redo 및 F06 구조 검증, ol/ul 목록 명령 추가.
+
+## 2026-10-16 P2.2.b — 목록 명령 회귀 및 스키마 경계
+
+- 최신 main에서 listCommands.ts 및 React 툴바 연결이 이미 존재함을 확인해 중복 구현을 피함.
+- packages/lexical/test/list-commands.test.mjs 추가: bullet 목록 삽입, 기존 문단 보존, 항목 추가, 잘못된 kind/selection 원자적 거부.
+- listCommands.ts의 삽입 허용 위치 검사를 document NODE_SCHEMA['tufte-section']에서 직접 도출하도록 변경. 중복 허용 목록 제거.
+- 사용자가 테스트는 Work에서 일괄 처리한다고 지시함. 이번 변경의 실행 테스트는 보류하며 P2.2.b 체크하지 않음. CI 없음.
+- 다음: P2.2.c 인용문/출처/epigraph/section footer 편집 명령과 회귀 테스트 구현.
