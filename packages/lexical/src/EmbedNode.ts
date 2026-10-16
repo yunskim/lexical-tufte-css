@@ -4,7 +4,7 @@ export type EmbedProvider='youtube'|'vimeo';
 export type EmbedWrapper='figure'|'div';
 export type SerializedEmbed=SerializedLexicalNode&{type:'tufte-embed';version:1;provider:EmbedProvider;src:string;title:string;wrapper:EmbedWrapper;width:'body'|'fullwidth';aspectRatio:number};
 function validate(provider:unknown,src:unknown,title:unknown,wrapper:unknown,width:unknown,aspectRatio:unknown):void{
- if(!['youtube','vimeo'].includes(provider as string)||!isEmbedURL(src,provider)||typeof title!=='string'||!title.trim()||title.length>500
+ if(!['youtube','vimeo'].includes(provider as string)||!isEmbedURL(src,provider)||typeof title!=='string'||!title.trim()||title.length>1000
  ||!['figure','div'].includes(wrapper as string)||!['body','fullwidth'].includes(width as string)
  ||typeof aspectRatio!=='number'||!Number.isFinite(aspectRatio)||aspectRatio<0.1||aspectRatio>10)throw Error('Invalid embed properties');
 }
