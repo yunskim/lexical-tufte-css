@@ -373,3 +373,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - 이전 canonical serialization 테스트의 `children.length > 1` 조건 때문에 단일 섹션 fixture에서는 배열 순서 보존 단언이 생략되던 문제를 수정했다.
 - 테스트가 서로 다른 두 개의 유효한 section을 명시적으로 구성하고 순서 반전 전후 직렬화 차이를 무조건 검사한다.
 - 실행 검증은 여전히 대기. R03 완료 체크 보류, CI 생략 유지.
+
+## 2026-10-16 — R03 테스트 fixture 오류 수정
+
+- 빈 `tufte-section`을 만드는 잘못된 synthetic fixture(E032)를 발견하여 유효한 자식을 가진 섹션으로 수정했다.
+- 테스트 fixture 유효성 선행 단언을 M029로 기록하고 오류·예방 문서를 갱신했다.
+- 테스트 실행 검증 대기, R03 미완료, CI 없음.
