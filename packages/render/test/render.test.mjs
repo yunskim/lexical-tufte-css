@@ -161,3 +161,27 @@ test('P2.2 ordered list numbering is retained; unordered list has no numeric att
  assert.match(result.html,/<li value="12">/);
  assert.match(result.html,/<ul><li>/);
 });
+
+test('F15 fullwidth renders nested blocks and escapes content without editor DOM',()=>{
+ const d=fixture(),section=d.lexicalState.root.children[0];
+ section.children.push({type:'tufte-fullwidth',version:1,children:[
+  {type:'paragraph',version:1,children:[{type:'text',version:1,text:'Wide <figure> & text',format:0}]},
+  {type:'quote',version:1,children:[{type:'text',version:1,text:'Wide quotation',format:0}]}
+ ]});
+ const before=JSON.stringify(d),result=renderArticle(d);
+ assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+ assert.match(result.html,/<div class="fullwidth"><p>/);
+ assert.match(result.html,/Wide &lt;figure&gt; &amp; text/);
+ assert.match(result.html,/<blockquote>/);
+ assert.equal(JSON.stringify(d),before);
+});
+test('F15 fullwidth rejects nested fullwidth without silently flattening',()=>{
+ const d=fixture(),section=d.lexicalState.root.children[0];
+ section.children.push({type:'tufte-fullwidth',version:1,children:[
+  {type:'tufte-fullwidth',version:1,children:[{type:'paragraph',version:1,children:[]}]}
+ ]});
+ const result=renderArticle(d);
+ assert.equal(result.ok,false);
+ assert.equal(result.html,null);
+ assert.ok(result.diagnostics.some(x=>x.code==='INVALID_CHILD'),JSON.stringify(result.diagnostics));
+});
