@@ -656,3 +656,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - `packages/lexical/test/document-bridge.test.mjs`에 공식 HorizontalRuleNode 등록 및 paragraph → horizontalrule → paragraph 엄격 왕복 테스트 추가.
 - 테스트 실행 및 실제 Lexical 0.52.0 JSON 호환성 확인은 미완료. 실패 시 노드 serialization 차이를 진단하고 문서 계약과 함께 수정할 것.
 - 다음 구현 순서: definition-list/term/definition. P2.2 완료 체크 보류, CI 없음.
+
+## 2026-10-16 — P2.2 F06 정의 목록 노드
+
+- `packages/lexical/src/DefinitionListNodes.ts`: definition-list/term/description 3종 ElementNode와 JSON import/export, dl/dt/dd 편집 DOM 구현.
+- 공개 API에 노드/팩토리 추가. 복수 dd 왕복 및 orphan dd의 문서 validator 거부 테스트 작성.
+- 테스트·typecheck 실행은 미확인. P2.2/F06/R02 완료 체크 보류. CI 없음.
+- 다음 순서: F08/F09 attribution/cite/epigraph 노드 및 구조 왕복 검증.
