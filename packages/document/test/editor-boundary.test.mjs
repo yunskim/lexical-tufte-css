@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {documentToEditorJSON,editorJSONToDocument,canonicalizeDocument,parseCanonicalDocument,inspectStoredDocument,validateDocumentV2,migrateStoredDocument,validatePostRecordV2,preparePostRevisionV2,InMemoryPostRevisionStoreV2} from '../dist/index.js';
+import {documentToEditorJSON,editorJSONToDocument,canonicalizeDocument,parseCanonicalDocument,inspectStoredDocument,validateDocumentV2,migrateStoredDocument,validatePostRecordV2,preparePostRevisionV2,InMemoryPostRevisionStoreV2,SqlitePostRevisionStoreV2} from '../dist/index.js';
 const fixture=()=>JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document.json',import.meta.url),'utf8'));
 test('R02 document editor JSON document preserves validated state without mutation',()=>{
  const original=fixture(),before=JSON.stringify(original);
@@ -299,4 +299,32 @@ test('R03 in-process CAS store allows exactly one concurrent writer',async()=>{
  const retry=await store.compareAndSwap({...b,metadata:{...b.metadata,revision:3}},2);
  assert.equal(retry.ok,true,JSON.stringify(retry.diagnostics));
  assert.equal(store.read().metadata.revision,3);
+});
+
+test('R03 SQLite CAS uses one parameterized conditional update',async()=>{
+ const document=JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document-v2.json',import.meta.url),'utf8'));
+ const metadata={slug:'sqlite-test',summary:'ok',tags:[],authors:['editor'],status:'draft',
+  createdAt:'2026-10-16T00:00:00Z',updatedAt:'2026-10-16T00:00:00Z',revision:2};
+ const record={document,metadata};
+ const calls=[];
+ let changes=1;
+ const db={prepare(sql){
+  const call={sql,values:null};calls.push(call);
+  return {bind(...values){call.values=values;return this;},async run(){return {meta:{changes}};}};
+ }};
+ const store=new SqlitePostRevisionStoreV2(db);
+ const success=await store.compareAndSwap(record,1);
+ assert.equal(success.ok,true,JSON.stringify(success.diagnostics));
+ assert.equal(calls.length,1);
+ assert.match(calls[0].sql,/WHERE id = \? AND slug = \? AND revision = \?/);
+ assert.deepEqual(calls[0].values.slice(2),[document.id,metadata.slug,1]);
+ changes=0;
+ const conflict=await store.compareAndSwap(record,1);
+ assert.equal(conflict.ok,false);
+ assert.ok(conflict.diagnostics.some(d=>d.code==='REVISION_CONFLICT'));
+ const before=calls.length;
+ const invalid=await store.compareAndSwap(record,2);
+ assert.equal(invalid.ok,false);
+ assert.ok(invalid.diagnostics.some(d=>d.code==='INVALID_NEXT_REVISION'));
+ assert.equal(calls.length,before);
 });
