@@ -554,3 +554,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - Node `node:sqlite` 기반 스키마/insert/CAS/constraint 통합 테스트 추가.
 - 환경 SQLite 3.46.1에서 동일 DDL과 revision 조건 UPDATE 1행 성공·재시도 0행 smoke 확인.
 - 저장소의 TS 빌드 및 node 통합 테스트는 미실행. D1 실제 연결/백업·복원 미완. CI 없음.
+
+## 2026-10-16 — v2 backup envelope 및 revision 보호 복원
+
+- `createPostBackupV2`, `inspectPostBackupV2`, `restorePostBackupV2` 구현·export.
+- 복원은 동일 id/slug에 새 revision을 CAS로 기록, stale restore 거부. 단위 테스트 작성.
+- 파일/DB 백업의 내구성 및 실제 실행 검증 미완. R03/P5.1 완료 보류, CI 없음.
