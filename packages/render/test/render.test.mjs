@@ -45,7 +45,7 @@ test('canonical JSON import validates without HTML fallback',async()=>{
 
 test('valid future node/data schemas do not imply renderer support',()=>{
  const d=fixture();d.lexicalState.root.children[0].children.push({type:'tufte-figure',version:1,width:'body',children:[{type:'tufte-imagequilt',version:1,src:'/quilt.png',alt:'Quilt',width:640,height:480}]});
- assert.equal(validateDocument(d).ok,true);const r=renderArticle(d);assert.equal(r.ok,false);assert.equal(r.html,null);assert.ok(r.diagnostics.some(x=>x.code==='UNSUPPORTED_RENDER_NODE'));
+ assert.equal(validateDocument(d).ok,true);const r=renderArticle(d);assert.equal(r.ok,true,JSON.stringify(r.diagnostics));assert.match(r.html,/class="imagequilt" width="640" height="480"/);
  const imageDoc=fixture(),image=note(imageDoc).children[2];image.width=800;assert.equal(validateDocument(imageDoc).ok,true);assert.ok(renderArticle(imageDoc).diagnostics.some(x=>x.code==='UNSUPPORTED_RENDER_PROPERTY'));
 });
 
@@ -240,4 +240,37 @@ test('F18 rejects unsafe provider URL before iframe rendering',()=>{
  assert.equal(result.ok,false);
  assert.equal(result.html,null);
  assert.ok(result.diagnostics.some(x=>x.code==='UNSAFE_EMBED'),JSON.stringify(result.diagnostics));
+});
+
+test('F19 ImageQuilt publishes intrinsic size and escaped alt without mutating assets',()=>{
+ const d=fixture(),section=d.lexicalState.root.children[0];
+ d.assets.push({id:'quilt-asset',src:'/assets/quilt.png',mimeType:'image/png',width:1200,height:720,byteLength:4096});
+ section.children.push({type:'tufte-figure',version:1,width:'fullwidth',children:[
+  {type:'tufte-imagequilt',version:1,src:'/assets/quilt.png',alt:'Quilt "wide" & safe',
+   assetId:'quilt-asset',width:1200,height:720}
+ ]});
+ const before=JSON.stringify(d),result=renderArticle(d);
+ assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+ assert.match(result.html,/<figure class="fullwidth"><img src="\/assets\/quilt.png" alt="Quilt &quot;wide&quot; &amp; safe" class="imagequilt" width="1200" height="720">/);
+ assert.equal(JSON.stringify(d),before);
+ const css=readFileSync(new URL('../styles.css',import.meta.url),'utf8');
+ assert.match(css,/figure img\.imagequilt/);
+});
+test('F19 ImageQuilt rejects asset source and dimension mismatches before publication',()=>{
+ for(const mismatch of [
+  {src:'/assets/other.png'},
+  {width:1199},
+  {height:721},
+  {assetId:'missing-asset'}
+ ]){
+  const d=fixture(),section=d.lexicalState.root.children[0];
+  d.assets.push({id:'quilt-asset',src:'/assets/quilt.png',mimeType:'image/png',width:1200,height:720});
+  section.children.push({type:'tufte-figure',version:1,width:'body',children:[
+   {type:'tufte-imagequilt',version:1,src:'/assets/quilt.png',alt:'Quilt',assetId:'quilt-asset',width:1200,height:720,...mismatch}
+  ]});
+  const result=renderArticle(d);
+  assert.equal(result.ok,false);
+  assert.equal(result.html,null);
+  assert.ok(result.diagnostics.some(x=>['ASSET_MISMATCH','MISSING_ASSET'].includes(x.code)),JSON.stringify(result.diagnostics));
+ }
 });
