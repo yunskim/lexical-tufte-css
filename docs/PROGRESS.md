@@ -958,3 +958,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - figure-commands.test.mjs의 중복 ID fixture가 고정 ID 생성기를 사용하여 두 번째 재발급에서 최대 100회 충돌 후 throw할 수 있던 오류를 수정. 서로 다른 ID 2개를 기대하도록 변경. 실행 검증 대기.
 - E059/M052(빈 NoteNode 중간 상태 방지) 재점검 결과 UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND의 note.clear() 후 append 경로가 같은 위험을 재도입했음을 확인. 새 자식 append→기존 자식 remove 순서로 수정.
 - P2.3 Work 검증에서 주석 수정 후 selection·Undo/Redo 및 자식 구조 확인 필요. 테스트 실행하지 않음, CI 생략, 완료 체크 보류.
+
+## 2026-10-16 P2.3 — figure note 교체 선택 보존
+
+- E059/M052 재발 방지에 따라 figure note 텍스트 교체를 새 자식 추가→새 텍스트 선택→기존 자식 제거 순서로 변경.
+- figure-commands.test.mjs에 교체 직후 RangeSelection이 새 텍스트 끝에 유지되는지 검사하는 회귀 추가.
+- 실행 테스트 및 브라우저 Undo/Redo 검증은 Work 대기, CI 생략, F13 완료 보류.
