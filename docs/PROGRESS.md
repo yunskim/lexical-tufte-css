@@ -379,3 +379,8 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - 빈 `tufte-section`을 만드는 잘못된 synthetic fixture(E032)를 발견하여 유효한 자식을 가진 섹션으로 수정했다.
 - 테스트 fixture 유효성 선행 단언을 M029로 기록하고 오류·예방 문서를 갱신했다.
 - 테스트 실행 검증 대기, R03 미완료, CI 없음.
+
+## 2026-10-16 — R03 테스트 fixture 전역 ID 충돌 예방
+
+- synthetic section 복제 시 noteId가 중복될 수 있는 문제(E033)를 발견하고, 두 번째 section의 자식을 독립 text paragraph로 대체.
+- M030 예방 규약 반영. 실행 검증 미확인, R03 체크 보류, CI 없음.
