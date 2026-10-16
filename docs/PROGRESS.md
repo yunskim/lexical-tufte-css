@@ -577,3 +577,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 
 - `backup-snapshot.mjs` 추가: 기대 revision과 조회 결과가 다르면 기존 파일을 변경하지 않음.
 - 회귀 테스트 추가, 실행 미확인. DB 조회 일관성은 호출자 책임. CI 없음.
+
+## 2026-10-16 — SQLite/D1 단일 조회 스냅샷
+
+- `readSqlitePostSnapshotV2` 추가: 단일 SELECT로 id/slug/revision/payload 조회 및 행-문서 일치 검증.
+- 실제 SQLite 엔진용 조회/CAS 후 최신 스냅샷 회귀 테스트 작성. 실행 미확인.
+- D1 실행 검증과 장애 복구는 미완료. CI 없음.
