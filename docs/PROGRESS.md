@@ -976,3 +976,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - E069–E071에 최근 figure note 테스트 ID factory, 빈 NoteNode 교체, cut→copy provenance 문제를 실제 원인·수정·미검증 상태로 등록.
 - M062–M064에 고유 ID 생성 계약, 새 자식 선택 후 이전 자식 제거, clipboard 상태 전환 규칙을 추가. E059/M052 및 E067/M060 재점검.
 - Work 일괄 실행과 브라우저 검증 전까지 수정 사항을 verified로 승격하지 않음. CI 생략.
+
+## 2026-10-16 P2.3 — 코드 블록 삽입 API 착수
+
+- `packages/lexical/src/codeCommands.ts`: INSERT_TUFTE_CODE_COMMAND 및 registerCodeCommands 추가. payload text/width/language 검사, 최상위 section의 선택 위치 및 IME/노트 중첩 거부, history tag 처리.
+- `packages/lexical/src/index.ts`에 공개 API export 추가.
+- 아직 React 예제 등록·회귀 테스트·빌드/실행 검증 전. Work 일괄 검증 대기, CI 생략, P2.3 체크 미완료.
