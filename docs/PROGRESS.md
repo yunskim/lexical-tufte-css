@@ -1001,3 +1001,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - blog/src/recovery.ts에 원본 JSON 복구 저장/읽기, 2MB 크기 제한, sequence CAS, BEGIN IMMEDIATE, SHA-256 checksum 검증 추가. blog 공개 API에 export.
 - blog/test/recovery.test.mjs에 구조적으로 무효한 JSON의 복구, stale CAS, 변조, 잘못된 JSON/크기 회귀 fixture 추가.
 - 아직 실행 검증 전. 편집기 자동 저장 UI, 복구 선택, 권한/보존 정책, purge 구현은 미완료. CI 생략.
+
+## 2026-10-16 복구 슬롯 CAS 삭제 및 세션 격리
+
+- SqliteEditorRecoveryStore.remove(postId,sessionId,expectedSequence): BEGIN IMMEDIATE에서 현재 순번 비교 후 해당 슬롯만 삭제; stale/missing 요청은 RECOVERY_CONFLICT.
+- recovery.test.mjs에 두 번째 저장 이후 stale 삭제 거부, 정상 삭제, 다른 session 보존 회귀 추가.
+- 테스트·빌드 실행은 Work 일괄 검증 대기. CI 생략. 자동 저장/복구 UI·호스트 권한·보존 정책·purge 구현은 아직 미완료.
