@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {createHeadlessEditor} from '@lexical/headless';
 import {$getRoot,$createParagraphNode,$createTextNode} from 'lexical';
 import {LinkNode,$createLinkNode} from '@lexical/link';
-import {NoteNode,InlineImageNode,$createNoteNode,$createInlineImageNode} from '../dist/index.js';
+import {NoteNode,InlineImageNode,$createNoteNode,$createInlineImageNode,$reidentifyPastedNotes,$prepareNoteComposition} from '../dist/index.js';
 function editor(){return createHeadlessEditor({namespace:'note-test',nodes:[NoteNode,InlineImageNode,LinkNode],onError(error){throw error;}});}
 test('rich inline note survives JSON restore with type, identity and body position',()=>{
  const e=editor();
@@ -70,4 +70,25 @@ test('shared JSON roundtrip harness: supported inline nodes',()=>{
   restored.setEditorState(restored.parseEditorState(JSON.stringify(json)));
   assert.deepEqual(restored.getEditorState().toJSON(),json,name);
  }
+});
+
+test('clipboard note IDs are unique across pasted duplicates and existing document',()=>{
+ const e=editor();
+ e.update(()=>{
+  $getRoot().append($createParagraphNode().append($createNoteNode('existing').append($createTextNode('원본'))));
+  const a=$createNoteNode('existing').append($createTextNode('복사1'));
+  const b=$createNoteNode('existing').append($createTextNode('복사2'));
+  const values=['new-1','new-1','new-2'];
+  const changed=$reidentifyPastedNotes([a,b],new Set(),()=>values.shift()??'fallback');
+  assert.equal(a.getNoteId(),'new-1');
+  assert.equal(b.getNoteId(),'new-2');
+  assert.deepEqual(changed.get('existing'),['new-1','new-2']);
+ },{discrete:true});
+});
+test('IME preparation is a no-op without a collapsed note selection',()=>{
+ const e=editor();
+ e.update(()=>{
+  $getRoot().append($createParagraphNode().append($createTextNode('본문')));
+  assert.equal($prepareNoteComposition(),false);
+ },{discrete:true});
 });
