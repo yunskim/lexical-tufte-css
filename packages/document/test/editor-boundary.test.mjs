@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {documentToEditorJSON,editorJSONToDocument,canonicalizeDocument,parseCanonicalDocument,inspectStoredDocument,validateDocumentV2,migrateStoredDocument} from '../dist/index.js';
+import {documentToEditorJSON,editorJSONToDocument,canonicalizeDocument,parseCanonicalDocument,inspectStoredDocument,validateDocumentV2,migrateStoredDocument,validatePostRecordV2} from '../dist/index.js';
 const fixture=()=>JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document.json',import.meta.url),'utf8'));
 test('R02 document editor JSON document preserves validated state without mutation',()=>{
  const original=fixture(),before=JSON.stringify(original);
@@ -228,4 +228,24 @@ test('R03 version failures preserve stable diagnostic paths',()=>{
   assert.equal(result.ok,false);
   assert.ok(result.diagnostics.some(d=>d.code===code&&d.path===path),JSON.stringify(result.diagnostics));
  }
+});
+
+test('R03 v2 post persistence boundary validates document and metadata together',()=>{
+ const document=JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document-v2.json',import.meta.url),'utf8'));
+ const metadata={
+  slug:'migration-golden',summary:'v2 document',tags:[],authors:['editor'],status:'draft',
+  createdAt:'2026-10-16T00:00:00Z',updatedAt:'2026-10-16T00:00:00Z',revision:1,
+ };
+ const record={document,metadata};
+ const accepted=validatePostRecordV2(record);
+ assert.equal(accepted.ok,true,JSON.stringify(accepted.diagnostics));
+ assert.deepEqual(accepted.value,record);
+ assert.notStrictEqual(accepted.value.metadata,metadata);
+ const bad=validatePostRecordV2({
+  document:{...document,editorFormat:{engine:'lexical',formatVersion:2}},
+  metadata:{...metadata,revision:0},
+ });
+ assert.equal(bad.ok,false);
+ assert.ok(bad.diagnostics.some(d=>d.path==='$.document.editorFormat'&&d.code==='UNSUPPORTED_EDITOR_FORMAT'));
+ assert.ok(bad.diagnostics.some(d=>d.path==='$.metadata.revision'&&d.code==='INVALID_REVISION'));
 });
