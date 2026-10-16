@@ -39,6 +39,17 @@ try {
   const ids=await page.locator('[data-note-id]').evaluateAll(es=>es.map(e=>e.dataset.noteId));assert.equal(new Set(ids).size,2);
   assert.equal(await page.locator('[data-note-id] a').count(),2);assert.equal(await page.locator('[data-note-id] img').count(),2);
  });
+ await scenario('note edge typing inserts exactly once and remains inside note',async page=>{
+  await enter(page);
+  const before=await page.locator('[data-note-id]').innerText();
+  await page.keyboard.type('Z');
+  const after=await page.locator('[data-note-id]').innerText();
+  assert.equal(after,'Z'+before);
+  const json=await state(page);
+  const note=json.root.children[0].children.find(n=>n.type==='tufte-note');
+  assert.ok(note,'note remains in paragraph');
+  assert.equal(note.children.map(n=>n.text??'').join('').startsWith('Z'),true);
+ });
  await scenario('whole note delete/undo/redo preserves atomic payload',async page=>{
   const before=await state(page);await selectNote(page);await page.keyboard.press('Backspace');
   assert.equal(await page.locator('[data-note-id]').count(),0);
