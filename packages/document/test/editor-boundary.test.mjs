@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {documentToEditorJSON,editorJSONToDocument,canonicalizeDocument,parseCanonicalDocument,inspectStoredDocument,validateDocumentV2,migrateStoredDocument,validatePostRecordV2} from '../dist/index.js';
+import {documentToEditorJSON,editorJSONToDocument,canonicalizeDocument,parseCanonicalDocument,inspectStoredDocument,validateDocumentV2,migrateStoredDocument,validatePostRecordV2,preparePostRevisionV2} from '../dist/index.js';
 const fixture=()=>JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document.json',import.meta.url),'utf8'));
 test('R02 document editor JSON document preserves validated state without mutation',()=>{
  const original=fixture(),before=JSON.stringify(original);
@@ -248,4 +248,30 @@ test('R03 v2 post persistence boundary validates document and metadata together'
  assert.equal(bad.ok,false);
  assert.ok(bad.diagnostics.some(d=>d.path==='$.document.editorFormat'&&d.code==='UNSUPPORTED_EDITOR_FORMAT'));
  assert.ok(bad.diagnostics.some(d=>d.path==='$.metadata.revision'&&d.code==='INVALID_REVISION'));
+});
+
+test('R03 v2 revision preflight rejects stale writers and revision gaps',()=>{
+ const document=JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document-v2.json',import.meta.url),'utf8'));
+ const metadata={
+  slug:'revision-test',summary:'test',tags:[],authors:['editor'],status:'draft',
+  createdAt:'2026-10-16T00:00:00Z',updatedAt:'2026-10-16T00:00:00Z',revision:3,
+ };
+ const current={document,metadata};
+ const next={document:structuredClone(document),metadata:{...metadata,revision:4}};
+ const ok=preparePostRevisionV2(current,next,3);
+ assert.equal(ok.ok,true,JSON.stringify(ok.diagnostics));
+ assert.equal(ok.value.expectedRevision,3);
+ assert.equal(ok.value.record.metadata.revision,4);
+ assert.notStrictEqual(ok.value.record,next);
+ const stale=preparePostRevisionV2(current,next,2);
+ assert.equal(stale.ok,false);
+ assert.ok(stale.diagnostics.some(d=>d.code==='REVISION_CONFLICT'));
+ const gap=preparePostRevisionV2(current,{...next,metadata:{...metadata,revision:5}},3);
+ assert.equal(gap.ok,false);
+ assert.ok(gap.diagnostics.some(d=>d.code==='INVALID_NEXT_REVISION'));
+ const renamed=preparePostRevisionV2(current,{...next,metadata:{...next.metadata,slug:'renamed'}},3);
+ assert.equal(renamed.ok,false);
+ assert.ok(renamed.diagnostics.some(d=>d.code==='POST_SLUG_MISMATCH'));
+ assert.equal(current.metadata.revision,3);
+ assert.equal(next.metadata.revision,4);
 });
