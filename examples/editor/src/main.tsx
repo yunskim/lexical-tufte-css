@@ -11,7 +11,7 @@ import {$loadLayoutFixture} from './layoutFixture.js';
 import {$createLinkNode} from '@lexical/link';
 import {$generateHtmlFromNodes} from '@lexical/html';
 import {
-  $getRoot, $getSelection, $isRangeSelection, $isElementNode, $isTextNode,
+  $getRoot, $getSelection, $isRangeSelection, $isNodeSelection, $isElementNode, $isTextNode,
   $createParagraphNode, $createTextNode, $createLineBreakNode, $isParagraphNode,
   FORMAT_TEXT_COMMAND, KEY_ESCAPE_COMMAND, KEY_ARROW_DOWN_COMMAND, KEY_ENTER_COMMAND,
   SELECTION_INSERT_CLIPBOARD_NODES_COMMAND, CUT_COMMAND, PASTE_COMMAND, KEY_BACKSPACE_COMMAND, KEY_DELETE_COMMAND, HISTORY_PUSH_TAG, UNDO_COMMAND, REDO_COMMAND,
@@ -89,8 +89,16 @@ function EditorUI(){
     const cutIds=new Set<string>();
     const cutting=editor.registerCommand(CUT_COMMAND,()=>{
       cutIds.clear();const s=$getSelection();
-      if($isRangeSelection(s))for(const node of s.getNodes()){
-        const note=containingNote(node);if(note)cutIds.add(note.getNoteId());
+      if($isRangeSelection(s)||$isNodeSelection(s)){
+        const visitCut=(node:LexicalNode):void=>{
+          if(node instanceof NoteNode)cutIds.add(node.getNoteId());
+          if($isElementNode(node))for(const child of node.getChildren())visitCut(child);
+        };
+        for(const node of s.getNodes()){
+          const parentNote=containingNote(node);
+          if(parentNote)cutIds.add(parentNote.getNoteId());
+          visitCut(node);
+        }
       }
       return false;
     },COMMAND_PRIORITY_HIGH);
