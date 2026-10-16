@@ -595,3 +595,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - `scripts/sqlite-restore.mjs` 추가: 파일 백업 검증, 단일 SELECT 현재 게시물 조회, CAS revision 증가 복원.
 - SQLite 통합 테스트 작성: 정상 복원, stale revision 거부, 손상 JSON 시 기존 데이터 보존.
 - 실제 테스트 실행 미확인. 복원 파일 읽기 시 최대 크기 제한은 기본 16 MiB. D1 실환경/장애 주입 미검증, CI 없음.
+
+## 2026-10-16 — 복원 충돌 및 쓰기 실패 주입 테스트
+
+- SQLite 통합 테스트에 읽기 이후 CAS 이전의 경쟁 갱신을 주입하여 승자 데이터 보존을 단언.
+- 저장소 UPDATE 실패를 주입하여 기존 revision과 payload 불변을 단언.
+- 실제 Node 테스트 실행 미확인. 프로세스 강제 종료, 디스크 부족, D1 네트워크 실패 주입은 미완. CI 없음.
