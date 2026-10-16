@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {DatabaseSync} from 'node:sqlite';
-import {SqlitePostRevisionStoreV2} from '../dist/index.js';
+import {SqlitePostRevisionStoreV2,createPostBackupV2,restorePostBackupV2} from '../dist/index.js';
 
 const schema=readFileSync(new URL('../sql/001_posts_v2.sql',import.meta.url),'utf8');
 const document=()=>JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document-v2.json',import.meta.url),'utf8'));
@@ -42,5 +42,28 @@ test('real SQLite schema, initial insert, competing CAS and JSON constraints',as
   assert.equal(JSON.parse(row.payload).metadata.summary,'writer-a');
   assert.throws(()=>db.prepare('UPDATE posts_v2 SET revision=3 WHERE id=?').run(doc.id));
   assert.equal(db.prepare('SELECT revision FROM posts_v2 WHERE id=?').get(doc.id).revision,2);
+ }finally{db.close();}
+});
+
+test('real SQLite backup restore uses a new revision and rejects stale replay',async()=>{
+ const db=new DatabaseSync(':memory:');
+ try{
+  db.exec(schema);
+  const store=new SqlitePostRevisionStoreV2(adapter(db));
+  const doc=document();
+  const initial={document:doc,metadata:metadata()};
+  assert.equal((await store.insert(initial)).ok,true);
+  const backup=createPostBackupV2(initial);
+  assert.equal(backup.ok,true);
+  const edited={document:doc,metadata:metadata(2,'changed')};
+  assert.equal((await store.compareAndSwap(edited,1)).ok,true);
+  const restored=await restorePostBackupV2(store,backup.value,edited,2);
+  assert.equal(restored.ok,true,JSON.stringify(restored.diagnostics));
+  const row=db.prepare('SELECT revision,payload FROM posts_v2 WHERE id=?').get(doc.id);
+  assert.equal(row.revision,3);
+  assert.equal(JSON.parse(row.payload).metadata.summary,'original');
+  const stale=await restorePostBackupV2(store,backup.value,edited,2);
+  assert.equal(stale.ok,false);
+  assert.equal(db.prepare('SELECT revision FROM posts_v2 WHERE id=?').get(doc.id).revision,3);
  }finally{db.close();}
 });
