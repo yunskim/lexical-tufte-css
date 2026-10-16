@@ -25,3 +25,19 @@ test('R02 malformed editor JSON fails with diagnostics',()=>{
  assert.equal(result.ok,false);
  assert.ok(result.diagnostics.some(x=>x.code==='UNKNOWN_NODE'));
 });
+
+test('R11 exported document owns a snapshot independent of editor state and base',()=>{
+ const base=fixture();
+ const imported=documentToEditorJSON(base);
+ assert.equal(imported.ok,true,JSON.stringify(imported.diagnostics));
+ const exported=editorJSONToDocument(base,imported.state);
+ assert.equal(exported.ok,true,JSON.stringify(exported.diagnostics));
+ assert.notStrictEqual(exported.document,base);
+ assert.notStrictEqual(exported.document.lexicalState,imported.state);
+ assert.notStrictEqual(exported.document.assets,base.assets);
+ const before=JSON.stringify(exported.document);
+ base.title='modified base';
+ base.assets.length=0;
+ imported.state.root.children.length=0;
+ assert.equal(JSON.stringify(exported.document),before);
+});
