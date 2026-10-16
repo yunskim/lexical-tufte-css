@@ -275,3 +275,8 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - packages/lexical/test/document-bridge.test.mjs: headless Lexical에서 section/paragraph/text/tufte-span/tufte-note를 생성하고 문서 envelope에 넣은 뒤, 실제 parseEditorState → setEditorState → toJSON → validateDocument 경유 동등성을 검사하는 성공 경로 테스트 작성.
 - 테스트는 작성되었지만 의존성 설치/실행은 현재 환경의 E025/E027로 검증하지 못함. 성공을 주장하거나 R02를 완료 처리하지 않음.
 - 서버 fixture 전체(그림·표 등) 및 Lexical 0.52.0 골든 파일 확장은 후속 작업.
+
+## 2026-10-16 — R02 그림·캡션 왕복 테스트 확장
+
+- packages/lexical/test/document-bridge.test.mjs: FigureNode/CaptionNode를 테스트 편집기에 등록하고, fullwidth figure → inline image(assetId/width/height) → caption의 document → 실제 Lexical → document 왕복 테스트 추가.
+- 여전히 테스트 미실행(E025/E027). 그림 테스트 성공을 확정하지 않으며 R02 미완료 유지. 표·목록과 Lexical 0.52.0 골든 fixture는 후속 작업.
