@@ -449,3 +449,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - docs/LEXICAL_MIGRATION_CONTRACT.ko.md에 필드별 복제/거부 규칙, legacy JSON의 실제 호환성 검증 전 자동 승격 금지, inspect/migrate/load API 분리, 저장 시 revision·백업·원자적 교체·롤백 정책 추가.
 - 현재 v1 validator의 unknown-field strict 정책은 유지한다. TufteDocumentV2, validator, migration 및 editor integration은 아직 구현하지 않았다.
 - 실행 테스트 불가 상태이므로 R03.b와 P2.5 완료 체크 보류. CI 없음.
+
+## 2026-10-16 — R03.a 버전 식별 API 부분 구현
+
+- `inspectStoredDocument` 및 공개 export 구현: strict v1 검증 후 legacy-v1 식별, v2 editorFormat descriptor 식별, 미지원 버전 진단.
+- document 단위 테스트에 원본 불변·v1/v2 구분·알 수 없는 버전/필드 거부 사례 추가.
+- v2는 descriptor 식별만 하며 전체 문서 검증/실제 migration을 수행하지 않는다. 실행 검증 미확인, R03.a 체크 보류. CI 없음.
