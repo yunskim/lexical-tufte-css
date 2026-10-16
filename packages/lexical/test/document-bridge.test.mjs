@@ -834,14 +834,15 @@ test('F19 ImageQuilt retains src alt assetId dimensions and figure width',()=>{
 });
 test('F19 ImageQuilt rejects unsafe source and invalid dimensions',()=>{
  assert.throws(()=>$createImageQuiltNode('javascript:alert(1)','bad'));
- assert.throws(()=>$createImageQuiltNode('/assets/q.png','bad',undefined,0));
+ assert.throws(()=>$createImageQuiltNode('/assets/q.png','bad',undefined,0,720));
+ assert.throws(()=>$createImageQuiltNode('/assets/q.png','bad'));
 });
 
 test('F18 embed retains provider title wrapper width and ratio through document roundtrip',()=>{
  const source=editor();
  source.update(()=>{
   $getRoot().append($createSectionNode().append(
-   $createEmbedNode('youtube','https://www.youtube-nocookie.com/embed/abcdefghijk','Demonstration','figure','fullwidth','16:9')
+   $createEmbedNode('youtube','https://www.youtube-nocookie.com/embed/abcdefghijk','Demonstration','figure','fullwidth',16/9)
   ));
  },{discrete:true});
  const document={...fixture(),lexicalState:source.getEditorState().toJSON()};
@@ -851,7 +852,7 @@ test('F18 embed retains provider title wrapper width and ratio through document 
  assert.equal(saved.ok,true,JSON.stringify(saved.diagnostics));
  assert.deepEqual(saved.value.lexicalState,document.lexicalState);
  const embed=saved.value.lexicalState.root.children[0].children[0];
- assert.deepEqual([embed.provider,embed.wrapper,embed.width,embed.aspectRatio],['youtube','figure','fullwidth','16:9']);
+ assert.deepEqual([embed.provider,embed.wrapper,embed.width,embed.aspectRatio],['youtube','figure','fullwidth',16/9]);
 });
 test('F18 embed disallows arbitrary iframe domains and query strings',()=>{
  assert.throws(()=>$createEmbedNode('youtube','https://example.com/embed/abcdefghijk','unsafe'));
