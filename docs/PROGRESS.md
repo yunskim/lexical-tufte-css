@@ -226,3 +226,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - packages/render/src/index.ts: heading/list/definition/quote/epigraph/attribution/cite/section-footer/tufte-span의 typed tree 발행 구현.
 - packages/render/src/profile.ts: 새 지원 노드를 render profile에 추가. packages/render/test/render.test.mjs에 대표 조합 회귀 작성.
 - 한계: list start/value 등 일부 Lexical 고급 목록 의미와 Tufte 시각 동등성, 편집기 import/export 왕복, CSS 및 브라우저 검증 미완료. 테스트 실행은 E025/E027 환경 차단. P2.2/F01–F09 완료 체크 보류.
+
+## 2026-10-16 — P2.2 목록 numbering 보존
+
+- packages/render/src/tree.ts: start/value HTML 속성 허용.
+- packages/render/src/index.ts: ol.start 및 ordered li.value를 발행 HTML에 보존. ul은 번호 속성을 출력하지 않음.
+- packages/render/test/render.test.mjs: 시작 번호·불연속 항목 번호·ul 속성 배제 회귀 추가.
+- 편집기 import/export 왕복과 브라우저/단위 테스트는 실행 미완료(E025/E027). P2.2 체크 보류.
