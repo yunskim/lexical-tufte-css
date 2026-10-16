@@ -23,3 +23,5 @@ export {TufteCodeHighlightNode,$createTufteCodeHighlightNode,type SerializedTuft
 export {$inspectEditorStructure,inspectEditorStructure,focusStructureIssue,type StructureIssue} from './structureRecovery.js';
 
 export {registerSectionCommands,WRAP_TUFTE_ROOT_COMMAND,INSERT_TUFTE_SECTION_COMMAND,SPLIT_TUFTE_SECTION_COMMAND,MERGE_TUFTE_SECTION_COMMAND,SET_TUFTE_BLOCK_COMMAND,type TufteBlockType} from './sectionCommands.js';
+
+export {registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND} from './inlineCommands.js';
