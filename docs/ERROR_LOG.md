@@ -265,3 +265,10 @@
 - `packages/lexical/test/note.test.mjs`의 이미지 오류 메시지 기대값이 검증 함수 통합 이후 변경된 메시지와 불일치.
 - `packages/lexical/test/document-bridge.test.mjs`의 R11 alias 테스트는 빈 assets fixture를 사용하면서 비어 있지 않음을 단언.
 - 조치: 각각 정규식 수정, 메시지 허용 범위 수정, 실제 asset fixture 추가. 외부 보고에서 임시 수정 후 render 17/17, document 20/20, lexical 2건 실패를 확인했다고 전달받음. 저장소 수정 후 재실행은 아직 확인되지 않음.
+
+## E035 — migration adapter의 불필요한 타입 강제 변환
+
+- 발견: 2026-10-16 R03 정적 점검. v2→v1 편집기 어댑터가 `Record<string,unknown>`에서 `TufteDocument`로 이중 캐스팅한 뒤 schemaVersion을 덮어쓰고 있었다.
+- 영향: v2 계약 변경 시 projection 누락 또는 잔존 필드가 컴파일러에 드러나지 않을 위험.
+- 처리: v1 필드를 명시적으로 구성하는 타입 검사 가능한 projection으로 교체하고 hostile v2 envelope 회귀 테스트 추가.
+- 상태: 코드/테스트 반영, 실제 타입 검사·테스트 미실행. M032 참조.
