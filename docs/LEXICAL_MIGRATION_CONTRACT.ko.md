@@ -56,3 +56,39 @@ Migration은 입력을 변경하지 않는 순수 함수여야 하며, 동일 �
 1. schemaVersion 2를 도입할 시점(P2.5)과 기존 v1 문서의 별도 백업·승격 절차.
 2. Lexical 0.52.0의 기본 직렬화 필드 집합과 버전별 차이를 실제 골든으로 확정.
 3. HistoryPlugin 초기화 API 및 브라우저 undo/redo 동작 검증.
+
+## v1 → v2 변환 규칙 초안 (R03.b)
+
+| 입력 | 처리 | 이유 |
+| --- | --- | --- |
+| 유효한 v1 문서, 검증된 legacy Lexical JSON | `schemaVersion=2`, `editorFormat={engine:'lexical',formatVersion:1}`로 감싼 새 객체 생성 | 명시적 출처를 부여하고 원본은 보존 |
+| `id`, `locale`, `title`, `subtitle`, `assets` | 값과 배열 순서를 변경하지 않고 복제 | 문서·자산 식별자 안정성 |
+| `lexicalState` 및 모든 노드 | 검증된 호환 형식이면 **그대로 복제** | 편집 의미와 노드 속성 무손실 |
+| 지원되지 않는 노드 `type` 또는 `version` | 실패 진단, 노드 삭제·대체 금지 | 조용한 손실 방지 |
+| 미확인 JSON 필드 또는 기본값 차이 | 실패 진단, 추정한 필드 삽입·삭제 금지 | Lexical 기본값 변화와 의미 변화 구별 |
+| v2 formatVersion=1 | 검증 후 원본과 참조가 다른 복제 반환 | idempotent 경계 |
+| v2 formatVersion>1 / 다른 engine | `UNSUPPORTED_EDITOR_FORMAT` | 미래 포맷을 현행으로 오인하지 않음 |
+| schemaVersion 미지원 | `UNSUPPORTED_DOCUMENT_VERSION` | 명시적 버전 협상 |
+
+**중요:** 위의 첫 번째 행은 모든 v1을 자동 승격한다는 의미가 아니다. 현재 `validateDocument`는 문서 구조만 확인하며 **Lexical 런타임 직렬화 호환성은 확인하지 않는다**. 따라서 v1 legacy JSON이 v2 formatVersion=1과 무손실 호환되는지 골든과 실제 `parseEditorState`로 검증되기 전에는 성공을 반환해서는 안 된다.
+
+### API 분리
+
+- `inspectStoredDocument(input)`: 구조·버전 식별만 수행. 지원되지 않는 버전을 진단하며 어떠한 변환도 하지 않는다.
+- `migrateStoredDocument(input)`: **검증된 버전 쌍**에 한해서만 새 문서를 반환한다. 원본 불변, 부작용 없음.
+- `loadMigratedDocumentIntoEditor(editor,input)`: migration 성공 → parse/무손실 검사 → editor 설치. 실패 시 설치 호출 금지.
+- `exportEditorToDocument`는 당분간 v1 전용으로 유지한다. v2 출력 지원은 validator·canonical serializer·render profile·storage adapter가 v2를 명시적으로 이해한 이후에 활성화한다.
+
+### 저장 및 롤백
+
+- migration은 메모리에서만 수행하며 읽기 작업 중 저장소를 자동 갱신하지 않는다.
+- 승격 저장은 사용자의 명시적 저장 동작에서 revision 충돌 검사를 거치고, 기존 원본을 백업한 후 원자적으로 교체한다(P5).
+- 변환 실패 시 원본 문서를 그대로 읽을 수 있게 유지하며 오류 경로와 코드만 전달한다. **실패했다고 빈 새 문서를 덮어쓰지 않는다.**
+- 같은 문서의 저장/재열기에서도 검증된 formatVersion을 보존한다. npm 의존성 업그레이드만으로 저장 버전을 변경하지 않는다.
+
+### 코드 적용 전 필수 확인
+
+1. `TufteDocumentV2`와 v2 validator를 별도로 정의하고, v1 validator의 strict unknown-field 정책을 유지한다.
+2. `editorFormat`은 engine, formatVersion만 허용하고 중복·알 수 없는 필드를 진단한다.
+3. 지원 포맷 테이블을 한곳에 두고 Lexical 의존성 업그레이드 시 명시적으로 재검증한다.
+4. render·storage·canonical consumers의 v2 지원 범위를 먼저 정한다. v1만 받는 소비자에게 v2를 전달하여 암묵적으로 처리하게 하지 않는다.
