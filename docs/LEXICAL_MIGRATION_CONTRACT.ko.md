@@ -104,3 +104,9 @@ Migration은 입력을 변경하지 않는 순수 함수여야 하며, 동일 �
 - `packages/document/src/validateV2.ts`에 `validateDocumentV2` 추가. v2 envelope와 editorFormat을 엄격히 검사하고, v1 content validator로 본문·자산을 재검증한다.
 - `inspectStoredDocument`도 v2 전체 검증을 통과해야 v2 formatVersion=1을 식별한다. 이전의 descriptor-only 식별 설명은 이 구현으로 대체한다.
 - v1→v2 migration, editor 로드 통합, 버전별 런타임 골든은 미구현이며 타입·테스트 실행은 아직 확인되지 않았다.
+
+## Envelope migration 구현 (2026-10-16)
+
+- `migrateStoredDocument`는 strict v1 검증 → 깊은 복제 → v2 `editorFormat` 추가 → strict v2 재검증을 수행한다. v2 입력은 재검증 후 복제한다.
+- **성공은 문서 외피 변환 성공만 의미한다.** 실제 Lexical parse/serialize 무손실 호환성을 증명하지 않으며, 이 결과만으로 저장된 원본을 덮어쓰거나 editor에 설치해서는 안 된다.
+- 이후 Lexical bridge에서 migration 결과를 parse/serialize 비교한 다음에만 editor state를 교체해야 한다. HistoryPlugin 이력 초기화는 별도 미완.
