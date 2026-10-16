@@ -11,3 +11,4 @@ export {migrateStoredDocument,type MigrationResult} from './migrateStoredDocumen
 export {preparePostRevisionV2,type RevisionDecision} from './revision.js';
 export {InMemoryPostRevisionStoreV2,type PostRevisionStoreV2} from './revisionStore.js';
 export {SqlitePostRevisionStoreV2,type SqliteDatabase,type SqliteStatement} from './sqliteRevisionStore.js';
+export {createPostBackupV2,inspectPostBackupV2,restorePostBackupV2,type PostBackupV2} from './backup.js';
