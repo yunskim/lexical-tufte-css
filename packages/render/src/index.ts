@@ -10,7 +10,7 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
  const doc=result.document,prefix=options.idPrefix??doc.id;
  if(typeof prefix!=='string'||!/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(prefix))return {ok:false,html:null,diagnostics:[{code:'INVALID_ID_PREFIX',path:'options.idPrefix',message:'Invalid article namespace'}]};
  const esc=escapeHTML;
- const attrs=(n:ElementFields)=>`${n.direction?` dir="${esc(String(n.direction))}"`:''}${n.format&&typeof n.format==='string'?` style="text-align: ${n.format};"`:''}`;
+ const attrs=(n:ElementFields)=>`${n.direction?` dir="${esc(String(n.direction))}"`:''}${n.format&&typeof n.format==='string'?` class="tufte-align-${n.format}"`:''}`;
  function render(n:JsonNode):string{
   const inner=()=>'children'in n?n.children.map(render).join(''):'';
   switch(n.type){
@@ -18,7 +18,7 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
    case 'tufte-section':return `<section${attrs(n)}>${inner()}</section>`;
    case 'paragraph':return `<p${attrs(n)}>${inner()}</p>`;
    case 'text':{
-    let html=`<span style="white-space: pre-wrap;">${esc(String(n.text))}</span>`;
+    let html=`<span class="tufte-pre-wrap">${esc(String(n.text))}</span>`;
     for(const [flag,tag] of [[16,'code'],[1,'strong'],[2,'em'],[4,'s'],[8,'u'],[32,'sub'],[64,'sup'],[128,'mark']] as const)if((Number(n.format)&flag)!==0)html=`<${tag}>${html}</${tag}>`;
     return html;
    }
@@ -45,7 +45,7 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
   }
  }
  const root=doc.lexicalState.root;
- const rootStyle=`counter-reset: sidenote-counter;${root.format?` text-align: ${root.format};`:""}`;
- const html=`<article id="${prefix}-article" lang="${esc(doc.locale)}"${root.direction?` dir="${root.direction}"`:""} style="${rootStyle}"><h1>${esc(doc.title)}</h1>${doc.subtitle!==undefined?`<p class="subtitle">${esc(doc.subtitle)}</p>`:''}${render(doc.lexicalState.root)}</article>`;
+ const rootClass=`tufte-article${root.format?` tufte-align-${root.format}`:""}`;
+ const html=`<article id="${prefix}-article" lang="${esc(doc.locale)}"${root.direction?` dir="${root.direction}"`:""} class="${rootClass}"><h1>${esc(doc.title)}</h1>${doc.subtitle!==undefined?`<p class="subtitle">${esc(doc.subtitle)}</p>`:''}${render(doc.lexicalState.root)}</article>`;
  return {ok:true,html,diagnostics:[]};
 }
