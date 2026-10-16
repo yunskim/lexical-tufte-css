@@ -542,3 +542,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - `SqlitePostRevisionStoreV2` 추가: ID/slug/revision 조건부 단일 UPDATE, 1행 갱신만 성공 처리.
 - SQL 바인딩·0행 충돌·revision 오류 mock 테스트 추가. 실제 DB 연동/DDL 적용/백업은 미구현, 실행 검증 미확인.
 - CI 생략, R03/P5 완료 체크 보류.
+
+## 2026-10-16 — SQLite/D1 스키마 및 최초 insert
+
+- `packages/document/sql/001_posts_v2.sql` 추가, payload/행 키 일관성 CHECK와 id/slug unique 정의.
+- `SqlitePostRevisionStoreV2.insert` 추가: revision 1만 허용, 중복 덮어쓰기 금지. mock 단위 테스트 추가.
+- 실제 DB 통합 테스트 및 백업·복원 미완. CI 없음, P5.1 체크 보류.
