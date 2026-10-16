@@ -22,7 +22,7 @@ TypeScript + pnpm workspace를 제안한다. React 편집기를 첫 UI로 제공
 | packages/lexical | 커스텀 노드, command, transform, JSON/HTML import-export |
 | packages/editor-react | 툴바, 삽입 메뉴, 속성 패널, 단축키, 접근성, IME |
 | packages/render | 문서에서 의미적 HTML 생성, SSR/정적 출력, 발행 검증 |
-| packages/theme | 고정 upstream CSS와 폰트 연결, 편집 화면용 격리 스타일, 한국어 fallback |
+| packages/theme | 고정 upstream CSS와 폰트 연결, 편집 화면용 격리 스타일, 한글 본명조·본고딕 |
 | packages/blog | 글 생명주기, slug, revision, archive/tag, feed, sitemap, SEO, build |
 | packages/adapter-fs | 파일 기반 문서·자산 저장과 revision 관리; Node 전용 |
 | examples/editor | 모든 기능을 작성하는 개발용 편집기 |
@@ -30,6 +30,14 @@ TypeScript + pnpm workspace를 제안한다. React 편집기를 첫 UI로 제공
 | fixtures/tufte | 기능별 원본, JSON, 기대 HTML, 시각 비교 자료 |
 
 독자 화면은 정적 HTML+CSS로 읽을 수 있게 한다. Lexical/React 편집 번들은 관리 화면에만 포함한다. 서버 렌더러는 Lexical JSON을 검증한 뒤 작은 내부 렌더링 트리로 변환한다. 별도의 두 정본 AST는 두지 않는다. headless Lexical 재사용 여부는 P1 spike에서 의존성과 일치성을 비교해 결정한다.
+
+## 한글 서체 정책
+
+- 한글 serif는 본명조(Source Han Serif), sans-serif는 본고딕(Source Han Sans)을 사용한다.
+- 기본 본문·제목·인용·주석의 한글에는 본명조를, `.sans` 및 산세리프 표 등의 한글에는 본고딕을 적용한다. 라틴 문자의 ET Book 및 Tufte 기본 서체는 유지하고 한글 글리프를 지정 서체로 보완한다.
+- 편집 화면·미리보기·발행 결과에 같은 서체 정책을 적용한다. 글자별 임의 대체 서체를 정규 디자인으로 삼지 않는다.
+- 한국어용 글리프/지역 변형을 명시하고 필요한 굵기를 준비한다. 웹폰트 자산·로딩·라이선스 고지를 관리하며, 실패 시에는 시스템 serif/sans-serif로 읽을 수 있게 한다.
+- F04에서 한글·라틴 혼용, 굵기, 주석·표, 로딩 성공/실패를 검증한다.
 
 ## 문서와 노드 계약
 
@@ -52,7 +60,7 @@ TypeScript + pnpm workspace를 제안한다. React 편집기를 첫 UI로 제공
 | [ ] | F01 | body/article/section, 본문 폭·간격·카운터 초기화, 관리 UI와 스타일 격리 |
 | [ ] | F02 | h1/h2/h3, subtitle, 제목 안 코드, section 경계 편집 |
 | [ ] | F03 | 문단·강조·굵게·링크·sup, 링크 밑줄·방문 상태 |
-| [ ] | F04 | ET Book regular/italic/bold/old-style numeral, 폰트 자산 경로와 fallback |
+| [ ] | F04 | ET Book regular/italic/bold/old-style numeral, 한글 본명조(Source Han Serif)·본고딕(Source Han Sans), 폰트 자산 경로와 fallback |
 | [ ] | F05 | sans/newthought/numeral/danger 인라인 속성과 sans 안 코드 |
 | [ ] | F06 | ol/ul 중첩·들여쓰기, dl/dt/dd와 항목 간격 |
 | [ ] | F07 | hr 및 section footer |
@@ -141,7 +149,7 @@ P3 gate: 예제 글의 모든 F기능을 HTML 직접 편집 없이 생성·수�
 - [ ] P4.2 원본 CSS 전체 페이지 모드와 scoped embedded 모드를 분리 검증; 전역 body 스타일이 관리자 UI를 바꾸지 않게 함.
 - [ ] P4.3 F01–F22 fixture와 공식 baseline 비교, 의도적 차이는 ADR에 명시.
 - [ ] P4.4 CSS 기본 토글 외에 키보드/스크린리더 가능한 progressive enhancement 결정; JS 없어도 내용 접근 fallback 제공.
-- [ ] P4.5 dark/한국어 fallback/장문·연속 노트/여러 article/좁은 화면 overflow 검증.
+- [ ] P4.5 dark/한글 본명조·본고딕 및 fallback/장문·연속 노트/여러 article/좁은 화면 overflow 검증.
 
 P4 gate: F01–F22 완료 증거 확보, 공개 페이지에 editor dependency가 포함되지 않음.
 
