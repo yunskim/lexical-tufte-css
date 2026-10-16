@@ -1,4 +1,4 @@
-import {isSafeURL} from '../../document/src/schema.js';
+import {isSafeURL,isIdentifier} from '../../document/src/schema.js';
 import {$applyNodeReplacement, DecoratorNode, type NodeKey, type SerializedLexicalNode, type DOMExportOutput} from 'lexical';
 export type SerializedInlineImage = SerializedLexicalNode & {type: 'tufte-inline-image'; version: 1; src: string; alt: string; assetId?: string; width?: number; height?: number};
 export class InlineImageNode extends DecoratorNode<null> {
@@ -22,8 +22,8 @@ export class InlineImageNode extends DecoratorNode<null> {
   exportDOM(): DOMExportOutput { return {element:this.createImageElement()}; }
   exportJSON(): SerializedInlineImage { return {...super.exportJSON(),type:'tufte-inline-image',version:1,src:this.getLatest().__src,alt:this.getLatest().__alt,...(this.getLatest().__assetId===undefined?{}:{assetId:this.getLatest().__assetId}),...(this.getLatest().__width===undefined?{}:{width:this.getLatest().__width}),...(this.getLatest().__height===undefined?{}:{height:this.getLatest().__height})}; }
   static importJSON(value: SerializedInlineImage): InlineImageNode {
-    if(value.version!==1 || typeof value.src!=='string' || typeof value.alt!=='string' || !isSafeURL(value.src,'image') || (value.assetId!==undefined && (typeof value.assetId!=='string' || !value.assetId)) || (value.width!==undefined && (!Number.isSafeInteger(value.width) || value.width<=0)) || (value.height!==undefined && (!Number.isSafeInteger(value.height) || value.height<=0))) throw Error('Unsupported image');
+    if(value.version!==1 || typeof value.src!=='string' || typeof value.alt!=='string' || !isSafeURL(value.src,'image') || (value.assetId!==undefined && !isIdentifier(value.assetId)) || (value.width!==undefined && (!Number.isSafeInteger(value.width) || value.width<=0)) || (value.height!==undefined && (!Number.isSafeInteger(value.height) || value.height<=0))) throw Error('Unsupported image');
     return $createInlineImageNode(value.src,value.alt,value.assetId,value.width,value.height);
   }
 }
-export function $createInlineImageNode(src: string, alt: string, assetId?: string, width?: number, height?: number): InlineImageNode { if(!isSafeURL(src,'image')) throw Error('Unsupported image URL'); return $applyNodeReplacement(new InlineImageNode(src,alt,undefined,assetId,width,height)); }
+export function $createInlineImageNode(src: string, alt: string, assetId?: string, width?: number, height?: number): InlineImageNode { if(!isSafeURL(src,'image') || (assetId!==undefined && !isIdentifier(assetId)) || (width!==undefined && (!Number.isSafeInteger(width) || width<=0)) || (height!==undefined && (!Number.isSafeInteger(height) || height<=0))) throw Error('Invalid image'); return $applyNodeReplacement(new InlineImageNode(src,alt,undefined,assetId,width,height)); }
