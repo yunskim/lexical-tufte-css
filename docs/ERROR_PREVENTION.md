@@ -154,3 +154,8 @@ E024/M023의 beforeinput 이벤트 취소 시점은 discrete update 사용만으
 - 외부 JSON 유사 객체를 판별할 때 `isRecord` 확인만으로 getter 안전성을 가정하지 않는다. 첫 속성 읽기 전에 own property descriptor의 data-only 조건을 검사한다.
 - 접근자 부작용 카운터를 이용해 `inspectStoredDocument` 및 `migrateStoredDocument`가 getter를 실행하지 않는 회귀 테스트를 유지한다.
 - 검증: pnpm check 및 document 테스트 실행 대기.
+
+## M034 — 문자열 치환 후 원본 소스 구문 점검 (E037)
+
+- GitHub 원격 파일을 문자열 치환으로 편집한 직후 `\\n`, `\\t` 같은 escape가 의도치 않게 코드 본문에 삽입되었는지 재조회한다.
+- 신규 함수 추가 후 최소한 소스 파싱과 TypeScript typecheck를 수행해야 완료로 표시한다. 실행 환경이 없으면 검증 미완을 명시한다.
