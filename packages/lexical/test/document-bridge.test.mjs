@@ -70,3 +70,31 @@ test('R02 figure and caption survive real Lexical document roundtrip',()=>{
  assert.equal(figure.children[0].width,640);
  assert.equal(figure.children[1].type,'tufte-caption');
 });
+
+test('R03 lossy Lexical import is rejected without mutating editor',()=>{
+ const base=fixture();
+ let mutations=0;
+ const fake={
+  parseEditorState(){return {toJSON(){return {root:{type:'root',version:1,children:[]}};}};},
+  setEditorState(){mutations++;}
+ };
+ const result=loadDocumentIntoEditor(fake,base);
+ assert.equal(result.ok,false);
+ assert.equal(result.diagnostics[0].code,'LEXICAL_IMPORT_LOSSY');
+ assert.equal(mutations,0);
+});
+test('R03 field ordering alone is not considered import loss',()=>{
+ const base=fixture();
+ let mutations=0;
+ const fake={
+  parseEditorState(){
+   const state=JSON.parse(JSON.stringify(base.lexicalState));
+   const reverse=(v)=>Array.isArray(v)?v.map(reverse):v&&typeof v==='object'?Object.fromEntries(Object.entries(v).reverse().map(([k,x])=>[k,reverse(x)])):v;
+   return {toJSON(){return reverse(state);}};
+  },
+  setEditorState(){mutations++;}
+ };
+ const result=loadDocumentIntoEditor(fake,base);
+ assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+ assert.equal(mutations,1);
+});
