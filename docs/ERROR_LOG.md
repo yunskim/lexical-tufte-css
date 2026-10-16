@@ -210,3 +210,15 @@
 - 영향: 의존성 설치 및 pnpm check/test:browser를 실행할 수 없었다. 기존 커밋의 테스트 성공을 주장하지 않는다.
 - 처리: 테스트 코드 보강만 GitHub에 반영하고 실행 검증은 보류한다. CI를 새로 추가하지 않는다.
 - 상태: 환경 차단, 미해결. M024 참조.
+
+## E026 — R06 충돌 회귀 테스트의 잘못된 반례
+
+- 발견: 2026-10-16 P2.2 안정화 재점검. 기존 테스트의 prefix=a-b/noteId=c와 prefix=a/noteId=b-c는 예전 `prefix-note-noteId` 규칙에서도 충돌하지 않았다. 따라서 이전 구현의 결함을 실제로 잡는 회귀 테스트가 아니었다.
+- 처리: prefix=a-note-b/noteId=c 및 prefix=a/noteId=b-note-c로 교체. 이전 방식에서는 둘 다 `a-note-b-note-c`이며, 길이 접두어를 붙인 새 방식에서는 서로 다른 ID가 된다.
+- 상태: 테스트 코드 수정, 실제 실행 미검증(E025). M025 참조.
+
+## E027 — Corepack pnpm 부트스트랩 네트워크 실패
+
+- 발견: 2026-10-16 R14 재점검. `corepack pnpm --version` 명령이 registry.npmjs.org DNS EAI_AGAIN으로 실패. Node v22.16.0은 정상.
+- 처리: 테스트 통과로 기록하지 않고 환경 차단을 유지한다. M024에 따라 네트워크 정상 환경에서 재시도한다.
+- 상태: 환경 차단, 미해결.
