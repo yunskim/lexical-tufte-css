@@ -107,7 +107,11 @@ export function registerFigureCommands(editor:LexicalEditor,onDiagnostic?:(diagn
    if(!(note instanceof NoteNode))return reject('FIGURE_NOTE_NOT_FOUND','선택한 그림에 해당 여백 주석이 없습니다.');
    if(note.getTextContent()===payload.text)return true;
    $addUpdateTag(HISTORY_PUSH_TAG);
-   note.clear();note.append($createTextNode(payload.text));note.selectEnd();return true;
+   const previous=note.getChildren();
+   const replacement=$createTextNode(payload.text);
+   note.append(replacement);
+   for(const child of previous)child.remove();
+   replacement.selectEnd();return true;
   },COMMAND_PRIORITY_EDITOR)
  ];
  return ()=>registrations.forEach(dispose=>dispose());
