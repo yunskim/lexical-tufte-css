@@ -31,3 +31,5 @@ export {registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_T
 export {registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,type TufteListKind} from './listCommands.js';
 
 export {registerQuotationCommands,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,type TufteQuotationKind} from './quotationCommands.js';
+
+export {registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,type InsertTufteFigure} from './figureCommands.js';
