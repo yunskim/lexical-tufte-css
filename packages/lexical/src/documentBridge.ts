@@ -20,8 +20,10 @@ export function loadDocumentIntoEditor(editor:LexicalEditor,input:unknown):Failu
   if(JSON.stringify(sortJSON(parsed))!==JSON.stringify(sortJSON(checked.state))){
    return failure('LEXICAL_IMPORT_LOSSY','Lexical import changed the serialized document state');
   }
+  // Never expose the caller-owned mutable envelope as a successful snapshot.
+  const snapshot=structuredClone(input as TufteDocument);
   editor.setEditorState(state);
-  return {ok:true,value:input as TufteDocument,diagnostics:[]};
+  return {ok:true,value:snapshot,diagnostics:[]};
  }catch(error){
   return failure('LEXICAL_IMPORT_FAILED',error instanceof Error?error.message:String(error));
  }
