@@ -8,7 +8,7 @@ test('pure renderer works without browser/editor globals and is deterministic wi
  assert.equal(typeof document,'undefined');assert.equal(typeof window,'undefined');
  const d=fixture(),before=JSON.stringify(d);const a=renderArticle(d),b=renderArticle(d);
  assert.equal(a.ok,true,JSON.stringify(a.diagnostics));assert.deepEqual(a,b);assert.equal(JSON.stringify(d),before);
- assert.match(a.html,/&lt;script&gt;/);assert.doesNotMatch(a.html,/<script/);assert.match(a.html,/<th scope="col">/);assert.match(a.html,/server-fixture-note-server-note/);
+ assert.match(a.html,/&lt;script&gt;/);assert.doesNotMatch(a.html,/<script/);assert.match(a.html,/<th scope="col">/);assert.match(a.html,/tufte-14-server-fixture-server-note/);
  const pkg=JSON.parse(readFileSync(new URL('../package.json',import.meta.url),'utf8'));assert.deepEqual(pkg.dependencies,{'@lexical-tufte/document':'workspace:*'});
 });
 test('unknown node/version and invalid nesting block the whole render with paths',()=>{
@@ -33,7 +33,7 @@ test('cycles and future envelope versions return diagnostics rather than recurse
 test('article namespaces separate note ids, titles and attributes are escaped',()=>{
  const d=fixture();d.title='"><script>alert(1)</script>';d.locale='ko-KR';d.lexicalState.root.children[0].children[0].children[1].children[2].alt='" onerror="alert(1)';
  const a=renderArticle(d,{idPrefix:'first'}),b=renderArticle(d,{idPrefix:'second'});assert.equal(a.ok,true);assert.equal(b.ok,true);
- assert.match(a.html,/first-note-server-note/);assert.match(b.html,/second-note-server-note/);assert.match(a.html,/alt="&quot; onerror=&quot;alert\(1\)"/);assert.doesNotMatch(a.html,/<script/);
+ assert.match(a.html,/tufte-5-first-server-note/);assert.match(b.html,/tufte-6-second-server-note/);assert.match(a.html,/alt="&quot; onerror=&quot;alert\(1\)"/);assert.doesNotMatch(a.html,/<script/);
  assert.equal(renderArticle(d,{idPrefix:'bad"id'}).ok,false);
 });
 
@@ -47,4 +47,18 @@ test('valid future node/data schemas do not imply renderer support',()=>{
  const d=fixture();d.lexicalState.root.children[0].children.push({type:'heading',version:1,tag:'h2',children:[{type:'text',version:1,text:'제목',format:0}]});
  assert.equal(validateDocument(d).ok,true);const r=renderArticle(d);assert.equal(r.ok,false);assert.equal(r.html,null);assert.ok(r.diagnostics.some(x=>x.code==='UNSUPPORTED_RENDER_NODE'));
  const imageDoc=fixture(),image=note(imageDoc).children[2];image.width=800;assert.equal(validateDocument(imageDoc).ok,true);assert.ok(renderArticle(imageDoc).diagnostics.some(x=>x.code==='UNSUPPORTED_RENDER_PROPERTY'));
+});
+
+test('length-delimited namespaces avoid prefix and note ID ambiguity',()=>{
+ const a=fixture(),b=fixture();
+ note(a).noteId='c';note(b).noteId='b-c';
+ const first=renderArticle(a,{idPrefix:'a-b'});
+ const second=renderArticle(b,{idPrefix:'a'});
+ assert.equal(first.ok,true,JSON.stringify(first.diagnostics));
+ assert.equal(second.ok,true,JSON.stringify(second.diagnostics));
+ const id=html=>html.match(/<input id="([^"]+)" type="checkbox"/)?.[1];
+ assert.equal(id(first.html),'tufte-3-a-b-c');
+ assert.equal(id(second.html),'tufte-1-a-b-c');
+ assert.notEqual(id(first.html),id(second.html));
+ for(const result of [first,second])assert.ok(result.html.includes('for="'+id(result.html)+'"'));
 });
