@@ -8,10 +8,12 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    }
+    },
+    "./sql/001_posts_v2.sql": "./sql/001_posts_v2.sql"
   },
   "files": [
-    "dist"
+    "dist",
+    "sql"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",

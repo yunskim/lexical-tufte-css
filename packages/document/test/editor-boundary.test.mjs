@@ -317,7 +317,7 @@ test('R03 SQLite CAS uses one parameterized conditional update',async()=>{
  assert.equal(success.ok,true,JSON.stringify(success.diagnostics));
  assert.equal(calls.length,1);
  assert.match(calls[0].sql,/WHERE id = \? AND slug = \? AND revision = \?/);
- assert.deepEqual(calls[0].values.slice(2),[document.id,metadata.slug,1]);
+ assert.deepEqual(calls[0].values.slice(2),[document.id,metadata.slug,1,metadata.createdAt,metadata.updatedAt]);
  changes=0;
  const conflict=await store.compareAndSwap(record,1);
  assert.equal(conflict.ok,false);

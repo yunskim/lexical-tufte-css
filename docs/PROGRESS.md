@@ -808,3 +808,11 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - React 툴바에 밑줄/취소선/마크, 결합 decoration 및 light/dark 마크 CSS 연결. 본문·굵은 주석·링크에서 각 비트/조합/해제/undo·redo/내부 수정/저장 재열기를 검증했다.
 - 실제 clipboard의 전체 주석 payload 교체에서 컨테이너 유실(E058)과 첫 수정의 빈 중간 상태(E059)를 수정. 기존 noteId/kind 및 포맷·주변 본문 보존, forward/backward 회귀 통과. E057의 전체 링크 교체는 기본 입력 의미로 별도 문서화.
 - 정본 renderer의 u/s/mark 의미·URL·주석/strong 관계 및 실제 결합 CSS 확인. [계약](TEXT_FORMAT_R10.ko.md). check189/189(document47·lexical114·render28, fail/skip0), browser8 및 대상 clipboard 실행 통과. diff check 통과. CI 생략. R10 체크, 다음 R11.
+
+
+## 2026-10-16 R11 — 실제 SQLite 공개 snapshot 생명주기 완료
+
+- packages/blog 신설: 동기 SQLite 전용 SqlitePublicationStore, 별도 snapshotVersion1 SQL 저장 모델, SHA-256 snapshot ID/읽기 검증, immutable/retained triggers. 기존 draft document/metadata schema는 확장하지 않았다.
+- 전체 draft revision+발행 generation 재검사 후 INSERT/공개 pointer를 한 transaction으로 전환. firstPublishedAt 보존, 비공개·재발행·과거 snapshot 조회, asset manifest 보존, slug 변경 거부, caller alias 차단. draft CAS 생성 시각 불변/updatedAt 역행 거부도 구현.
+- blog12개: 실제 SQLite 전체 생명주기·두 연결 경쟁·preflight 중 draft 변경·asset/render 및 insert/pointer 실패·close/reopen·checksum 손상·옵션 mutation·시간 불변식 통과. [계약](PUBLICATION_LIFECYCLE_R11.ko.md), packages/blog/README.md.
+- check201/201(document47·lexical114·render28·blog12, fail/skip0), browser8, frozen offline install, diff check 통과. E060/M053 기록·반영. CI 생략. R11 체크, 다음 R13. P5 filesystem/redirect/SSG/feed/실제 자산GC·인증·배포는 미완료.

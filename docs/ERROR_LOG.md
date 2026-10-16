@@ -443,3 +443,9 @@ E001–E049/M001–M042를 검토했다. E024의 경계 입력은 실제 Chromiu
 - 원인: NoteNode.canBeEmpty=false이므로 자식을 먼저 모두 지우면 컨테이너가 제거된다. 최종 상태만 생각하고 중간 상태의 Lexical 불변식을 놓쳤다.
 - 처리: 새 payload를 먼저 append한 후 이전 자식을 제거하고 새 끝으로 선택을 이동한다. 빈 중간 상태를 만들지 않는다.
 - 상태: verified (양방향 선택과 clipboard 및 전체 회귀). M052 참조.
+
+## E060 — R11 CAS의 시간 불변식 추가 후 SQL bind 계약 테스트 미갱신
+
+- 발견: 실제 SQLite 검사는 통과했지만 기존 conditional UPDATE 단위 검사에서 bind 배열 기대값이 새 createdAt/updatedAt 조건을 포함하지 않아 실패했다.
+- 처리: 조건과 bind 순서를 함께 갱신하고 실제 SQLite의 createdAt 변경·updatedAt 역행 거부 회귀로 의미를 확인한다. SQL 비교 조건을 제거해 옛 테스트에 맞추지 않는다.
+- 상태: verified (실제 SQLite/메모리 시간 불변식 및 전체201개·브라우저8개). M053 참조.

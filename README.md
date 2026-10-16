@@ -67,3 +67,5 @@ pnpm test:browser
 2026-10-16 R02 후속 완료: 공통33종 registry와 전체 노드 golden, 실제 React 저장/재열기를 검증했습니다. 현재 로컬 전체 검사는 **178개 + 브라우저7개 통과**입니다. [R02 왕복 계약과 갱신 절차](docs/ROUNDTRIP_R02.ko.md)를 따릅니다. HTML 발행/편집 명령의 전체 지원을 뜻하지 않습니다.
 
 R03.d 문서 교체 이력 계약과 검증: [HISTORY_R03.ko.md](docs/HISTORY_R03.ko.md). 최신 로컬 검증은 단위·통합180개 및 브라우저7개 통과, CI 생략.
+
+R11 공개 snapshot 생명주기: [packages/blog](packages/blog), [구현·검증 계약](docs/PUBLICATION_LIFECYCLE_R11.ko.md). 최신 로컬 검증은 단위·통합201개 및 브라우저8개 통과, CI 생략.

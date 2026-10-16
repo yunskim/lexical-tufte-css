@@ -24,6 +24,10 @@ export function preparePostRevisionV2(
   return {ok:false,diagnostics:[{code:'DOCUMENT_ID_MISMATCH',path:'$.next.document.id',message:'Cannot replace a different document'}]};
  if(old.value.metadata.slug!==proposed.value.metadata.slug)
   return {ok:false,diagnostics:[{code:'POST_SLUG_MISMATCH',path:'$.next.metadata.slug',message:'Slug change requires a separate rename operation'}]};
+ if(old.value.metadata.createdAt!==proposed.value.metadata.createdAt)
+  return {ok:false,diagnostics:[{code:'CREATED_AT_IMMUTABLE',path:'$.next.metadata.createdAt',message:'Creation timestamp cannot change'}]};
+ if(Date.parse(proposed.value.metadata.updatedAt)<Date.parse(old.value.metadata.updatedAt))
+  return {ok:false,diagnostics:[{code:'UPDATED_AT_REGRESSION',path:'$.next.metadata.updatedAt',message:'Update timestamp cannot move backwards'}]};
  if(old.value.metadata.revision!==expectedRevision)
   return {ok:false,diagnostics:[{code:'REVISION_CONFLICT',path:'$.expectedRevision',message:'Stored revision differs from expected revision'}]};
  if(expectedRevision===Number.MAX_SAFE_INTEGER||proposed.value.metadata.revision!==expectedRevision+1)

@@ -32,8 +32,8 @@ export class SqlitePostRevisionStoreV2{
    return {ok:false,diagnostics:[{code:'INVALID_NEXT_REVISION',path:'$.next.metadata.revision',message:'Next revision must increment once'}]};
   const record=checked.value;
   const outcome=await this.db.prepare(
-   'UPDATE posts_v2 SET revision = ?, payload = ? WHERE id = ? AND slug = ? AND revision = ?'
-  ).bind(record.metadata.revision,JSON.stringify(record),record.document.id,record.metadata.slug,expectedRevision).run();
+   `UPDATE posts_v2 SET revision = ?, payload = ? WHERE id = ? AND slug = ? AND revision = ? AND json_extract(payload, '$.metadata.createdAt') = ? AND julianday(json_extract(payload, '$.metadata.updatedAt')) <= julianday(?)`
+  ).bind(record.metadata.revision,JSON.stringify(record),record.document.id,record.metadata.slug,expectedRevision,record.metadata.createdAt,record.metadata.updatedAt).run();
   if(outcome.meta.changes===1)return {ok:true,value:record,diagnostics:[]};
   if(outcome.meta.changes===0)return {ok:false,diagnostics:[{code:'REVISION_CONFLICT',path:'$.expectedRevision',message:'Post missing, identity mismatch or stored revision changed'}]};
   return {ok:false,diagnostics:[{code:'STORAGE_RESULT_UNKNOWN',path:'$',message:'Storage adapter did not report a single-row update'}]};

@@ -299,3 +299,17 @@ E001–E056/M001–M049 점검. 실제 UI에서 각 format bit와 조합·기존
 ## 2026-10-16 R10 완료 점검
 
 E057–E059/M050–M052 반영. 전체 주석 교체의 정체성/중간 빈 상태/선택 유실을 수정하고 실제 clipboard와 양방향 단위 회귀를 통과했다. check189개·browser8 통과. 링크 전체 선택 교체와 내부 수정의 차이를 명시하고, OS 실제 IME/타 브라우저/전체 대비 평가는 P6로 유지한다. 다음 R11 시작·완료 점검.
+
+
+## 2026-10-16 R11 시작 점검
+
+E001–E059/M001–M052를 검토했다. snapshot alias, 실제 SQLite CAS, 실패 시 rollback, single SELECT snapshot, 공개 포인터와 초안 분리를 적용한다. public 저장 모델은 document/metadata 기존 schema를 암묵적으로 확장하지 않는 별도 snapshotVersion1이다. 메모리 mock 대신 실제 SQLite와 close/reopen 및 오류 주입으로 검증한다. 다음 완료 점검.
+
+## M053 — SQL 조건과 bind 계약의 동시 변경
+
+- E060: CAS 조건을 바꿀 때 parameter 순서 기대값과 실제 DB 의미 테스트를 함께 갱신한다. 문자열/배열 계약 검사만으로 데이터 불변식을 대신하지 않는다. 동일 revision의 생성 시각 변경·갱신 시각 역행을 실제 SQLite와 메모리 구현에서 검증한다.
+
+
+## 2026-10-16 R11 완료 점검
+
+E060/M053 반영. R11 신규12개는 실제 SQLite 두 연결·영속 재열기·오류 주입·checksum·옵션 소유권·시간 불변식을 포함한다. check201개와 browser8, frozen offline install 및 diff check 통과. source record/metadata를 변경하지 않고 snapshotVersion1 경계를 도입했다. filesystem/D1/GC/redirect/인증과 불확실한 commit 응답 범위를 문서화했다. 다음 R13 시작·완료 및 P단계 전환 점검.

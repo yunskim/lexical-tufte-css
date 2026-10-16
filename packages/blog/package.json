@@ -1,0 +1,30 @@
+{
+  "name": "@lexical-tufte/blog",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "license": "GPL-3.0-only",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./sql/001_publications_v1.sql": "./sql/001_publications_v1.sql"
+  },
+  "files": [
+    "dist",
+    "sql"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "@lexical-tufte/document": "workspace:*",
+    "@lexical-tufte/render": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "6.0.2"
+  }
+}
