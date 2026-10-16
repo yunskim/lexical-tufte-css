@@ -57,6 +57,35 @@ function EditorUI(){
   const recoveryKey='lexical-tufte-recovery-v2';
   const recoverySession=useRef<string>(crypto.randomUUID());
   const sessionKey=recoveryKey+':'+recoverySession.current;
+  const legacyRecoveryKey='lexical-tufte-recovery-v1';
+  const maxRecoverySessions=12;
+  function recoveryKeys(){
+    return Object.keys(localStorage).filter(key=>key.startsWith(recoveryKey+':'));
+  }
+  function migrateLegacyRecovery(){
+    const raw=localStorage.getItem(legacyRecoveryKey);
+    if(raw===null)return;
+    const parsed:unknown=JSON.parse(raw);
+    if(!parsed||typeof parsed!=='object')return;
+    const migratedKey=recoveryKey+':legacy';
+    if(localStorage.getItem(migratedKey)===null){
+      localStorage.setItem(migratedKey,JSON.stringify({savedAt:new Date().toISOString(),state:parsed}));
+    }
+    // Only delete the legacy copy after the new slot is confirmed present.
+    if(localStorage.getItem(migratedKey)!==null)localStorage.removeItem(legacyRecoveryKey);
+  }
+  function pruneRecoverySessions(){
+    const entries=recoveryKeys().filter(key=>key!==sessionKey).map(key=>{
+      try{
+        const raw=localStorage.getItem(key);
+        const parsed=raw===null?null:JSON.parse(raw) as {savedAt?:unknown};
+        return {key,savedAt:typeof parsed?.savedAt==='string'?parsed.savedAt:''};
+      }catch{return {key,savedAt:''};}
+    }).sort((a,b)=>b.savedAt.localeCompare(a.savedAt));
+    // Never prune unreadable or legacy entries automatically; they may be the only recovery copy.
+    const eligible=entries.filter(entry=>entry.savedAt!==''&&!entry.key.endsWith(':legacy'));
+    for(const entry of eligible.slice(Math.max(0,maxRecoverySessions-1)))localStorage.removeItem(entry.key);
+  }
   useEffect(()=>{
     let pending:ReturnType<typeof setTimeout>|undefined;
     let latest:EditorState|null=null;
@@ -65,13 +94,13 @@ function EditorUI(){
         setRecoveryAvailable(Object.keys(localStorage).some(key=>key.startsWith(recoveryKey+':')));
       }catch{setAutoSaveState('복구 저장소에 접근할 수 없습니다.');}
     };
-    refresh();
+    try{migrateLegacyRecovery();refresh();}catch{setAutoSaveState('이전 복구본 이관에 실패했습니다. 원본은 유지됩니다.');}
     const persist=()=>{
       if(pending!==undefined){clearTimeout(pending);pending=undefined;}
       if(latest===null)return;
       try{
         localStorage.setItem(sessionKey,JSON.stringify({savedAt:new Date().toISOString(),state:latest.toJSON()}));
-        latest=null;refresh();setAutoSaveState('이 탭의 편집 상태를 복구용으로 저장했습니다.');
+        latest=null;pruneRecoverySessions();refresh();setAutoSaveState('이 탭의 편집 상태를 복구용으로 저장했습니다.');
       }catch{setAutoSaveState('자동 복구 저장 실패: 저장 공간을 확인하세요.');}
     };
     const unregister=editor.registerUpdateListener(({editorState,dirtyElements,dirtyLeaves})=>{
@@ -107,9 +136,11 @@ function EditorUI(){
         }).filter((item):item is {key:string;savedAt:string;state:unknown}=>item!==null)
         .sort((a,b)=>b.savedAt.localeCompare(a.savedAt));
       if(entries.length===0){setRecoveryAvailable(false);setStatus('읽을 수 있는 복구용 사본이 없습니다.');return;}
-      const selected=entries.length===1?entries[0]:entries[Number(window.prompt(
+      const choice=entries.length===1?'0':window.prompt(
         '복구본 번호를 선택하세요 (취소하면 현재 문서를 유지합니다):\\n'+
-        entries.map((entry,index)=>index+': '+entry.savedAt+' · '+entry.key.slice(-8)).join('\\n'),'0'))];
+        entries.map((entry,index)=>index+': '+entry.savedAt+' · '+entry.key.slice(-8)).join('\\n'),'0');
+      if(choice===null){setStatus('복구본 선택을 취소했습니다.');return;}
+      const selected=/^(0|[1-9][0-9]*)$/.test(choice)?entries[Number(choice)]:undefined;
       if(!selected){setStatus('복구본 선택을 취소했습니다.');return;}
       const state=editor.parseEditorState(JSON.stringify(selected.state));
       if(!window.confirm('현재 편집 상태를 선택한 복구본으로 바꾸시겠습니까?'))return;
