@@ -299,3 +299,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - packages/lexical/test/document-bridge.test.mjs: TableLayoutNode 및 @lexical/table TableNode/TableRowNode/TableCellNode를 headless registry에 등록. 2x2 표, 헤더 셀, scroll 레이아웃을 생성하고 document→Lexical→document JSON 동등성 검사 작성.
 - 신규 테스트 실행은 여전히 미확인(E025/E027). Lexical 0.52.0의 실제 table 직렬화 필드가 document schema와 일치하는지는 실행 후 확인해야 함. R02 체크 보류.
 - 다음: frozen install/check에서 실패가 드러나면 ERROR_LOG/ERROR_PREVENTION 갱신, 이어서 0.52.0 골든 fixture 구축.
+
+## 2026-10-16 — R03 스키마 지원 범위·미래 표 속성 검사
+
+- packages/lexical/test/document-bridge.test.mjs: headless 테스트 등록 노드와 NODE_SCHEMA 사이의 지원/미지원 유형을 명시적으로 비교하는 회귀 추가. 아직 구현하지 않은 tufte-code/embed/epigraph를 지원 완료로 오인하지 않음.
+- TableCellNode 직렬화 결과에 futureTableField를 삽입해 validateDocument가 UNKNOWN_FIELD를 반환하는지 검사 추가.
+- Node v22.16.0 확인, pnpm 실행 파일 부재. 의존성 설치와 전체 테스트 실행 증거가 없어 R02/R03 완료 보류. 실제 Lexical 0.52.0 출력 기반 골든 fixture는 아직 생성하지 않음(추측 fixture 금지).
