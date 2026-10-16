@@ -868,3 +868,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - 라이브러리 공개 API 및 React 툴바 연결, quotation-commands.test.mjs 회귀 코드 추가.
 - 사용자 지시에 따라 테스트 실행은 Work 일괄 검증으로 이관. 실제 검증 전 P2.2.c 완료 체크하지 않음. CI 생략.
 - 다음: 인용 구조의 직렬화·DOM·발행 renderer 교차 검토, P2.2.d 통합 검증 자료 준비.
+
+## 2026-10-16 P2.2.d — 정적 계약 점검 및 Work 검증 인계
+
+- quotationCommands.ts: 출처 삽입 대상 quote의 부모가 NODE_SCHEMA에 허용된 구조인지 추가 검사. 잘못된 구조에 대한 변형 거부.
+- docs/P22_WORK_VERIFICATION.ko.md: P2.2.a–c 명령별 성공·거부 계약, JSON/renderer 왕복, undo/redo, selection/IME 및 명령 비동기 관찰 검증 체크리스트 작성.
+- 사용자가 테스트는 Work에서 일괄 처리하기로 결정함. 이 대화에서는 테스트 미실행, P2.2.d/F01–F09 완료 표시 보류. CI 없음.
+- 다음: P2.3 F10–F19의 미구현 편집 조작과 데이터/발행 경계 정적 검토를 진행하되 Work 결과와 충돌하지 않도록 검증 기록 분리.
