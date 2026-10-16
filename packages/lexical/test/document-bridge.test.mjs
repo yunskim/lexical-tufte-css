@@ -6,7 +6,7 @@ import {dirname,join,parse} from 'node:path';
 import {createRequire} from 'node:module';
 import {createHeadlessEditor} from '@lexical/headless';
 import {$getRoot,$createParagraphNode,$createTextNode,CLEAR_HISTORY_COMMAND,COMMAND_PRIORITY_CRITICAL} from 'lexical';
-import {SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,$createTableLayoutNode,$createFigureNode,$createCaptionNode,$createInlineImageNode,$createSectionNode,$createNoteNode,$createTufteSpanNode,loadDocumentIntoEditor,loadMigratedDocumentIntoEditor,exportEditorToDocument,exportEditorToDocumentV2} from '../dist/index.js';
+import {SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,$createTableLayoutNode,$createFigureNode,$createCaptionNode,$createInlineImageNode,$createSectionNode,$createNoteNode,$createTufteSpanNode,loadDocumentIntoEditor,loadMigratedDocumentIntoEditor,exportEditorToDocument,exportEditorToDocumentV2,DefinitionListNode,DefinitionTermNode,DefinitionDescriptionNode,$createDefinitionListNode,$createDefinitionTermNode,$createDefinitionDescriptionNode} from '../dist/index.js';
 import {LinkNode} from '@lexical/link';
 import {HeadingNode,QuoteNode,$createHeadingNode,$createQuoteNode} from '@lexical/rich-text';
 import {HorizontalRuleNode,$createHorizontalRuleNode} from '@lexical/react/LexicalHorizontalRuleNode';
@@ -15,7 +15,7 @@ import {NODE_SCHEMA,validateDocument} from '@lexical-tufte/document';
 import {ListNode,ListItemNode,$createListNode,$createListItemNode} from '@lexical/list';
 import {TableNode,TableRowNode,TableCellNode,$createTableNode,$createTableRowNode,$createTableCellNode} from '@lexical/table';
 const fixture=()=>JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document.json',import.meta.url),'utf8'));
-const editor=()=>createHeadlessEditor({namespace:'document-bridge-test',nodes:[SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,TableNode,TableRowNode,TableCellNode,ListNode,ListItemNode,LinkNode,HeadingNode,QuoteNode,HorizontalRuleNode],onError(e){throw e;}});
+const editor=()=>createHeadlessEditor({namespace:'document-bridge-test',nodes:[SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,TableNode,TableRowNode,TableCellNode,ListNode,ListItemNode,LinkNode,HeadingNode,QuoteNode,HorizontalRuleNode,DefinitionListNode,DefinitionTermNode,DefinitionDescriptionNode],onError(e){throw e;}});
 test('R02 strict Lexical bridge fails closed when a registered node is missing',()=>{
  const source=editor();
  source.update(()=>{
@@ -649,4 +649,43 @@ test('P2.2 horizontal rule retains node type and position across editor roundtri
  assert.equal(saved.ok,true,JSON.stringify(saved.diagnostics));
  assert.deepEqual(saved.value.lexicalState,document.lexicalState);
  assert.deepEqual(saved.value.lexicalState.root.children[0].children.map(node=>node.type),['paragraph','horizontalrule','paragraph']);
+});
+
+test('F06 definition list with multiple descriptions roundtrips without flattening',()=>{
+ const source=editor();
+ source.update(()=>{
+  $getRoot().append($createSectionNode().append(
+   $createDefinitionListNode().append(
+    $createDefinitionTermNode().append($createTextNode('Term A')),
+    $createDefinitionDescriptionNode().append($createParagraphNode().append($createTextNode('Meaning A1'))),
+    $createDefinitionDescriptionNode().append($createParagraphNode().append($createTextNode('Meaning A2'))),
+    $createDefinitionTermNode().append($createTextNode('Term B')),
+    $createDefinitionDescriptionNode().append($createParagraphNode().append($createTextNode('Meaning B')))
+   )
+  ));
+ },{discrete:true});
+ const base=fixture(),document={...base,lexicalState:source.getEditorState().toJSON()};
+ const target=editor(),loaded=loadDocumentIntoEditor(target,document);
+ assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
+ const saved=exportEditorToDocument(target,document);
+ assert.equal(saved.ok,true,JSON.stringify(saved.diagnostics));
+ assert.deepEqual(saved.value.lexicalState,document.lexicalState);
+ assert.deepEqual(saved.value.lexicalState.root.children[0].children[0].children.map(node=>node.type),
+  ['tufte-term','tufte-definition','tufte-definition','tufte-term','tufte-definition']);
+});
+test('F06 malformed definition list is rejected before editor installation',()=>{
+ const source=editor();
+ source.update(()=>{
+  $getRoot().append($createSectionNode().append(
+   $createDefinitionListNode().append(
+    $createDefinitionDescriptionNode().append($createParagraphNode().append($createTextNode('Orphan')))
+   )
+  ));
+ },{discrete:true});
+ const document={...fixture(),lexicalState:source.getEditorState().toJSON()};
+ const target=editor(),before=target.getEditorState().toJSON();
+ const loaded=loadDocumentIntoEditor(target,document);
+ assert.equal(loaded.ok,false);
+ assert.ok(loaded.diagnostics.some(d=>d.code==='INVALID_DEFINITION_LIST'),JSON.stringify(loaded.diagnostics));
+ assert.deepEqual(target.getEditorState().toJSON(),before);
 });
