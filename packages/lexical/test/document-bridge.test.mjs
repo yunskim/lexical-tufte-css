@@ -354,3 +354,29 @@ test('R01 image factory preserves optional asset metadata through real Lexical J
  const valid=validateDocument(document);
  assert.equal(valid.ok,true,JSON.stringify(valid.diagnostics));
 });
+
+test('R01 image asset mismatch fails before editor state is installed',()=>{
+ const source=editor();
+ source.update(()=>{
+  $getRoot().append($createSectionNode().append(
+   $createParagraphNode().append($createInlineImageNode('/figures/chart.svg','차트','chart-1',640,360))
+  ));
+ },{discrete:true});
+ const base=fixture();
+ const state=source.getEditorState().toJSON();
+ const validAsset={id:'chart-1',src:'/figures/chart.svg',mimeType:'image/svg+xml',width:640,height:360};
+ const destination=editor();
+ const before=JSON.stringify(destination.getEditorState().toJSON());
+ for(const asset of [
+  undefined,
+  {...validAsset,src:'/figures/other.svg'},
+  {...validAsset,width:320},
+  {...validAsset,height:180}
+ ]){
+  const document={...base,assets:[...base.assets,...(asset?[asset]:[])],lexicalState:state};
+  const result=loadDocumentIntoEditor(destination,document);
+  assert.equal(result.ok,false);
+  assert.ok(result.diagnostics.some(d=>['MISSING_ASSET','ASSET_MISMATCH'].includes(d.code)),JSON.stringify(result.diagnostics));
+  assert.equal(JSON.stringify(destination.getEditorState().toJSON()),before);
+ }
+});
