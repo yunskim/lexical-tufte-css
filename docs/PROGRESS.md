@@ -525,3 +525,8 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - `validatePostRecordV2` 구현·export 및 v2 골든 문서/메타데이터 결합 테스트 추가.
 - 오류 진단 경로를 document/metadata 하위로 분리. 실제 revision 충돌 처리·저장 트랜잭션은 별도 후속 작업.
 - 타입 검사 및 테스트 실행 미확인. R03/P2.5 완료 처리 보류, CI 없음.
+
+## 2026-10-16 — v2 revision 충돌 preflight
+
+- `preparePostRevisionV2` 구현·공개 export. stale expected revision, revision gap, slug 변경 거부 테스트 추가.
+- 사전 검사만 구현됨. CAS/원자적 저장 및 실제 테스트 실행은 미완. CI 없음.
