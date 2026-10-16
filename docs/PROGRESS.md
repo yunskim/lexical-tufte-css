@@ -423,3 +423,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - `packages/lexical/src/NoteNode.ts`에 `setKind('sidenote'|'marginnote')` 추가, 잘못된 종류 거부.
 - 실제 Lexical editor update에서 종류를 전환해 noteId·텍스트 보존과 JSON 직렬화 결과를 검사하는 회귀 테스트 추가.
 - E032/E033 및 M029/M030의 synthetic fixture 제약을 재점검. 테스트 실행은 미확인, P2.3 및 F기능 완료 체크 보류. CI 없음.
+
+## 2026-10-16 — 외부 검증 피드백 E034 대응
+
+- 사용자 제공 독립 검증: 설치/lint/inventory/type 검사 통과, document 20/20 통과, render 정규식 임시 수정 시 17/17 통과, lexical 40건 중 2건 실패. 브라우저 Chromium 다운로드 제한으로 미실행. 해당 검증은 수정 전 `cd0f5ef` 기준.
+- 저장소에서 render 정규식, note 이미지 오류 메시지 기대값, R11 alias 자산 fixture를 각각 수정.
+- E034/M031에 원인과 재발 방지 조치를 기록. **수정 후** `pnpm check` 및 단위 테스트 실행 결과는 아직 확보하지 못했으며 통과로 표기하지 않음.
+- R02 전체 노드 왕복, R03 버전별 migration, R05 무효 상태 복구 및 undo history 정리 문제는 여전히 미완. CI 추가 없음.
