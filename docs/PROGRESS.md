@@ -927,3 +927,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - React 편집기 CUT_COMMAND의 cutIds 수집을 RangeSelection/NodeSelection 양쪽으로 확대하고, 선택된 figure 하위 NoteNode를 재귀적으로 수집하도록 수정.
 - $reidentifyPastedNotes에서 cutIds가 중복 등장하는 입력에 대해 첫 원본 ID만 보존하고 후속 동일 ID는 새로 발급하도록 방어.
 - 실제 브라우저 clipboard 이벤트, CUT_COMMAND와 SELECTION_INSERT_CLIPBOARD_NODES_COMMAND 간 이벤트 순서, 편집·삭제·undo/redo는 Work 검증 대기. 실행 테스트 없음, CI 생략, 체크리스트 완료 보류.
+
+## 2026-10-16 P2.3 — clipboard ID 재검토
+
+- $reidentifyPastedNotes의 기존 existing 집합이 붙여넣기 payload 내 중복을 이미 차단하므로 중복 processed 집합을 제거.
+- 문서에 이미 연결된 그림의 동일 noteId가 cutIds에 포함되어도 기존 문서 ID와 충돌하면 재발급되는 회귀 케이스 추가.
+- 실제 cut 후 노드가 분리된 경우 원본 ID 보존, DOM paste 이벤트, undo/redo, figure note 삭제는 Work 검증 대기. 테스트 실행하지 않음, CI 생략.
