@@ -964,3 +964,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - E059/M052 재발 방지에 따라 figure note 텍스트 교체를 새 자식 추가→새 텍스트 선택→기존 자식 제거 순서로 변경.
 - figure-commands.test.mjs에 교체 직후 RangeSelection이 새 텍스트 끝에 유지되는지 검사하는 회귀 추가.
 - 실행 테스트 및 브라우저 Undo/Redo 검증은 Work 대기, CI 생략, F13 완료 보류.
+
+## 2026-10-16 P2.3 — 클립보드 cut ID 무효화
+
+- React 예제 COPY_COMMAND에서 이전 CUT_COMMAND로 수집된 cutIds를 초기화하도록 변경하고 cleanup을 등록. 잘라내기 후 복사 전환의 stale ID 위험 완화.
+- P23_WORK_VERIFICATION.ko.md에 cut→copy→paste 및 clipboard 이벤트 순서 검증을 추가. 외부 앱 clipboard 변경·취소된 copy/cut의 provenance는 미해결 제한.
+- 테스트 실행하지 않음, CI 생략. Work 검증 후 완료 여부 판정.
