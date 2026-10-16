@@ -147,3 +147,10 @@ E024/M023의 beforeinput 이벤트 취소 시점은 discrete update 사용만으
 - 서로 다른 버전의 문서를 연결할 때 `as unknown as`로 구조를 강제하지 않는다. 필수·선택 필드를 명시적으로 구성해 타입 변경이 컴파일 단계에서 드러나게 한다.
 - v2 envelope의 accessor/unknown field 거부를 회귀 테스트로 고정한다. 이후 스키마 버전 추가 시 양방향 projection과 지원 버전 행렬을 검토한다.
 - 검증: pnpm typecheck 및 document/lexical 테스트 실행 대기.
+
+## M033 — untrusted object 필드 접근 전 data descriptor 확인
+
+- 관련 오류: E036.
+- 외부 JSON 유사 객체를 판별할 때 `isRecord` 확인만으로 getter 안전성을 가정하지 않는다. 첫 속성 읽기 전에 own property descriptor의 data-only 조건을 검사한다.
+- 접근자 부작용 카운터를 이용해 `inspectStoredDocument` 및 `migrateStoredDocument`가 getter를 실행하지 않는 회귀 테스트를 유지한다.
+- 검증: pnpm check 및 document 테스트 실행 대기.
