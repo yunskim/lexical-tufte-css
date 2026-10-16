@@ -96,3 +96,20 @@ test('a mixed or non-leading column header row remains in tbody',()=>{
  assert.doesNotMatch(rendered.html,/<thead>/);
  assert.match(rendered.html,/<tbody><tr/);
 });
+
+test('R10 underline, strike and highlight compose without losing text',()=>{
+ for(const [flag,tag] of [[4,'s'],[8,'u'],[128,'mark']]){
+  const d=fixture();
+  const text=note(d).children[0];
+  text.format=flag;
+  const result=renderArticle(d);
+  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+  assert.match(result.html,new RegExp('<'+tag+'><span class="tufte-pre-wrap">'));
+  assert.match(result.html,new RegExp('</span></'+tag+'>'));
+ }
+ const d=fixture();note(d).children[0].format=4|8|128;
+ const combined=renderArticle(d);
+ assert.equal(combined.ok,true,JSON.stringify(combined.diagnostics));
+ assert.match(combined.html,/<mark><u><s><span class="tufte-pre-wrap">/);
+ assert.match(combined.html,/<\/span><\/s><\/u><\/mark>/);
+});
