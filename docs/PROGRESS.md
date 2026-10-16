@@ -861,3 +861,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - listCommands.ts의 삽입 허용 위치 검사를 document NODE_SCHEMA['tufte-section']에서 직접 도출하도록 변경. 중복 허용 목록 제거.
 - 사용자가 테스트는 Work에서 일괄 처리한다고 지시함. 이번 변경의 실행 테스트는 보류하며 P2.2.b 체크하지 않음. CI 없음.
 - 다음: P2.2.c 인용문/출처/epigraph/section footer 편집 명령과 회귀 테스트 구현.
+
+## 2026-10-16 P2.2.c — 인용 구조 편집 명령 착수
+
+- quotationCommands.ts 신규: INSERT_TUFTE_QUOTATION_COMMAND (quote/epigraph/section-footer), APPEND_TUFTE_ATTRIBUTION_COMMAND (quote 내부 출처 및 cite). 잘못된 selection/IME/중복 출처는 진단 후 거부; 섹션 삽입 위치는 NODE_SCHEMA 기준 검증.
+- 라이브러리 공개 API 및 React 툴바 연결, quotation-commands.test.mjs 회귀 코드 추가.
+- 사용자 지시에 따라 테스트 실행은 Work 일괄 검증으로 이관. 실제 검증 전 P2.2.c 완료 체크하지 않음. CI 생략.
+- 다음: 인용 구조의 직렬화·DOM·발행 renderer 교차 검토, P2.2.d 통합 검증 자료 준비.
