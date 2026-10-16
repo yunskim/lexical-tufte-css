@@ -38,11 +38,10 @@ export function loadDocumentIntoEditor(editor:LexicalEditor,input:unknown):Failu
 export function loadMigratedDocumentIntoEditor(editor:LexicalEditor,input:unknown):Failure|Success<TufteDocumentV2>{
  const migrated=migrateStoredDocument(input);
  if(!migrated.ok)return migrated;
- const envelope={...migrated.document} as Record<string,unknown>;
- delete envelope.editorFormat;
- // Existing strict Lexical bridge intentionally accepts only the v1 envelope.
- const legacy=envelope as unknown as TufteDocument;
- legacy.schemaVersion=1;
+ // Project only the fields understood by the legacy strict bridge.
+ const {id,locale,title,subtitle,lexicalState,assets}=migrated.document;
+ const legacy:TufteDocument={schemaVersion:1,id,locale,title,lexicalState,assets};
+ if(subtitle!==undefined)legacy.subtitle=subtitle;
  const imported=loadDocumentIntoEditor(editor,legacy);
  if(!imported.ok)return imported;
  // HistoryPlugin listens for this command. Never clear history for rejected loads.
