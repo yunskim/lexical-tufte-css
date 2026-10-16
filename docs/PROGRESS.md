@@ -752,3 +752,11 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - F18 정상 출력·HTML escape·sandbox·URL 거부 테스트 추가. 이전 미지원 노드 테스트는 F19 ImageQuilt로 변경.
 - 실제 빌드·브라우저 테스트 및 provider별 iframe 재생 호환성·CSP 검증 미완료. F18 완료 체크 보류. CI 없음.
 - 다음: 렌더링 보안 정책과 iframe CSS 실제 동작 검증, F19 ImageQuilt 발행 및 asset 일치 검증.
+
+## 2026-10-16 — F19 ImageQuilt HTML 발행
+
+- `packages/render/src/index.ts`: tufte-imagequilt를 class=imagequilt, 원본 width/height, escaped alt/src를 갖는 img로 출력.
+- `packages/render/src/profile.ts`: F19 노드를 지원 목록에 추가. `packages/render/styles.css`: figure 내부 imagequilt 반응형 최대 너비 및 자동 높이 지정.
+- renderer tests: 기존 미지원 F19 회귀 테스트를 지원 기대값으로 갱신; 자산 메타데이터 일치 정상 발행, URL/크기/누락 asset ID 거부, 입력 불변성 테스트 추가.
+- 실제 pnpm check, unit/browser 테스트 미실행. F19 완료 체크 보류, CI 생략 유지.
+- 다음: 누적 렌더러 계약 감사, 실제 테스트 실행 환경 복구 및 문서/에디터/렌더러 end-to-end 회귀.
