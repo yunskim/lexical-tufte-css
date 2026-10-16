@@ -29,3 +29,29 @@ test('future note schema and active image URL are rejected',()=>{
  assert.throws(()=>e.parseEditorState(JSON.stringify(json)),/Unsupported/);
  e.update(()=>assert.throws(()=>InlineImageNode.importJSON({version:1,src:'javascript:alert(1)',alt:''}),/Unsupported/),{discrete:true});
 });
+
+test('image metadata and relative URL survive Lexical JSON roundtrip',()=>{
+ const e=editor();
+ e.update(()=>{
+  $getRoot().append($createParagraphNode().append($createInlineImageNode('./images/figure.png','설명','asset-1',640,480)));
+ },{discrete:true});
+ const json=e.getEditorState().toJSON();
+ const image=json.root.children[0].children[0];
+ assert.equal(image.src,'./images/figure.png');
+ assert.equal(image.assetId,'asset-1');
+ assert.equal(image.width,640);
+ assert.equal(image.height,480);
+ const restored=editor();
+ restored.setEditorState(restored.parseEditorState(JSON.stringify(json)));
+ assert.deepEqual(restored.getEditorState().toJSON(),json);
+});
+test('image and note validation share document constraints',()=>{
+ const e=editor();
+ e.update(()=>{
+  assert.throws(()=>$createInlineImageNode('https://user:pass@example.com/x.png','x'),/Invalid image/);
+  assert.throws(()=>$createInlineImageNode('/x.png','x','bad id'),/Invalid image/);
+  assert.throws(()=>$createInlineImageNode('/x.png','x',undefined,0),/Invalid image/);
+  assert.throws(()=>$createNoteNode('-invalid'),/Invalid note/);
+  assert.throws(()=>$createNoteNode('a'.repeat(129)),/Invalid note/);
+ },{discrete:true});
+});
