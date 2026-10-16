@@ -195,3 +195,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - docs/TEXT_FORMAT_R10.ko.md: underline(8), strikethrough(4), mark(128)의 허용 위치·HTML 의미·조합·링크와의 독립성·스타일/CSP 경계 정의. Tufte 고유 기능이 아닌 HTML 편집 확장으로 구분.
 - packages/render/test/render.test.mjs: 각 비트 및 복합 비트의 HTML 태그 중첩 회귀 검사 추가.
 - 실제 pnpm 테스트와 Lexical 편집기 선택/IME/undo 검증 미실행(E025). R10 체크 보류.
+
+## 2026-10-16 — R11/R12 진행 기록
+
+- R11: docs/PUBLICATION_LIFECYCLE_R11.ko.md에서 초안·불변 공개 스냅샷 분리, 최초 발행 시각, publishedRevision, 원자적 공개 포인터 전환을 정의했다. 실제 저장 구현과 테스트는 미완료.
+- R12: packages/document/src/storageKeys.ts에 ID 기반 상대 저장 경로, Windows 예약 장치명 차단, slug 대소문자 충돌 키를 구현했다. test/storage-keys.test.mjs와 docs/STORAGE_PATH_R12.ko.md 추가.
+- R12의 실제 adapter-fs 경로 해석·심볼릭 링크·원자 저장·다중 OS 검증 및 테스트 실행은 미완료(E025). 완료 체크 보류.
