@@ -558,3 +558,55 @@ test('R01 image export preserves validated asset and dimensions',()=>{
  assert.equal(node.width,640);
  assert.equal(node.height,360);
 });
+
+
+test('R02 all supported Tufte span kinds and both note kinds roundtrip',()=>{
+ const source=editor();
+ source.update(()=>{
+  const paragraph=$createParagraphNode();
+  for(const kind of ['sans','newthought','numeral','danger']){
+   paragraph.append($createTufteSpanNode(kind).append($createTextNode(kind)));
+  }
+  paragraph.append(
+   $createNoteNode('note-left','sidenote').append($createTextNode('left')),
+   $createNoteNode('note-right','marginnote').append($createTextNode('right'))
+  );
+  $getRoot().append($createSectionNode().append(paragraph));
+ },{discrete:true});
+ const base=fixture(),document={...base,lexicalState:source.getEditorState().toJSON()};
+ const target=editor(),loaded=loadDocumentIntoEditor(target,document);
+ assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
+ const saved=exportEditorToDocument(target,document);
+ assert.equal(saved.ok,true,JSON.stringify(saved.diagnostics));
+ assert.deepEqual(saved.value.lexicalState,document.lexicalState);
+ const children=saved.value.lexicalState.root.children[0].children[0].children;
+ assert.deepEqual(children.slice(0,4).map(node=>node.kind),['sans','newthought','numeral','danger']);
+ assert.deepEqual(children.slice(4).map(node=>[node.noteId,node.kind]),[['note-left','sidenote'],['note-right','marginnote']]);
+});
+
+test('R02 figure body width and table fullwidth layout roundtrip',()=>{
+ const source=editor();
+ source.update(()=>{
+  const table=$createTableNode().append(
+   $createTableRowNode().append(
+    $createTableCellNode(1).append($createParagraphNode().append($createTextNode('heading')))
+   )
+  );
+  $getRoot().append($createSectionNode().append(
+   $createFigureNode('body').append(
+    $createInlineImageNode('/images/plot.png','plot','plot-asset',320,200),
+    $createCaptionNode().append($createTextNode('caption'))
+   ),
+   $createTableLayoutNode('fullwidth').append(table)
+  ));
+ },{discrete:true});
+ const base=fixture();
+ const document={...base,assets:[...base.assets,{id:'plot-asset',src:'/images/plot.png',mimeType:'image/png',width:320,height:200}],lexicalState:source.getEditorState().toJSON()};
+ const target=editor(),loaded=loadDocumentIntoEditor(target,document);
+ assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
+ const saved=exportEditorToDocument(target,document);
+ assert.equal(saved.ok,true,JSON.stringify(saved.diagnostics));
+ assert.deepEqual(saved.value.lexicalState,document.lexicalState);
+ assert.equal(saved.value.lexicalState.root.children[0].children[0].width,'body');
+ assert.equal(saved.value.lexicalState.root.children[0].children[1].layout,'fullwidth');
+});
