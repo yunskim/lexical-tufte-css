@@ -219,3 +219,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - R06: 이전 prefix-note-noteId 조합에서 실제 충돌하는 prefix/noteId 쌍으로 회귀 테스트 교체. legacy 충돌 동등성 assertion 추가. 변경: packages/render/test/render.test.mjs.
 - 오류·대책: E026/M025 추가. Corepack pnpm 실행은 registry.npmjs.org DNS EAI_AGAIN(E027)으로 차단. E025/M024 계속 적용.
 - 실행: node --version PASS(v22.16.0), corepack pnpm --version FAIL(DNS). pnpm check 및 pnpm test:browser 미실행. CI 없음.
+
+## 2026-10-16 — P2.2 F01–F09 semantic render 확장
+
+- packages/render/src/tree.ts: h2/h3, hr, ol/ul/li, dl/dt/dd, blockquote, footer, cite 등 허용.
+- packages/render/src/index.ts: heading/list/definition/quote/epigraph/attribution/cite/section-footer/tufte-span의 typed tree 발행 구현.
+- packages/render/src/profile.ts: 새 지원 노드를 render profile에 추가. packages/render/test/render.test.mjs에 대표 조합 회귀 작성.
+- 한계: list start/value 등 일부 Lexical 고급 목록 의미와 Tufte 시각 동등성, 편집기 import/export 왕복, CSS 및 브라우저 검증 미완료. 테스트 실행은 E025/E027 환경 차단. P2.2/F01–F09 완료 체크 보류.
