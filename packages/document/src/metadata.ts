@@ -1,6 +1,7 @@
 import type {Diagnostic,PostMetadata,PostRecord,Result} from './types.js';
 import {isRecord} from './schema.js';
 import {validateDocument} from './validate.js';
+import {validateDocumentV2,type TufteDocumentV2} from './validateV2.js';
 /** Strict calendar timestamp with explicit offset; Date.parse alone normalizes invalid dates. */
 export function isTimestamp(value:unknown):value is string{
  if(typeof value!=='string')return false;
@@ -39,4 +40,21 @@ export function validatePostRecord(input:unknown):Result<PostRecord>{
  if(!d.ok)diagnostics.push(...d.diagnostics.map(x=>({...x,path:'$.document'+x.path.slice(1)})));
  if(!m.ok)diagnostics.push(...m.diagnostics.map(x=>({...x,path:'$.metadata'+x.path.slice(1)})));
  return d.ok&&m.ok&&diagnostics.length===0?{ok:true,value:{document:d.document,metadata:m.value},diagnostics}:{ok:false,diagnostics};
+}
+
+/** Storage boundary for migrated posts; v1 records remain supported separately. */
+export type PostRecordV2={document:TufteDocumentV2;metadata:PostMetadata};
+export function validatePostRecordV2(input:unknown):Result<PostRecordV2>{
+ if(!isRecord(input)||Object.getOwnPropertySymbols(input).length!==0||
+  !Object.values(Object.getOwnPropertyDescriptors(input)).every(d=>'value'in d))
+  return {ok:false,diagnostics:[{code:'INVALID_POST',path:'$',message:'Expected plain post object'}]};
+ const diagnostics:Diagnostic[]=Object.keys(input).filter(k=>!['document','metadata'].includes(k))
+  .map(k=>({code:'UNKNOWN_FIELD',path:`$.${k}`,message:'Unrecognized post field'}));
+ const document=validateDocumentV2(input.document);
+ const metadata=validateMetadata(input.metadata);
+ if(!document.ok)diagnostics.push(...document.diagnostics.map(d=>({...d,path:'$.document'+d.path.slice(1)})));
+ if(!metadata.ok)diagnostics.push(...metadata.diagnostics.map(d=>({...d,path:'$.metadata'+d.path.slice(1)})));
+ return document.ok&&metadata.ok&&diagnostics.length===0
+  ?{ok:true,value:{document:document.document,metadata:structuredClone(metadata.value)},diagnostics:[]}
+  :{ok:false,diagnostics};
 }
