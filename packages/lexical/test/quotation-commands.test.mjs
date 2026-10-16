@@ -18,18 +18,21 @@ test('quote insertion and attribution append preserve source paragraph',()=>{
   text.selectEnd();
  },{discrete:true});
  assert.equal(editor.dispatchCommand(INSERT_TUFTE_QUOTATION_COMMAND,'quote'),true);
+ editor.update(()=>{},{discrete:true});
  editor.getEditorState().read(()=>{
   const section=$getRoot().getFirstChild();
   assert.deepEqual(section.getChildren().map(n=>n.getType()),['paragraph','quote']);
   assert.equal(section.getFirstChild().getTextContent(),'original');
  });
  assert.equal(editor.dispatchCommand(APPEND_TUFTE_ATTRIBUTION_COMMAND,undefined),true);
+ editor.update(()=>{},{discrete:true});
  editor.getEditorState().read(()=>{
   const quote=$getRoot().getFirstChild().getLastChild();
   assert.equal(quote.getLastChild().getType(),'tufte-attribution');
   assert.equal(quote.getLastChild().getLastChild().getType(),'tufte-cite');
  });
  assert.equal(editor.dispatchCommand(APPEND_TUFTE_ATTRIBUTION_COMMAND,undefined),true);
+ editor.update(()=>{},{discrete:true});
  assert.ok(diagnostics.some(d=>d.code==='INVALID_QUOTATION_SELECTION'));
  dispose();
 });
@@ -42,6 +45,7 @@ test('epigraph and section footer use schema-defined nesting',()=>{
    text.selectEnd();
   },{discrete:true});
   editor.dispatchCommand(INSERT_TUFTE_QUOTATION_COMMAND,kind);
+ editor.update(()=>{},{discrete:true});
   editor.getEditorState().read(()=>{
    const inserted=$getRoot().getFirstChild().getLastChild();
    assert.equal(inserted.getType(),kind==='epigraph'?'tufte-epigraph':'tufte-section-footer');
