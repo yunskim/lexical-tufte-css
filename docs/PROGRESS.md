@@ -644,3 +644,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - `docs/P2_NODE_COVERAGE.ko.md` 작성: 공개 커스텀 노드 7종, 공식 Lexical 노드 재사용 후보, 미구현 노드 우선순위 및 수락 조건 정리.
 - 다음 작업: heading/quote/horizontalrule 공식 노드의 JSON 호환성 및 최소 왕복 fixture 검증.
 - 조사만 완료한 상태이며 P2.2 및 R02 체크 보류. CI 없음.
+
+## 2026-10-16 — P2.2 공식 제목/인용문 노드
+
+- `packages/lexical/test/document-bridge.test.mjs`에서 공식 `HeadingNode`와 `QuoteNode` 등록, h2/h3/quote 문서 왕복 테스트 추가.
+- `horizontalrule`은 아직 미연결. 공식 노드의 실제 직렬화 결과와 문서 validator 호환성은 실행 전 미확인.
+- P2.2 체크 보류, CI 없음.
