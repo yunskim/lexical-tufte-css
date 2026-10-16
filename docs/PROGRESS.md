@@ -239,3 +239,12 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - packages/lexical/src/TufteSpanNode.ts: sans/newthought/numeral/danger 인라인 ElementNode 추가. kind 검증, JSON import/export, clone, DOM 업데이트 구현.
 - packages/lexical/src/index.ts: 생성자와 타입 공개. 기존 문서 v1 tufte-span 타입에 대응.
 - 아직 editor nodes registry 통합, document/editor 왕복, 단위 및 브라우저 실행 검증이 없다(E025/E027). P2.2 완료 체크 보류.
+
+## 2026-10-16 — 외부 코드 검토 피드백 반영
+
+- 검토 대상 커밋 02b2e39의 외부 실행 결과: pnpm install/lint/inventory PASS, 타입 검사 FAIL(render/src/index.ts:67 readonly children), document 12/12, lexical 16/16, render 14/16. 외부 검토자의 보고이며 이 작업 환경에서 독립 재실행한 결과가 아님.
+- packages/render/src/tree.ts: element(children)를 readonly RenderChild[]로 수정해 table.children 타입 충돌 해결.
+- packages/render/test/render.test.mjs: 지원 노드로 바뀐 heading 대신 미지원 tufte-code를 사용; mixed-header 검사 범위를 첫 table HTML로 제한.
+- 외부 검토에서 브라우저 Chromium 다운로드 차단으로 test:browser 미실행. E025/E027의 환경 차단은 기존 실행 환경 기록으로 보존하되, 모든 환경에서 설치 불가능하다는 일반화는 하지 않음.
+- R02/R03/R04/R05는 각각 document-editor-document 왕복, Lexical 버전 호환 정규화, 명령 등록 이동, 무효 편집 상태 복구가 남아 있음. R01 및 R06–R09도 이 환경의 check/browser 재실행 증거가 없어 완료 체크 보류.
+- 다음 검증: pnpm install --frozen-lockfile; pnpm check; pnpm test:browser. 실패 시 오류/대책 기록.
