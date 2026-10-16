@@ -92,3 +92,27 @@ test('IME preparation is a no-op without a collapsed note selection',()=>{
   assert.equal($prepareNoteComposition(),false);
  },{discrete:true});
 });
+
+test('cut payload with duplicate note IDs retains at most one identity',()=>{
+ const e=editor();
+ e.update(()=>{
+  const a=$createNoteNode('moved').append($createTextNode('첫째'));
+  const b=$createNoteNode('moved').append($createTextNode('둘째'));
+  const ids=['replacement'];
+  const changes=$reidentifyPastedNotes([a,b],new Set(['moved']),()=>ids.shift()??'other');
+  assert.equal(a.getNoteId(),'moved');
+  assert.equal(b.getNoteId(),'replacement');
+  assert.deepEqual(changes.get('moved'),['replacement']);
+ },{discrete:true});
+});
+test('clipboard helper does not mutate plain link targets when note IDs change',()=>{
+ const e=editor();
+ e.update(()=>{
+  const note=$createNoteNode('note-old').append($createTextNode('노트'));
+  const link=$createLinkNode('https://example.org/note-old').append($createTextNode('링크'));
+  const changes=$reidentifyPastedNotes([note,link],new Set(),()=> 'note-new');
+  assert.equal(note.getNoteId(),'note-new');
+  assert.equal(link.getURL(),'https://example.org/note-old');
+  assert.deepEqual(changes.get('note-old'),['note-new']);
+ },{discrete:true});
+});
