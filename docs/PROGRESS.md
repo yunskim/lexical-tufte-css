@@ -982,3 +982,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - `packages/lexical/src/codeCommands.ts`: INSERT_TUFTE_CODE_COMMAND 및 registerCodeCommands 추가. payload text/width/language 검사, 최상위 section의 선택 위치 및 IME/노트 중첩 거부, history tag 처리.
 - `packages/lexical/src/index.ts`에 공개 API export 추가.
 - 아직 React 예제 등록·회귀 테스트·빌드/실행 검증 전. Work 일괄 검증 대기, CI 생략, P2.3 체크 미완료.
+
+## 2026-10-16 clean checkout 검증 피드백 대응
+
+- 외부 Work 검증 보고: Node 22.22 clean checkout에서 루트 pnpm check의 blog typecheck가 render 선행 빌드 누락으로 실패. 루트 typecheck를 pnpm build → pnpm -r typecheck로 변경.
+- Lexical 명령 테스트 9건의 비동기 커밋 읽기 실패 보고에 따라 definition/figure/inline/list/quotation 5개 테스트 파일의 dispatchCommand 뒤에 discrete update flush를 추가. 실제 회귀 성공 여부는 재실행 전 미확정.
+- 설계 검토에서 저장소 책임 혼재, 파일/SQLite 정본 불일치, snapshot purge, v2→v1 렌더 변환, invalid draft 복구 슬롯을 후속 높은 우선순위로 식별.
+- 이 변경 이후 pnpm check·browser·package 검증을 아직 실행하지 않음. CI 생략. 과거 README 검증 개수를 현재 통과 결과로 인용하지 말 것.
