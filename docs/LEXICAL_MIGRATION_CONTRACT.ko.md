@@ -192,3 +192,9 @@ Migration은 입력을 변경하지 않는 순수 함수여야 하며, 동일 �
 - `SqlitePostRevisionStoreV2.insert()` 추가: v2 record 검증, revision 1 필수, `INSERT OR IGNORE`로 기존 게시물 덮어쓰기 금지. 1행 삽입만 성공으로 인정.
 - SQLite JSON1/JSON 함수가 활성화된 환경을 전제로 한다. 실제 SQLite/D1 엔진에 스키마 적용 및 동시 실행 테스트는 아직 수행하지 않았다.
 - 초기 insert는 create만 지원하며 공개 snapshot, backup, restore는 아직 지원하지 않는다.
+
+## 실제 SQLite 엔진 통합 테스트 추가 (2026-10-16)
+
+- `packages/document/test/sqlite-integration.test.mjs`에 Node `node:sqlite` DatabaseSync 기반 실제 SQLite 테스트 추가. DDL 실행, insert, duplicate, 동시 CAS의 단일 승자, payload 일관성 CHECK 위반을 확인하도록 구성.
+- `node:sqlite`는 Node 22에서 experimental일 수 있으므로 환경별 경고/지원 상태를 확인해야 한다. D1 실제 런타임과는 별도 검증이 필요하다.
+- 현재 작업 환경의 Python sqlite3(3.46.1)로 동일 DDL 및 UPDATE의 1행→0행 동작을 독립 smoke 확인했다. **저장소의 node 테스트 전체는 아직 실행하지 못했다.**
