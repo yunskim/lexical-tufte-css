@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {documentToEditorJSON,editorJSONToDocument,canonicalizeDocument,parseCanonicalDocument,inspectStoredDocument,validateDocumentV2,migrateStoredDocument,validatePostRecordV2,preparePostRevisionV2,InMemoryPostRevisionStoreV2,SqlitePostRevisionStoreV2} from '../dist/index.js';
+import {documentToEditorJSON,editorJSONToDocument,canonicalizeDocument,parseCanonicalDocument,inspectStoredDocument,validateDocumentV2,migrateStoredDocument,validatePostRecordV2,preparePostRevisionV2,InMemoryPostRevisionStoreV2,SqlitePostRevisionStoreV2,createPostBackupV2,inspectPostBackupV2,restorePostBackupV2} from '../dist/index.js';
 const fixture=()=>JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document.json',import.meta.url),'utf8'));
 test('R02 document editor JSON document preserves validated state without mutation',()=>{
  const original=fixture(),before=JSON.stringify(original);
@@ -350,4 +350,26 @@ test('R03 SQLite insert refuses duplicate rows and requires initial revision',as
  assert.equal(bad.ok,false);
  assert.ok(bad.diagnostics.some(d=>d.code==='INVALID_INITIAL_REVISION'));
  assert.equal(sql.length,before);
+});
+
+test('R03 backup is explicit and restore increments live revision through CAS',async()=>{
+ const document=JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document-v2.json',import.meta.url),'utf8'));
+ const metadata={slug:'backup-test',summary:'before',tags:[],authors:['editor'],status:'draft',
+  createdAt:'2026-10-16T00:00:00Z',updatedAt:'2026-10-16T00:00:00Z',revision:1};
+ const store=new InMemoryPostRevisionStoreV2({document,metadata});
+ const backup=createPostBackupV2(store.read());
+ assert.equal(backup.ok,true,JSON.stringify(backup.diagnostics));
+ const bad=inspectPostBackupV2({...backup.value,backupVersion:999});
+ assert.equal(bad.ok,false);
+ const edited={document,metadata:{...metadata,summary:'edited',revision:2}};
+ assert.equal((await store.compareAndSwap(edited,1)).ok,true);
+ const stale=await restorePostBackupV2(store,backup.value,edited,1);
+ assert.equal(stale.ok,false);
+ const restored=await restorePostBackupV2(store,backup.value,store.read(),2);
+ assert.equal(restored.ok,true,JSON.stringify(restored.diagnostics));
+ assert.equal(store.read().metadata.revision,3);
+ assert.equal(store.read().metadata.summary,'before');
+ const replay=await restorePostBackupV2(store,backup.value,edited,2);
+ assert.equal(replay.ok,false);
+ assert.equal(store.read().metadata.revision,3);
 });
