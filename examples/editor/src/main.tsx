@@ -15,10 +15,10 @@ import {
   $getRoot, $getSelection, $isRangeSelection, $isElementNode, $isTextNode,
   $createParagraphNode, $createTextNode, $createLineBreakNode, $isParagraphNode,
   FORMAT_TEXT_COMMAND, KEY_ESCAPE_COMMAND, KEY_ARROW_DOWN_COMMAND, KEY_ENTER_COMMAND,
-  COMPOSITION_START_COMMAND, SELECTION_INSERT_CLIPBOARD_NODES_COMMAND, CUT_COMMAND, PASTE_COMMAND, KEY_BACKSPACE_COMMAND, KEY_DELETE_COMMAND, HISTORY_PUSH_TAG, UNDO_COMMAND, REDO_COMMAND,
+  SELECTION_INSERT_CLIPBOARD_NODES_COMMAND, CUT_COMMAND, PASTE_COMMAND, KEY_BACKSPACE_COMMAND, KEY_DELETE_COMMAND, HISTORY_PUSH_TAG, UNDO_COMMAND, REDO_COMMAND,
   COMMAND_PRIORITY_HIGH, type LexicalNode,
 } from 'lexical';
-import {NoteNode, InlineImageNode, $createNoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, type NoteKind, SectionNode,FigureNode,CaptionNode,TableLayoutNode} from '@lexical-tufte/lexical';
+import {NoteNode, InlineImageNode, $createNoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, type NoteKind, SectionNode,FigureNode,CaptionNode,TableLayoutNode} from '@lexical-tufte/lexical';
 import './style.css';
 
 function containingNote(node: LexicalNode | null): NoteNode | null {
@@ -121,19 +121,7 @@ function EditorUI(){
     }
     const backspace=editor.registerCommand(KEY_BACKSPACE_COMMAND,event=>exitAtEdge(event,true),COMMAND_PRIORITY_HIGH);
     const forwardDelete=editor.registerCommand(KEY_DELETE_COMMAND,event=>exitAtEdge(event,false),COMMAND_PRIORITY_HIGH);
-    const composing=editor.registerCommand(COMPOSITION_START_COMMAND,()=>{
-      const s=$getSelection();if(!$isRangeSelection(s)||!s.isCollapsed())return false;
-      const node=s.anchor.getNode();
-      if(!$isTextNode(node)||!(node.getParent() instanceof NoteNode))return false;
-      const offset=s.anchor.offset;
-      if(offset===0||offset===node.getTextContentSize()){
-        // Let Lexical own composition, but provide an interior text position
-        // before its default edge heuristic runs. Lexical removes this marker.
-        node.spliceText(offset,0,'\u200b',false);
-        const point=offset===0?1:offset;node.select(point,point);
-      }
-      return false;
-    },COMMAND_PRIORITY_HIGH);
+    const composing=registerNoteCompositionGuard(editor);
     const enter=editor.registerCommand(KEY_ENTER_COMMAND,event=>{
       const s=$getSelection();if(!$isRangeSelection(s)||!containingNote(s.anchor.getNode()))return false;
       if(event?.isComposing)return false;
