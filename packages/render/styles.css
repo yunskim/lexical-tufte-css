@@ -1,0 +1,9 @@
+/* Scoped publication styles. Include alongside Tufte CSS. */
+.tufte-article { counter-reset: sidenote-counter; }
+.tufte-article .tufte-pre-wrap { white-space: pre-wrap; }
+.tufte-article.tufte-align-left, .tufte-article .tufte-align-left { text-align: left; }
+.tufte-article.tufte-align-center, .tufte-article .tufte-align-center { text-align: center; }
+.tufte-article.tufte-align-right, .tufte-article .tufte-align-right { text-align: right; }
+.tufte-article.tufte-align-justify, .tufte-article .tufte-align-justify { text-align: justify; }
+.tufte-article.tufte-align-start, .tufte-article .tufte-align-start { text-align: start; }
+.tufte-article.tufte-align-end, .tufte-article .tufte-align-end { text-align: end; }
