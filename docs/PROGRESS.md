@@ -736,3 +736,11 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - `packages/render/test/render.test.mjs`: 중첩 paragraph/quote, escape, 입력 불변성, 금지된 중첩 fullwidth 진단 회귀 테스트 추가.
 - 실제 빌드·테스트 실행 미확인. CSS/반응형 시각 회귀까지 확인 전 F15 완료 체크 보류. CI 없음.
 - 다음: F17 code block의 pre/code 구조와 tab/linebreak 보존 렌더링, 이후 F18 embed의 iframe 안전 정책.
+
+## 2026-10-16 — F17 code 발행 기본 경로
+
+- 순수 렌더러에서 tufte-code를 pre/code로 출력, text/tab/linebreak의 정확한 공백·개행을 보존하고 HTML 특수문자를 escape.
+- tree.ts에 pre 태그 허용. render profile에서 code/tab/code-highlight를 등록하되 language 및 highlightType 정보의 실제 발행은 아직 미구현이므로 fail-closed 진단.
+- 공백/이스케이프/미지원 메타데이터 테스트 추가. 기존 미지원 노드 회귀 테스트는 F18 embed로 교체하여 F17 지원과 충돌하지 않도록 조정.
+- 빌드 및 테스트 실행 미완료; CSS/시각 회귀와 language/highlight 발행을 검증하기 전 F17 완료 체크 보류. CI 없음.
+- 다음: F18 iframe 안전 속성, 화면 비율과 CSP를 검토하고 순수 HTML 렌더러를 확장.
