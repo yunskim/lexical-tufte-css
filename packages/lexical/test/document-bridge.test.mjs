@@ -754,14 +754,21 @@ test('F07 section footer with cite survives strict document roundtrip',()=>{
  assert.equal(footer.type,'tufte-section-footer');
  assert.equal(footer.children[1].type,'tufte-cite');
 });
-test('F07 section footer cannot be nested inside a paragraph',()=>{
+test('F07 validator rejects footer nested inside a paragraph without Lexical normalization',()=>{
  const source=editor();
  source.update(()=>{
   $getRoot().append($createSectionNode().append(
-   $createParagraphNode().append($createSectionFooterNode().append($createTextNode('Invalid')))
+   $createParagraphNode().append($createTextNode('Body')),
+   $createSectionFooterNode().append($createTextNode('Invalid placement'))
   ));
  },{discrete:true});
  const document={...fixture(),lexicalState:source.getEditorState().toJSON()};
+ const section=document.lexicalState.root.children[0];
+ const footer=section.children.pop();
+ section.children[0].children.push(footer);
+ const checked=validateDocument(document);
+ assert.equal(checked.ok,false);
+ assert.ok(checked.diagnostics.some(d=>d.code==='INVALID_CHILD'),JSON.stringify(checked.diagnostics));
  const result=loadDocumentIntoEditor(editor(),document);
  assert.equal(result.ok,false);
  assert.ok(result.diagnostics.some(d=>d.code==='INVALID_CHILD'),JSON.stringify(result.diagnostics));
