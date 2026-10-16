@@ -54,18 +54,24 @@ function EditorUI(){
   }
   const [recoveryAvailable,setRecoveryAvailable]=useState(false);
   const [autoSaveState,setAutoSaveState]=useState('자동 복구 저장 대기');
-  const recoveryKey='lexical-tufte-recovery-v1';
+  const recoveryKey='lexical-tufte-recovery-v2';
+  const recoverySession=useRef<string>(crypto.randomUUID());
+  const sessionKey=recoveryKey+':'+recoverySession.current;
   useEffect(()=>{
-    try{setRecoveryAvailable(localStorage.getItem(recoveryKey)!==null);}catch{setAutoSaveState('복구 저장소에 접근할 수 없습니다.');}
     let pending:ReturnType<typeof setTimeout>|undefined;
     let latest:EditorState|null=null;
+    const refresh=()=>{
+      try{
+        setRecoveryAvailable(Object.keys(localStorage).some(key=>key.startsWith(recoveryKey+':')));
+      }catch{setAutoSaveState('복구 저장소에 접근할 수 없습니다.');}
+    };
+    refresh();
     const persist=()=>{
       if(pending!==undefined){clearTimeout(pending);pending=undefined;}
       if(latest===null)return;
       try{
-        localStorage.setItem(recoveryKey,JSON.stringify(latest.toJSON()));
-        latest=null;
-        setRecoveryAvailable(true);setAutoSaveState('현재 편집 상태를 복구용으로 저장했습니다.');
+        localStorage.setItem(sessionKey,JSON.stringify({savedAt:new Date().toISOString(),state:latest.toJSON()}));
+        latest=null;refresh();setAutoSaveState('이 탭의 편집 상태를 복구용으로 저장했습니다.');
       }catch{setAutoSaveState('자동 복구 저장 실패: 저장 공간을 확인하세요.');}
     };
     const unregister=editor.registerUpdateListener(({editorState,dirtyElements,dirtyLeaves})=>{
@@ -76,20 +82,39 @@ function EditorUI(){
     });
     const flush=()=>{if(document.visibilityState==='hidden')persist();};
     const onPageHide=()=>persist();
+    const onStorage=(event:StorageEvent)=>{if(event.key===null||event.key.startsWith(recoveryKey+':'))refresh();};
     document.addEventListener('visibilitychange',flush);
     window.addEventListener('pagehide',onPageHide);
+    window.addEventListener('storage',onStorage);
     return()=>{
       unregister();persist();
       document.removeEventListener('visibilitychange',flush);
       window.removeEventListener('pagehide',onPageHide);
+      window.removeEventListener('storage',onStorage);
     };
-  },[editor]);
+  },[editor,sessionKey]);
   function restoreRecovery(){
     try{
-      const raw=localStorage.getItem(recoveryKey);
-      if(!raw){setRecoveryAvailable(false);setStatus('복구용 사본이 없습니다.');return;}
-      replaceEditorDocumentState(editor,editor.parseEditorState(raw));
-      setStatus('복구용 사본을 열었습니다. 구조를 확인한 후 정상 저장하세요.');
+      const entries=Object.keys(localStorage).filter(key=>key.startsWith(recoveryKey+':'))
+        .map(key=>{
+          try{
+            const raw=localStorage.getItem(key);
+            if(raw===null)return null;
+            const value=JSON.parse(raw) as {savedAt?:unknown;state?:unknown};
+            if(typeof value.savedAt!=='string'||!value.state)return null;
+            return {key,savedAt:value.savedAt,state:value.state};
+          }catch{return null;}
+        }).filter((item):item is {key:string;savedAt:string;state:unknown}=>item!==null)
+        .sort((a,b)=>b.savedAt.localeCompare(a.savedAt));
+      if(entries.length===0){setRecoveryAvailable(false);setStatus('읽을 수 있는 복구용 사본이 없습니다.');return;}
+      const selected=entries.length===1?entries[0]:entries[Number(window.prompt(
+        '복구본 번호를 선택하세요 (취소하면 현재 문서를 유지합니다):\\n'+
+        entries.map((entry,index)=>index+': '+entry.savedAt+' · '+entry.key.slice(-8)).join('\\n'),'0'))];
+      if(!selected){setStatus('복구본 선택을 취소했습니다.');return;}
+      const state=editor.parseEditorState(JSON.stringify(selected.state));
+      if(!window.confirm('현재 편집 상태를 선택한 복구본으로 바꾸시겠습니까?'))return;
+      replaceEditorDocumentState(editor,state);
+      setStatus('선택한 복구본을 열었습니다. 구조를 확인한 후 정상 저장하세요.');
     }catch{setStatus('복구용 사본을 열지 못했습니다.');}
   }
   const textarea=useRef<HTMLTextAreaElement>(null);
