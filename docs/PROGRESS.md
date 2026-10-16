@@ -349,3 +349,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - `packages/document/test/editor-boundary.test.mjs`에 editorJSONToDocument 성공 결과가 원본 editor state 및 base metadata/assets와 참조를 공유하지 않는지 검사하는 테스트 추가.
 - 기존 Lexical bridge 회귀와 별도로 문서 패키지 경계에서 스냅샷 독립성을 검증하도록 범위를 분리했다.
 - 테스트 코드는 커밋했지만 실행은 미확인. R11 완료 체크 보류, CI 추가 없음.
+
+## 2026-10-16 — R11/R03 경계 입력 불변성 회귀
+
+- `packages/document/test/editor-boundary.test.mjs`에 가져오기 JSON과 원본 lexicalState의 참조 분리 및 양방향 변경 독립성 테스트 추가.
+- 알 수 없는 필드로 내보내기가 거부되어도 원본 base와 전달된 editor JSON이 변경되지 않는 회귀 테스트 추가.
+- 코드 반영 완료, 의존성 미확보로 실행 검증 대기. R11/R03 체크 보류, CI 생략 유지.
