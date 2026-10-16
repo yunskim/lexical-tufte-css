@@ -720,3 +720,11 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - GitHub 연결 도구를 통해 F07 부정 테스트를 개선: Lexical 편집 중 잘못된 노드 삽입 대신 유효한 직렬화 상태를 변형해 validator와 bridge가 `INVALID_CHILD`를 거부하는지 검사.
 - 테스트 실행 통과를 주장하지 않으며 P2/F07 완료 체크 보류. CI 추가 없음.
 - 후속: 실행 환경 확보 전까지 validator/serialization 정적 대조 및 부정 테스트 보강. 실행 환경 확보 시 `pnpm install --frozen-lockfile && pnpm check && pnpm test:browser` 순서로 재검증.
+
+## 2026-10-16 — F17/F18/F19 직렬화 계약 회귀 보강
+
+- F18 제목 제한을 validator와 동일하게 1000자로 정렬.
+- F19 SerializedImageQuilt의 width/height 필수화. 누락 입력은 런타임 validator에서 거부.
+- F17/F18/F19의 serialized JSON에 대한 validator 정상·오류 매트릭스 추가.
+- E027 기록. 실행 환경에서 GitHub DNS 접근 불가 및 pnpm 미설치 상태를 재확인; 빌드·테스트 미실행, 완료 체크 보류. CI 없음.
+- 후속: Node 생성/편집/발행 HTML 계약까지 확대하고, 실행 가능 환경에서 pnpm check 및 browser regression 검증.
