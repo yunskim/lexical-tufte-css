@@ -1,5 +1,5 @@
 import {documentToEditorJSON,editorJSONToDocument,migrateStoredDocument,type TufteDocumentV2,type Diagnostic,type TufteDocument} from '@lexical-tufte/document';
-import type {LexicalEditor} from 'lexical';
+import {CLEAR_HISTORY_COMMAND,type LexicalEditor} from 'lexical';
 
 type Failure={ok:false;diagnostics:Diagnostic[]};
 type Success<T>={ok:true;value:T;diagnostics:Diagnostic[]};
@@ -32,7 +32,8 @@ export function loadDocumentIntoEditor(editor:LexicalEditor,input:unknown):Failu
  * Opt-in v2 import: validate and migrate the envelope before invoking the
  * existing fail-closed Lexical parser. The original stored document is never
  * changed, and the editor is only installed after loss detection succeeds.
- * Undo/redo history reset remains the responsibility of the editor host.
+ * Successful document replacement dispatches CLEAR_HISTORY_COMMAND. The host
+ * must register HistoryPlugin for the command to clear its history state.
  */
 export function loadMigratedDocumentIntoEditor(editor:LexicalEditor,input:unknown):Failure|Success<TufteDocumentV2>{
  const migrated=migrateStoredDocument(input);
@@ -44,6 +45,8 @@ export function loadMigratedDocumentIntoEditor(editor:LexicalEditor,input:unknow
  legacy.schemaVersion=1;
  const imported=loadDocumentIntoEditor(editor,legacy);
  if(!imported.ok)return imported;
+ // HistoryPlugin listens for this command. Never clear history for rejected loads.
+ editor.dispatchCommand(CLEAR_HISTORY_COMMAND,undefined);
  return {ok:true,value:structuredClone(migrated.document),diagnostics:[]};
 }
 /** Export is checked against the document schema; no unknown Lexical keys are removed. */
