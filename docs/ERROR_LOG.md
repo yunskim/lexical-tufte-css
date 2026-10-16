@@ -228,3 +228,9 @@
 - 발견: 2026-10-16 R02 정적 코드 점검. 그림 테스트가 assetId=chart-1을 포함하지만 document.assets에 해당 자산을 추가하지 않아 MISSING_ASSET 진단이 발생하는 입력이었다.
 - 처리: 테스트 문서의 assets에 chart-1 URL, MIME, 크기를 명시해 검증 조건을 충족시켰다.
 - 상태: 코드 수정, 실행 검증 대기(E025/E027). M026 참조.
+
+## E029 — 골든 버전 확인의 package exports 가정
+
+- 발견: 2026-10-16 R02 검토. `require('lexical/package.json')`는 패키지의 exports 설정에 따라 ERR_PACKAGE_PATH_NOT_EXPORTED를 낼 수 있어 버전 확인 방법으로 불안정하다.
+- 처리: 공개 엔트리 `require.resolve('lexical')`의 실제 설치 위치에서 상위 package.json을 탐색하고 name=lexical인 manifest의 version을 검사하도록 수정.
+- 상태: 코드 수정, 의존성 설치 후 실제 검증 대기(E025/E027). M027 참조.
