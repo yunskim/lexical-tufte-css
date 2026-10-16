@@ -786,3 +786,11 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - pnpm check178/178(document47/lexical104/render27), skip/fail/todo0. browser7개 전체 PASS; 실제 예제에서33종 문서 열기→term 입력→저장→재열기 및 null token/note ID/구조 보존. frozen install/diff check PASS. CI 없음.
 - R02 체크 완료. 코드 syntax metadata 발행·공식 highlighter plugin 연동, 신규 삽입 명령/속성 UI, 복구 UX, 폰트/접근성은 별개 후속이다. editor JS557.00kB(gzip171.59kB) W001 유지.
 - 증거: [R02 보고서](ROUNDTRIP_R02.ko.md), src/nodes.ts, CodeHighlightNode.ts, all-nodes.test.mjs, 전체 golden, tests/all-nodes-browser.mjs. 다음 R03.d 실제 문서 교체 history integration.
+
+
+## 2026-10-16 R03.d — 문서 교체 history 통합 완료
+
+- 일반/이관 loader와 실제 예제 복원에 공통 replaceEditorDocumentState 적용. 성공 시 이전 undo/redo 삭제, 새 문서를 첫 수정의 undo 기준으로 등록. 실패한 입력은 문서/이력 보존. 반복 로드도 같은 정책.
+- [통합 계약](HISTORY_R03.ko.md): HistoryPlugin 등록, update 밖 호출, 기준 재설치의 listener 중복 가능성, 공유 history 및 Yjs 범위 명시. 레이아웃 예제 삽입은 기존 편집 이력 유지.
+- 실제 registerHistory 두 loader 흐름 및 React UI 복원/첫 수정/실패 후 redo/재열기 검사. check180/180(document47·lexical106·render27, fail/skip0), browser7, diff check 통과. CI 생략.
+- E053(clear 후 첫 수정 기준 소실)/E054(test double 통합 누락)와 M046/M047 기록·반영·검증. R03.d 및 현행 R03 완료 체크. 다음 R05. 전체 P2–P7 기능 완료를 뜻하지 않는다.

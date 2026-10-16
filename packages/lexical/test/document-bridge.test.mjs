@@ -5,7 +5,7 @@ import {fileURLToPath} from 'node:url';
 import {dirname,join,parse} from 'node:path';
 import {createRequire} from 'node:module';
 import {createHeadlessEditor} from '@lexical/headless';
-import {$getRoot,$createParagraphNode,$createTextNode,CLEAR_HISTORY_COMMAND,COMMAND_PRIORITY_CRITICAL} from 'lexical';
+import {$getRoot,$createParagraphNode,$createTextNode,CLEAR_HISTORY_COMMAND,COMMAND_PRIORITY_CRITICAL,UNDO_COMMAND,REDO_COMMAND,HISTORY_PUSH_TAG} from 'lexical';
 import {TUFTE_NODES,TUFTE_NODE_TYPES,SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,$createTableLayoutNode,$createFigureNode,$createCaptionNode,$createInlineImageNode,$createSectionNode,$createNoteNode,$createTufteSpanNode,loadDocumentIntoEditor,loadMigratedDocumentIntoEditor,exportEditorToDocument,exportEditorToDocumentV2,DefinitionListNode,DefinitionTermNode,DefinitionDescriptionNode,$createDefinitionListNode,$createDefinitionTermNode,$createDefinitionDescriptionNode,EpigraphNode,AttributionNode,CiteNode,$createEpigraphNode,$createAttributionNode,$createCiteNode,SectionFooterNode,$createSectionFooterNode,FullwidthNode,$createFullwidthNode,TufteCodeNode,$createTufteCodeNode,ImageQuiltNode,$createImageQuiltNode,EmbedNode,$createEmbedNode} from '../dist/index.js';
 import {LinkNode} from '@lexical/link';
 import {HeadingNode,QuoteNode,$createHeadingNode,$createQuoteNode} from '@lexical/rich-text';
@@ -93,7 +93,7 @@ test('R03 lossy Lexical import is rejected without mutating editor',()=>{
  let mutations=0;
  const fake={
   parseEditorState(){return {toJSON(){return {root:{type:'root',version:1,children:[]}};}};},
-  setEditorState(){mutations++;}
+  dispatchCommand(){return true;},setEditorState(){mutations++;}
  };
  const result=loadDocumentIntoEditor(fake,base);
  assert.equal(result.ok,false);
@@ -109,11 +109,11 @@ test('R03 field ordering alone is not considered import loss',()=>{
    const reverse=(v)=>Array.isArray(v)?v.map(reverse):v&&typeof v==='object'?Object.fromEntries(Object.entries(v).reverse().map(([k,x])=>[k,reverse(x)])):v;
    return {toJSON(){return reverse(state);}};
   },
-  setEditorState(){mutations++;}
+  dispatchCommand(){return true;},setEditorState(){mutations++;}
  };
  const result=loadDocumentIntoEditor(fake,base);
  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
- assert.equal(mutations,1);
+ assert.equal(mutations,2);
 });
 
 test('R02 ordered list survives Lexical roundtrip',()=>{
@@ -240,7 +240,7 @@ test('R02 missing referenced asset fails before editor mutation',()=>{
  },{discrete:true});
  const base=fixture(),document={...base,lexicalState:source.getEditorState().toJSON()};
  let parses=0,sets=0;
- const fake={parseEditorState(){parses++;throw Error('unexpected parse');},setEditorState(){sets++;}};
+ const fake={parseEditorState(){parses++;throw Error('unexpected parse');},dispatchCommand(){return true;},setEditorState(){sets++;}};
  const result=loadDocumentIntoEditor(fake,document);
  assert.equal(result.ok,false);
  assert.ok(result.diagnostics.some(x=>x.code==='MISSING_ASSET'));
@@ -253,6 +253,7 @@ test('R11 successful import returns detached envelope and editor state',()=>{
  let captured;
  const fake={
   parseEditorState(){return {toJSON(){return structuredClone(base.lexicalState);}};},
+  dispatchCommand(){return true;},
   setEditorState(state){captured=state;}
  };
  const result=loadDocumentIntoEditor(fake,base);
@@ -888,3 +889,32 @@ test('F17/F18/F19 serialized contract rejects invalid fields before Lexical impo
  const invalidQuilt=validateDocument(make({...figure,children:[{...quilt,height:undefined}]}));
  assert.ok(invalidQuilt.diagnostics.some(d=>d.code==='INVALID_IMAGE_SIZE'));
 });
+
+for(const [name,load] of [['strict',loadDocumentIntoEditor],['migrated',loadMigratedDocumentIntoEditor]]){
+ test(`R03.d ${name} replacement isolates real undo/redo and preserves rejected-load history`,async()=>{
+  const destination=editor(),history=createEmptyHistoryState();
+  const unregister=registerHistory(destination,history,300);
+  const flush=()=>new Promise(resolve=>setImmediate(resolve));
+  const text=()=>destination.getEditorState().read(()=>$getRoot().getTextContent());
+  const edit=value=>destination.update(()=>{$getRoot().getFirstDescendant().setTextContent(value);},{discrete:true,tag:HISTORY_PUSH_TAG});
+  try{
+   const source=editor();
+   source.update(()=>$getRoot().append($createSectionNode().append($createParagraphNode().append($createTextNode('A')))),{discrete:true});
+   const document={...fixture(),lexicalState:source.getEditorState().toJSON()};
+   assert.equal(load(destination,document).ok,true);await flush();
+   edit('A1');await flush();edit('A2');await flush();
+   destination.dispatchCommand(UNDO_COMMAND,undefined);await flush();assert.equal(text(),'A1');
+   const before={current:history.current,undo:[...history.undoStack],redo:[...history.redoStack]};
+   assert.equal(load(destination,{...document,schemaVersion:999}).ok,false);await flush();
+   assert.equal(history.current,before.current);assert.deepEqual(history.undoStack,before.undo);assert.deepEqual(history.redoStack,before.redo);
+   destination.dispatchCommand(REDO_COMMAND,undefined);await flush();assert.equal(text(),'A2');
+   const replacement=structuredClone(document);replacement.lexicalState.root.children[0].children[0].children[0].text='B';
+   assert.equal(load(destination,replacement).ok,true);await flush();
+   assert.equal(history.undoStack.length,0);assert.equal(history.redoStack.length,0);
+   for(const command of [UNDO_COMMAND,REDO_COMMAND]){destination.dispatchCommand(command,undefined);await flush();assert.equal(text(),'B');}
+   edit('B1');await flush();destination.dispatchCommand(UNDO_COMMAND,undefined);await flush();assert.equal(text(),'B');
+   destination.dispatchCommand(REDO_COMMAND,undefined);await flush();assert.equal(text(),'B1');
+   assert.equal(load(destination,replacement).ok,true);await flush();destination.dispatchCommand(UNDO_COMMAND,undefined);await flush();assert.equal(text(),'B');
+  }finally{unregister();}
+ });
+}

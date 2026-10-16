@@ -9,7 +9,7 @@ export {$collectNoteIds,$reidentifyPastedNotes} from './clipboardNotes.js';
 export {$prepareNoteComposition,registerNoteCompositionGuard} from './noteComposition.js';
 export {$insertNoteEdgeText,registerNoteEdgeTypingGuard} from './noteEdgeTyping.js';
 export {TufteSpanNode,$createTufteSpanNode,type TufteSpanKind,type SerializedTufteSpan} from './TufteSpanNode.js';
-export {loadDocumentIntoEditor,loadMigratedDocumentIntoEditor,exportEditorToDocument,exportEditorToDocumentV2} from './documentBridge.js';
+export {replaceEditorDocumentState,loadDocumentIntoEditor,loadMigratedDocumentIntoEditor,exportEditorToDocument,exportEditorToDocumentV2} from './documentBridge.js';
 export {DefinitionListNode,DefinitionTermNode,DefinitionDescriptionNode,$createDefinitionListNode,$createDefinitionTermNode,$createDefinitionDescriptionNode} from './DefinitionListNodes.js';
 export {EpigraphNode,AttributionNode,CiteNode,$createEpigraphNode,$createAttributionNode,$createCiteNode} from './QuotationNodes.js';
 export {SectionFooterNode,$createSectionFooterNode} from './SectionFooterNode.js';

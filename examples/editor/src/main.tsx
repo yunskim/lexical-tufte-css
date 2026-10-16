@@ -17,7 +17,7 @@ import {
   SELECTION_INSERT_CLIPBOARD_NODES_COMMAND, CUT_COMMAND, PASTE_COMMAND, KEY_BACKSPACE_COMMAND, KEY_DELETE_COMMAND, HISTORY_PUSH_TAG, UNDO_COMMAND, REDO_COMMAND,
   COMMAND_PRIORITY_HIGH, type LexicalNode,
 } from 'lexical';
-import {TUFTE_NODES,NoteNode, $createNoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, registerNoteEdgeTypingGuard, type NoteKind} from '@lexical-tufte/lexical';
+import {replaceEditorDocumentState,TUFTE_NODES,NoteNode, $createNoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, registerNoteEdgeTypingGuard, type NoteKind} from '@lexical-tufte/lexical';
 import './style.css';
 
 function containingNote(node: LexicalNode | null): NoteNode | null {
@@ -168,7 +168,7 @@ function EditorUI(){
   function restore(){
     try{
       const raw=localStorage.getItem('lexical-tufte-p1');if(!raw){setStatus('저장한 문서가 없습니다.');return;}
-      editor.setEditorState(editor.parseEditorState(raw));setStatus('저장한 문서를 불러왔습니다.');
+      replaceEditorDocumentState(editor,editor.parseEditorState(raw));setStatus('저장한 문서를 불러왔습니다.');
     }catch{setStatus('문서를 불러오지 못했습니다.');}
   }
   const preserve=(e:React.MouseEvent)=>e.preventDefault();

@@ -1,13 +1,25 @@
 import {documentToEditorJSON,editorJSONToDocument,migrateStoredDocument,validateDocumentV2,type TufteDocumentV2,type Diagnostic,type TufteDocument} from '@lexical-tufte/document';
-import {CLEAR_HISTORY_COMMAND,type LexicalEditor} from 'lexical';
+import {CLEAR_HISTORY_COMMAND,HISTORY_MERGE_TAG,type EditorState,type LexicalEditor} from 'lexical';
 
 type Failure={ok:false;diagnostics:Diagnostic[]};
 type Success<T>={ok:true;value:T;diagnostics:Diagnostic[]};
 const failure=(code:string,message:string):Failure=>({ok:false,diagnostics:[{code,path:'$.lexicalState',message}]});
 
+/** Install a prevalidated state outside an editor update; register HistoryPlugin first.
+ * Clear old stacks and commit the new document as the next edit's undo baseline.
+ * Parsing/validation must finish before calling this document-boundary operation.
+ */
+export function replaceEditorDocumentState(editor:LexicalEditor,state:EditorState):void{
+ editor.setEditorState(state);
+ editor.dispatchCommand(CLEAR_HISTORY_COMMAND,undefined);
+ // Recommit after clear so HistoryPlugin retains this document as its baseline.
+ editor.setEditorState(state,{tag:HISTORY_MERGE_TAG});
+}
 /**
  * Strict bridge to a configured Lexical editor. The editor must register every
  * node in the supplied document; unsupported nodes fail rather than downgrade.
+ * Success replaces the document and clears undo/redo through CLEAR_HISTORY_COMMAND.
+ * Register HistoryPlugin (or registerHistory) before loading; rejected loads retain history.
  */
 export function loadDocumentIntoEditor(editor:LexicalEditor,input:unknown):Failure|Success<TufteDocument>{
  const checked=documentToEditorJSON(input);
@@ -22,7 +34,7 @@ export function loadDocumentIntoEditor(editor:LexicalEditor,input:unknown):Failu
   }
   // Never expose the caller-owned mutable envelope as a successful snapshot.
   const snapshot=structuredClone(input as TufteDocument);
-  editor.setEditorState(state);
+  replaceEditorDocumentState(editor,state);
   return {ok:true,value:snapshot,diagnostics:[]};
  }catch(error){
   return failure('LEXICAL_IMPORT_FAILED',error instanceof Error?error.message:String(error));
@@ -44,8 +56,7 @@ export function loadMigratedDocumentIntoEditor(editor:LexicalEditor,input:unknow
  if(subtitle!==undefined)legacy.subtitle=subtitle;
  const imported=loadDocumentIntoEditor(editor,legacy);
  if(!imported.ok)return imported;
- // HistoryPlugin listens for this command. Never clear history for rejected loads.
- editor.dispatchCommand(CLEAR_HISTORY_COMMAND,undefined);
+ // The strict loader applies the shared document replacement/history policy.
  return {ok:true,value:structuredClone(migrated.document),diagnostics:[]};
 }
 /** Export is checked against the document schema; no unknown Lexical keys are removed. */

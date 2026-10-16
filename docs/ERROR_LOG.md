@@ -396,3 +396,17 @@ E001–E049/M001–M042를 검토했다. E024의 경계 입력은 실제 Chromiu
 - 원인: 공식 replacement descriptor가 동일 type의 registry entry를 원본 클래스로 덮어쓴다. 서로 다른 type을 쓰는 replacement 예제를 동일 wire type에 적용한 것이 잘못이었다.
 - 처리: registry에는 null 보존 클래스 하나만 등록하고 $createTufteCodeHighlightNode를 명시적 factory로 제공한다. 공식 CodeHighlightNode/factory와 같은 registry에서 혼용하지 않는다. native syntax highlighting plugin 연동은 지원했다고 주장하지 않는다.
 - 상태: verified (단일 클래스 registry로 전체 회귀 통과). M045: wire type별 등록 클래스는 하나로 유지하며 공식 plugin과의 호환성을 별도 검증한다.
+
+## E053 — 문서 로드 뒤 clear만 수행하면 첫 수정의 undo 기준이 사라짐
+
+- 발견: R03.d 실제 registerHistory 회귀에서 B 로드 → B1 수정 → undo 결과가 B1로 남았다.
+- 원인: CLEAR_HISTORY_COMMAND가 current도 null로 만든다. stack 길이만 확인했던 기존 테스트는 첫 편집의 기준 소실을 검출하지 못했다.
+- 처리: 상태 설치 후 clear하고 HISTORY_MERGE_TAG로 새 문서를 기준으로 재설치한다. clear와 set을 하나의 editor.update에 넣는 시도도 실제 테스트에서 undoStack 1이 남아 채택하지 않았다. 공개 API를 쓰는 명시적 순서로 고정했다.
+- 검증: 두 loader의 실제 history 흐름과 React UI 회귀. verified: 전체180개·브라우저7개 통과. M046 참조.
+
+## E054 — 통합 계약 변경 후 성공 경로 테스트 double 누락
+
+- 발견: R03.d 검사에서 fake editor의 dispatchCommand 누락으로 성공 기대 테스트가 실패했다. 초기 일괄 update 구현 때는 update도 누락됐다.
+- 원인: parse/set만 가진 최소 fake가 새 history 통합 경계를 모사하지 못했다.
+- 처리: 성공 경로 double에 dispatchCommand를 추가하고 기준 재설치 횟수를 반영한다. 실제 registerHistory/React 흐름으로 제품 동작을 별도 검증한다. production에 fake 호환 분기를 추가하지 않는다.
+- 상태: verified (전체180개·브라우저7개 통과). M047 참조.
