@@ -96,3 +96,10 @@ E024/M023의 beforeinput 이벤트 취소 시점은 discrete update 사용만으
 
 - E025/M024는 지속: Node 22.16.0 정상, Corepack pnpm 부트스트랩은 npm registry DNS EAI_AGAIN(E027)으로 실패. 테스트 성공을 주장하지 않는다.
 - E026/M025 신규 추가: 과거 버그의 반례를 먼저 계산해 실제 재발 검출력이 있는지 점검한다. 이후 namespace/slug/path 충돌 테스트에도 같은 절차를 적용한다.
+
+## M026 — 왕복 fixture의 문서 수준 참조 무결성
+
+- 관련 오류: E028.
+- 절차: Lexical 노드만 생성하는 테스트라도 문서 envelope의 assets와 node.assetId, src, dimensions의 참조 관계를 확인한다. 골든 fixture는 실제 고정 버전 Lexical 출력에서 생성하고 검토 후 커밋한다.
+- 검증: pnpm check 및 R02 테스트에서 MISSING_ASSET/ASSET_MISMATCH가 없는지 확인한다.
+- 상태: 코드 반영, 실행 대기.
