@@ -176,3 +176,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - packages/render/src/index.ts: 기존 escapeHTML을 serializer에서 재사용하고 article envelope를 typed tree로 구성. 하위 노드 렌더러는 아직 문자열 adapter이므로 R08 미완료.
 - packages/render/test/tree.test.mjs: text/attribute escaping, 허용되지 않은 태그·속성, void element 자식 거부 검증 코드 추가.
 - 테스트 실행 증거 없음(E025). 다음 단계에서 모든 render switch case를 tree로 전환하고 문자열 replace 기반 table fullwidth를 제거한다.
+
+## 2026-10-16 — R08 typed render tree 전체 노드 전환
+
+- packages/render/src/index.ts: 지원 중인 root/section/paragraph/text/linebreak/link/image/note/figure/caption/table-layout/table/row/cell 모두 RenderChild[] 생성 방식으로 이전. article envelope와 본문을 하나의 typed tree로 구성해 serializeHTML 한 번으로 출력.
+- table-layout fullwidth는 문자열 replace가 아닌 table element의 class 속성 갱신으로 처리. HTML 문자열 어댑터 제거.
+- 기존 render.test.mjs와 tree.test.mjs의 실제 실행은 E025 환경 차단으로 미검증. 구조적 전환은 반영되었지만 R08 완료 체크는 테스트 통과 후 진행.
