@@ -355,3 +355,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - `packages/document/test/editor-boundary.test.mjs`에 가져오기 JSON과 원본 lexicalState의 참조 분리 및 양방향 변경 독립성 테스트 추가.
 - 알 수 없는 필드로 내보내기가 거부되어도 원본 base와 전달된 editor JSON이 변경되지 않는 회귀 테스트 추가.
 - 코드 반영 완료, 의존성 미확보로 실행 검증 대기. R11/R03 체크 보류, CI 생략 유지.
+
+## 2026-10-16 — R03 편집기 실패 경로 회귀
+
+- `packages/lexical/test/document-bridge.test.mjs`에 `setEditorState` 예외 시 `LEXICAL_IMPORT_FAILED` 및 `toJSON` 예외 시 `LEXICAL_EXPORT_FAILED`를 반환하는 회귀 테스트 추가.
+- 성공 반환을 잘못 보고하지 않는 실패 경로 검사이며 실제 Lexical 0.52.0 통합 검증과 별개.
+- 의존성 미확보로 테스트 실행은 미확인. R03/R02/R11 완료 체크 보류, CI 추가 없음.
