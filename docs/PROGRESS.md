@@ -473,3 +473,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - `loadMigratedDocumentIntoEditor` 구현 및 export: v1/v2 migration 결과를 기존 strict Lexical bridge의 parse/serialize 무손실 검사 후 editor에 설치하는 opt-in 경로.
 - Lexical 단위 테스트에 v1→v2 로드/스냅샷 및 미지원 버전 시 기존 상태 불변 사례 추가.
 - 실행 테스트 미확인. undo/redo history reset, 저장 경로 및 브라우저 검증 미완. R03/P2.5 완료 체크 보류, CI 없음.
+
+## 2026-10-16 — R03 문서 교체 history reset 명령
+
+- 성공한 migrated load에 한해 `CLEAR_HISTORY_COMMAND` dispatch 구현. 실패한 migration에서는 history를 건드리지 않음.
+- Lexical 단위 테스트에 성공 1회·실패 0회 dispatch 검증 추가.
+- 실제 HistoryPlugin undo/redo 통합과 브라우저 테스트 미실행; 환경 제약으로 타입 검사/테스트 미실행. R03/P2.5 체크 보류. CI 없음.
