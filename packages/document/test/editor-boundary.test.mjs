@@ -168,3 +168,19 @@ test('R03 envelope migration preserves v1 content and isolates caller objects',(
  assert.equal(unsupported.ok,false);
  assert.ok(unsupported.diagnostics.some(d=>d.code==='UNSUPPORTED_EDITOR_FORMAT'));
 });
+
+test('R03 v2 validation rejects hostile envelopes without invoking accessors',()=>{
+ const base=fixture();
+ const candidate={...base,schemaVersion:2,editorFormat:{engine:'lexical',formatVersion:1}};
+ let called=0;
+ Object.defineProperty(candidate,'surprise',{enumerable:true,get(){called++;throw Error('getter executed');}});
+ const result=validateDocumentV2(candidate);
+ assert.equal(result.ok,false);
+ assert.equal(called,0);
+ const format={engine:'lexical',formatVersion:1};
+ Object.defineProperty(format,'surprise',{enumerable:true,get(){called++;throw Error('getter executed');}});
+ const badFormat=validateDocumentV2({...base,schemaVersion:2,editorFormat:format});
+ assert.equal(badFormat.ok,false);
+ assert.equal(called,0);
+ assert.equal(validateDocumentV2({...base,schemaVersion:2,editorFormat:{engine:'lexical',formatVersion:1},extra:true}).ok,false);
+});
