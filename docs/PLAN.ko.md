@@ -89,6 +89,8 @@ TypeScript + pnpm workspace를 제안한다. React 편집기를 첫 UI로 제공
 
 ## 실행 체크리스트
 
+CI는 구성하지 않으며 GitHub Actions 실행이나 CI 상태를 완료·병합 조건으로 삼지 않는다. 빌드·타입 검사·관련 테스트는 로컬에서 수행하고 결과를 기록한다.
+
 체크된 항목은 실제 완료된 준비 작업뿐이다. 예상 일정은 P1 spike 이후 산정한다.
 
 ### P0 — 범위·저장소·기준선
@@ -98,7 +100,7 @@ TypeScript + pnpm workspace를 제안한다. React 편집기를 첫 UI로 제공
 - [x] P0.3 단계·완료 조건·작업 규약 작성. 증거: 이 문서 및 AGENTS.md.
 - [x] P0.4 사용자가 `yunskim/lexical-tufte` 저장소 생성, 계획·규약·README 업로드. 증거: main의 README.md, AGENTS.md, docs/PLAN.ko.md.
 - [ ] P0.5 Lexical 안정 릴리스 및 peer dependency 호환 확인, 모든 @lexical 패키지 버전 통일·lockfile 고정.
-- [ ] P0.6 workspace/TS/lint/build/CI 구성, CSS·폰트·이미지별 라이선스/고지 확인, 기존 GPL-3.0 LICENSE에 맞는 패키지 메타데이터·고지 반영. 데모 이미지 무단 재배포 없이 자체 fixture 제작.
+- [ ] P0.6 workspace/TS/lint/build 및 로컬 검증 명령 구성, CSS·폰트·이미지별 라이선스/고지 확인, 기존 GPL-3.0 LICENSE에 맞는 패키지 메타데이터·고지 반영. 데모 이미지 무단 재배포 없이 자체 fixture 제작.
 - [ ] P0.7 upstream CSS selector·media·font 규칙을 추출해 F표와 전수 대조; 누락 시 항목 추가. 초기 feature inventory snapshot 커밋.
 
 P0 gate: 저장소 URL, 재현 가능한 설치/빌드, 버전/라이선스/전수 목록이 기록되어 있다.
@@ -163,7 +165,7 @@ P5 gate: 실제 예제 블로그에서 작성→발행→수정→비공개→�
 - [ ] P6.4 5만 자·노트 200개 장문 fixture에서 입력/저장/렌더 baseline 측정 후 성능 예산 확정, 회귀 기준 적용.
 - [ ] P6.5 package export/ESM/types/SSR·consumer 설치 smoke test, 브라우저에 Node 전용 모듈이 새지 않는지 검증.
 
-P6 gate: CI 녹색, 남은 결함과 지원 브라우저 범위 명시. 검증 미완료 기능은 지원 완료로 홍보하지 않음.
+P6 gate: 로컬 빌드·타입 검사·관련 테스트 통과, 남은 결함과 지원 브라우저 범위 명시. 검증 미완료 기능은 지원 완료로 홍보하지 않음.
 
 ### P7 — 문서·출시 (P6 이후)
 
@@ -181,7 +183,7 @@ P6 gate: CI 녹색, 남은 결함과 지원 브라우저 범위 명시. 검증 �
 
 진행 기록 형식: `작업 ID | 상태(todo/in-progress/blocked/done) | 변경 경로/PR | 검증 명령·결과 | 차단 원인 | 다음 작업`. 증거 없이 체크하지 않는다. 문서 수정만으로 구현 작업을 완료하지 않는다.
 
-현재 다음 작업: P0.5 Lexical 안정 릴리스·호환 버전 확인. 이어 P0.6/P0.7에서 workspace·CI·기능 전수 목록을 구축한다.
+현재 다음 작업: P0.5 Lexical 안정 릴리스·호환 버전 확인. 이어 P0.6/P0.7에서 workspace·로컬 검증 명령·기능 전수 목록을 구축한다.
 
 ## 주요 위험과 처리
 
