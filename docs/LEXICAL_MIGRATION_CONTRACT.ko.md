@@ -132,3 +132,9 @@ Migration은 입력을 변경하지 않는 순수 함수여야 하며, 동일 �
 5. React HistoryPlugin, headless History 등록, 브라우저 키보드 단축키를 각각 검증한다. 명령 dispatch 횟수 테스트만으로 이 시나리오를 대체하지 않는다.
 
 **주의:** 현재 구현은 성공 후 `CLEAR_HISTORY_COMMAND`를 dispatch하지만 실제 history plugin 등록 여부를 검사하지 않는다. 이 기능을 통합하는 host는 HistoryPlugin을 반드시 등록해야 한다. 문서 설치/명령 실행 시점의 순서와 history state 보존은 실행 검증 전까지 미확정이다.
+
+## 실제 History 등록 테스트 추가 (2026-10-16)
+
+- `packages/lexical/test/document-bridge.test.mjs`에 `@lexical/history`의 `createEmptyHistoryState`/`registerHistory`를 사용하는 통합 테스트를 추가했다.
+- 사전 undo/redo 항목을 삽입한 후 지원하지 않는 문서 버전 거부 시 스택 유지, 정상 문서 교체 시 두 스택 초기화를 단언한다.
+- 이는 **테스트 코드 추가**이지 실행 통과 증거가 아니다. 설치된 Lexical 0.52.0의 History API 시그니처 및 비동기 update 순서를 실제 실행에서 확인해야 한다.
