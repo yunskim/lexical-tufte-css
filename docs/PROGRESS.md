@@ -566,3 +566,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - 원격 파일 점검으로 `sqliteRevisionStore.ts` 중복 코드 오염 발견(E038), 완전 재작성. M035 예방 규약 추가.
 - 실제 Node SQLite 엔진에서 백업→수정→CAS 복원→stale replay 거부를 검사하는 통합 테스트 추가.
 - 저장소 테스트/타입 검사 실제 실행 미확인. 파일 백업 내구성·D1 검증 미완, CI 없음.
+
+## 2026-10-16 — Node 파일 백업 쓰기/읽기
+
+- `packages/document/scripts/backup-file.mjs` 추가: 임시 파일+fsync+rename 및 크기 제한 읽기.
+- 파일 백업 roundtrip, 손상 JSON, 용량 초과 테스트 추가.
+- Node 테스트 미실행, 파일시스템 장애 복구·권한 정책·DB snapshot 정합성 미검증. P5.1 완료 보류, CI 없음.
