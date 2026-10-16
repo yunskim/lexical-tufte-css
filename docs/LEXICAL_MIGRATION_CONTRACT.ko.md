@@ -156,3 +156,10 @@ Migration은 입력을 변경하지 않는 순수 함수여야 하며, 동일 �
 - `packages/lexical/test/document-bridge.test.mjs`에서 `fixtures/tufte/server-document-v2.json`을 직접 로드해 `loadMigratedDocumentIntoEditor` → 실제 headless editor state → `exportEditorToDocumentV2` 전체 문서 동등성을 검사한다.
 - 지원하지 않는 `editorFormat.formatVersion`을 입력한 경우 로드 거부 및 editor state 불변성도 검사한다.
 - 이 검사는 고정된 저장 JSON의 현행 런타임 왕복을 위한 테스트 코드다. **실행하지 않았으며**, 과거/미래 Lexical npm 버전 간 호환성을 증명하지 않는다.
+
+## v2 게시물 저장 경계 (2026-10-16)
+
+- `validatePostRecordV2` 추가: v2 document와 기존 PostMetadata를 각각 검증하고 진단 경로를 `$.document`/`$.metadata`로 구분한다.
+- v1 `validatePostRecord`는 호환성 유지를 위해 그대로 둔다. v2 저장은 새 validator를 명시적으로 호출해야 한다.
+- 검증된 성공 결과의 metadata는 복제한다. revision 값 자체의 유효성 검사만 수행하며, 저장소의 이전 revision과 비교하는 낙관적 동시성 검사·원자적 저장은 아직 구현하지 않았다.
+- 저장 fixture 기반 성공/복합 실패 테스트를 작성했지만 실제 실행은 미완이다.
