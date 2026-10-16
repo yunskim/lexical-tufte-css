@@ -208,6 +208,29 @@ test('R02 Lexical 0.52.0 generated golden snapshot (explicit update only)',t=>{
   mkdirSync(dirname(fileURLToPath(snapshot)),{recursive:true});
   writeFileSync(snapshot,actual,'utf8');
  }
- if(!existsSync(snapshot)){t.skip('Golden fixture not yet generated from installed Lexical 0.52.0; run UPDATE_LEXICAL_GOLDEN=1 and commit reviewed output');return;}
+ if(!existsSync(snapshot)){
+  if(process.env.REQUIRE_LEXICAL_GOLDEN==='1')assert.fail('Golden fixture is required; generate and review using UPDATE_LEXICAL_GOLDEN=1');
+  t.skip('Golden fixture not yet generated from installed Lexical 0.52.0; run UPDATE_LEXICAL_GOLDEN=1 and commit reviewed output');return;
+ }
  assert.equal(actual,readFileSync(snapshot,'utf8'));
+});
+
+test('R02 missing referenced asset fails before editor mutation',()=>{
+ const source=editor();
+ source.update(()=>{
+  $getRoot().append($createSectionNode().append(
+   $createFigureNode('body').append(
+    $createInlineImageNode('/figures/missing.svg','누락된 그림','missing-asset'),
+    $createCaptionNode().append($createTextNode('캡션'))
+   )
+  ));
+ },{discrete:true});
+ const base=fixture(),document={...base,lexicalState:source.getEditorState().toJSON()};
+ let parses=0,sets=0;
+ const fake={parseEditorState(){parses++;throw Error('unexpected parse');},setEditorState(){sets++;}};
+ const result=loadDocumentIntoEditor(fake,document);
+ assert.equal(result.ok,false);
+ assert.ok(result.diagnostics.some(x=>x.code==='MISSING_ASSET'));
+ assert.equal(parses,0);
+ assert.equal(sets,0);
 });
