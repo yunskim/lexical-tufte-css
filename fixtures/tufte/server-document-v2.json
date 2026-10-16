@@ -1,0 +1,724 @@
+{
+  "schemaVersion": 2,
+  "id": "server-fixture",
+  "locale": "ko-KR",
+  "title": "서버 렌더링 <검증>",
+  "subtitle": "주석·그림·표",
+  "lexicalState": {
+    "root": {
+      "children": [
+        {
+          "children": [
+            {
+              "children": [
+                {
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "서버 본문 & <script> 금지 ",
+                  "type": "text",
+                  "version": 1
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 1,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "주석 <내용>",
+                      "type": "text",
+                      "version": 1
+                    },
+                    {
+                      "children": [
+                        {
+                          "detail": 0,
+                          "format": 0,
+                          "mode": "normal",
+                          "style": "",
+                          "text": "문서",
+                          "type": "text",
+                          "version": 1
+                        }
+                      ],
+                      "rel": null,
+                      "target": null,
+                      "title": null,
+                      "url": "https://lexical.dev",
+                      "direction": null,
+                      "format": "",
+                      "indent": 0,
+                      "type": "link",
+                      "version": 1
+                    },
+                    {
+                      "type": "tufte-inline-image",
+                      "version": 1,
+                      "src": "/fixture.svg",
+                      "alt": "주석 그림"
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "tufte-note",
+                  "version": 1,
+                  "noteId": "server-note",
+                  "kind": "sidenote"
+                },
+                {
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " 다음 본문",
+                  "type": "text",
+                  "version": 1
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": "",
+              "type": "paragraph",
+              "version": 1
+            },
+            {
+              "children": [
+                {
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "여백 ",
+                  "type": "text",
+                  "version": 1
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "번호 없는 주석",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "tufte-note",
+                  "version": 1,
+                  "noteId": "server-margin",
+                  "kind": "marginnote"
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": "",
+              "type": "paragraph",
+              "version": 1
+            },
+            {
+              "children": [
+                {
+                  "type": "tufte-inline-image",
+                  "version": 1,
+                  "src": "/fixture.svg",
+                  "alt": "그림"
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "서버 그림 캡션",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "tufte-caption",
+                  "version": 1
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "type": "tufte-figure",
+              "version": 1,
+              "width": "body"
+            },
+            {
+              "children": [
+                {
+                  "type": "tufte-inline-image",
+                  "version": 1,
+                  "src": "/fixture.svg",
+                  "alt": "그림"
+                },
+                {
+                  "children": [
+                    {
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "서버 그림 캡션",
+                      "type": "text",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "tufte-caption",
+                  "version": 1
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "type": "tufte-figure",
+              "version": 1,
+              "width": "fullwidth"
+            },
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "children": [
+                                {
+                                  "detail": 0,
+                                  "format": 0,
+                                  "mode": "normal",
+                                  "style": "",
+                                  "text": "항목 1",
+                                  "type": "text",
+                                  "version": 1
+                                }
+                              ],
+                              "direction": null,
+                              "format": "",
+                              "indent": 0,
+                              "textFormat": 0,
+                              "textStyle": "",
+                              "type": "paragraph",
+                              "version": 1
+                            }
+                          ],
+                          "backgroundColor": null,
+                          "colSpan": 1,
+                          "headerState": 1,
+                          "rowSpan": 1,
+                          "direction": null,
+                          "format": "",
+                          "indent": 0,
+                          "type": "tablecell",
+                          "version": 1
+                        },
+                        {
+                          "children": [
+                            {
+                              "children": [
+                                {
+                                  "detail": 0,
+                                  "format": 0,
+                                  "mode": "normal",
+                                  "style": "",
+                                  "text": "항목 2",
+                                  "type": "text",
+                                  "version": 1
+                                }
+                              ],
+                              "direction": null,
+                              "format": "",
+                              "indent": 0,
+                              "textFormat": 0,
+                              "textStyle": "",
+                              "type": "paragraph",
+                              "version": 1
+                            }
+                          ],
+                          "backgroundColor": null,
+                          "colSpan": 1,
+                          "headerState": 1,
+                          "rowSpan": 1,
+                          "direction": null,
+                          "format": "",
+                          "indent": 0,
+                          "type": "tablecell",
+                          "version": 1
+                        }
+                      ],
+                      "direction": null,
+                      "format": "",
+                      "indent": 0,
+                      "type": "tablerow",
+                      "version": 1
+                    },
+                    {
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "children": [
+                                {
+                                  "detail": 0,
+                                  "format": 0,
+                                  "mode": "normal",
+                                  "style": "",
+                                  "text": "값 1",
+                                  "type": "text",
+                                  "version": 1
+                                }
+                              ],
+                              "direction": null,
+                              "format": "",
+                              "indent": 0,
+                              "textFormat": 0,
+                              "textStyle": "",
+                              "type": "paragraph",
+                              "version": 1
+                            }
+                          ],
+                          "backgroundColor": null,
+                          "colSpan": 1,
+                          "headerState": 0,
+                          "rowSpan": 1,
+                          "direction": null,
+                          "format": "",
+                          "indent": 0,
+                          "type": "tablecell",
+                          "version": 1
+                        },
+                        {
+                          "children": [
+                            {
+                              "children": [
+                                {
+                                  "detail": 0,
+                                  "format": 0,
+                                  "mode": "normal",
+                                  "style": "",
+                                  "text": "값 2",
+                                  "type": "text",
+                                  "version": 1
+                                }
+                              ],
+                              "direction": null,
+                              "format": "",
+                              "indent": 0,
+                              "textFormat": 0,
+                              "textStyle": "",
+                              "type": "paragraph",
+                              "version": 1
+                            }
+                          ],
+                          "backgroundColor": null,
+                          "colSpan": 1,
+                          "headerState": 0,
+                          "rowSpan": 1,
+                          "direction": null,
+                          "format": "",
+                          "indent": 0,
+                          "type": "tablecell",
+                          "version": 1
+                        }
+                      ],
+                      "direction": null,
+                      "format": "",
+                      "indent": 0,
+                      "type": "tablerow",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "table",
+                  "version": 1
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "type": "tufte-table-layout",
+              "version": 1,
+              "layout": "body"
+            },
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "children": [
+                                {
+                                  "detail": 0,
+                                  "format": 0,
+                                  "mode": "normal",
+                                  "style": "",
+                                  "text": "항목 1",
+                                  "type": "text",
+                                  "version": 1
+                                }
+                              ],
+                              "direction": null,
+                              "format": "",
+                              "indent": 0,
+                              "textFormat": 0,
+                              "textStyle": "",
+                              "type": "paragraph",
+                              "version": 1
+                            }
+                          ],
+                          "backgroundColor": null,
+                          "colSpan": 1,
+                          "headerState": 1,
+                          "rowSpan": 1,
+                          "direction": null,
+                          "format": "",
+                          "indent": 0,
+                          "type": "tablecell",
+                          "version": 1
+                        },
+                        {
+                          "children": [
+                            {
+                              "children": [
+                                {
+                                  "detail": 0,
+                                  "format": 0,
+                                  "mode": "normal",
+                                  "style": "",
+                                  "text": "항목 2",
+                                  "type": "text",
+                                  "version": 1
+                                }
+                              ],
+                              "direction": null,
+                              "format": "",
+                              "indent": 0,
+                              "textFormat": 0,
+                              "textStyle": "",
+                              "type": "paragraph",
+                              "version": 1
+                            }
+                          ],
+                          "backgroundColor": null,
+                          "colSpan": 1,
+                          "headerState": 1,
+                          "rowSpan": 1,
+                          "direction": null,
+                          "format": "",
+                          "indent": 0,
+                          "type": "tablecell",
+                          "version": 1
+                        }
+                      ],
+                      "direction": null,
+                      "format": "",
+                      "indent": 0,
+                      "type": "tablerow",
+                      "version": 1
+                    },
+                    {
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "children": [
+                                {
+                                  "detail": 0,
+                                  "format": 0,
+                                  "mode": "normal",
+                                  "style": "",
+                                  "text": "값 1",
+                                  "type": "text",
+                                  "version": 1
+                                }
+                              ],
+                              "direction": null,
+                              "format": "",
+                              "indent": 0,
+                              "textFormat": 0,
+                              "textStyle": "",
+                              "type": "paragraph",
+                              "version": 1
+                            }
+                          ],
+                          "backgroundColor": null,
+                          "colSpan": 1,
+                          "headerState": 0,
+                          "rowSpan": 1,
+                          "direction": null,
+                          "format": "",
+                          "indent": 0,
+                          "type": "tablecell",
+                          "version": 1
+                        },
+                        {
+                          "children": [
+                            {
+                              "children": [
+                                {
+                                  "detail": 0,
+                                  "format": 0,
+                                  "mode": "normal",
+                                  "style": "",
+                                  "text": "값 2",
+                                  "type": "text",
+                                  "version": 1
+                                }
+                              ],
+                              "direction": null,
+                              "format": "",
+                              "indent": 0,
+                              "textFormat": 0,
+                              "textStyle": "",
+                              "type": "paragraph",
+                              "version": 1
+                            }
+                          ],
+                          "backgroundColor": null,
+                          "colSpan": 1,
+                          "headerState": 0,
+                          "rowSpan": 1,
+                          "direction": null,
+                          "format": "",
+                          "indent": 0,
+                          "type": "tablecell",
+                          "version": 1
+                        }
+                      ],
+                      "direction": null,
+                      "format": "",
+                      "indent": 0,
+                      "type": "tablerow",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "table",
+                  "version": 1
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "type": "tufte-table-layout",
+              "version": 1,
+              "layout": "fullwidth"
+            },
+            {
+              "children": [
+                {
+                  "children": [
+                    {
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "children": [
+                                {
+                                  "detail": 0,
+                                  "format": 0,
+                                  "mode": "normal",
+                                  "style": "",
+                                  "text": "SCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENT",
+                                  "type": "text",
+                                  "version": 1
+                                }
+                              ],
+                              "direction": null,
+                              "format": "",
+                              "indent": 0,
+                              "textFormat": 0,
+                              "textStyle": "",
+                              "type": "paragraph",
+                              "version": 1
+                            }
+                          ],
+                          "backgroundColor": null,
+                          "colSpan": 1,
+                          "headerState": 1,
+                          "rowSpan": 1,
+                          "direction": null,
+                          "format": "",
+                          "indent": 0,
+                          "type": "tablecell",
+                          "version": 1
+                        },
+                        {
+                          "children": [
+                            {
+                              "children": [
+                                {
+                                  "detail": 0,
+                                  "format": 0,
+                                  "mode": "normal",
+                                  "style": "",
+                                  "text": "SCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENT",
+                                  "type": "text",
+                                  "version": 1
+                                }
+                              ],
+                              "direction": null,
+                              "format": "",
+                              "indent": 0,
+                              "textFormat": 0,
+                              "textStyle": "",
+                              "type": "paragraph",
+                              "version": 1
+                            }
+                          ],
+                          "backgroundColor": null,
+                          "colSpan": 1,
+                          "headerState": 1,
+                          "rowSpan": 1,
+                          "direction": null,
+                          "format": "",
+                          "indent": 0,
+                          "type": "tablecell",
+                          "version": 1
+                        }
+                      ],
+                      "direction": null,
+                      "format": "",
+                      "indent": 0,
+                      "type": "tablerow",
+                      "version": 1
+                    },
+                    {
+                      "children": [
+                        {
+                          "children": [
+                            {
+                              "children": [
+                                {
+                                  "detail": 0,
+                                  "format": 0,
+                                  "mode": "normal",
+                                  "style": "",
+                                  "text": "SCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENT",
+                                  "type": "text",
+                                  "version": 1
+                                }
+                              ],
+                              "direction": null,
+                              "format": "",
+                              "indent": 0,
+                              "textFormat": 0,
+                              "textStyle": "",
+                              "type": "paragraph",
+                              "version": 1
+                            }
+                          ],
+                          "backgroundColor": null,
+                          "colSpan": 1,
+                          "headerState": 0,
+                          "rowSpan": 1,
+                          "direction": null,
+                          "format": "",
+                          "indent": 0,
+                          "type": "tablecell",
+                          "version": 1
+                        },
+                        {
+                          "children": [
+                            {
+                              "children": [
+                                {
+                                  "detail": 0,
+                                  "format": 0,
+                                  "mode": "normal",
+                                  "style": "",
+                                  "text": "SCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENTSCROLLABLECONTENT",
+                                  "type": "text",
+                                  "version": 1
+                                }
+                              ],
+                              "direction": null,
+                              "format": "",
+                              "indent": 0,
+                              "textFormat": 0,
+                              "textStyle": "",
+                              "type": "paragraph",
+                              "version": 1
+                            }
+                          ],
+                          "backgroundColor": null,
+                          "colSpan": 1,
+                          "headerState": 0,
+                          "rowSpan": 1,
+                          "direction": null,
+                          "format": "",
+                          "indent": 0,
+                          "type": "tablecell",
+                          "version": 1
+                        }
+                      ],
+                      "direction": null,
+                      "format": "",
+                      "indent": 0,
+                      "type": "tablerow",
+                      "version": 1
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "type": "table",
+                  "version": 1
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "type": "tufte-table-layout",
+              "version": 1,
+              "layout": "scroll"
+            }
+          ],
+          "direction": null,
+          "format": "",
+          "indent": 0,
+          "type": "tufte-section",
+          "version": 1
+        }
+      ],
+      "direction": null,
+      "format": "",
+      "indent": 0,
+      "type": "root",
+      "version": 1
+    }
+  },
+  "assets": [],
+  "editorFormat": {
+    "engine": "lexical",
+    "formatVersion": 1
+  }
+}
