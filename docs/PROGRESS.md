@@ -397,3 +397,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - 정상 이미지의 assetId/width/height 왕복 테스트와 함께 R01 경계를 추적한다.
 - 기존 E032/E033 및 M029/M030을 재점검해 synthetic section은 독립 최소 노드로 유지했다.
 - 실행 검증 미확인으로 R01/R03 체크 보류. CI 추가 없음.
+
+## 2026-10-16 — R01 이미지 입력 정책 통합
+
+- `InlineImageNode`의 JSON import와 `$createInlineImageNode`에서 중복된 URL/alt/assetId/width/height 검증을 `assertImageProperties`로 통합했다.
+- 잘못된 alt, data URL, ID, 크기 등 동일 거부 정책을 확인하는 회귀 테스트를 추가했다.
+- E032/E033의 fixture 제약과 M029/M030 재발 방지 내용을 점검했다. 새로운 실행 오류는 확인되지 않았으나 테스트 자체는 미실행.
+- R01 완료 체크 보류, CI 없음.
