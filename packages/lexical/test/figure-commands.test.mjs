@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createHeadlessEditor} from '@lexical/headless';
 import {$getRoot,$createParagraphNode,$createTextNode,$createNodeSelection,$setSelection} from 'lexical';
-import {TUFTE_NODES,$createSectionNode,registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,$createFigureNode,$createInlineImageNode,$createCaptionNode,$createNoteNode,$reidentifyPastedNotes} from '../dist/index.js';
+import {TUFTE_NODES,$createSectionNode,registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,$createFigureNode,$createInlineImageNode,$createCaptionNode,$createNoteNode,$reidentifyPastedNotes} from '../dist/index.js';
 
 function setup(){
  const diagnostics=[];
@@ -113,5 +113,32 @@ test('cut-paste preserves one nested figure note ID and renews duplicate copies'
   assert.equal(second.getLastChild().getNoteId(),'renewed-copy');
   assert.equal(changes.get('shared-cut')?.length,2);
  },{discrete:true});
+ dispose();
+});
+
+test('figure marginnote update and removal preserve sibling caption',()=>{
+ const {editor,diagnostics,dispose}=setup();
+ editor.update(()=>{
+  const figure=$createFigureNode().append($createInlineImageNode('/figure.png','figure'),$createNoteNode('figure-note','marginnote').append($createTextNode('before')),$createCaptionNode().append($createTextNode('caption')));
+  $getRoot().append($createSectionNode().append(figure));
+  const selection=$createNodeSelection();selection.add(figure.getKey());$setSelection(selection);
+ },{discrete:true});
+ editor.dispatchCommand(UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,{noteId:'figure-note',text:'after'});
+ editor.getEditorState().read(()=>{
+  const figure=$getRoot().getFirstChild().getFirstChild();
+  assert.equal(figure.getChildAtIndex(1).getTextContent(),'after');
+  assert.equal(figure.getLastChild().getTextContent(),'caption');
+ });
+ editor.update(()=>{
+  const figure=$getRoot().getFirstChild().getFirstChild();
+  const selection=$createNodeSelection();selection.add(figure.getKey());$setSelection(selection);
+ },{discrete:true});
+ editor.dispatchCommand(REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,'figure-note');
+ editor.getEditorState().read(()=>{
+  const figure=$getRoot().getFirstChild().getFirstChild();
+  assert.deepEqual(figure.getChildren().map(n=>n.getType()),['tufte-inline-image','tufte-caption']);
+  assert.equal(figure.getLastChild().getTextContent(),'caption');
+ });
+ assert.deepEqual(diagnostics,[]);
  dispose();
 });
