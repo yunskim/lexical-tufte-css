@@ -177,3 +177,11 @@ Migration은 입력을 변경하지 않는 순수 함수여야 하며, 동일 �
 - `InMemoryPostRevisionStoreV2`는 단일 JS 프로세스 내 동기 검사·교체로 CAS 의미를 구현한 테스트/예제용 저장소다. `read()`는 복제 snapshot을 반환한다.
 - 이 구현은 영속성, 프로세스 간 동기화, 백업, 장애 복구를 제공하지 않는다. SQLite/D1 등의 실제 저장 adapter와 migration backup/atomic replace는 미구현이다.
 - 두 writer가 같은 revision으로 경쟁하는 회귀 테스트 작성, 실행 미확인.
+
+## SQLite/D1 조건부 갱신 CAS adapter (2026-10-16)
+
+- `SqlitePostRevisionStoreV2` 추가: `UPDATE posts_v2 SET revision=?, payload=? WHERE id=? AND slug=? AND revision=?` 단일 조건부 SQL을 사용한다. DB의 단일 문장 원자성을 전제로 비교·교체 간 간격을 제거한다.
+- 필수 테이블: `posts_v2(id TEXT PRIMARY KEY, slug TEXT UNIQUE NOT NULL, revision INTEGER NOT NULL CHECK(revision>=1), payload TEXT NOT NULL)`.
+- `meta.changes===1`만 성공. 0이면 충돌/행 없음/identity 불일치로 거부, 값이 없거나 그 외면 `STORAGE_RESULT_UNKNOWN`으로 거부한다.
+- 이 구현은 D1 호환 prepared statement 최소 인터페이스만 의존한다. 실제 D1/SQLite 연결 테스트, 테이블 생성 migration, 최초 insert, 백업, 삭제·복원은 미완이다. 호출자는 DB 에러를 처리해야 한다.
+- Mock statement 테스트 작성, 미실행. 프로세스 간 CAS는 실제 DB 엔진에서 검증해야 한다.
