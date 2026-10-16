@@ -933,3 +933,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - $reidentifyPastedNotes의 기존 existing 집합이 붙여넣기 payload 내 중복을 이미 차단하므로 중복 processed 집합을 제거.
 - 문서에 이미 연결된 그림의 동일 noteId가 cutIds에 포함되어도 기존 문서 ID와 충돌하면 재발급되는 회귀 케이스 추가.
 - 실제 cut 후 노드가 분리된 경우 원본 ID 보존, DOM paste 이벤트, undo/redo, figure note 삭제는 Work 검증 대기. 테스트 실행하지 않음, CI 생략.
+
+## 2026-10-16 P2.3 — 그림 내부 marginnote 삭제
+
+- REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND(noteId) 추가. 선택된 FigureNode의 직접 자식 marginnote만 대상으로 하며, ID 형식·선택·존재 검증과 history push 처리.
+- packages/lexical 공개 API 및 examples/editor의 그림 여백 주석 삭제 버튼 연결.
+- docs/PLAN.ko.md의 저장소 정본 URL을 lexical-tufte-css로 정정.
+- 삭제/삽입/undo/redo와 브라우저 동작 테스트 실행은 Work 일괄 처리 대기. CI 생략, F13 완료 체크 보류.
