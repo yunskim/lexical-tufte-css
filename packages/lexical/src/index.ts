@@ -8,3 +8,4 @@ export {SectionNode,FigureNode,CaptionNode,TableLayoutNode,$createSectionNode,$c
 export {$collectNoteIds,$reidentifyPastedNotes} from './clipboardNotes.js';
 export {$prepareNoteComposition,registerNoteCompositionGuard} from './noteComposition.js';
 export {$insertNoteEdgeText,registerNoteEdgeTypingGuard} from './noteEdgeTyping.js';
+export {TufteSpanNode,$createTufteSpanNode,type TufteSpanKind,type SerializedTufteSpan} from './TufteSpanNode.js';
