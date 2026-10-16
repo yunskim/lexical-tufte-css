@@ -28,7 +28,7 @@ export function registerListCommands(editor:LexicalEditor,onDiagnostic?:(diagnos
    if(!(section instanceof SectionNode)||section.getParent()?.getType()!=='root')return reject('최상위 섹션에서만 목록을 삽입할 수 있습니다.');
    let block:LexicalNode=s.anchor.getNode();
    while(block.getParent()&&!block.getParent()!.is(section))block=block.getParent()!;
-   if(!block.getParent()?.is(section))return reject('유효한 섹션 블록을 선택하세요.');
+   if(!block.getParent()?.is(section)||!['paragraph','heading','list','tufte-definition-list','horizontalrule','quote','tufte-epigraph','tufte-figure','tufte-table-layout','tufte-code','tufte-embed','tufte-fullwidth','tufte-section-footer'].includes(block.getType()))return reject('유효한 섹션 블록을 선택하세요.');
    $addUpdateTag(HISTORY_PUSH_TAG);
    const item=$createListItemNode();
    const list=$createListNode(kind).append(item);
