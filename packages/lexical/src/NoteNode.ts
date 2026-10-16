@@ -1,3 +1,4 @@
+import {isIdentifier} from '../../document/src/schema.js';
 import {
   $applyNodeReplacement, ElementNode, isHTMLElement,
   type EditorConfig, type LexicalEditor, type NodeKey,
@@ -21,7 +22,7 @@ export class NoteNode extends ElementNode {
     super(key); this.__noteId = noteId; this.__kind = kind;
   }
   getNoteId(): string { return this.getLatest().__noteId; }
-  setNoteId(id: string): this { this.getWritable().__noteId = id; return this; }
+  setNoteId(id: string): this { if(!isIdentifier(id)) throw new Error('Invalid note ID'); this.getWritable().__noteId = id; return this; }
   extractWithChild(): true { return true; }
   getKind(): NoteKind { return this.getLatest().__kind; }
   isInline(): true { return true; }
@@ -43,7 +44,7 @@ export class NoteNode extends ElementNode {
       noteId: this.getNoteId(), kind: this.getKind()};
   }
   static importJSON(value: SerializedNoteNode): NoteNode {
-    if (value.version !== 1 || !/^[a-zA-Z0-9_-]+$/.test(value.noteId)
+    if (value.version !== 1 || !isIdentifier(value.noteId)
       || !['sidenote', 'marginnote'].includes(value.kind)) {
       throw new Error('Unsupported or invalid Tufte note');
     }
@@ -71,5 +72,6 @@ export class NoteNode extends ElementNode {
   }
 }
 export function $createNoteNode(id: string, kind: NoteKind = 'sidenote'): NoteNode {
+  if(!isIdentifier(id) || !['sidenote','marginnote'].includes(kind)) throw new Error('Invalid note');
   return $applyNodeReplacement(new NoteNode(id, kind));
 }
