@@ -156,3 +156,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - note.test.mjs에 잘라낸 중복 noteId 중 한 개만 기존 ID를 유지하는 검사와 외부 링크 URL이 노트 ID 재발급에 의해 변경되지 않는 검사를 추가했다.
 - 향후 명시적 note reference 필드 도입 시에는 1:N 매핑의 대상이 모호한 경우 실패 진단 또는 사용자 선택을 요구하고, 참조와 정의를 같은 트랜잭션에서 변경한다.
 - 테스트 실행 증거 없음. R04 완료 체크 보류.
+
+## 2026-10-16 — R06 note HTML ID 충돌 방지 (구현, 실행 검증 대기)
+
+- packages/render/src/index.ts: 기존 `prefix-note-noteId` 연결은 prefix/noteId 경계가 모호하므로 `tufte-{prefix.length}-{prefix}-{noteId}`로 변경. label.for와 input.id는 같은 값을 사용.
+- packages/render/test/render.test.mjs: 기존 ID 기대값 갱신, `prefix=a-b,noteId=c`와 `prefix=a,noteId=b-c` 충돌 회귀 fixture 추가.
+- 브라우저·단위 테스트 실행 불가(E025). R06은 완료 체크하지 않는다. HTML ID 형식은 프로토타입 공개 계약이 아니며 변경 영향은 P4 발행 호환성 검증 시 재확인.
