@@ -112,3 +112,34 @@
 - 처리: 의미적 이미지 속성(src/alt) 생성만 공유하고 편집 전용 contentEditable 속성은 createDOM에서만 설정하도록 분리했다.
 - 검증: tests/note-dom-browser.mjs에서 두 note 종류의 편집 속성 배제·마크업·export JSON 불변성·모바일 CSS 토글 및 전체 P1.1/P1.2 회귀 통과.
 - 상태: verified (현재 주석·이미지 DOM export 범위). 대책 M011: 편집 DOM과 발행 DOM을 별도로 검사하고 발행 결과의 편집 class/data/contenteditable 유출을 회귀 테스트로 차단한다.
+
+## E013 — table export의 DOM 반환 타입 불일치
+
+- 발생: 2026-10-16 P1.4 타입 검사. 첫 build 결과를 회수하기 전에 두 번째 검사 묶음을 시작해 같은 타입 오류를 재확인했다.
+- 증상: TS2322, exportDOM.after에서 querySelector의 Element를 반환하여 HTMLElement 계약과 불일치.
+- 확인한 원인: table 선택 결과의 구체적 DOM 타입을 지정하지 않았다.
+- 처리: querySelector<HTMLTableElement>로 구체화하고 타입 검사 후 후속 검증을 실행한다.
+- 상태: verified (타입·빌드·후속 브라우저 검사 통과). 대책 M012: DOM export 반환 타입을 확인하고 선행 빌드가 끝나고 통과하기 전에는 의존 검증을 시작하지 않는다.
+
+## E014 — 실패한 빌드 뒤 브라우저 검증을 실행함
+
+- 발생: 2026-10-16 P1.4. E003/M003의 선행 build 규약을 ad-hoc 실행 묶음에 일관되게 적용하지 못했다.
+- 증상: 선행 pnpm check가 실패했는데 다음 줄의 브라우저 검증이 실행되어 .editor 5초 timeout.
+- 확인한 원인: shell 실행 묶음이 실패 시 중단하지 않아 새 export를 빌드하지 못한 상태로 UI를 실행했다. UI timeout만 별도 제품 오류로 해석하면 안 된다.
+- 처리: 의존 검증 실행은 set -e 또는 &&로 fail-fast하고 기존 test:browser의 build 선행 조건을 유지한다.
+- 상태: verified (타입·빌드·후속 브라우저 검사 통과). 대책 M012: 실행 묶음의 실패 전파와 선행 결과 회수도 점검한다.
+
+## E015 — 스크롤 검증 fixture에 줄바꿈 가능한 문자열 사용
+
+- 발생: 2026-10-16 P1.4 Chromium 레이아웃 검사. 타입·빌드·단위 6개는 통과했다.
+- 증상: 실제/기준 CSS 비교는 일치했지만 scroll wrapper의 overflows가 false여서 강제 스크롤 조건 assertion 실패.
+- 확인한 조건: 길게 반복한 fixture 문자열에 하이픈이 포함되어 줄바꿈 기회가 있었다. 긴 문자열이라는 이유만으로 min-content 폭 초과를 가정했다.
+- 처리: 줄바꿈 기회 없는 연속 문자열로 실제/수동 기준 fixture를 수정하고 viewport·측정값을 assertion에 포함한다.
+- 상태: verified (5개 viewport에서 실제 overflow와 문서 넘침 격리 확인). 대책 M013: overflow fixture는 길이뿐 아니라 줄바꿈 가능성과 scrollWidth/clientWidth를 확인하고, 기준 HTML 일치와 제품 요구 조건을 별도로 검사한다.
+
+## W001 — 편집기 prototype 번들 크기 경고
+
+- 발생: 2026-10-16 P1.4. Vite가 minified chunk 500kB 기준 경고를 출력했다. 빌드는 성공했다.
+- 관측: 편집기 JS 약 511.80kB, gzip 160.49kB. TablePlugin을 포함한 개발 예제의 값이다.
+- 상태: open (경고). 기준을 올려 숨기지 않는다. P3/P6에서 lazy loading/분할 및 성능 예산을 검토한다. 독자용 페이지에 편집기 번들을 넣지 않는 기존 경계를 유지한다.
+- 대책 M014: 작성/독자 번들 경계와 실제 번들 크기를 P3/P6에서 확인하고 변경 전후 측정 결과를 기록한다.

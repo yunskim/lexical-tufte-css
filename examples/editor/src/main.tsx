@@ -6,6 +6,9 @@ import {RichTextPlugin} from '@lexical/react/LexicalRichTextPlugin';
 import {ContentEditable} from '@lexical/react/LexicalContentEditable';
 import {HistoryPlugin} from '@lexical/react/LexicalHistoryPlugin';
 import {LexicalErrorBoundary} from '@lexical/react/LexicalErrorBoundary';
+import {TablePlugin} from '@lexical/react/LexicalTablePlugin';
+import {TableNode,TableRowNode,TableCellNode} from '@lexical/table';
+import {$loadLayoutFixture} from './layoutFixture.js';
 import {LinkNode, $createLinkNode} from '@lexical/link';
 import {$generateHtmlFromNodes} from '@lexical/html';
 import {
@@ -15,7 +18,7 @@ import {
   COMPOSITION_START_COMMAND, SELECTION_INSERT_CLIPBOARD_NODES_COMMAND, CUT_COMMAND, PASTE_COMMAND, KEY_BACKSPACE_COMMAND, KEY_DELETE_COMMAND, HISTORY_PUSH_TAG, UNDO_COMMAND, REDO_COMMAND,
   COMMAND_PRIORITY_HIGH, type LexicalNode,
 } from 'lexical';
-import {NoteNode, InlineImageNode, $createNoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, type NoteKind} from '@lexical-tufte/lexical';
+import {NoteNode, InlineImageNode, $createNoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, type NoteKind, SectionNode,FigureNode,CaptionNode,TableLayoutNode} from '@lexical-tufte/lexical';
 import './style.css';
 
 function containingNote(node: LexicalNode | null): NoteNode | null {
@@ -232,12 +235,12 @@ function EditorUI(){
     <p id="help">본문에서 Alt+↓: 다음 노트로 이동 · 노트에서 Escape: 본문으로 이동</p>
     <main>
       <RichTextPlugin contentEditable={<ContentEditable className="editor" aria-label="본문과 사이드노트 편집" aria-describedby="help"/>} ErrorBoundary={LexicalErrorBoundary}/>
-      <HistoryPlugin/>
+      <HistoryPlugin/><TablePlugin/>
     </main>
     <p role="status">{status}</p>
-    <div className="actions"><button onClick={save}>저장</button><button onClick={restore}>불러오기</button><button onClick={exportDocument}>JSON·HTML 확인</button></div>
+    <div className="actions"><button onClick={save}>저장</button><button onClick={restore}>불러오기</button><button onClick={exportDocument}>JSON·HTML 확인</button><button onClick={()=>{editor.update($loadLayoutFixture,{tag:HISTORY_PUSH_TAG});setStatus('레이아웃 예제를 불러왔습니다. 실행 취소할 수 있습니다.');}}>레이아웃 예제 불러오기</button></div>
     <details><summary>JSON과 발행 HTML 검사</summary><label>JSON<textarea ref={textarea} aria-label="문서 JSON" value={json} readOnly/></label><label>HTML<textarea aria-label="발행 HTML" value={html} readOnly/></label></details>
     <p className="notice">프로토타입: 공개 발행·모바일 여백 배치·OS별 실제 IME와 다른 브라우저 검증은 후속 단계에서 진행합니다. 한글 웹폰트 자산 연결은 P4 대상입니다.</p>
   </>;
 }
-createRoot(document.getElementById('root')!).render(<LexicalComposer initialConfig={{namespace:'tufte-p1',nodes:[NoteNode,InlineImageNode,LinkNode],editorState:seed,onError(error){throw error;},theme:{text:{bold:'text-bold',italic:'text-italic',code:'text-code'}}}}><EditorUI/></LexicalComposer>);
+createRoot(document.getElementById('root')!).render(<LexicalComposer initialConfig={{namespace:'tufte-p1',nodes:[NoteNode,InlineImageNode,LinkNode,SectionNode,FigureNode,CaptionNode,TableLayoutNode,TableNode,TableRowNode,TableCellNode],editorState:seed,onError(error){throw error;},theme:{text:{bold:'text-bold',italic:'text-italic',code:'text-code'}}}}><EditorUI/></LexicalComposer>);

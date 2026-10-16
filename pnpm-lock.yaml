@@ -26,6 +26,9 @@ importers:
       '@lexical/react':
         specifier: 0.52.0
         version: 0.52.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@6.0.2)(yjs@13.6.27)
+      '@lexical/table':
+        specifier: 0.52.0
+        version: 0.52.0(typescript@6.0.2)
       lexical:
         specifier: 0.52.0
         version: 0.52.0(typescript@6.0.2)

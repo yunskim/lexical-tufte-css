@@ -4,3 +4,4 @@ export {createHeadlessEditor} from "@lexical/headless";
 export {$createNoteNode, NoteNode, type NoteKind, type SerializedNoteNode} from './NoteNode.js';
 export {$createInlineImageNode, InlineImageNode} from './InlineImageNode.js';
 export {$getContainingNote,$splitNoteAtSelection,$mergeNoteWithNext,$moveNote,$insertNotePhrasing} from './noteOperations.js';
+export {SectionNode,FigureNode,CaptionNode,TableLayoutNode,$createSectionNode,$createFigureNode,$createCaptionNode,$createTableLayoutNode,type FigureWidth,type TableLayout} from './LayoutNodes.js';

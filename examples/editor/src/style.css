@@ -14,3 +14,10 @@ a {color:inherit;}
 textarea {display:block;width:100%;min-height:10rem;font-family:monospace;margin-bottom:1rem;}
 details {margin-top:2rem;} .notice {color:#555;font-size:.9rem;}
 @media(prefers-color-scheme:dark){:root{background:#151515;color:#ddd;}.tufte-note-editor,.text-code{background:#292929;}.notice,.tufte-note-editor::before{color:#bbb;}}
+
+.editor [data-tufte-editor=section] {border:1px dashed #999;padding:1rem;}
+.editor figure {margin:1.5rem 0;}
+.editor figure img {max-width:240px;}
+.editor figcaption {font-size:1rem;}
+.editor [data-tufte-editor=table-layout] {overflow-x:auto;margin:1rem 0;}
+.editor td,.editor th {border:1px solid #999;padding:.4rem;}

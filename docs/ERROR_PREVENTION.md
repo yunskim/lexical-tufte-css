@@ -28,6 +28,9 @@
 | M009 | E010 | composition 시작 경계를 보완하고 기본 Lexical 처리 유지; commit/cancel/undo와 표식 제거 검사 | COMPOSITION_START_COMMAND, Chromium CDP 회귀 | Chromium protocol 검증, OS 실제 IME는 P6 |
 | M010 | E011 | 일반 입력과 programmatic 삽입을 구분해 edge helper 적용; rich 내용/URL/이미지/ID를 함께 검사 | noteOperations.ts, clipboard·toolbar, rich split/merge 검사 | 적용, 새로운 입력 경로 추가 시 점검 |
 | M011 | E012 | 의미 DOM 생성만 공유하고 편집 전용 속성은 createDOM에 한정; 발행 속성과 adjacent CSS 동작을 실제 검사 | InlineImageNode, tests/note-dom-browser.mjs | 적용, 새 노드 export 추가 시 검사 |
+| M012 | E013/E014 | 구체적 DOM 반환 타입 지정, 선행 실행 결과 회수·통과 후 의존 검사. shell 묶음은 set -e/&&로 실패 전파 | LayoutNodes.ts, package.json의 build 선행 test:browser, AGENTS 규약 | 적용, 매 의존 검증 묶음 시작 시 점검 |
+| M013 | E015 | overflow fixture의 줄바꿈·min-content 조건을 확인; 기준 일치와 실제 overflow를 별도 검사, viewport/치수로 실패 식별 | layoutFixture.ts, layout-reference.html, tests/layout-browser.mjs | 5개 폭 검증, fixture 변경 시 확인 |
+| M014 | W001 | 경고 기준을 올리지 않고 작성/독자 번들 분리·지연 로딩과 실제 크기 측정 | P3/P6, PROGRESS의 baseline | 계획, 해당 단계 시작 시 점검 |
 
 ## 점검 기록
 
@@ -38,6 +41,8 @@
 | 2026-10-16 P1.2 완료 전 | E001–E011 / M001–M010 | M006의 일반 입력 검사만으로 rich 삽입/조합 경계를 보장할 수 없음을 확인, clipboard 추출·ID·IME·programmatic helper 대책으로 확대. 타입·빌드·단위 2개와 P1.1/P1.2 브라우저 회귀 통과. 환경 제한 E004/E005 및 OS IME 후속 유지 | P1.3 시작·완료 및 P1 단계 종료 |
 | 2026-10-16 P1.3 시작 | E001–E011 / M001–M010 | inline 경계의 일반/프로그램 입력·clipboard·composition 대책과 잔여 OS IME 제한 확인. nested composer·shared history의 고정 버전 소스를 비교 근거로 확인 | P1.3 완료 전 |
 | 2026-10-16 P1.3 완료 전 | E001–E012 / M001–M011 | M006/M008–M010 회귀를 유지하면서 DOM 분리의 E012를 추가 발견·수정. nested 상태/history 비교 실험으로 과도한 결론을 피하고 ADR 근거를 구분. 전체 로컬 검사·브라우저 회귀 통과 | P1.4 시작·완료 및 P1 단계 종료 |
+| 2026-10-16 P1.4 시작 | E001–E012 / M001–M011 | 편집/발행 DOM 분리 대책을 새 layout 노드에 적용. TableNode의 공식 export가 tbody를 만드는 것을 소스에서 확인하고 기준 HTML은 table 내부와 CSS direct-child를 구분해 비교할 계획 | P1.4 완료 전 |
+| 2026-10-16 P1.4 완료 전 | E001–E015/W001, M001–M014 | M003 선행 결과 회수·실패 전파가 ad-hoc 묶음에 빠진 점을 E014/M012로 보완. 독립 기준 HTML과 줄바꿈 없는 overflow fixture로 5개 폭 검증. 타입·빌드·단위 6개와 전체 브라우저 회귀 통과. 번들 경고는 P3/P6 후속으로 유지 | P1.5 시작·완료 및 P1 단계 종료 |
 
 ## 새 대책/점검 양식
 
