@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createHeadlessEditor} from '@lexical/headless';
-import {$getRoot,$createParagraphNode,$createTextNode,$createNodeSelection,$setSelection} from 'lexical';
+import {$getRoot,$createParagraphNode,$createTextNode,$createNodeSelection,$setSelection,$getSelection,$isRangeSelection} from 'lexical';
 import {TUFTE_NODES,$createSectionNode,registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,$createFigureNode,$createInlineImageNode,$createCaptionNode,$createNoteNode,$reidentifyPastedNotes} from '../dist/index.js';
 
 function setup(){
@@ -157,5 +157,24 @@ test('figure note commands reject invalid content and missing IDs without changi
  editor.dispatchCommand(REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,'absent-note');
  assert.equal(JSON.stringify(editor.getEditorState().toJSON().root),before);
  assert.deepEqual(diagnostics.map(d=>d.code),['INVALID_FIGURE_NOTE','FIGURE_NOTE_NOT_FOUND','FIGURE_NOTE_NOT_FOUND']);
+ dispose();
+});
+
+test('figure note text replacement retains a selection inside the replacement note',()=>{
+ const {editor,dispose}=setup();
+ editor.update(()=>{
+  const figure=$createFigureNode().append($createInlineImageNode('/figure.png','figure'),$createNoteNode('selection-note','marginnote').append($createTextNode('old text')));
+  $getRoot().append($createSectionNode().append(figure));
+  const selection=$createNodeSelection();selection.add(figure.getKey());$setSelection(selection);
+ },{discrete:true});
+ editor.dispatchCommand(UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,{noteId:'selection-note',text:'replacement text'});
+ editor.getEditorState().read(()=>{
+  const note=$getRoot().getFirstChild().getFirstChild().getLastChild();
+  const selection=$getSelection();
+  assert.ok($isRangeSelection(selection));
+  assert.equal(note.getTextContent(),'replacement text');
+  assert.equal(selection.anchor.getNode().getTextContent(),'replacement text');
+  assert.equal(selection.anchor.offset,'replacement text'.length);
+ });
  dispose();
 });
