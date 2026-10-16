@@ -143,10 +143,10 @@ P1 gate: 완료. 노트 편집 회귀와 SSR 출력의 실제 브라우저 비�
 - [x] R10 underline/strike/mark의 편집 허용 범위와 Tufte 발행 의미를 명시한다. [실제 편집·발행 검증](TEXT_FORMAT_R10.ko.md), 189개·브라우저8개 통과.
 - [x] R11 P5 이전 firstPublishedAt/publishedRevision과 immutable 공개 snapshot의 생명주기를 정의한다. [실제 SQLite 저장·실패 검증](PUBLICATION_LIFECYCLE_R11.ko.md), packages/blog, 201개·브라우저8개 통과.
 - [x] R12 adapter-fs의 id 기반 저장 경로, slug case-fold 중복, Windows 예약어·경로 충돌을 검증한다.
-- [ ] R13 GPL-3.0-only 유지 여부와 재사용 정책을 P7 전에 명시적으로 결정한다. 한글 Source Han 폰트의 subset unicode-range woff2 전략을 P4 전에 검증한다.
+- [x] R13 GPL-3.0-only 유지 여부와 재사용 정책을 P7 전에 명시적으로 결정한다. 한글 Source Han 폰트의 subset unicode-range woff2 전략을 P4 전에 검증한다. [기존 GPL 유지·대표 서브셋/원본/패키지 검증](LICENSE_AND_FONTS_R13.ko.md), check201개·browser9개·tarball4개 통과. 전체 생산 폰트는 P4.
 - [x] R14 CI 없이 로컬 check + test:browser 실행 경로(pre-push hook은 선택)를 문서화하고 실제 실행 결과를 남긴다.
 
-2026-10-16 통합 검증: [실행 보고서](VERIFICATION_2026-10-16.ko.md). 140개 단위/통합 및 6개 브라우저 실행 파일 통과. 체크한 R 항목은 보고서의 범위에 한정한다. R13 및 P2.2–P7/F표는 미완료다. R02는 후속 [전체 노드 왕복 검증](ROUNDTRIP_R02.ko.md)으로 완료(178개·브라우저7개)했다.
+2026-10-16 통합 검증: [실행 보고서](VERIFICATION_2026-10-16.ko.md). 140개 단위/통합 및 6개 브라우저 실행 파일 통과. 체크한 R 항목은 보고서의 범위에 한정한다. 후속 R 항목은 각 보고서에서 완료했다. P2.2–P7/F표는 미완료다. R02는 후속 [전체 노드 왕복 검증](ROUNDTRIP_R02.ko.md)으로 완료(178개·브라우저7개)했다.
 
 완료 판정: 각 항목은 변경 파일, 테스트 명령, 실행 결과를 docs/PROGRESS.md에 기록한 뒤 체크한다. 코드 실행을 하지 않은 설계 검토만으로 완료 처리하지 않는다.
 
@@ -220,7 +220,7 @@ P6 gate: 로컬 빌드·타입 검사·관련 테스트 통과, 남은 결함과
 
 진행 기록 형식: `작업 ID | 상태(todo/in-progress/blocked/done) | 변경 경로/PR | 검증 명령·결과 | 차단 원인 | 다음 작업`. 증거 없이 체크하지 않는다. 문서 수정만으로 구현 작업을 완료하지 않는다.
 
-현재 다음 작업: 미완료 R13 등 선행 안정화 범위를 마무리한 후 P2.2 F01–F09 노드/속성/commands와 JSON serialization 구현. P2.1의 33개 노드 계약을 순서대로 편집/발행 구현에 연결한다. 구조 검증 통과와 제품 기능 완료는 구분한다.
+현재 다음 작업: R01–R14 선행 안정화 완료 후 P2.2 F01–F09 노드/속성/commands와 JSON serialization 구현. P2.1의 33개 노드 계약을 순서대로 편집/발행 구현에 연결한다. 구조 검증 통과와 제품 기능 완료는 구분한다.
 
 ## 주요 위험과 처리
 

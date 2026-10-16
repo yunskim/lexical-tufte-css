@@ -1,0 +1,72 @@
+[
+  {
+    "selector": "#serif-hangul",
+    "width": 828,
+    "height": 38.390625
+  },
+  {
+    "selector": "#serif-hanja",
+    "width": 336,
+    "height": 38.390625
+  },
+  {
+    "selector": "#serif-punct",
+    "width": 293,
+    "height": 38.390625
+  },
+  {
+    "selector": "#serif-jamo",
+    "width": 92,
+    "height": 38.390625
+  },
+  {
+    "selector": "#sans-hangul",
+    "width": 792,
+    "height": 38.390625
+  },
+  {
+    "selector": "#sans-hanja",
+    "width": 336,
+    "height": 38.390625
+  },
+  {
+    "selector": "#sans-punct",
+    "width": 298,
+    "height": 38.390625
+  },
+  {
+    "selector": "#sans-jamo",
+    "width": 88,
+    "height": 38.390625
+  },
+  {
+    "selector": "#serif .sidenote",
+    "width": 666,
+    "height": 38.390625
+  },
+  {
+    "selector": "#serif figcaption",
+    "width": 586,
+    "height": 38.390625
+  },
+  {
+    "selector": "#serif td",
+    "width": 78.640625,
+    "height": 40.390625
+  },
+  {
+    "selector": "#sans .sidenote",
+    "width": 666,
+    "height": 38.390625
+  },
+  {
+    "selector": "#sans figcaption",
+    "width": 586,
+    "height": 38.390625
+  },
+  {
+    "selector": "#sans td",
+    "width": 75.640625,
+    "height": 40.390625
+  }
+]

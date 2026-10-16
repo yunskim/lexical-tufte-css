@@ -449,3 +449,41 @@ E001–E049/M001–M042를 검토했다. E024의 경계 입력은 실제 Chromiu
 - 발견: 실제 SQLite 검사는 통과했지만 기존 conditional UPDATE 단위 검사에서 bind 배열 기대값이 새 createdAt/updatedAt 조건을 포함하지 않아 실패했다.
 - 처리: 조건과 bind 순서를 함께 갱신하고 실제 SQLite의 createdAt 변경·updatedAt 역행 거부 회귀로 의미를 확인한다. SQL 비교 조건을 제거해 옛 테스트에 맞추지 않는다.
 - 상태: verified (실제 SQLite/메모리 시간 불변식 및 전체201개·브라우저8개). M053 참조.
+
+## E061 — 폰트 실제 로드 검사에서 Chromium family 표시 문자열 가정
+
+- 발견: R13 CDP 결과가 실제 custom font를 보고했지만 familyName 뒤에 '(Fontations)'를 붙여 문자열 동일성 assertion이 실패했다.
+- 처리: 생성된 font의 고정 PostScript name을 manifest에 기록하고 CDP isCustomFont/postScriptName/glyphCount를 함께 확인한다. 플랫폼 표시용 family 문자열의 장식을 데이터 유실로 오인하지 않는다.
+- 상태: verified (custom PostScript/glyph 및 원본 비교, 전체 회귀). M054 참조.
+
+## E062 — hmtx advance 합을 브라우저 폭과 동일하다고 가정
+
+- 발견: R13에서 hmtx 합×font-size 기대값 834.624px와 실제 Fontations 폭 828px가 달라 assertion 실패. subset의 hmtx 자체는 원본과 일치했다.
+- 확인: 동일 CSS·브라우저에서 고정 Adobe 원본 OTF와 WOFF2를 직접 비교했으며 8개 샘플의 실제 폭/높이가 일치했다. 따라서 이 실패는 subset 데이터 유실의 증거가 아니다. shaping/렌더 backend 세부 원인은 단정하지 않는다.
+- 처리: 테이블 메트릭 보존과 실제 브라우저 원본 비교를 분리한다. 원본 직접 비교로 metric fixture를 명시적으로 생성하고 일반 회귀에서는 필수 fixture를 사용한다.
+- 상태: verified (8개 샘플+6개 의미 위치 원본 비교 및 필수 metric fixture 회귀). M055 참조.
+
+## E063 — 혼합 문자 폰트 비교의 원본/서브셋 fallback 정책 불일치
+
+- 발견: R13 노트·캡션·표의 원본 비교에서 폭 차이 발생. 원본 @font-face가 ASCII 공백까지 덮고, subset 쪽은 비라틴 범위만 적용해 서로 다른 Latin/fallback을 비교했다.
+- 처리: 원본 비교에도 동일한 unicode-range 및 serif/sans fallback을 적용했다. 같은 브라우저·내용·CSS 정책에서 8개 문자 샘플과 6개 의미 위치의 폭/높이가 일치함을 확인했다.
+- 상태: verified (원본 비교와 재생성 byte 일치). M056 참조.
+
+## E064 — 폰트 실패 시 DOM 가시성만으로 한글 가독성을 추정할 위험
+
+- 발견: R13 검토에서 기본 환경에 한국어 시스템 폰트가 없고 fc-match :lang=ko가 DejaVu를 반환했다. 글자 박스가 보인다는 검사만으로 한글 글리프 가독성을 보장할 수 없다.
+- 처리: CDP의 실제 fallback font를 결과에 포함한다. 전역 환경을 바꾸지 않고 별도 fontconfig를 쓰는 검증에서 Adobe 한글 폰트를 제공한 뒤, webfont 차단 시 SourceHanSansKR-Regular의 실제 시스템 glyph 사용을 확인했다.
+- 상태: 기본 환경의 한국어 fallback 부재는 제한으로 유지. 별도 한글 폰트 환경의 실패 fallback은 verified. P4/P6에서 실제 배포 OS별 가독성·font loading 실패를 검증한다. M057 참조.
+
+## E065 — fonts.ready와 실제 교체 paint를 같은 시점으로 가정
+
+- 발견: 별도 한국어 fallback 환경의 150ms 지연 검사에서 fonts.ready 직후 CDP가 이전 fallback을 보고해 custom font assertion이 실패했다.
+- 처리: 폰트 전달을 해제하고 fonts.ready 후 두 animation frame을 기다린 다음 실제 glyph 사용을 검사한다. 지연 전 fallback → 지연 후 custom font 전환을 확인했다.
+- 상태: verified (기본 환경과 별도 한글 fallback 환경 모두 통과). M058 참조.
+
+
+## E066 — 외부 검색 서비스의 GitHub 페이지 fetch 차단
+
+- 발견: 폰트 공식 GitHub tree 페이지 open이 DisabledError로 실패했다.
+- 처리: 동일 요청 반복 대신 연결된 GitHub API로 공식 repository/ref/파일 목록/라이선스를 읽고 고정 raw URL에서 원본 OTF를 확보했다. commit/blob와 SHA-256을 확인했다.
+- 상태: 자료 확보 경로 verified. 검색 서비스 차단 자체를 해제했다고 주장하지 않는다. 제품 테스트와 분리한다. M059 참조.

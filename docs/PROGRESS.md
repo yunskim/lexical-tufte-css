@@ -816,3 +816,11 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - 전체 draft revision+발행 generation 재검사 후 INSERT/공개 pointer를 한 transaction으로 전환. firstPublishedAt 보존, 비공개·재발행·과거 snapshot 조회, asset manifest 보존, slug 변경 거부, caller alias 차단. draft CAS 생성 시각 불변/updatedAt 역행 거부도 구현.
 - blog12개: 실제 SQLite 전체 생명주기·두 연결 경쟁·preflight 중 draft 변경·asset/render 및 insert/pointer 실패·close/reopen·checksum 손상·옵션 mutation·시간 불변식 통과. [계약](PUBLICATION_LIFECYCLE_R11.ko.md), packages/blog/README.md.
 - check201/201(document47·lexical114·render28·blog12, fail/skip0), browser8, frozen offline install, diff check 통과. E060/M053 기록·반영. CI 생략. R11 체크, 다음 R13. P5 filesystem/redirect/SSG/feed/실제 자산GC·인증·배포는 미완료.
+
+
+## 2026-10-16 R13 — 라이선스 및 폰트 전략 검증 완료
+
+- 소유자의 기존 GPL-3.0-only 유지·콘텐츠/코드 구분·외부 기여(DCO 권장/CLA 없음) 방침을 CONTRIBUTING과 [R13 계약](LICENSE_AND_FONTS_R13.ko.md)에 공개. prepack 고지 복사 및 실제4개 tarball의 JS/타입/문서 왕복/SQL export 검사 통과. private 유지, 배포/발행하지 않았다.
+- 공식 Adobe Serif KR2.003/Sans KR2.005 고정 commit/해시. OFL reserved name에 따라 수정본 이름 변경, 대표4그룹×2family WOFF2 45,172bytes 생성. 전체 생산 글리프/굵기와 제품 연결은 P4.
+- 8개 문자샘플+6개 노트/캡션/표 위치 원본 OTF 대조, cmap/hmtx/name 및 WOFF2/CSS/manifest 재생성 byte 일치. Latin-only 요청0, 혼합8, self CSP·150ms fallback→custom swap 확인. 기본 환경에 한국어 시스템 fallback이 없음을 유지하고 별도 fontconfig에서는 실제 SourceHanSansKR fallback glyph 사용 확인.
+- check201/201(document47·lexical114·render28·blog12, fail/skip0), browser9, package4 tarball 소비/타입, frozen offline install, diff check 통과. 원본/지연/차단/별도 한국어 fallback 대상 검사도 추가 통과. E061–E066/M054–M059 기록·반영. CI 생략. R13 체크, R01–R14 선행 안정화 완료. 다음 P2.2.

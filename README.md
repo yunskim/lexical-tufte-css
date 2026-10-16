@@ -69,3 +69,5 @@ pnpm test:browser
 R03.d 문서 교체 이력 계약과 검증: [HISTORY_R03.ko.md](docs/HISTORY_R03.ko.md). 최신 로컬 검증은 단위·통합180개 및 브라우저7개 통과, CI 생략.
 
 R11 공개 snapshot 생명주기: [packages/blog](packages/blog), [구현·검증 계약](docs/PUBLICATION_LIFECYCLE_R11.ko.md). 최신 로컬 검증은 단위·통합201개 및 브라우저8개 통과, CI 생략.
+
+R13 폰트·패키지 검증: [정책과 결과](docs/LICENSE_AND_FONTS_R13.ko.md). 최신 로컬 검증은 단위·통합201개·브라우저9개 및 패키지4개 소비 검사 통과. `pnpm package:check`는 로컬 tarball만 검사하며 발행하지 않는다. 본명조/본고딕 WOFF2는 대표 문자 검증용이며 전체 생산 폰트 연결은 P4다.

@@ -313,3 +313,38 @@ E001–E059/M001–M052를 검토했다. snapshot alias, 실제 SQLite CAS, 실�
 ## 2026-10-16 R11 완료 점검
 
 E060/M053 반영. R11 신규12개는 실제 SQLite 두 연결·영속 재열기·오류 주입·checksum·옵션 소유권·시간 불변식을 포함한다. check201개와 browser8, frozen offline install 및 diff check 통과. source record/metadata를 변경하지 않고 snapshotVersion1 경계를 도입했다. filesystem/D1/GC/redirect/인증과 불확실한 commit 응답 범위를 문서화했다. 다음 R13 시작·완료 및 P단계 전환 점검.
+
+## M054 — 폰트 CSS 선언과 실제 사용 글리프의 식별 구분
+
+- E061: font-family CSS나 document.fonts.check만으로 실제 font 사용을 판정하지 않는다. manifest의 PostScript name과 CDP custom-font glyph 사용을 비교한다. 브라우저 렌더 백엔드가 붙이는 family 표시 접미사는 안정된 font ID가 아니다.
+
+## M055 — 폰트 테이블 메트릭과 실제 shaping 결과 구분
+
+- E062: hmtx 무변경은 정적 데이터 검증이며 브라우저 폭의 단순 합 공식을 보장하지 않는다. 동일 CSS·브라우저로 원본 OTF와 subset WOFF2를 직접 비교한다.
+- reference-metrics.json은 고정 원본/해시/도구 버전과 UPDATE_FONT_METRICS=1을 함께 제공할 때만 갱신한다. 일반 검사는 필수 fixture를 생성하거나 누락을 허용하지 않는다. 다른 엔진의 표시 차이를 확인 없이 폰트 손실로 분류하지 않는다.
+
+
+## 2026-10-16 R13 시작 점검
+
+E001–E060/M001–M053 점검 후 작업을 시작했다. 소유자가 설정한 GPL-3.0-only 유지, 별도 폰트 OFL 및 reserved name 보존 정책을 적용한다. 공식 Adobe 고정 commit/해시를 확인하고, 대표 문자 샘플 WOFF2와 실제 원본 비교로 범위를 한정한다. source family 유지와 수정본 naming을 혼동하지 않는다. 다음 완료 점검.
+
+## M056 — 폰트 비교의 비대상 문자와 fallback 고정
+
+- E063: 대상 한글/한자 외에 Latin/공백/fallback과 CSS 기능도 원본·수정본 양쪽에 동일하게 적용한다. full-font face와 제한 unicode-range face를 그대로 비교하지 않는다. 문자 샘플 외 노트·캡션·표 위치도 함께 검사한다.
+
+## M057 — fallback 가시성과 글리프 가독성의 구분
+
+- E064: CSS 박스/텍스트/폭 존재를 글리프 지원의 증거로 사용하지 않는다. 실제 fallback font 식별과 언어 지원을 확인한다. 기본 환경의 한국어 폰트 부재는 남기며, 별도 fontconfig 성공을 모든 사용자 환경의 성공으로 확대하지 않는다.
+
+## M058 — font readiness 이후 paint 동기화
+
+- E065: 폰트 다운로드/디코딩 완료와 glyph paint 교체를 구분한다. 지연 로드 검사는 fonts.ready와 animation frame을 거쳐 실제 custom font로 바뀌었는지 확인한다.
+
+
+## M059 — 공식 자료 조회 차단 시 확인 가능한 1차 채널 사용
+
+- E066: 실패한 검색 페이지를 반복 호출하지 않는다. 공식 repository API/ref/raw 파일로 출처·고정 버전·해시를 확인한다. 조회 성공을 제품 실행 성공으로 대신하지 않는다.
+
+## 2026-10-16 R13 완료 및 P2.2 전환 점검
+
+E061–E066/M054–M059를 반영했다. 원본/서브셋의 동일 fallback 정책·실제 custom glyph·font-ready/paint·기본 한국어 fallback 부재를 구분했다. E064 기본 환경 제한 및 기존 OS IME/다른 브라우저/DOM adapter/W001은 유지한다. check201개, browser9개 및 추가 지연/원본/별도 한국어 fallback, package4 tarball 소비·타입, frozen install/diff 통과. R01–R14의 선행 안정화 범위 완료이며 F표나 P2–P7 전체 완료로 확대하지 않는다. 다음 P2.2 작업 시작/완료 및 같은 오류 재발 때 점검한다.

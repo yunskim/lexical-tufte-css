@@ -9,12 +9,14 @@
   "scripts": {
     "build": "pnpm -r build",
     "typecheck": "pnpm --filter @lexical-tufte/document build && pnpm -r typecheck",
-    "check": "pnpm lint && pnpm inventory:check && pnpm typecheck && pnpm build && pnpm test",
+    "check": "pnpm lint && pnpm inventory:check && pnpm font:check && pnpm typecheck && pnpm build && pnpm test",
     "lint": "node scripts/lint.mjs",
     "inventory:check": "node scripts/inventory.mjs",
     "test": "pnpm -r --if-present test",
-    "test:browser": "pnpm build && node tests/note-browser.mjs && node tests/note-editing-browser.mjs && node tests/note-dom-browser.mjs && node tests/layout-browser.mjs && node tests/server-browser.mjs && node tests/publication-browser.mjs && node tests/all-nodes-browser.mjs && node tests/text-format-browser.mjs",
-    "dev:editor": "pnpm --filter @lexical-tufte/lexical build && pnpm --filter @lexical-tufte/editor-prototype dev"
+    "test:browser": "pnpm build && node tests/note-browser.mjs && node tests/note-editing-browser.mjs && node tests/note-dom-browser.mjs && node tests/layout-browser.mjs && node tests/server-browser.mjs && node tests/publication-browser.mjs && node tests/all-nodes-browser.mjs && node tests/text-format-browser.mjs && node tests/font-proof-browser.mjs",
+    "dev:editor": "pnpm --filter @lexical-tufte/lexical build && pnpm --filter @lexical-tufte/editor-prototype dev",
+    "font:check": "node scripts/check-font-proof.mjs",
+    "package:check": "pnpm build && node scripts/pack-and-check.mjs"
   },
   "devDependencies": {
     "playwright": "1.51.1"

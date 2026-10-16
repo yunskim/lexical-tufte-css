@@ -1,0 +1,170 @@
+{
+  "fixtureVersion": 1,
+  "scope": "R13 proof only; sample glyph coverage, Regular weight",
+  "fontTools": "4.61.1",
+  "brotli": "1.2.0",
+  "samples": {
+    "hangul": "한글 본명조 본고딕 섹션 본문 여백 주석 캡션 표 그림 편집 저장 발행 복구 값 항목 대한민국",
+    "hanja": "漢字 大韓民國 學問 文書 春夏秋冬",
+    "punct": "「」『』、。！？〈〉《》…—·",
+    "jamo": "한 ㅎㅏㄴ"
+  },
+  "sources": [
+    {
+      "kind": "serif",
+      "file": "SourceHanSerifKR-Regular.otf",
+      "version": "2.003",
+      "commit": "7889f11bf31170b5d092a083b357c8c8130f89e0",
+      "sha256": "b2b310255186ce92de2909f96522b9183a9f6c323dbe5663f205f02d6ece08b7",
+      "repo": "source-han-serif",
+      "url": "https://raw.githubusercontent.com/adobe-fonts/source-han-serif/7889f11bf31170b5d092a083b357c8c8130f89e0/SubsetOTF/KR/SourceHanSerifKR-Regular.otf",
+      "family": "Lexical Tufte Han Serif Proof",
+      "originalBytes": 7669328,
+      "unitsPerEm": 1000,
+      "chunks": [
+        {
+          "postScriptName": "LexicalTufteHanSerifProof-hangul",
+          "kind": "hangul",
+          "file": "serif-hangul.woff2",
+          "characters": "값고구국그글대딕림명목문민발백복본석섹션여장저조주집캡편표한항행",
+          "unicodeRange": "U+AC12,U+ACE0,U+AD6C-AD6D,U+ADF8,U+AE00,U+B300,U+B515,U+B9BC,U+BA85,U+BAA9,U+BB38,U+BBFC,U+BC1C,U+BC31,U+BCF5,U+BCF8,U+C11D,U+C139,U+C158,U+C5EC,U+C7A5,U+C800,U+C870,U+C8FC,U+C9D1,U+CEA1,U+D3B8,U+D45C,U+D55C,U+D56D,U+D589",
+          "bytes": 12408,
+          "sha256": "224d8d4d769adf78c6719117cc25ce01ae782f0669fb8f3300ce6e03d33a7762",
+          "advanceUnits": 34776,
+          "sampleNonAscii": "한글본명조본고딕섹션본문여백주석캡션표그림편집저장발행복구값항목대한민국",
+          "hhea": {
+            "ascent": 1151,
+            "descent": -286,
+            "lineGap": 0
+          }
+        },
+        {
+          "postScriptName": "LexicalTufteHanSerifProof-hanja",
+          "kind": "hanja",
+          "file": "serif-hanja.woff2",
+          "characters": "冬問國夏大字學文春書民漢秋韓",
+          "unicodeRange": "U+51AC,U+554F,U+570B,U+590F,U+5927,U+5B57,U+5B78,U+6587,U+6625,U+66F8,U+6C11,U+6F22,U+79CB,U+97D3",
+          "bytes": 6284,
+          "sha256": "43eea67cd702fa2d8104c440c42263b24f02f47da3628eccb7fce8c5e288e178",
+          "advanceUnits": 14000,
+          "sampleNonAscii": "漢字大韓民國學問文書春夏秋冬",
+          "hhea": {
+            "ascent": 1151,
+            "descent": -286,
+            "lineGap": 0
+          }
+        },
+        {
+          "postScriptName": "LexicalTufteHanSerifProof-punct",
+          "kind": "punct",
+          "file": "serif-punct.woff2",
+          "characters": "·—…、。〈〉《》「」『』！？",
+          "unicodeRange": "U+B7,U+2014,U+2026,U+3001-3002,U+3008-300F,U+FF01,U+FF1F",
+          "bytes": 5716,
+          "sha256": "fdd45d8ba81db904ef52f73bdfbe01f6ba5518888ac02b66da8db8dc54729e77",
+          "advanceUnits": 14217,
+          "sampleNonAscii": "「」『』、。！？〈〉《》…—·",
+          "hhea": {
+            "ascent": 1151,
+            "descent": -286,
+            "lineGap": 0
+          }
+        },
+        {
+          "postScriptName": "LexicalTufteHanSerifProof-jamo",
+          "kind": "jamo",
+          "file": "serif-jamo.woff2",
+          "characters": "한ㄴㅎㅏ",
+          "unicodeRange": "U+1112,U+1161,U+11AB,U+3134,U+314E-314F",
+          "bytes": 3772,
+          "sha256": "ca32c0b75b2f969466461944d241a039ff046ec8ee9c0bff44aee961cce0dcfd",
+          "advanceUnits": 5796,
+          "sampleNonAscii": "한ㅎㅏㄴ",
+          "hhea": {
+            "ascent": 1151,
+            "descent": -286,
+            "lineGap": 0
+          }
+        }
+      ]
+    },
+    {
+      "kind": "sans",
+      "file": "SourceHanSansKR-Regular.otf",
+      "version": "2.005",
+      "commit": "a4f7cf94edfb9d7ffbdfc4841de276358bd7e0f2",
+      "sha256": "d8299926a5284f7461b46fa0617cc05d4f1fce8f034ffff78084225ce8b38071",
+      "repo": "source-han-sans",
+      "url": "https://raw.githubusercontent.com/adobe-fonts/source-han-sans/a4f7cf94edfb9d7ffbdfc4841de276358bd7e0f2/SubsetOTF/KR/SourceHanSansKR-Regular.otf",
+      "family": "Lexical Tufte Han Sans Proof",
+      "originalBytes": 4632304,
+      "unitsPerEm": 1000,
+      "chunks": [
+        {
+          "postScriptName": "LexicalTufteHanSansProof-hangul",
+          "kind": "hangul",
+          "file": "sans-hangul.woff2",
+          "characters": "값고구국그글대딕림명목문민발백복본석섹션여장저조주집캡편표한항행",
+          "unicodeRange": "U+AC12,U+ACE0,U+AD6C-AD6D,U+ADF8,U+AE00,U+B300,U+B515,U+B9BC,U+BA85,U+BAA9,U+BB38,U+BBFC,U+BC1C,U+BC31,U+BCF5,U+BCF8,U+C11D,U+C139,U+C158,U+C5EC,U+C7A5,U+C800,U+C870,U+C8FC,U+C9D1,U+CEA1,U+D3B8,U+D45C,U+D55C,U+D56D,U+D589",
+          "bytes": 5168,
+          "sha256": "b6c78acf5aae01a944437f23f1782de6e5b47b9b65736545c43da2af87cfcfd1",
+          "advanceUnits": 33120,
+          "sampleNonAscii": "한글본명조본고딕섹션본문여백주석캡션표그림편집저장발행복구값항목대한민국",
+          "hhea": {
+            "ascent": 1160,
+            "descent": -288,
+            "lineGap": 0
+          }
+        },
+        {
+          "postScriptName": "LexicalTufteHanSansProof-hanja",
+          "kind": "hanja",
+          "file": "sans-hanja.woff2",
+          "characters": "冬問國夏大字學文春書民漢秋韓",
+          "unicodeRange": "U+51AC,U+554F,U+570B,U+590F,U+5927,U+5B57,U+5B78,U+6587,U+6625,U+66F8,U+6C11,U+6F22,U+79CB,U+97D3",
+          "bytes": 4520,
+          "sha256": "a21bf278575fb6b02664349148c4dcaeb9d25b9ccf17dc9f735e370062d2468a",
+          "advanceUnits": 14000,
+          "sampleNonAscii": "漢字大韓民國學問文書春夏秋冬",
+          "hhea": {
+            "ascent": 1160,
+            "descent": -288,
+            "lineGap": 0
+          }
+        },
+        {
+          "postScriptName": "LexicalTufteHanSansProof-punct",
+          "kind": "punct",
+          "file": "sans-punct.woff2",
+          "characters": "·—…、。〈〉《》「」『』！？",
+          "unicodeRange": "U+B7,U+2014,U+2026,U+3001-3002,U+3008-300F,U+FF01,U+FF1F",
+          "bytes": 4788,
+          "sha256": "9da69c9f024a5980a3a6ddf8d00823416468dd6fdf6d5361d757fb01b324d9c2",
+          "advanceUnits": 14455,
+          "sampleNonAscii": "「」『』、。！？〈〉《》…—·",
+          "hhea": {
+            "ascent": 1160,
+            "descent": -288,
+            "lineGap": 0
+          }
+        },
+        {
+          "postScriptName": "LexicalTufteHanSansProof-jamo",
+          "kind": "jamo",
+          "file": "sans-jamo.woff2",
+          "characters": "한ㄴㅎㅏ",
+          "unicodeRange": "U+1112,U+1161,U+11AB,U+3134,U+314E-314F",
+          "bytes": 2516,
+          "sha256": "c6354c8da488b1a5c8a0e413995a3c95f4a2552684afe122dcb6e7ad2371099e",
+          "advanceUnits": 5520,
+          "sampleNonAscii": "한ㅎㅏㄴ",
+          "hhea": {
+            "ascent": 1160,
+            "descent": -288,
+            "lineGap": 0
+          }
+        }
+      ]
+    }
+  ]
+}

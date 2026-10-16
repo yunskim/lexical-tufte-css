@@ -1,42 +1,46 @@
-# R13 — 라이선스와 외부 재사용 정책 (결정 대기)
+# R13 — 라이선스 유지 및 한글 폰트 서브셋 검증
 
-## 현재 상태
+## 배포·재사용 정책
 
-- 루트 `package.json` 및 현재 패키지의 라이선스 표기는 `GPL-3.0-only`, 루트 `LICENSE`는 GPL v3 전문이다.
-- **라이선스 변경은 보류한다.** 이 문서는 GPL 유지·변경의 선택지를 기록하며, 권리자의 명시적 승인 없이 이중 라이선스나 예외를 도입하지 않는다.
-- GPL-3.0-only는 LGPL/MIT와 다르다. GPL 라이브러리를 다른 배포 프로그램에 통합하면 해당 프로그램의 배포 방식에 GPL 의무가 영향을 줄 수 있다. 정적 블로그 산출물 자체가 언제나 GPL이 되는 것은 아니다. 구체적인 배포·결합 구조는 별도 검토가 필요하다.
+사용자가 생성한 저장소의 기존 GPL-3.0-only 설정을 유지한다(PLAN의 저장소 기준). 라이선스를 변경하거나 linking 예외·이중 라이선스를 추가하지 않는다. 자체 코드의 SPDX/루트 LICENSE/각 패키지 메타데이터를 일치시킨다.
 
-## 재사용 시나리오
+기여자는 저작권을 유지하고 GPL-3.0-only로 기여한다. 별도 CLA/저작권 양도는 요구하지 않으며, 새로운 외부 기여에 DCO 1.1 sign-off를 권장한다. 과거 커밋을 소급 수정하지 않는다. [CONTRIBUTING](../CONTRIBUTING.md)에 정책을 공개했다.
 
-| 시나리오 | 현재 방침 |
-| --- | --- |
-| 저장소 코드 수정·재배포 | GPL-3.0-only 및 제3자 라이선스 준수 |
-| 외부 프로젝트의 편집기/렌더러 라이브러리 사용 | GPL 결합·배포 의무를 검토한 뒤 사용 |
-| 블로그에서 생성한 글과 HTML | 사용자 콘텐츠의 저작권과 프로그램 라이선스를 구분 |
-| GPL과 다른 조건으로 상용 제품에 포함 | 권리자 승인과 기여자 권리 확인 전까지 약속하지 않음 |
-| 제3자 Tufte CSS, Lexical, 폰트 | 각각의 라이선스·저작권 고지를 별도로 보존 |
+사용자 글·사진과 라이브러리 코드는 구분한다. 생성물이 프로그램 코드를 포함하거나 CSS/폰트를 재배포한다면 해당 자료의 고지를 보존한다. 모든 상용 결합이 가능하다거나 모든 출력물이 GPL이라고 단정하지 않는다. 정책 근거는 [GNU GPLv3](https://www.gnu.org/licenses/gpl-3.0.html), [GNU output FAQ](https://www.gnu.org/licenses/gpl-faq.html#GPLOutput), [DCO](https://developercertificate.org/)다.
 
-## P7 이전 결정 체크
+`prepack`은 자체 LICENSE와 THIRD_PARTY_NOTICES 및 licenses/를 복사한다. `pnpm package:check`는 document/lexical/render/blog 4개 로컬 tarball을 만들고 고지·JS import·fresh declaration·정본 왕복·renderer/blog API·SQL export를 검사한다. npm 발행은 하지 않았고 private 상태를 유지한다. 패키지 P7 품질 완료를 뜻하지 않는다.
 
-- [ ] GPL-3.0-only 유지, LGPL, MPL, MIT/Apache 또는 이중 라이선스 중 배포 목표에 맞는 방침을 권리자가 승인
-- [ ] 기여자 저작권·CLA/DCO 필요 여부 결정
-- [ ] 각 패키지의 SPDX 및 LICENSE/NOTICE, 제3자 의존성 고지 점검
-- [ ] 라이브러리와 사용자가 작성한 블로그 콘텐츠의 라이선스 분리 정책 공개
-- [ ] 실제 재사용 예제와 배포 조건을 문서로 검증
+## 원본 폰트와 수정본 이름
 
-## 한글 폰트 배포
+한국어 원본은 본명조 Source Han Serif KR Regular 2.003과 본고딕 Source Han Sans KR Regular 2.005다. Adobe 공식 저장소의 고정 commit과 SHA-256은 [manifest](../fixtures/fonts/proof/manifest.json)에 있다. 원본 약 7.67MB/4.63MB는 재생성 입력이며 저장소에 추가하지 않았다.
 
-- 기본 한국어 serif는 **Source Han Serif(본명조)**, sans-serif는 **Source Han Sans(본고딕)**.
-- 서브셋 WOFF2를 만들 때 원본 라이선스(OFL 등 실제 배포본 고지)를 확인하고, 폰트 파일·이름·고지 요건을 준수한다.
-- `@font-face`는 `unicode-range`가 겹치지 않는 서브셋을 우선한다. 라틴·한글·한자·문장부호와 fallback의 글리프 누락/중복을 실제 브라우저에서 확인한다.
-- 원본 폰트 대비 텍스트 폭·행간·각주 정렬 변화를 검증한다. 웹폰트가 로드되지 않을 때 시스템 serif/sans-serif fallback을 제공한다.
-- CSP에서 `font-src 'self'` 사용 가능하도록 자체 호스팅을 기본으로 설계한다. 외부 CDN 의존을 필수로 만들지 않는다.
+두 원본의 OFL-1.1은 'Source'를 Reserved Font Name으로 지정한다. 검증용 수정본은 primary family/PostScript 이름을 **Lexical Tufte Han Serif Proof / Lexical Tufte Han Sans Proof**로 바꾼다. 디자인 출처가 본명조/본고딕인 점과 원본 저작권·OFL을 보존한다. 폰트를 프로젝트 GPL로 재라이선스하지 않는다. [OFL 명명 기준](https://openfontlicense.org/ofl-reserved-font-names), [webfont 기준](https://openfontlicense.org/webfonts-and-reserved-font-names), 각 원본 고지를 따른다.
 
-## P4 이전 폰트 검증 체크
+## 서브셋 전략 및 실제 결과
 
-- [ ] 원본 폰트 라이선스 및 배포 고지 확인
-- [ ] Source Han Serif/Sans WOFF2 subset 제작 방식·`unicode-range` 매핑 검증
-- [ ] 한국어·영어·한자 혼합 샘플과 노트·표·캡션의 폰트 메트릭 비교
-- [ ] 브라우저 네트워크 요청량, 글리프 누락, FOUT/FOIT, CSP 확인
+- 대표 한글/한자/문장부호/자모 4그룹을 family마다 분리해 WOFF2 8개, 총 **45,172 bytes**를 생성했다. unicode-range는 family 안에서 겹치지 않고 ASCII/Latin은 제외한다. 실제 사용 문자에 필요한 조각만 요청한다.
+- fontTools 4.61.1/Brotli 1.2.0 및 원본 해시를 고정했다. 재생성한 WOFF2/CSS/manifest가 byte 단위로 일치했다. 원본 대비 cmap·hmtx와 primary font 이름을 검사했다.
+- 실제 Chromium의 custom font/PostScript name/glyphCount를 확인했다. 원본 OTF와 같은 unicode-range·Latin/fallback·CSS를 적용해 8개 문자 샘플 및 6개 노트/캡션/표 위치의 폭·높이가 일치했다. reference-metrics.json은 명시적 원본 비교에서만 갱신한다.
+- Latin-only 페이지는 WOFF2 요청 0개, 혼합 페이지는 8개 요청. `font-src 'self'`, 외부 CSS 및 script 금지 CSP에서 통과했다.
+- 150ms 전달 지연에서 fallback glyph가 먼저 보이고 전달 후 custom glyph로 바뀌었다. 이 환경의 예시 한글 폭은 기본 fallback 518.48→828px, 한국어 폰트를 제공한 별도 환경 792→828px로 바뀌었다. 따라서 swap을 쓴다는 이유로 layout shift가 없다고 주장하지 않는다.
+- 기본 실행 환경에는 한국어 시스템 fallback이 없다(E064). 가시성과 한글 가독성을 구분한다. 전역 설정을 바꾸지 않은 별도 fontconfig 환경에서는 webfont 차단 시 실제 SourceHanSansKR-Regular 시스템 glyph 사용을 확인했다. 모든 OS의 fallback 성공을 의미하지 않는다.
 
-이 문서는 법률 자문이 아니라 프로젝트 정책 결정 기록이다. 체크가 완료되기 전에는 R13을 완료로 표시하지 않는다.
+이 자료는 **전략 검증 fixture**다. 전체 한글/옛한글/한자 커버리지, 다른 굵기/italic, 제품 편집·미리보기·발행 연결, ET Book 실제 자산, 좁은 화면·실제 OS fallback 및 장문 로딩/CLS 예산은 P4/P6에 남는다. 전체 폰트를 이 45KB로 제공한다고 주장하지 않는다.
+
+## 재현
+
+1. `scripts/font-proof-requirements.txt`의 Python 의존성을 설치하고 manifest의 고정 URL에서 원본 OTF 두 파일을 내려받는다.
+2. `python scripts/build-font-proof.py --source-dir /path/to/originals`로 생성한다. 원본 SHA-256 불일치는 중단한다.
+3. `FONT_SOURCE_DIR=/path/to/originals UPDATE_FONT_METRICS=1 node tests/font-proof-browser.mjs`로 원본 직접 비교 후 metric fixture를 명시적으로 갱신한다.
+4. 일반 검증: `pnpm check`, `pnpm test:browser`, `pnpm package:check`. 원본 직접 비교 및 별도 한국어 fontconfig 실패 fallback 검증은 추가 실행이다. 일반 테스트는 원본 다운로드나 Python 도구가 필요 없다.
+
+## 완료 범위
+
+- [x] 기존 GPL-3.0-only 유지 및 콘텐츠/외부 재사용 정책 공개
+- [x] 기여자 저작권·DCO/CLA 방침 명시
+- [x] 현재 4개 패키지 SPDX/고지 및 실제 tarball 소비 검사
+- [x] 공식 폰트 고지·수정본 이름·고정 원본 해시 확인
+- [x] 대표 WOFF2 분할·unicode-range·원본 메트릭·요청량/CSP/지연/차단 검증
+- [ ] P4/P6: 전체 생산 폰트 커버리지·굵기·제품 연결·실제 OS fallback·CLS/접근성
+
+2026-10-16 결과: check201/201(실패/skip0), browser9개, package4개 tarball 소비/타입, frozen offline install, diff check 통과. 원본 직접 비교·150ms 지연/차단·별도 한국어 fontconfig 및 재생성 byte 비교도 통과했다. CI는 생략했다.
