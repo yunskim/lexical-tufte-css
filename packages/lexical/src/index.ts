@@ -7,3 +7,4 @@ export {$getContainingNote,$splitNoteAtSelection,$mergeNoteWithNext,$moveNote,$i
 export {SectionNode,FigureNode,CaptionNode,TableLayoutNode,$createSectionNode,$createFigureNode,$createCaptionNode,$createTableLayoutNode,type FigureWidth,type TableLayout} from './LayoutNodes.js';
 export {$collectNoteIds,$reidentifyPastedNotes} from './clipboardNotes.js';
 export {$prepareNoteComposition,registerNoteCompositionGuard} from './noteComposition.js';
+export {$insertNoteEdgeText,registerNoteEdgeTypingGuard} from './noteEdgeTyping.js';
