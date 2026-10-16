@@ -875,3 +875,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - docs/P22_WORK_VERIFICATION.ko.md: P2.2.a–c 명령별 성공·거부 계약, JSON/renderer 왕복, undo/redo, selection/IME 및 명령 비동기 관찰 검증 체크리스트 작성.
 - 사용자가 테스트는 Work에서 일괄 처리하기로 결정함. 이 대화에서는 테스트 미실행, P2.2.d/F01–F09 완료 표시 보류. CI 없음.
 - 다음: P2.3 F10–F19의 미구현 편집 조작과 데이터/발행 경계 정적 검토를 진행하되 Work 결과와 충돌하지 않도록 검증 기록 분리.
+
+## 2026-10-16 P2.3 — F13/F14 그림 편집 명령 착수
+
+- packages/lexical/src/figureCommands.ts: INSERT_TUFTE_FIGURE_COMMAND (src/alt/optional caption/width) 및 SET_TUFTE_FIGURE_WIDTH_COMMAND (body/fullwidth) 신규. 섹션·노트·IME·입력값 검증, history push, 공개 API 등록.
+- packages/lexical/test/figure-commands.test.mjs: 이미지/캡션 구조와 기존 문단 보존, 잘못된 URL·선택 거부 테스트 코드 추가.
+- 사용자 지시에 따라 실행 테스트는 Work에서 일괄 진행. 구현의 빌드·테스트 통과를 주장하지 않으며 P2.3/F13/F14 체크는 보류. CI 없음.
+- 다음: 그림 명령 React UI 연결, width 변경 선택 접근성 및 figure 내부 marginnote/asset 경계 보완.
