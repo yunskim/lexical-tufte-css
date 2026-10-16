@@ -443,3 +443,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - docs/LEXICAL_MIGRATION_CONTRACT.ko.md 작성. schemaVersion 1과 Lexical node version의 구분, schemaVersion 2의 editorFormat 후보, legacy v1 명시적 분기, 실패 시 editor 불변, HistoryPlugin undo/redo 정책, 필수 fixture 및 판정 기준을 정리.
 - 현재 validator가 unknown top-level field를 거부하므로 기존 v1에 editorFormat을 임의 추가하지 않기로 설계. 설계안은 미확정이며 migration 함수는 아직 구현되지 않음.
 - 실행 환경 제한으로 테스트 미실행. R03/P2.5 체크 보류, CI 없음.
+
+## 2026-10-16 — R03.b v1→v2 변환 규칙 명세
+
+- docs/LEXICAL_MIGRATION_CONTRACT.ko.md에 필드별 복제/거부 규칙, legacy JSON의 실제 호환성 검증 전 자동 승격 금지, inspect/migrate/load API 분리, 저장 시 revision·백업·원자적 교체·롤백 정책 추가.
+- 현재 v1 validator의 unknown-field strict 정책은 유지한다. TufteDocumentV2, validator, migration 및 editor integration은 아직 구현하지 않았다.
+- 실행 테스트 불가 상태이므로 R03.b와 P2.5 완료 체크 보류. CI 없음.
