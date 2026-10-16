@@ -10,3 +10,4 @@ export {$prepareNoteComposition,registerNoteCompositionGuard} from './noteCompos
 export {$insertNoteEdgeText,registerNoteEdgeTypingGuard} from './noteEdgeTyping.js';
 export {TufteSpanNode,$createTufteSpanNode,type TufteSpanKind,type SerializedTufteSpan} from './TufteSpanNode.js';
 export {loadDocumentIntoEditor,loadMigratedDocumentIntoEditor,exportEditorToDocument,exportEditorToDocumentV2} from './documentBridge.js';
+export {DefinitionListNode,DefinitionTermNode,DefinitionDescriptionNode,$createDefinitionListNode,$createDefinitionTermNode,$createDefinitionDescriptionNode} from './DefinitionListNodes.js';
