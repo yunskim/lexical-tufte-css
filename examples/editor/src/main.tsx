@@ -18,7 +18,7 @@ import {
   COMPOSITION_START_COMMAND, SELECTION_INSERT_CLIPBOARD_NODES_COMMAND, CUT_COMMAND, PASTE_COMMAND, KEY_BACKSPACE_COMMAND, KEY_DELETE_COMMAND, HISTORY_PUSH_TAG, UNDO_COMMAND, REDO_COMMAND,
   COMMAND_PRIORITY_HIGH, type LexicalNode,
 } from 'lexical';
-import {NoteNode, InlineImageNode, $createNoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, type NoteKind, SectionNode,FigureNode,CaptionNode,TableLayoutNode} from '@lexical-tufte/lexical';
+import {NoteNode, InlineImageNode, $createNoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, type NoteKind, SectionNode,FigureNode,CaptionNode,TableLayoutNode} from '@lexical-tufte/lexical';
 import './style.css';
 
 function containingNote(node: LexicalNode | null): NoteNode | null {
@@ -83,12 +83,7 @@ function EditorUI(){
       if($isRangeSelection(selection)&&containingNote(selection.anchor.getNode())&&notes.length){
         setStatus('노트 안에는 다른 노트를 붙여넣을 수 없습니다.');return true;
       }
-      const existing=new Set<string>();
-      function ids(n:LexicalNode){if(n instanceof NoteNode)existing.add(n.getNoteId());if($isElementNode(n))n.getChildren().forEach(ids);}
-      ids($getRoot());
-      for(const note of notes){
-        if(!cutIds.has(note.getNoteId())||existing.has(note.getNoteId()))note.setNoteId(crypto.randomUUID());
-      }
+      $reidentifyPastedNotes(nodes,cutIds,()=>crypto.randomUUID());
       cutIds.clear();
       if($isRangeSelection(selection)&&containingNote(selection.anchor.getNode())){
         const phrasing:LexicalNode[]=[];
