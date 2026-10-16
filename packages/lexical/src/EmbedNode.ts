@@ -24,8 +24,11 @@ export class EmbedNode extends DecoratorNode<null>{
  updateDOM(previous:EmbedNode):boolean{return previous.__src!==this.__src||previous.__title!==this.__title||previous.__provider!==this.__provider;}
  exportDOM():DOMExportOutput{
   const n=this.getLatest(),outer=document.createElement(n.__wrapper);
-  outer.className=(n.__width==='fullwidth'?'fullwidth ':'')+'iframe-wrapper';
+  outer.className=(n.__width==='fullwidth'?'fullwidth ':'')+'tufte-embed';
   const frame=document.createElement('iframe');frame.src=n.__src;frame.title=n.__title;frame.loading='lazy';frame.referrerPolicy='strict-origin-when-cross-origin';
+  frame.setAttribute('sandbox','allow-scripts allow-same-origin allow-presentation');
+  frame.setAttribute('allowfullscreen','');
+  frame.width='960';frame.height=String(Math.round(960/n.__aspectRatio));
   outer.append(frame);return {element:outer};
  }
  exportJSON():SerializedEmbed{
