@@ -154,6 +154,10 @@ P1 gate: 완료. 노트 편집 회귀와 SSR 출력의 실제 브라우저 비�
 
 - [x] P2.1 envelope·metadata·asset·노드 schema 및 validator 구현. 증거: packages/document, DOCUMENT_SCHEMA_V1.ko.md, document-contract.test.mjs, PROGRESS.md.
 - [ ] P2.2 F01–F09 노드/속성/commands와 JSON serialization 구현.
+  - [x] P2.2.a section 묶기/추가/블록 경계 분할/병합 및 paragraph·h2·h3 명령, 내용 보존·거부 원자성·실제 UI 왕복. [명령 계약](SECTION_COMMANDS_P22A.ko.md), check214개·browser10개·package4개 통과.
+  - [ ] P2.2.b F03/F05 인라인 속성 및 F06 목록/정의목록 명령과 회귀.
+  - [ ] P2.2.c F07–F09 구분선/section footer/quote·출처/epigraph 명령과 회귀.
+  - [ ] P2.2.d F01–F09 직렬화·발행 지원 경계 통합 검증. F04 전체 폰트/시각 증거는 P4와 연결.
 - [ ] P2.3 F10–F19 노트·그림·표·코드·embed 구현.
 - [ ] P2.4 JSON 및 HTML import/export, 지원 subset 명시, 손실 진단과 unknown-node 발행 차단.
 - [ ] P2.5 schema migration fixture, malformed 입력·ID 충돌·참조 오류 검증.
@@ -220,7 +224,7 @@ P6 gate: 로컬 빌드·타입 검사·관련 테스트 통과, 남은 결함과
 
 진행 기록 형식: `작업 ID | 상태(todo/in-progress/blocked/done) | 변경 경로/PR | 검증 명령·결과 | 차단 원인 | 다음 작업`. 증거 없이 체크하지 않는다. 문서 수정만으로 구현 작업을 완료하지 않는다.
 
-현재 다음 작업: R01–R14 선행 안정화 완료 후 P2.2 F01–F09 노드/속성/commands와 JSON serialization 구현. P2.1의 33개 노드 계약을 순서대로 편집/발행 구현에 연결한다. 구조 검증 통과와 제품 기능 완료는 구분한다.
+현재 다음 작업: P2.2.a 완료 후 P2.2.b 인라인·목록 명령, P2.2.c 인용 명령, P2.2.d 통합 검증. P2.1의 33개 노드 계약을 순서대로 편집/발행 구현에 연결한다. 구조 검증 통과와 제품 기능 완료는 구분한다.
 
 ## 주요 위험과 처리
 

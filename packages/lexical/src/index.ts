@@ -21,3 +21,5 @@ export {TUFTE_NODES,TUFTE_NODE_CLASSES,TUFTE_NODE_TYPES,TESTED_LEXICAL_VERSION} 
 export {TufteCodeHighlightNode,$createTufteCodeHighlightNode,type SerializedTufteCodeHighlight} from './CodeHighlightNode.js';
 
 export {$inspectEditorStructure,inspectEditorStructure,focusStructureIssue,type StructureIssue} from './structureRecovery.js';
+
+export {registerSectionCommands,WRAP_TUFTE_ROOT_COMMAND,INSERT_TUFTE_SECTION_COMMAND,SPLIT_TUFTE_SECTION_COMMAND,MERGE_TUFTE_SECTION_COMMAND,SET_TUFTE_BLOCK_COMMAND,type TufteBlockType} from './sectionCommands.js';

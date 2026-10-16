@@ -824,3 +824,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - 공식 Adobe Serif KR2.003/Sans KR2.005 고정 commit/해시. OFL reserved name에 따라 수정본 이름 변경, 대표4그룹×2family WOFF2 45,172bytes 생성. 전체 생산 글리프/굵기와 제품 연결은 P4.
 - 8개 문자샘플+6개 노트/캡션/표 위치 원본 OTF 대조, cmap/hmtx/name 및 WOFF2/CSS/manifest 재생성 byte 일치. Latin-only 요청0, 혼합8, self CSP·150ms fallback→custom swap 확인. 기본 환경에 한국어 시스템 fallback이 없음을 유지하고 별도 fontconfig에서는 실제 SourceHanSansKR fallback glyph 사용 확인.
 - check201/201(document47·lexical114·render28·blog12, fail/skip0), browser9, package4 tarball 소비/타입, frozen offline install, diff check 통과. 원본/지연/차단/별도 한국어 fallback 대상 검사도 추가 통과. E061–E066/M054–M059 기록·반영. CI 생략. R13 체크, R01–R14 선행 안정화 완료. 다음 P2.2.
+
+
+## 2026-10-16 P2.2.a — 섹션·본문 블록 명령 완료
+
+- registerSectionCommands 및 root 묶기/section 추가·블록 앞 분할·속성 일치 병합/paragraph·h2·h3 변환 명령과 실제 툴바 연결. 원본 rich payload·note ID·선택 offset·직렬화 속성 보존, 무효 selection/주석/표 셀/다중 블록/속성 불일치 거부. [계약](SECTION_COMMANDS_P22A.ko.md).
+- 신규13개 단위/통합 및 실제 React 명령·undo/redo·저장/재열기·정본 renderer 검사. 패키지 fresh declaration 소비에도 새 명령 API 추가. check214/214(document47·lexical127·render28·blog12, fail/skip0), browser10, package4, frozen/diff 통과.
+- E067 fixture 구문/E068 상태 관찰 순서 및 M060/M061 반영. CI 생략. P2.2.a만 체크. P2.2.b/c/d와 전체 F표는 계속 미완료.

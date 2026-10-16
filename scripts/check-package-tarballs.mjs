@@ -28,7 +28,7 @@ try{
  assert.ok(readFileSync(new URL(import.meta.resolve('@lexical-tufte/document/sql/001_posts_v2.sql')),'utf8').includes('posts_v2'));
  `);
  execFileSync(process.execPath,[join(temp,'consumer.mjs')],{cwd:temp,stdio:'pipe'});
- writeFileSync(join(temp,'consumer.ts'),`import {SqlitePublicationStore,type PublicationDatabase,type PublicationSnapshot} from '@lexical-tufte/blog';import {TUFTE_NODES,createHeadlessEditor} from '@lexical-tufte/lexical';declare const db:PublicationDatabase;const store=new SqlitePublicationStore(db);store.readState('post');createHeadlessEditor({nodes:TUFTE_NODES});declare const snapshot:PublicationSnapshot;const revision:number=snapshot.publishedRevision;`);
+ writeFileSync(join(temp,'consumer.ts'),`import {SqlitePublicationStore,type PublicationDatabase,type PublicationSnapshot} from '@lexical-tufte/blog';import {TUFTE_NODES,createHeadlessEditor,registerSectionCommands,SET_TUFTE_BLOCK_COMMAND} from '@lexical-tufte/lexical';declare const db:PublicationDatabase;const store=new SqlitePublicationStore(db);store.readState('post');const editor=createHeadlessEditor({nodes:TUFTE_NODES});registerSectionCommands(editor);editor.dispatchCommand(SET_TUFTE_BLOCK_COMMAND,'h2');declare const snapshot:PublicationSnapshot;const revision:number=snapshot.publishedRevision;`);
  execFileSync(join(root,'packages/lexical/node_modules/.bin/tsc'),['--noEmit','--module','NodeNext','--moduleResolution','NodeNext','--target','ES2022','--skipLibCheck',join(temp,'consumer.ts')],{cwd:temp,stdio:'pipe'});
  console.log('R13 four tarballs: full LICENSE/notices/OFL, packed JS imports, fresh declarations, strict editor roundtrip, renderer/blog and SQL exports PASS. No publishing.');
 }finally{rmSync(temp,{recursive:true,force:true});}

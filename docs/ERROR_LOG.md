@@ -487,3 +487,15 @@ E001–E049/M001–M042를 검토했다. E024의 경계 입력은 실제 Chromiu
 - 발견: 폰트 공식 GitHub tree 페이지 open이 DisabledError로 실패했다.
 - 처리: 동일 요청 반복 대신 연결된 GitHub API로 공식 repository/ref/파일 목록/라이선스를 읽고 고정 raw URL에서 원본 OTF를 확보했다. commit/blob와 SHA-256을 확인했다.
 - 상태: 자료 확보 경로 verified. 검색 서비스 차단 자체를 해제했다고 주장하지 않는다. 제품 테스트와 분리한다. M059 참조.
+
+## E067 — P2.2.a 테스트 fixture의 중첩 생성 괄호 오류
+
+- 발견: 신규 section command 테스트 파일의 한 fixture에 닫는 괄호가 하나 더 있어 Node parser가 실패했다. 제품 명령 실행 전 실패다.
+- 처리: note/paragraph/section을 지역 변수로 분리하고 node --check로 먼저 구문을 검사한다. E002의 복잡한 즉석 중첩 구성 실수가 테스트 파일에서도 재발했다.
+- 상태: verified (구문 검사 및 전체214개·browser10개). M060 참조.
+
+## E068 — 진단 상태 확인 전에 검사 버튼이 상태를 갱신
+
+- 발견: P2.2.a UI의 거부 원자성 검증은 통과했지만 snapshot helper가 JSON·HTML 버튼을 눌러 status를 바꾼 뒤 이전 주석 진단을 기대해 실패했다.
+- 처리: 거부 직후 상태 문구를 확인하고 그 다음 snapshot으로 내용 불변성을 검사한다. 제품 거부 로직과 검사 도구의 부수 효과를 구분한다.
+- 상태: verified (실제 UI 진단/원자성 및 전체 회귀). M061 참조.
