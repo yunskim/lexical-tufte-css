@@ -169,3 +169,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - packages/render/styles.css: .tufte-article 범위의 스타일 규칙 추가. packages/render/package.json의 ./styles.css export와 배포 files 목록에 등록.
 - packages/render/test/render.test.mjs: 발행 HTML style 속성 부재, CSS 규칙 존재를 검사하는 테스트 추가.
 - 별도 CSS를 실제 호스트에서 로드해야 동일한 시각 효과가 유지된다. CSP style-src 'self' 정책에서의 브라우저 실행과 Tufte 원본 CSS 우선순위 검증은 미실행(E025). R07 체크 보류.
+
+## 2026-10-16 — R08 typed render tree 착수
+
+- packages/render/src/tree.ts: 제한된 HTML tag/attribute를 표현하는 RenderElement, element(), serializeHTML() 도입. 텍스트·속성 escape를 직렬화 단계로 통합.
+- packages/render/src/index.ts: 기존 escapeHTML을 serializer에서 재사용하고 article envelope를 typed tree로 구성. 하위 노드 렌더러는 아직 문자열 adapter이므로 R08 미완료.
+- packages/render/test/tree.test.mjs: text/attribute escaping, 허용되지 않은 태그·속성, void element 자식 거부 검증 코드 추가.
+- 테스트 실행 증거 없음(E025). 다음 단계에서 모든 render switch case를 tree로 전환하고 문자열 replace 기반 table fullwidth를 제거한다.
