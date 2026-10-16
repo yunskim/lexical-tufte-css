@@ -18,6 +18,7 @@ test('insert bullet list after selected section block and append item',()=>{
   text.selectEnd();
  },{discrete:true});
  assert.equal(editor.dispatchCommand(INSERT_TUFTE_LIST_COMMAND,'bullet'),true);
+ editor.update(()=>{},{discrete:true});
  editor.getEditorState().read(()=>{
   const section=$getRoot().getFirstChild();
   assert.deepEqual(section.getChildren().map(n=>n.getType()),['paragraph','list']);
@@ -26,6 +27,7 @@ test('insert bullet list after selected section block and append item',()=>{
   assert.equal(section.getLastChild().getChildrenSize(),1);
  });
  assert.equal(editor.dispatchCommand(APPEND_TUFTE_LIST_ITEM_COMMAND,undefined),true);
+ editor.update(()=>{},{discrete:true});
  editor.getEditorState().read(()=>assert.equal($getRoot().getFirstChild().getLastChild().getChildrenSize(),2));
  assert.equal(diagnostics.length,0);
  dispose();
@@ -37,7 +39,9 @@ test('invalid list kind and missing selection leave editor state unchanged',()=>
  },{discrete:true});
  const before=JSON.stringify(editor.getEditorState().toJSON());
  assert.equal(editor.dispatchCommand(INSERT_TUFTE_LIST_COMMAND,'invalid'),true);
+ editor.update(()=>{},{discrete:true});
  assert.equal(editor.dispatchCommand(APPEND_TUFTE_LIST_ITEM_COMMAND,undefined),true);
+ editor.update(()=>{},{discrete:true});
  assert.equal(JSON.stringify(editor.getEditorState().toJSON()),before);
  assert.equal(diagnostics.length,2);
  dispose();
