@@ -728,3 +728,11 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - F17/F18/F19의 serialized JSON에 대한 validator 정상·오류 매트릭스 추가.
 - E027 기록. 실행 환경에서 GitHub DNS 접근 불가 및 pnpm 미설치 상태를 재확인; 빌드·테스트 미실행, 완료 체크 보류. CI 없음.
 - 후속: Node 생성/편집/발행 HTML 계약까지 확대하고, 실행 가능 환경에서 pnpm check 및 browser regression 검증.
+
+## 2026-10-16 — F15 fullwidth 순수 HTML 발행
+
+- `packages/render/src/index.ts`: tufte-fullwidth를 div.fullwidth로 렌더링. 자식 블록 구조 유지, HTML escape는 공통 serializer 사용.
+- `packages/render/src/profile.ts`: F15 발행 지원 목록 추가.
+- `packages/render/test/render.test.mjs`: 중첩 paragraph/quote, escape, 입력 불변성, 금지된 중첩 fullwidth 진단 회귀 테스트 추가.
+- 실제 빌드·테스트 실행 미확인. CSS/반응형 시각 회귀까지 확인 전 F15 완료 체크 보류. CI 없음.
+- 다음: F17 code block의 pre/code 구조와 tab/linebreak 보존 렌더링, 이후 F18 embed의 iframe 안전 정책.
