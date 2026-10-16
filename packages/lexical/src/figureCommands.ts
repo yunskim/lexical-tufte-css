@@ -1,8 +1,9 @@
-import {$addUpdateTag,$createTextNode,$getRoot,$getSelection,$isRangeSelection,$isNodeSelection,createCommand,COMMAND_PRIORITY_EDITOR,HISTORY_PUSH_TAG,type LexicalCommand,type LexicalEditor,type LexicalNode} from 'lexical';
+import {$addUpdateTag,$createTextNode,$getSelection,$isRangeSelection,$isNodeSelection,createCommand,COMMAND_PRIORITY_EDITOR,HISTORY_PUSH_TAG,type LexicalCommand,type LexicalEditor,type LexicalNode} from 'lexical';
 import {NODE_SCHEMA,isSafeURL,isIdentifier,type Diagnostic} from '@lexical-tufte/document';
 import {SectionNode,FigureNode,CaptionNode,$createFigureNode,$createCaptionNode,type FigureWidth} from './LayoutNodes.js';
 import {InlineImageNode,$createInlineImageNode} from './InlineImageNode.js';
-import {$createNoteNode,NoteNode} from './NoteNode.js';
+import {$createNoteNode} from './NoteNode.js';
+import {$collectNoteIds} from './clipboardNotes.js';
 import {$getContainingNote} from './noteOperations.js';
 
 export type InsertTufteFigure={src:string;alt:string;assetId?:string;imageWidth?:number;imageHeight?:number;width?:FigureWidth;caption?:string};
@@ -75,12 +76,7 @@ export function registerFigureCommands(editor:LexicalEditor,onDiagnostic?:(diagn
     return reject('INVALID_FIGURE_NOTE','여백 주석 ID와 내용을 확인하세요.');
    const figure=selectedFigure();
    if(!figure)return reject('INVALID_FIGURE_SELECTION','그림을 선택한 후 여백 주석을 삽입하세요.');
-   const ids=new Set<string>();
-   const visit=(node:LexicalNode):void=>{
-    if(node instanceof NoteNode)ids.add(node.getNoteId());
-    if('getChildren' in node&&typeof node.getChildren==='function')for(const child of node.getChildren() as LexicalNode[])visit(child);
-   };
-   visit($getRoot());
+   const ids=$collectNoteIds();
    if(ids.has(payload.noteId))return reject('DUPLICATE_NOTE_ID','이미 사용 중인 여백 주석 ID입니다.');
    $addUpdateTag(HISTORY_PUSH_TAG);
    const note=$createNoteNode(payload.noteId,'marginnote').append($createTextNode(payload.text));
