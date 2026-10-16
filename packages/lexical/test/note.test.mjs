@@ -55,3 +55,19 @@ test('image and note validation share document constraints',()=>{
   assert.throws(()=>$createNoteNode('a'.repeat(129)),/Invalid note/);
  },{discrete:true});
 });
+
+test('shared JSON roundtrip harness: supported inline nodes',()=>{
+ const cases=[
+  {name:'note',build:()=>$createNoteNode('note-123').append($createTextNode('내용'))},
+  {name:'image',build:()=>$createInlineImageNode('../assets/photo.png','대체 텍스트','asset-123',320,240)},
+  {name:'link',build:()=>$createLinkNode('https://example.com').append($createTextNode('링크'))},
+ ];
+ for(const {name,build} of cases){
+  const original=editor();
+  original.update(()=>{$getRoot().append($createParagraphNode().append(build()));},{discrete:true});
+  const json=original.getEditorState().toJSON();
+  const restored=editor();
+  restored.setEditorState(restored.parseEditorState(JSON.stringify(json)));
+  assert.deepEqual(restored.getEditorState().toJSON(),json,name);
+ }
+});
