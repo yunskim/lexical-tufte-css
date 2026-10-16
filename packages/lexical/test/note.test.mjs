@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import {createHeadlessEditor} from '@lexical/headless';
 import {$getRoot,$createParagraphNode,$createTextNode} from 'lexical';
 import {LinkNode,$createLinkNode} from '@lexical/link';
-import {NoteNode,InlineImageNode,$createNoteNode,$createInlineImageNode,$reidentifyPastedNotes,$prepareNoteComposition} from '../dist/index.js';
-function editor(){return createHeadlessEditor({namespace:'note-test',nodes:[NoteNode,InlineImageNode,LinkNode],onError(error){throw error;}});}
+import {NoteNode,InlineImageNode,$createNoteNode,$createInlineImageNode,$reidentifyPastedNotes,$prepareNoteComposition,TufteSpanNode,$createTufteSpanNode} from '../dist/index.js';
+function editor(){return createHeadlessEditor({namespace:'note-test',nodes:[NoteNode,InlineImageNode,LinkNode,TufteSpanNode],onError(error){throw error;}});}
 test('rich inline note survives JSON restore with type, identity and body position',()=>{
  const e=editor();
  e.update(()=>{
@@ -114,5 +114,28 @@ test('clipboard helper does not mutate plain link targets when note IDs change',
   assert.equal(note.getNoteId(),'note-new');
   assert.equal(link.getURL(),'https://example.org/note-old');
   assert.deepEqual(changes.get('note-old'),['note-new']);
+ },{discrete:true});
+});
+
+test('F05 Tufte inline span kinds survive editor JSON restore',()=>{
+ for(const kind of ['sans','newthought','numeral','danger']){
+  const original=editor();
+  original.update(()=>{
+   $getRoot().append($createParagraphNode().append($createTufteSpanNode(kind).append($createTextNode('서식'))));
+  },{discrete:true});
+  const json=original.getEditorState().toJSON();
+  const node=json.root.children[0].children[0];
+  assert.equal(node.type,'tufte-span');
+  assert.equal(node.kind,kind);
+  const restored=editor();
+  restored.setEditorState(restored.parseEditorState(JSON.stringify(json)));
+  assert.deepEqual(restored.getEditorState().toJSON(),json,kind);
+ }
+});
+test('F05 rejects unknown Tufte inline kind during import',()=>{
+ const e=editor();
+ e.update(()=>{
+  assert.throws(()=>$createTufteSpanNode('unexpected'),/Invalid Tufte span kind/);
+  assert.throws(()=>TufteSpanNode.importJSON({type:'tufte-span',version:1,kind:'unexpected',children:[]}),/Unsupported Tufte span/);
  },{discrete:true});
 });
