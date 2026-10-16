@@ -1,0 +1,27 @@
+{
+  "name": "@lexical-tufte/editor-prototype",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "license": "GPL-3.0-only",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc --noEmit && vite build",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@lexical-tufte/lexical": "workspace:*",
+    "lexical": "0.52.0",
+    "@lexical/react": "0.52.0",
+    "@lexical/link": "0.52.0",
+    "@lexical/html": "0.52.0",
+    "react": "19.2.0",
+    "react-dom": "19.2.0"
+  },
+  "devDependencies": {
+    "typescript": "6.0.2",
+    "vite": "8.3.4",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2"
+  }
+}

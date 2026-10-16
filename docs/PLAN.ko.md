@@ -1,7 +1,7 @@
 # Lexical Tufte 블로그 라이브러리 계획
 
 작성: 2026-10-16 (Asia/Seoul)
-상태: P0 기반 구성 완료, P1 prototype 미착수. 편집기 제품 기능은 아직 미구현.
+상태: P0 및 P1.1 완료. 사이드노트 편집 prototype 구현·Chromium 검증, 제품 기능의 전체 검증은 후속 단계.
 저장소: https://github.com/yunskim/lexical-tufte (public, GPL-3.0; 사용자가 생성한 설정 유지).
 
 ## 목표와 완료 정의
@@ -115,7 +115,7 @@ P0 gate: 저장소 URL, 재현 가능한 설치/빌드, 버전/라이선스/전�
 
 ### P1 — 어려운 편집 동작을 먼저 검증 (P0 이후)
 
-- [ ] P1.1 문단 중간 note, 링크/코드/이미지 payload, 키보드 진입/탈출 prototype.
+- [x] P1.1 문단 중간 note, 링크/코드/이미지 payload, 키보드 진입/탈출 prototype.
 - [ ] P1.2 노트 복사·삭제·split/merge·이동·undo/redo·한국어 IME prototype.
 - [ ] P1.3 Lexical 소유 DOM과 export DOM을 분리해 label/input/span 인접성 확인; nested editor vs inline container 결정 ADR.
 - [ ] P1.4 section·figure·caption·fullwidth·표를 조합해 CSS direct-child 규칙과 렌더러 일치 검증.
@@ -185,13 +185,15 @@ P6 gate: 로컬 빌드·타입 검사·관련 테스트 통과, 남은 결함과
 
 ## 진행 방식
 
+각 작업 시작·완료 때 [에러 기록](ERROR_LOG.md)과 [재발 방지 대책](ERROR_PREVENTION.md)을 점검한다. 단계 전환과 동일 오류 재발 때는 전체 기록을 점검하고 개선 내역을 남긴다. 오류 기록 → 원인 확인 → 대책 적용 → 관련 검증 → 기록 갱신을 작업 완료 조건에 포함한다.
+
 단계 의존성: P0 → P1 → P2 → P3 → P4 → P5 → P6 → P7. P2 이후 노드 단위로 편집/변환/렌더를 함께 검증해 조기 피드백을 받는다.
 
 각 작업은 같은 ID의 이슈로 만들고 수락 조건을 본문에 복사한다. PLAN을 범위·완료 상태의 기준으로 유지하고 이슈는 실행 증거를 연결한다. 이슈 종료와 체크 갱신을 같은 작업 단위로 처리한다. 단계별 추적 이슈를 생성하고 아래 이슈 목록에서 관리한다.
 
 진행 기록 형식: `작업 ID | 상태(todo/in-progress/blocked/done) | 변경 경로/PR | 검증 명령·결과 | 차단 원인 | 다음 작업`. 증거 없이 체크하지 않는다. 문서 수정만으로 구현 작업을 완료하지 않는다.
 
-현재 다음 작업: P1.1 노트 편집 prototype. P0 검증 증거는 docs/PROGRESS.md와 docs/DEPENDENCIES.md에 기록한다.
+현재 다음 작업: P1.2 노트 복사·삭제·split/merge·이동·undo/redo·한국어 IME 검증. P1.1 증거: examples/editor, packages/lexical/src/NoteNode.ts, tests/note-browser.mjs 및 docs/PROGRESS.md.
 
 ## 주요 위험과 처리
 

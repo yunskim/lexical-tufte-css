@@ -13,3 +13,5 @@ The project's own source follows the existing GPL-3.0 LICENSE. Upstream works re
 Font binaries are not yet bundled. When assets are selected, pin their release/checksums and retain complete notices in redistributed assets and package tarballs. OFL reserved font naming requirements apply to modified fonts. Do not sell fonts by themselves. Source Han fonts retain OFL rather than being relicensed under the project GPL.
 
 Upstream demonstration images are not redistributed. Use original or separately licensed fixtures and record their provenance before adding them.
+
+Prototype tooling: React/React DOM and Vite retain MIT licenses in their installed dependency packages; Playwright retains Apache-2.0. Test browser binaries are not distributed with the repository.

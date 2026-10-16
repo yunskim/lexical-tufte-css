@@ -9,8 +9,14 @@
   "scripts": {
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",
-    "check": "pnpm lint && pnpm inventory:check && pnpm typecheck && pnpm build",
+    "check": "pnpm lint && pnpm inventory:check && pnpm typecheck && pnpm build && pnpm test",
     "lint": "node scripts/lint.mjs",
-    "inventory:check": "node scripts/inventory.mjs"
+    "inventory:check": "node scripts/inventory.mjs",
+    "test": "pnpm -r --if-present test",
+    "test:browser": "pnpm build && node tests/note-browser.mjs",
+    "dev:editor": "pnpm --filter @lexical-tufte/lexical build && pnpm --filter @lexical-tufte/editor-prototype dev"
+  },
+  "devDependencies": {
+    "playwright": "1.51.1"
   }
 }
