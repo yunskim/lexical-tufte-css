@@ -1018,3 +1018,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 
 - editor 자동 복구의 마지막 미저장 EditorState를 보존하고 visibilitychange(hidden), pagehide, React cleanup에서 동기 localStorage flush를 시도하도록 변경.
 - 오류 예방 M065 추가. 강제 종료, 브라우저 제한, 여러 탭 충돌은 여전히 미해결. 브라우저/타입/회귀 실행은 Work 대기; CI 생략.
+
+## 2026-10-16 탭별 복구본 격리
+
+- editor 예제의 localStorage 복구 키를 세션 UUID별로 분리하고 저장 시각 메타데이터 추가. storage 이벤트로 복구본 존재 여부 갱신.
+- 복구 UI는 저장 시각 목록을 prompt로 선택하고 confirm 후 편집기 상태를 교체. 기존 v1 단일 키는 자동 이관하지 않음.
+- 저장본 누적 정리, 세션 복원 식별자 지속성, 접근 제어, SQLite 연동, Work 브라우저 검증은 미완료. CI 생략.
