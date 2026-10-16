@@ -189,3 +189,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - packages/render/src/tree.ts: thead를 typed tree 허용 태그에 추가.
 - packages/render/test/render.test.mjs: thead/tbody 경계 및 혼합 머리글 행이 tbody에 남는 회귀 검사 추가. fixture의 첫 행은 headerState=[1,1], 두 번째 행은 [0,0] 확인.
 - 실제 실행 검증 미완료(E025), R09 체크 보류. headerState 조합의 세부 정책 및 접근성 검증은 추후 보강.
+
+## 2026-10-16 — R10 text format 의미론 및 회귀 준비
+
+- docs/TEXT_FORMAT_R10.ko.md: underline(8), strikethrough(4), mark(128)의 허용 위치·HTML 의미·조합·링크와의 독립성·스타일/CSP 경계 정의. Tufte 고유 기능이 아닌 HTML 편집 확장으로 구분.
+- packages/render/test/render.test.mjs: 각 비트 및 복합 비트의 HTML 태그 중첩 회귀 검사 추가.
+- 실제 pnpm 테스트와 Lexical 편집기 선택/IME/undo 검증 미실행(E025). R10 체크 보류.
