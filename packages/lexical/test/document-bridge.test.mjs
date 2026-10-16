@@ -292,3 +292,26 @@ test('R11 exported document cannot alias mutable editor JSON or base metadata',(
  assert.equal(result.value.title,title);
  assert.ok(result.value.assets.length>0);
 });
+
+test('R03 failed editor state installation reports failure without a false success',()=>{
+ const base=fixture();
+ let attempts=0;
+ const fake={
+  parseEditorState(){return {toJSON(){return structuredClone(base.lexicalState);}};},
+  setEditorState(){attempts++;throw Error('editor rejected state');}
+ };
+ const result=loadDocumentIntoEditor(fake,base);
+ assert.equal(result.ok,false);
+ assert.equal(result.diagnostics[0].code,'LEXICAL_IMPORT_FAILED');
+ assert.match(result.diagnostics[0].message,/editor rejected state/);
+ assert.equal(attempts,1);
+});
+
+test('R03 failed editor serialization returns a diagnostic',()=>{
+ const base=fixture();
+ const fake={getEditorState(){return {toJSON(){throw Error('serialization failure');}};}};
+ const result=exportEditorToDocument(fake,base);
+ assert.equal(result.ok,false);
+ assert.equal(result.diagnostics[0].code,'LEXICAL_EXPORT_FAILED');
+ assert.match(result.diagnostics[0].message,/serialization failure/);
+});
