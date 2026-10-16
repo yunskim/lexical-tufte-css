@@ -8,10 +8,17 @@ import {LinkNode} from '@lexical/link';
 const fixture=()=>JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document.json',import.meta.url),'utf8'));
 const editor=()=>createHeadlessEditor({namespace:'document-bridge-test',nodes:[SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,LinkNode],onError(e){throw e;}});
 test('R02 strict Lexical bridge fails closed when a registered node is missing',()=>{
- const e=editor(),d=fixture();
- const result=loadDocumentIntoEditor(e,d);
+ const source=editor();
+ source.update(()=>{
+  $getRoot().append($createSectionNode().append(
+   $createParagraphNode().append($createTufteSpanNode('sans').append($createTextNode('등록 필요')))
+  ));
+ },{discrete:true});
+ const base=fixture(),document={...base,lexicalState:source.getEditorState().toJSON()};
+ const withoutSpan=createHeadlessEditor({namespace:'bridge-missing-node',nodes:[SectionNode,NoteNode,InlineImageNode,LinkNode],onError(e){throw e;}});
+ const result=loadDocumentIntoEditor(withoutSpan,document);
  assert.equal(result.ok,false);
- assert.ok(result.diagnostics.some(x=>x.code==='LEXICAL_IMPORT_FAILED'));
+ assert.ok(result.diagnostics.some(x=>['LEXICAL_IMPORT_FAILED','LEXICAL_IMPORT_LOSSY'].includes(x.code)));
 });
 test('R02 strict Lexical bridge rejects invalid document before touching editor',()=>{
  const e=editor(),d=fixture();d.schemaVersion=999;
