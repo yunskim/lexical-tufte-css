@@ -670,3 +670,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - quote 내부 attribution/cite 포함 왕복 및 내용 없는 quote 구조 거부 테스트 작성.
 - Lexical 정규화와 schema의 실제 호환성은 테스트 미실행으로 미확인. P2.2/F08/F09 완료 체크 보류, CI 없음.
 - 다음 순서: tufte-section-footer 노드 및 직계 섹션 왕복 검증.
+
+## 2026-10-16 — P2.2 F07 section footer
+
+- `packages/lexical/src/SectionFooterNode.ts`에 section footer ElementNode, JSON import/export 및 footer DOM 추가.
+- index 공개 API 및 footer + cite 문서 왕복, paragraph 내부 footer 구조 거부 테스트 추가.
+- 테스트·typecheck 실행 미확인. F07/P2.2 완료 체크 보류, CI 없음.
+- 다음 작업: F15 tufte-fullwidth 블록 노드와 문서 직계 구조 검증.
