@@ -361,3 +361,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - `packages/lexical/test/document-bridge.test.mjs`에 `setEditorState` 예외 시 `LEXICAL_IMPORT_FAILED` 및 `toJSON` 예외 시 `LEXICAL_EXPORT_FAILED`를 반환하는 회귀 테스트 추가.
 - 성공 반환을 잘못 보고하지 않는 실패 경로 검사이며 실제 Lexical 0.52.0 통합 검증과 별개.
 - 의존성 미확보로 테스트 실행은 미확인. R03/R02/R11 완료 체크 보류, CI 추가 없음.
+
+## 2026-10-16 — R03 canonical serialization 회귀
+
+- `packages/document/test/editor-boundary.test.mjs`에 canonicalizeDocument의 객체 키 순서 불변성, 배열 순서 보존, parseCanonicalDocument 왕복, unknown field 거부 및 입력 비변경 회귀 추가.
+- 배열 순서 변경 검사는 root에 섹션이 둘 이상 있을 때만 수행하도록 조건화했으므로 단일 섹션 fixture에서는 해당 단언이 실행되지 않는다. 다중 섹션 fixture로 강화할 여지가 있다.
+- 테스트 실행 미확인. R03 체크 보류, CI 생략 유지.
