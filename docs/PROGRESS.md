@@ -513,3 +513,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - 저장된 `server-document-v2.json`을 실제 Lexical 로드·export 경계에 통과시켜 완전 동등성·입력 불변성을 검사하는 테스트 추가.
 - 지원하지 않는 editor format 거부 시 editor state 불변 테스트 추가.
 - 로컬 의존성/테스트 실행 불가(E025/E027). R03.c 체크 미완료, CI 없음.
+
+## 2026-10-16 — R03 버전 판별 접근자 방어·진단 계약
+
+- inspectStoredDocument에서 schemaVersion 읽기 전에 접근자 및 symbol own property를 거부하도록 변경.
+- untrusted getter 미실행 및 unsupported version/editor format/unknown field 진단 경로 테스트 추가.
+- E036/M033 기록. 테스트 미실행(E025/E027), R03 완료 체크 보류. CI 없음.
