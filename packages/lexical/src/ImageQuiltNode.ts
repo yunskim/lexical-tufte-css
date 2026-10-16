@@ -3,7 +3,7 @@ import {$applyNodeReplacement,DecoratorNode,type NodeKey,type SerializedLexicalN
 
 export type SerializedImageQuilt=SerializedLexicalNode&{type:'tufte-imagequilt';version:1;src:string;alt:string;assetId?:string;width?:number;height?:number};
 function validate(src:unknown,alt:unknown,assetId:unknown,width:unknown,height:unknown):void{
- if(!isSafeURL(src,'image')||typeof alt!=='string'
+ if(!isSafeURL(src,'image')||typeof alt!=='string'||width===undefined||height===undefined
   ||(assetId!==undefined&&!isIdentifier(assetId))
   ||(width!==undefined&&(!Number.isSafeInteger(width)||(width as number)<=0))
   ||(height!==undefined&&(!Number.isSafeInteger(height)||(height as number)<=0)))throw Error('Invalid ImageQuilt properties');
