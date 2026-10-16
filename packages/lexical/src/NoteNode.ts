@@ -23,6 +23,7 @@ export class NoteNode extends ElementNode {
   }
   getNoteId(): string { return this.getLatest().__noteId; }
   setNoteId(id: string): this { if(!isIdentifier(id)) throw new Error('Invalid note ID'); this.getWritable().__noteId = id; return this; }
+  setKind(kind: NoteKind): this { if(kind!=='sidenote'&&kind!=='marginnote') throw new Error('Invalid note kind'); this.getWritable().__kind=kind; return this; }
   extractWithChild(): true { return true; }
   getKind(): NoteKind { return this.getLatest().__kind; }
   isInline(): true { return true; }
