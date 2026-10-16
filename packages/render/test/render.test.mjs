@@ -44,7 +44,7 @@ test('canonical JSON import validates without HTML fallback',async()=>{
 });
 
 test('valid future node/data schemas do not imply renderer support',()=>{
- const d=fixture();d.lexicalState.root.children[0].children.push({type:'tufte-embed',version:1,provider:'youtube',src:'https://www.youtube-nocookie.com/embed/abcdefghijk',title:'Video',wrapper:'figure',width:'body',aspectRatio:16/9});
+ const d=fixture();d.lexicalState.root.children[0].children.push({type:'tufte-figure',version:1,width:'body',children:[{type:'tufte-imagequilt',version:1,src:'/quilt.png',alt:'Quilt',width:640,height:480}]});
  assert.equal(validateDocument(d).ok,true);const r=renderArticle(d);assert.equal(r.ok,false);assert.equal(r.html,null);assert.ok(r.diagnostics.some(x=>x.code==='UNSUPPORTED_RENDER_NODE'));
  const imageDoc=fixture(),image=note(imageDoc).children[2];image.width=800;assert.equal(validateDocument(imageDoc).ok,true);assert.ok(renderArticle(imageDoc).diagnostics.some(x=>x.code==='UNSUPPORTED_RENDER_PROPERTY'));
 });
@@ -214,4 +214,30 @@ test('F17 code language and highlight metadata fail closed until publishing sema
  const highlighted=renderArticle(d);
  assert.equal(highlighted.ok,false);
  assert.ok(highlighted.diagnostics.some(x=>x.path.endsWith('.highlightType')));
+});
+
+test('F18 embeds publish escaped sandboxed iframe with responsive dimensions',()=>{
+ const d=fixture(),section=d.lexicalState.root.children[0];
+ section.children.push({type:'tufte-embed',version:1,provider:'youtube',
+  src:'https://www.youtube-nocookie.com/embed/abcdefghijk',
+  title:'Tutorial "quoted" & explained',wrapper:'figure',width:'fullwidth',aspectRatio:16/9});
+ const result=renderArticle(d);
+ assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+ assert.match(result.html,/<figure class="fullwidth tufte-embed" data-tufte-ratio="1\.777/);
+ assert.match(result.html,/<iframe src="https:\/\/www\.youtube-nocookie\.com\/embed\/abcdefghijk"/);
+ assert.match(result.html,/title="Tutorial &quot;quoted&quot; &amp; explained"/);
+ assert.match(result.html,/sandbox="allow-scripts allow-same-origin allow-presentation"/);
+ assert.match(result.html,/width="960" height="540" allowfullscreen=""/);
+ assert.doesNotMatch(result.html,/style=|<script/);
+ const css=readFileSync(new URL('../styles.css',import.meta.url),'utf8');
+ assert.match(css,/\.tufte-embed iframe/);
+});
+test('F18 rejects unsafe provider URL before iframe rendering',()=>{
+ const d=fixture(),section=d.lexicalState.root.children[0];
+ section.children.push({type:'tufte-embed',version:1,provider:'youtube',
+  src:'https://evil.example/embed/abcdefghijk',title:'Bad',wrapper:'div',width:'body',aspectRatio:4/3});
+ const result=renderArticle(d);
+ assert.equal(result.ok,false);
+ assert.equal(result.html,null);
+ assert.ok(result.diagnostics.some(x=>x.code==='UNSAFE_EMBED'),JSON.stringify(result.diagnostics));
 });
