@@ -713,3 +713,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - F19 ImageQuilt 원본 width/height 필수 검사 및 부정 테스트 강화.
 - 에러 E026 및 예방 대책 M026 추가. 실제 빌드·테스트 실행 환경 미확보로 완료 체크 보류. CI 생략 유지.
 - 다음: 실행 환경 확보 후 pnpm check / node test를 순서대로 실행하고 발견된 실패 수정.
+
+## 2026-10-16 — 실행 환경 재확인 및 F07 부정 테스트 보강
+
+- 현재 실행 컨테이너 Node.js v22.16.0, pnpm 미설치. `git ls-remote https://github.com/yunskim/lexical-tufte.git HEAD` 실행 결과 `Could not resolve host: github.com`으로 실패. 이 환경에서는 저장소 clone 및 pnpm check 실행 불가.
+- GitHub 연결 도구를 통해 F07 부정 테스트를 개선: Lexical 편집 중 잘못된 노드 삽입 대신 유효한 직렬화 상태를 변형해 validator와 bridge가 `INVALID_CHILD`를 거부하는지 검사.
+- 테스트 실행 통과를 주장하지 않으며 P2/F07 완료 체크 보류. CI 추가 없음.
+- 후속: 실행 환경 확보 전까지 validator/serialization 정적 대조 및 부정 테스트 보강. 실행 환경 확보 시 `pnpm install --frozen-lockfile && pnpm check && pnpm test:browser` 순서로 재검증.
