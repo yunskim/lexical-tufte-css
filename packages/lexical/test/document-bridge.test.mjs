@@ -6,7 +6,7 @@ import {dirname,join,parse} from 'node:path';
 import {createRequire} from 'node:module';
 import {createHeadlessEditor} from '@lexical/headless';
 import {$getRoot,$createParagraphNode,$createTextNode,CLEAR_HISTORY_COMMAND,COMMAND_PRIORITY_CRITICAL} from 'lexical';
-import {SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,$createTableLayoutNode,$createFigureNode,$createCaptionNode,$createInlineImageNode,$createSectionNode,$createNoteNode,$createTufteSpanNode,loadDocumentIntoEditor,loadMigratedDocumentIntoEditor,exportEditorToDocument,exportEditorToDocumentV2,DefinitionListNode,DefinitionTermNode,DefinitionDescriptionNode,$createDefinitionListNode,$createDefinitionTermNode,$createDefinitionDescriptionNode} from '../dist/index.js';
+import {SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,$createTableLayoutNode,$createFigureNode,$createCaptionNode,$createInlineImageNode,$createSectionNode,$createNoteNode,$createTufteSpanNode,loadDocumentIntoEditor,loadMigratedDocumentIntoEditor,exportEditorToDocument,exportEditorToDocumentV2,DefinitionListNode,DefinitionTermNode,DefinitionDescriptionNode,$createDefinitionListNode,$createDefinitionTermNode,$createDefinitionDescriptionNode,EpigraphNode,AttributionNode,CiteNode,$createEpigraphNode,$createAttributionNode,$createCiteNode} from '../dist/index.js';
 import {LinkNode} from '@lexical/link';
 import {HeadingNode,QuoteNode,$createHeadingNode,$createQuoteNode} from '@lexical/rich-text';
 import {HorizontalRuleNode,$createHorizontalRuleNode} from '@lexical/react/LexicalHorizontalRuleNode';
@@ -15,7 +15,7 @@ import {NODE_SCHEMA,validateDocument} from '@lexical-tufte/document';
 import {ListNode,ListItemNode,$createListNode,$createListItemNode} from '@lexical/list';
 import {TableNode,TableRowNode,TableCellNode,$createTableNode,$createTableRowNode,$createTableCellNode} from '@lexical/table';
 const fixture=()=>JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document.json',import.meta.url),'utf8'));
-const editor=()=>createHeadlessEditor({namespace:'document-bridge-test',nodes:[SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,TableNode,TableRowNode,TableCellNode,ListNode,ListItemNode,LinkNode,HeadingNode,QuoteNode,HorizontalRuleNode,DefinitionListNode,DefinitionTermNode,DefinitionDescriptionNode],onError(e){throw e;}});
+const editor=()=>createHeadlessEditor({namespace:'document-bridge-test',nodes:[SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,TableNode,TableRowNode,TableCellNode,ListNode,ListItemNode,LinkNode,HeadingNode,QuoteNode,HorizontalRuleNode,DefinitionListNode,DefinitionTermNode,DefinitionDescriptionNode,EpigraphNode,AttributionNode,CiteNode],onError(e){throw e;}});
 test('R02 strict Lexical bridge fails closed when a registered node is missing',()=>{
  const source=editor();
  source.update(()=>{
@@ -688,4 +688,47 @@ test('F06 malformed definition list is rejected before editor installation',()=>
  assert.equal(loaded.ok,false);
  assert.ok(loaded.diagnostics.some(d=>d.code==='INVALID_DEFINITION_LIST'),JSON.stringify(loaded.diagnostics));
  assert.deepEqual(target.getEditorState().toJSON(),before);
+});
+
+test('F08 F09 epigraph quotation and attribution cite survive document roundtrip',()=>{
+ const source=editor();
+ source.update(()=>{
+  $getRoot().append($createSectionNode().append(
+   $createEpigraphNode().append(
+    $createQuoteNode().append(
+     $createTextNode('Quoted passage'),
+     $createAttributionNode().append(
+      $createTextNode('Author, '),
+      $createCiteNode().append($createTextNode('Book title'))
+     )
+    )
+   )
+  ));
+ },{discrete:true});
+ const base=fixture(),document={...base,lexicalState:source.getEditorState().toJSON()};
+ const target=editor(),loaded=loadDocumentIntoEditor(target,document);
+ assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
+ const saved=exportEditorToDocument(target,document);
+ assert.equal(saved.ok,true,JSON.stringify(saved.diagnostics));
+ assert.deepEqual(saved.value.lexicalState,document.lexicalState);
+ const epigraph=saved.value.lexicalState.root.children[0].children[0];
+ assert.equal(epigraph.type,'tufte-epigraph');
+ assert.deepEqual(epigraph.children[0].children.map(n=>n.type),['text','tufte-attribution']);
+ assert.equal(epigraph.children[0].children[1].children[1].type,'tufte-cite');
+});
+test('F08 quotation rejects attribution before quoted content',()=>{
+ const source=editor();
+ source.update(()=>{
+  $getRoot().append($createSectionNode().append(
+   $createEpigraphNode().append(
+    $createQuoteNode().append(
+     $createAttributionNode().append($createTextNode('Attribution only'))
+    )
+   )
+  ));
+ },{discrete:true});
+ const document={...fixture(),lexicalState:source.getEditorState().toJSON()};
+ const result=loadDocumentIntoEditor(editor(),document);
+ assert.equal(result.ok,false);
+ assert.ok(result.diagnostics.some(d=>d.code==='INVALID_QUOTE'),JSON.stringify(result.diagnostics));
 });
