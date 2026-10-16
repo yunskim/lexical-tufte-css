@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {validateDocument,parseDocument,validateMetadata,validatePostRecord,isTimestamp,NODE_SCHEMA,DOCUMENT_LIMITS} from '../dist/index.js';
+import {validateDocument,parseDocument,canonicalizeDocument,parseCanonicalDocument,validateMetadata,validatePostRecord,isTimestamp,NODE_SCHEMA,DOCUMENT_LIMITS} from '../dist/index.js';
 const fixture=()=>JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document.json',import.meta.url),'utf8'));
 const text=(value='한글')=>({type:'text',version:1,text:value,format:0});
 const el=(type,children=[],props={})=>({type,version:1,children,...props});
@@ -78,4 +78,17 @@ test('metadata validates Korean slugs, strict calendar dates, offsets and lifecy
 test('post validation keeps body and metadata separate and returns contextual paths',()=>{
  const post={document:fixture(),metadata:metadata()};assert.equal(validatePostRecord(post).ok,true);
  post.metadata.revision=-1;post.document.id='bad/id';const r=validatePostRecord(post);assert.equal(r.ok,false);assert.ok(r.diagnostics.some(x=>x.path==='$.metadata.revision'));assert.ok(r.diagnostics.some(x=>x.path==='$.document.id'));
+});
+
+test('R03 canonical serialization is deterministic, reversible and rejects unknown fields',()=>{
+ const original=fixture();
+ const shuffled=Object.fromEntries(Object.entries(original).reverse());
+ const a=canonicalizeDocument(original),b=canonicalizeDocument(shuffled);
+ assert.equal(a.ok,true);
+ assert.equal(b.ok,true);
+ assert.equal(a.value,b.value);
+ assert.deepEqual(parseCanonicalDocument(a.value).value,original);
+ assert.equal(canonicalizeDocument({...original,unexpected:'must not drop'}).ok,false);
+ assert.equal(canonicalizeDocument({...original,schemaVersion:2}).ok,false);
+ assert.equal(canonicalizeDocument(original).value,a.value);
 });
