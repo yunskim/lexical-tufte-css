@@ -485,3 +485,8 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - migrated load에서 unknown node 거부 시 editor state 불변 및 CLEAR_HISTORY_COMMAND 미전달을 검사하는 테스트 추가.
 - HistoryPlugin 실물 undo/redo 시나리오와 호스트 등록 요건을 migration 계약 문서에 명시.
 - 명령 전달 단위 테스트 외 실제 HistoryPlugin 통합은 미검증. 환경 제약으로 테스트 미실행; R03 완료 체크 보류. CI 없음.
+
+## 2026-10-16 — R03 HistoryPlugin 실물 통합 테스트 작성
+
+- @lexical/history의 실제 history state와 registerHistory를 이용한 테스트 추가. 거부된 문서에서는 undo/redo 유지, 성공한 교체에서는 양쪽 스택 비움을 단언.
+- 환경 제약으로 테스트/타입 검사 미실행. 실행 결과가 없으므로 R03 완료 체크 보류, CI 없음.
