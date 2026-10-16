@@ -3,11 +3,12 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {createHeadlessEditor} from '@lexical/headless';
 import {$getRoot,$createParagraphNode,$createTextNode} from 'lexical';
-import {SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,$createFigureNode,$createCaptionNode,$createInlineImageNode,$createSectionNode,$createNoteNode,$createTufteSpanNode,loadDocumentIntoEditor,exportEditorToDocument} from '../dist/index.js';
+import {SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,$createTableLayoutNode,$createFigureNode,$createCaptionNode,$createInlineImageNode,$createSectionNode,$createNoteNode,$createTufteSpanNode,loadDocumentIntoEditor,exportEditorToDocument} from '../dist/index.js';
 import {LinkNode} from '@lexical/link';
 import {ListNode,ListItemNode,$createListNode,$createListItemNode} from '@lexical/list';
+import {TableNode,TableRowNode,TableCellNode,$createTableNode,$createTableRowNode,$createTableCellNode} from '@lexical/table';
 const fixture=()=>JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document.json',import.meta.url),'utf8'));
-const editor=()=>createHeadlessEditor({namespace:'document-bridge-test',nodes:[SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,ListNode,ListItemNode,LinkNode],onError(e){throw e;}});
+const editor=()=>createHeadlessEditor({namespace:'document-bridge-test',nodes:[SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,TableNode,TableRowNode,TableCellNode,ListNode,ListItemNode,LinkNode],onError(e){throw e;}});
 test('R02 strict Lexical bridge fails closed when a registered node is missing',()=>{
  const source=editor();
  source.update(()=>{
@@ -124,4 +125,32 @@ test('R02 ordered list survives Lexical roundtrip',()=>{
  assert.equal(exported.ok,true,JSON.stringify(exported.diagnostics));
  assert.deepEqual(exported.value.lexicalState,document.lexicalState);
  assert.equal(exported.value.lexicalState.root.children[0].children[0].start,7);
+});
+
+test('R02 scroll table preserves cell headers and layout in Lexical roundtrip',()=>{
+ const source=editor();
+ source.update(()=>{
+  const table=$createTableNode();
+  table.append(
+   $createTableRowNode().append(
+    $createTableCellNode(1).append($createParagraphNode().append($createTextNode('항목'))),
+    $createTableCellNode(1).append($createParagraphNode().append($createTextNode('값')))
+   ),
+   $createTableRowNode().append(
+    $createTableCellNode(0).append($createParagraphNode().append($createTextNode('A'))),
+    $createTableCellNode(0).append($createParagraphNode().append($createTextNode('10')))
+   )
+  );
+  $getRoot().append($createSectionNode().append($createTableLayoutNode('scroll').append(table)));
+ },{discrete:true});
+ const base=fixture(),document={...base,lexicalState:source.getEditorState().toJSON()};
+ const destination=editor(),loaded=loadDocumentIntoEditor(destination,document);
+ assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
+ const exported=exportEditorToDocument(destination,document);
+ assert.equal(exported.ok,true,JSON.stringify(exported.diagnostics));
+ assert.deepEqual(exported.value.lexicalState,document.lexicalState);
+ const layout=exported.value.lexicalState.root.children[0].children[0];
+ assert.equal(layout.layout,'scroll');
+ assert.equal(layout.children[0].type,'table');
+ assert.equal(layout.children[0].children[0].children[0].headerState,1);
 });
