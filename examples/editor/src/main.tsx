@@ -52,6 +52,32 @@ function EditorUI(){
       editor.setEditorState(checkpoint.current,{tag:HISTORY_PUSH_TAG});setStatus('복구용 사본을 보존하고 마지막 정상 구조로 돌아왔습니다.');
     }catch{setStatus('복구용 사본 저장에 실패했습니다. 현재 내용은 유지합니다.');}
   }
+  const [recoveryAvailable,setRecoveryAvailable]=useState(false);
+  const [autoSaveState,setAutoSaveState]=useState('자동 복구 저장 대기');
+  const recoveryKey='lexical-tufte-recovery-v1';
+  useEffect(()=>{
+    try{setRecoveryAvailable(localStorage.getItem(recoveryKey)!==null);}catch{setAutoSaveState('복구 저장소에 접근할 수 없습니다.');}
+    let pending:ReturnType<typeof setTimeout>|undefined;
+    const unregister=editor.registerUpdateListener(({editorState,dirtyElements,dirtyLeaves})=>{
+      if(dirtyElements.size===0&&dirtyLeaves.size===0)return;
+      if(pending!==undefined)clearTimeout(pending);
+      pending=setTimeout(()=>{
+        try{
+          localStorage.setItem(recoveryKey,JSON.stringify(editorState.toJSON()));
+          setRecoveryAvailable(true);setAutoSaveState('현재 편집 상태를 복구용으로 저장했습니다.');
+        }catch{setAutoSaveState('자동 복구 저장 실패: 저장 공간을 확인하세요.');}
+      },800);
+    });
+    return()=>{unregister();if(pending!==undefined)clearTimeout(pending);};
+  },[editor]);
+  function restoreRecovery(){
+    try{
+      const raw=localStorage.getItem(recoveryKey);
+      if(!raw){setRecoveryAvailable(false);setStatus('복구용 사본이 없습니다.');return;}
+      replaceEditorDocumentState(editor,editor.parseEditorState(raw));
+      setStatus('복구용 사본을 열었습니다. 구조를 확인한 후 정상 저장하세요.');
+    }catch{setStatus('복구용 사본을 열지 못했습니다.');}
+  }
   const textarea=useRef<HTMLTextAreaElement>(null);
   function enterNote():boolean {
     const selection=$getSelection();
@@ -266,9 +292,9 @@ function EditorUI(){
       <RichTextPlugin contentEditable={<ContentEditable className="editor" aria-label="본문과 사이드노트 편집" aria-describedby="help"/>} ErrorBoundary={LexicalErrorBoundary}/>
       <HistoryPlugin/><TablePlugin/>
     </main>
-    <p role="status">{status}</p>
+    <p role="status">{status}</p><p role="status" aria-label="자동 복구 저장 상태">{autoSaveState}</p>
     {structureIssues.length>0&&<aside role="alert" aria-label="문서 구조 복구"><p>문서 구조를 수정하세요. 내용은 자동 삭제하지 않으며 HTML 생성은 차단됩니다.</p><ul>{structureIssues.map((issue,i)=><li key={`${issue.key}-${i}`}><button onClick={()=>focusStructureIssue(editor,issue.key)}>{issue.message}</button> <code>{issue.path}</code></li>)}</ul><button onClick={()=>editor.dispatchCommand(UNDO_COMMAND,undefined)}>구조 변경 실행 취소</button><button onClick={recoverStructure} disabled={!checkpoint.current}>마지막 정상 구조로 복구</button></aside>}
-    <div className="actions"><button onClick={save}>저장</button><button onClick={restore}>불러오기</button><button onClick={()=>{try{const raw=localStorage.getItem('lexical-tufte-recovery-v1');if(!raw){setStatus('복구용 사본이 없습니다.');return;}replaceEditorDocumentState(editor,editor.parseEditorState(raw));setStatus('복구용 사본을 열었습니다. 구조를 수정하세요.');}catch{setStatus('복구용 사본을 열지 못했습니다.');}}}>복구용 사본 열기</button><button onClick={exportDocument}>JSON·HTML 확인</button><button onClick={()=>{editor.update($loadLayoutFixture,{tag:HISTORY_PUSH_TAG});setStatus('레이아웃 예제를 불러왔습니다. 실행 취소할 수 있습니다.');}}>레이아웃 예제 불러오기</button></div>
+    <div className="actions"><button onClick={save}>저장</button><button onClick={restore}>불러오기</button><button onClick={restoreRecovery} disabled={!recoveryAvailable}>복구용 사본 열기</button><button onClick={exportDocument}>JSON·HTML 확인</button><button onClick={()=>{editor.update($loadLayoutFixture,{tag:HISTORY_PUSH_TAG});setStatus('레이아웃 예제를 불러왔습니다. 실행 취소할 수 있습니다.');}}>레이아웃 예제 불러오기</button></div>
     <details><summary>JSON과 발행 HTML 검사</summary><label>JSON<textarea ref={textarea} aria-label="문서 JSON" value={json} readOnly/></label><label>HTML<textarea aria-label="발행 HTML" value={html} readOnly/></label></details>
     <p className="notice">프로토타입: 공개 발행·모바일 여백 배치·OS별 실제 IME와 다른 브라우저 검증은 후속 단계에서 진행합니다. 한글 웹폰트 자산 연결은 P4 대상입니다.</p>
   </>;
