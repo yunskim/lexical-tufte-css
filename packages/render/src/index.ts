@@ -24,6 +24,19 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
    case 'root':return inner();
    case 'tufte-section':return [element('section',attrs(n),inner())];
    case 'paragraph':return [element('p',attrs(n),inner())];
+   case 'heading':return [element(n.tag,attrs(n),inner())];
+   case 'horizontalrule':return [element('hr',{},[],true)];
+   case 'list':return [element(n.tag,attrs(n),inner())];
+   case 'listitem':return [element('li',attrs(n),inner())];
+   case 'tufte-definition-list':return [element('dl',attrs(n),inner())];
+   case 'tufte-term':return [element('dt',attrs(n),inner())];
+   case 'tufte-definition':return [element('dd',attrs(n),inner())];
+   case 'quote':return [element('blockquote',attrs(n),inner())];
+   case 'tufte-epigraph':return [element('div',withClass(n,'epigraph'),inner())];
+   case 'tufte-attribution':return [element('footer',attrs(n),inner())];
+   case 'tufte-cite':return [element('cite',attrs(n),inner())];
+   case 'tufte-section-footer':return [element('footer',attrs(n),inner())];
+   case 'tufte-span':return [element('span',withClass(n,n.kind==='sans'?'sans':n.kind),inner())];
    case 'text':{
     let child:RenderChild=element('span',{class:'tufte-pre-wrap'},[String(n.text)]);
     for(const [flag,tag] of [[16,'code'],[1,'strong'],[2,'em'],[4,'s'],[8,'u'],[32,'sub'],[64,'sup'],[128,'mark']] as const)
