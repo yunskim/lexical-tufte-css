@@ -1,18 +1,12 @@
 import {readSqlitePostSnapshotV2} from '../dist/index.js';
-import {writePostBackupSnapshotFile} from './backup-snapshot.mjs';
+import {writePostBackupFile} from './backup-file.mjs';
 
-/**
- * Backup a SQLite/D1 post using a single-statement consistent snapshot.
- * The caller supplies an authorized destination and a revision observed earlier.
- */
-export async function writeSqlitePostBackupFile(
- path,db,postId,expectedRevision,
-){
- return writePostBackupSnapshotFile(
-  path,async()=>{
-   const snapshot=await readSqlitePostSnapshotV2(db,postId);
-   if(!snapshot.ok)return snapshot;
-   return snapshot.value;
-  },expectedRevision,
- );
+/** Single-row snapshot and revision guard before writing a local backup file. */
+export async function writeSqlitePostBackupFile(path,db,postId,expectedRevision){
+ const snapshot=await readSqlitePostSnapshotV2(db,postId);
+ if(!snapshot.ok)return snapshot;
+ if(!Number.isSafeInteger(expectedRevision)||expectedRevision<1||
+  snapshot.value.metadata.revision!==expectedRevision)
+  return {ok:false,diagnostics:[{code:'BACKUP_REVISION_CONFLICT',path:'$.expectedRevision',message:'Snapshot revision differs'}]};
+ return writePostBackupFile(path,snapshot.value);
 }
