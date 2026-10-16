@@ -133,7 +133,7 @@ test('P2.2 F02-F09 headings, lists, definitions and quotations render semantical
   {type:'tufte-epigraph',version:1,children:[
    {type:'quote',version:1,children:[text('Quotation')]}
   ]},
-  {type:'tufte-span',version:1,kind:'sans',children:[text('Sans')]}
+  {type:'paragraph',version:1,children:[{type:'tufte-span',version:1,kind:'sans',children:[text('Sans')]}]}
  );
  const result=renderArticle(d);
  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
