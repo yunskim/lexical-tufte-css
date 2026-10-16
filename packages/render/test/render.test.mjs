@@ -185,3 +185,33 @@ test('F15 fullwidth rejects nested fullwidth without silently flattening',()=>{
  assert.equal(result.html,null);
  assert.ok(result.diagnostics.some(x=>x.code==='INVALID_CHILD'),JSON.stringify(result.diagnostics));
 });
+
+test('F17 plain code renders pre/code with exact spaces tabs newlines and escaped text',()=>{
+ const d=fixture(),section=d.lexicalState.root.children[0];
+ section.children.push({type:'tufte-code',version:1,width:'fullwidth',language:null,children:[
+  {type:'text',version:1,text:'  const x = "<tag>";',format:0},
+  {type:'linebreak',version:1},
+  {type:'tab',version:1,text:'\t',format:0},
+  {type:'text',version:1,text:'return x & y;',format:0}
+ ]});
+ const result=renderArticle(d);
+ assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+ assert.match(result.html,/<pre class="fullwidth"><code>  const x = &quot;&lt;tag&gt;&quot;;\n\treturn x &amp; y;<\/code><\/pre>/);
+ assert.doesNotMatch(result.html,/<script|style=/);
+});
+test('F17 code language and highlight metadata fail closed until publishing semantics are implemented',()=>{
+ const d=fixture(),section=d.lexicalState.root.children[0];
+ const code={type:'tufte-code',version:1,width:'body',language:'js',children:[
+  {type:'text',version:1,text:'const x = 1;',format:0}
+ ]};
+ section.children.push(code);
+ assert.equal(validateDocument(d).ok,true,JSON.stringify(validateDocument(d).diagnostics));
+ const result=renderArticle(d);
+ assert.equal(result.ok,false);
+ assert.ok(result.diagnostics.some(x=>x.code==='UNSUPPORTED_RENDER_PROPERTY'&&x.path.endsWith('.language')));
+ code.language=null;
+ code.children=[{type:'code-highlight',version:1,text:'const',format:0,highlightType:'keyword'}];
+ const highlighted=renderArticle(d);
+ assert.equal(highlighted.ok,false);
+ assert.ok(highlighted.diagnostics.some(x=>x.path.endsWith('.highlightType')));
+});
