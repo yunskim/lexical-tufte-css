@@ -23,8 +23,8 @@ export function registerDefinitionCommands(editor:LexicalEditor,onDiagnostic?:(d
   return s;
  };
  const pair=()=>{
-  const term=$createDefinitionTermNode().append($createTextNode(''));
-  const description=$createDefinitionDescriptionNode().append($createParagraphNode());
+  const term=$createDefinitionTermNode().append($createTextNode('용어'));
+  const description=$createDefinitionDescriptionNode().append($createParagraphNode().append($createTextNode('설명')));
   return {term,description};
  };
  const registrations=[
