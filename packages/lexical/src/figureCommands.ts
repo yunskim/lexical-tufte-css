@@ -2,7 +2,7 @@ import {$addUpdateTag,$createTextNode,$getSelection,$isRangeSelection,$isNodeSel
 import {NODE_SCHEMA,isSafeURL,isIdentifier,type Diagnostic} from '@lexical-tufte/document';
 import {SectionNode,FigureNode,CaptionNode,$createFigureNode,$createCaptionNode,type FigureWidth} from './LayoutNodes.js';
 import {InlineImageNode,$createInlineImageNode} from './InlineImageNode.js';
-import {$createNoteNode} from './NoteNode.js';
+import {$createNoteNode,NoteNode} from './NoteNode.js';
 import {$collectNoteIds} from './clipboardNotes.js';
 import {$getContainingNote} from './noteOperations.js';
 
@@ -11,6 +11,7 @@ export const INSERT_TUFTE_FIGURE_COMMAND:LexicalCommand<InsertTufteFigure>=creat
 export const SET_TUFTE_FIGURE_WIDTH_COMMAND:LexicalCommand<FigureWidth>=createCommand('SET_TUFTE_FIGURE_WIDTH');
 export type InsertFigureMarginNote={noteId:string;text:string};
 export const INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND:LexicalCommand<InsertFigureMarginNote>=createCommand('INSERT_TUFTE_FIGURE_MARGINNOTE');
+export const REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND:LexicalCommand<string>=createCommand('REMOVE_TUFTE_FIGURE_MARGINNOTE');
 
 export function registerFigureCommands(editor:LexicalEditor,onDiagnostic?:(diagnostic:Diagnostic)=>void):()=>void{
  if(!editor.hasNodes([SectionNode,FigureNode,CaptionNode]))throw Error('Figure commands require TUFTE_NODES');
@@ -84,6 +85,16 @@ export function registerFigureCommands(editor:LexicalEditor,onDiagnostic?:(diagn
    if(caption)caption.insertBefore(note);
    else figure.append(note);
    note.selectEnd();return true;
+  },COMMAND_PRIORITY_EDITOR),
+  editor.registerCommand(REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,noteId=>{
+   if(!isIdentifier(noteId))return reject('INVALID_FIGURE_NOTE','삭제할 주석 ID가 올바르지 않습니다.');
+   const figure=selectedFigure();
+   if(!figure)return reject('INVALID_FIGURE_SELECTION','그림을 선택한 후 여백 주석을 삭제하세요.');
+   const note=figure.getChildren().find(child=>child instanceof NoteNode&&child.getKind()==='marginnote'&&child.getNoteId()===noteId);
+   if(!(note instanceof NoteNode))return reject('FIGURE_NOTE_NOT_FOUND','선택한 그림에 해당 여백 주석이 없습니다.');
+   $addUpdateTag(HISTORY_PUSH_TAG);
+   note.remove();
+   figure.selectEnd();return true;
   },COMMAND_PRIORITY_EDITOR)
  ];
  return ()=>registrations.forEach(dispose=>dispose());
