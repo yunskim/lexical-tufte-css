@@ -1013,3 +1013,8 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - examples/editor/src/main.tsx: Lexical update listener에서 내용 변경 시 800ms debounce로 현재 JSON을 localStorage 복구 슬롯에 저장, 성공/실패 상태와 복구본 존재 여부 표시, 복구 버튼 연결.
 - 이 예제는 SQLite recovery store와 연결되지 않으며 세션 CAS·서버 권한·보존 정책을 제공하지 않는다. 기존 수동 저장/정상 문서 슬롯과 구분한다.
 - 아직 browser/typecheck/회귀 실행 전. 타이머 종료 시 pending write가 취소되는 한계와 탭 충돌/스토리지 quota 문제는 후속 Work 검증 및 개선 대상. CI 생략.
+
+## 2026-10-16 자동 복구 종료 flush
+
+- editor 자동 복구의 마지막 미저장 EditorState를 보존하고 visibilitychange(hidden), pagehide, React cleanup에서 동기 localStorage flush를 시도하도록 변경.
+- 오류 예방 M065 추가. 강제 종료, 브라우저 제한, 여러 탭 충돌은 여전히 미해결. 브라우저/타입/회귀 실행은 Work 대기; CI 생략.
