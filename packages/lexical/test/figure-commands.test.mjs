@@ -108,9 +108,10 @@ test('attached cut payload with colliding note IDs renews both copies',()=>{
   const first=$createFigureNode().append($createInlineImageNode('/a.png','a'),$createNoteNode('shared-cut','marginnote').append($createTextNode('a')));
   const second=$createFigureNode().append($createInlineImageNode('/b.png','b'),$createNoteNode('shared-cut','marginnote').append($createTextNode('b')));
   $getRoot().append($createSectionNode().append(first,second));
-  const changes=$reidentifyPastedNotes([first,second],new Set(['shared-cut']),()=> 'renewed-copy');
-  assert.equal(first.getLastChild().getNoteId(),'renewed-copy');
-  assert.equal(second.getLastChild().getNoteId(),'renewed-copy');
+  let nextId=0;
+  const changes=$reidentifyPastedNotes([first,second],new Set(['shared-cut']),()=> 'renewed-copy-'+(++nextId));
+  assert.equal(first.getLastChild().getNoteId(),'renewed-copy-1');
+  assert.equal(second.getLastChild().getNoteId(),'renewed-copy-2');
   assert.equal(changes.get('shared-cut')?.length,2);
  },{discrete:true});
  dispose();
