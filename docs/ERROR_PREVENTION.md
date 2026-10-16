@@ -103,3 +103,10 @@ E024/M023의 beforeinput 이벤트 취소 시점은 discrete update 사용만으
 - 절차: Lexical 노드만 생성하는 테스트라도 문서 envelope의 assets와 node.assetId, src, dimensions의 참조 관계를 확인한다. 골든 fixture는 실제 고정 버전 Lexical 출력에서 생성하고 검토 후 커밋한다.
 - 검증: pnpm check 및 R02 테스트에서 MISSING_ASSET/ASSET_MISMATCH가 없는지 확인한다.
 - 상태: 코드 반영, 실행 대기.
+
+## M027 — 패키지 버전 확인 시 공개 exports만 사용
+
+- 관련 오류: E029, E019.
+- 절차: 외부 패키지의 비공개 package.json subpath를 직접 require하지 않는다. 공개 엔트리의 resolve 경로에서 설치 패키지 manifest를 찾아 name/version을 확인한다.
+- 검증: pnpm 설치 후 골든 생성 테스트에서 버전 0.52.0 확인, 다른 버전의 생성 거부 여부 확인.
+- 상태: 코드 반영, 실행 대기.
