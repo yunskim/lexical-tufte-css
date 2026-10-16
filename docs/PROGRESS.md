@@ -908,3 +908,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - figure-commands.test.mjs에 assetId/width/height 직렬화 필드 확인, 잘못된 식별자·음수 크기의 원자적 거부 회귀 코드 추가.
 - 외부 자산 스토어 업로드/조회 연동은 아직 구현하지 않음. 기존 자산 참조를 편집 문서에 전달하는 범위만 지원.
 - 테스트 실행은 Work 일괄 처리 대기. P2.3 완료 표시 보류, CI 없음.
+
+## 2026-10-16 P2.3 — F13 그림 내부 marginnote 삽입
+
+- INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND 추가: 선택된 figure 내부에 marginnote 삽입, noteId 형식·문서 전역 중복 검사, IME/선택 조건 검사, history push, caption 앞 배치.
+- 공개 API 및 examples/editor의 그림 여백 주석 입력 버튼 연결.
+- noteId 자동 생성, 이미지 업로드, 그림-주석 이동/복사 시 ID 재발급, 렌더러·접근성·undo/redo 검증은 후속 작업.
+- 테스트 실행은 Work 일괄 처리 대기. P2.3/F13 체크 보류, CI 없음.
