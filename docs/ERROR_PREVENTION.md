@@ -117,3 +117,8 @@ E024/M023의 beforeinput 이벤트 취소 시점은 discrete update 사용만으
 - 절차: document/editor 경계 성공 반환값은 호출자 소유의 입력 객체를 직접 노출하지 않는다. 입력과 반환 envelope·assets·lexicalState의 참조 비공유 및 사후 변경 내성을 회귀 테스트로 확인한다.
 - 검증: R11 snapshot regression과 pnpm check 실행.
 - 상태: 코드 반영, 실행 대기.
+
+## 2026-10-16 R11 양방향 경계 점검
+
+- E030/M028을 내보내기 경계까지 확장했다(E031). 가져오기뿐 아니라 `editorJSONToDocument` 성공 결과도 원본 state·base와 참조를 공유하지 않도록 복제한다.
+- 다음 검증: R11 양방향 alias 회귀, pnpm check. 실제 실행 전에는 완료 체크하지 않는다.
