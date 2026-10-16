@@ -140,3 +140,10 @@ E024/M023의 beforeinput 이벤트 취소 시점은 discrete update 사용만으
 - 오류 메시지 변경 시 기존 메시지 기대값을 전역 검색하고, 가능하면 안정적인 오류 코드 기반 단언을 우선한다.
 - alias 회귀는 초기 fixture가 실제로 비어 있지 않음을 먼저 단언한 뒤 원본 변경과 결과 불변성을 비교한다.
 - 변경 뒤 `pnpm check`와 패키지별 단위 테스트를 로컬 실행한 결과가 없으면 완료 처리하지 않는다.
+
+## M032 — 스키마 버전 간 adapter의 명시적 projection
+
+- 관련 오류: E035.
+- 서로 다른 버전의 문서를 연결할 때 `as unknown as`로 구조를 강제하지 않는다. 필수·선택 필드를 명시적으로 구성해 타입 변경이 컴파일 단계에서 드러나게 한다.
+- v2 envelope의 accessor/unknown field 거부를 회귀 테스트로 고정한다. 이후 스키마 버전 추가 시 양방향 projection과 지원 버전 행렬을 검토한다.
+- 검증: pnpm typecheck 및 document/lexical 테스트 실행 대기.
