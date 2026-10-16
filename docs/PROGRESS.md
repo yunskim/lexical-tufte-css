@@ -882,3 +882,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - packages/lexical/test/figure-commands.test.mjs: 이미지/캡션 구조와 기존 문단 보존, 잘못된 URL·선택 거부 테스트 코드 추가.
 - 사용자 지시에 따라 실행 테스트는 Work에서 일괄 진행. 구현의 빌드·테스트 통과를 주장하지 않으며 P2.3/F13/F14 체크는 보류. CI 없음.
 - 다음: 그림 명령 React UI 연결, width 변경 선택 접근성 및 figure 내부 marginnote/asset 경계 보완.
+
+## 2026-10-16 P2.3 — 그림 명령 UI 연결
+
+- registerFigureCommands의 CaptionNode 등록 전제 검사 보강.
+- examples/editor/src/main.tsx에 그림 삽입 URL/alt/caption 입력, 본문 폭·전체 폭 명령 버튼 추가. 기존 toolbar selection 유지 방식 사용.
+- 현재 width 명령은 figure 내부의 collapsed selection이 있어야 하며, 삽입 직후 이미지 노드 선택/캡션 없는 figure에서의 접근성은 Work 통합 검증 및 후속 UX 보완 대상.
+- 테스트 실행은 사용자 지시에 따라 Work에서 일괄 처리. F13/F14 및 P2.3 체크 보류, CI 없음.
