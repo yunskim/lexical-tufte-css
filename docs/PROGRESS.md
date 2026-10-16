@@ -677,3 +677,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - index 공개 API 및 footer + cite 문서 왕복, paragraph 내부 footer 구조 거부 테스트 추가.
 - 테스트·typecheck 실행 미확인. F07/P2.2 완료 체크 보류, CI 없음.
 - 다음 작업: F15 tufte-fullwidth 블록 노드와 문서 직계 구조 검증.
+
+## 2026-10-16 — F15 fullwidth container
+
+- `packages/lexical/src/FullwidthNode.ts`: 전체 폭 블록의 ElementNode와 JSON import/export, 편집 DOM 구현.
+- index 공개 API 등록, paragraph/quote를 포함한 fullwidth 구조의 strict document roundtrip 테스트 추가.
+- 실제 빌드·테스트 실행 및 Tufte CSS 반응형 시각 검증은 미완료. F15 및 P2.2/P2.3 완료 체크 보류. CI 없음.
+- 다음 순서: F17 코드 블록 노드 및 공백·탭·언어 정보 보존.
