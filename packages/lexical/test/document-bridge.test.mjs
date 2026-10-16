@@ -68,7 +68,7 @@ test('R02 figure and caption survive real Lexical document roundtrip',()=>{
    )
   ));
  },{discrete:true});
- const base=fixture(),document={...base,lexicalState:source.getEditorState().toJSON()};
+ const base=fixture(),document={...base,assets:[...base.assets,{id:'chart-1',src:'/figures/chart.svg',mimeType:'image/svg+xml',width:640,height:360}],lexicalState:source.getEditorState().toJSON()};
  const destination=editor(),loaded=loadDocumentIntoEditor(destination,document);
  assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
  const exported=exportEditorToDocument(destination,document);
