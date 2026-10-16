@@ -233,3 +233,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - packages/render/src/index.ts: ol.start 및 ordered li.value를 발행 HTML에 보존. ul은 번호 속성을 출력하지 않음.
 - packages/render/test/render.test.mjs: 시작 번호·불연속 항목 번호·ul 속성 배제 회귀 추가.
 - 편집기 import/export 왕복과 브라우저/단위 테스트는 실행 미완료(E025/E027). P2.2 체크 보류.
+
+## 2026-10-16 — P2.2 F05 Lexical TufteSpanNode 시작
+
+- packages/lexical/src/TufteSpanNode.ts: sans/newthought/numeral/danger 인라인 ElementNode 추가. kind 검증, JSON import/export, clone, DOM 업데이트 구현.
+- packages/lexical/src/index.ts: 생성자와 타입 공개. 기존 문서 v1 tufte-span 타입에 대응.
+- 아직 editor nodes registry 통합, document/editor 왕복, 단위 및 브라우저 실행 검증이 없다(E025/E027). P2.2 완료 체크 보류.
