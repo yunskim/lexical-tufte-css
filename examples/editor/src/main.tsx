@@ -18,7 +18,7 @@ import {
   SELECTION_INSERT_CLIPBOARD_NODES_COMMAND, CUT_COMMAND, PASTE_COMMAND, KEY_BACKSPACE_COMMAND, KEY_DELETE_COMMAND, HISTORY_PUSH_TAG, UNDO_COMMAND, REDO_COMMAND,
   COMMAND_PRIORITY_HIGH, type LexicalNode,
 } from 'lexical';
-import {NoteNode, InlineImageNode, $createNoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, type NoteKind, SectionNode,FigureNode,CaptionNode,TableLayoutNode} from '@lexical-tufte/lexical';
+import {NoteNode, InlineImageNode, $createNoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, registerNoteEdgeTypingGuard, type NoteKind, SectionNode,FigureNode,CaptionNode,TableLayoutNode} from '@lexical-tufte/lexical';
 import './style.css';
 
 function containingNote(node: LexicalNode | null): NoteNode | null {
@@ -127,30 +127,7 @@ function EditorUI(){
       if(event?.isComposing)return false;
       event?.preventDefault();s.insertLineBreak();return true;
     },COMMAND_PRIORITY_HIGH);
-    // Prototype boundary guard: intercept native edge insertion before Lexical
-    // normalizes an inline boundary into the surrounding paragraph.
-    const beforeInput=(event:InputEvent)=>{
-      if(event.inputType!=='insertText'||event.isComposing||event.data===null)return;
-      editor.update(()=>{
-        const s=$getSelection();
-        if(!$isRangeSelection(s)||!s.isCollapsed())return;
-        const node=s.anchor.getNode();
-        if(!$isTextNode(node)||!(node.getParent() instanceof NoteNode))return;
-        const offset=s.anchor.offset;
-        if(offset!==0&&offset!==node.getTextContentSize())return;
-        event.preventDefault();event.stopImmediatePropagation();
-        if(node.getFormat()===s.format&&node.getStyle()===s.style)node.spliceText(offset,0,event.data!,true);
-        else{
-          const inserted=$createTextNode(event.data!).setFormat(s.format).setStyle(s.style);
-          if(offset===0)node.insertBefore(inserted);else node.insertAfter(inserted);
-          inserted.selectEnd();
-        }
-      });
-    };
-    const typing=editor.registerRootListener((root,previous)=>{
-      previous?.removeEventListener('beforeinput',beforeInput as EventListener,true);
-      root?.addEventListener('beforeinput',beforeInput as EventListener,true);
-    });
+    const typing=registerNoteEdgeTypingGuard(editor);
     return()=>{escape();down();typing();cutting();pasting();plainPaste();backspace();forwardDelete();composing();enter();};
   },[editor]);
   function insertNote(kind:NoteKind='sidenote'){
