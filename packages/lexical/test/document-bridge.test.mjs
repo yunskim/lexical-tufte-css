@@ -5,7 +5,7 @@ import {fileURLToPath} from 'node:url';
 import {dirname,join,parse} from 'node:path';
 import {createRequire} from 'node:module';
 import {createHeadlessEditor} from '@lexical/headless';
-import {$getRoot,$createParagraphNode,$createTextNode} from 'lexical';
+import {$getRoot,$createParagraphNode,$createTextNode,CLEAR_HISTORY_COMMAND,COMMAND_PRIORITY_CRITICAL} from 'lexical';
 import {SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,$createTableLayoutNode,$createFigureNode,$createCaptionNode,$createInlineImageNode,$createSectionNode,$createNoteNode,$createTufteSpanNode,loadDocumentIntoEditor,loadMigratedDocumentIntoEditor,exportEditorToDocument} from '../dist/index.js';
 import {LinkNode} from '@lexical/link';
 import {NODE_SCHEMA,validateDocument} from '@lexical-tufte/document';
@@ -422,4 +422,25 @@ test('R03 migrated loader refuses unsupported format before editor replacement',
  assert.equal(result.ok,false);
  assert.ok(result.diagnostics.some(d=>d.code==='UNSUPPORTED_EDITOR_FORMAT'));
  assert.deepEqual(destination.getEditorState().toJSON(),before);
+});
+
+test('R03 migrated document replacement dispatches history reset only on success',()=>{
+ const destination=editor();
+ let cleared=0;
+ const unregister=destination.registerCommand(CLEAR_HISTORY_COMMAND,()=>{
+  cleared+=1;
+  return false;
+ },COMMAND_PRIORITY_CRITICAL);
+ const invalid={...fixture(),schemaVersion:2,editorFormat:{engine:'lexical',formatVersion:999}};
+ assert.equal(loadMigratedDocumentIntoEditor(destination,invalid).ok,false);
+ assert.equal(cleared,0);
+ const source=editor();
+ source.update(()=>$getRoot().append($createSectionNode().append(
+  $createParagraphNode().append($createTextNode('history boundary'))
+ )),{discrete:true});
+ const valid={...fixture(),lexicalState:source.getEditorState().toJSON()};
+ const result=loadMigratedDocumentIntoEditor(destination,valid);
+ assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+ assert.equal(cleared,1);
+ unregister();
 });
