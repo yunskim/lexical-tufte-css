@@ -50,6 +50,14 @@ try {
   assert.ok(note,'note remains in paragraph');
   assert.equal(note.children.map(n=>n.text??'').join('').startsWith('Z'),true);
  });
+ await scenario('ordinary body typing does not get intercepted by note guard',async page=>{
+  await page.locator('.editor').click();
+  await page.keyboard.press('Control+Home');
+  await page.keyboard.type('Q');
+  const json=await state(page);
+  assert.equal(json.root.children[0].children[0].text.startsWith('Q'),true);
+  assert.equal(await page.locator('[data-note-id]').count(),1);
+ });
  await scenario('whole note delete/undo/redo preserves atomic payload',async page=>{
   const before=await state(page);await selectNote(page);await page.keyboard.press('Backspace');
   assert.equal(await page.locator('[data-note-id]').count(),0);
