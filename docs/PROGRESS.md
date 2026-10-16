@@ -437,3 +437,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - R03을 R03.a–d로 세분화: 별도 Lexical format version, 명시적 migration, 버전별 golden fixture, 문서 교체 시 undo/redo 정책.
 - 현행 `loadDocumentIntoEditor`의 엄격한 JSON 동등성은 손실 방지에 유용하지만 구버전 저장 문서의 호환성을 보장하지 않는다. 버전별 변환이 구현되기 전에는 로드 호환성이 해결된 것으로 간주하지 않는다.
 - CI 추가 없음. 다음은 format version 저장 위치 및 migration 입력·출력 계약 설계.
+
+## 2026-10-16 — R03 migration 경계 계약 설계
+
+- docs/LEXICAL_MIGRATION_CONTRACT.ko.md 작성. schemaVersion 1과 Lexical node version의 구분, schemaVersion 2의 editorFormat 후보, legacy v1 명시적 분기, 실패 시 editor 불변, HistoryPlugin undo/redo 정책, 필수 fixture 및 판정 기준을 정리.
+- 현재 validator가 unknown top-level field를 거부하므로 기존 v1에 editorFormat을 임의 추가하지 않기로 설계. 설계안은 미확정이며 migration 함수는 아직 구현되지 않음.
+- 실행 환경 제한으로 테스트 미실행. R03/P2.5 체크 보류, CI 없음.
