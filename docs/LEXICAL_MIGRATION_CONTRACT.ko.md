@@ -92,3 +92,9 @@ Migration은 입력을 변경하지 않는 순수 함수여야 하며, 동일 �
 2. `editorFormat`은 engine, formatVersion만 허용하고 중복·알 수 없는 필드를 진단한다.
 3. 지원 포맷 테이블을 한곳에 두고 Lexical 의존성 업그레이드 시 명시적으로 재검증한다.
 4. render·storage·canonical consumers의 v2 지원 범위를 먼저 정한다. v1만 받는 소비자에게 v2를 전달하여 암묵적으로 처리하게 하지 않는다.
+
+## 부분 구현 상태 (2026-10-16)
+
+- `packages/document/src/inspectStoredDocument.ts`에서 버전 식별만 구현했다. v1은 현재 strict validator로 검사하고 `legacy-v1`로 식별한다.
+- v2는 `editorFormat` descriptor의 형태와 버전만 검사한다. **v2 문서 전체의 유효성이나 Lexical 런타임 호환성은 보장하지 않는다.**
+- migration, v2 validator, editor load 통합은 아직 구현되지 않았다. 실행 테스트 미확인.
