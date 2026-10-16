@@ -27,7 +27,8 @@ export function validateDocumentV2(input:unknown):V2ValidationResult{
   return fail('UNKNOWN_FIELD','$.editorFormat','Unknown editor format field');
  if(format.engine!=='lexical'||format.formatVersion!==1)
   return fail('UNSUPPORTED_EDITOR_FORMAT','$.editorFormat','Unsupported editor format');
- const {editorFormat:unused,...legacy}=input;
+ const legacy={...input};
+ delete legacy.editorFormat;
  const checked=validateDocument({...legacy,schemaVersion:1});
  if(!checked.ok)return {ok:false,diagnostics:checked.diagnostics};
  return {ok:true,document:{
