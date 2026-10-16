@@ -380,3 +380,19 @@ test('R01 image asset mismatch fails before editor state is installed',()=>{
   assert.equal(JSON.stringify(destination.getEditorState().toJSON()),before);
  }
 });
+
+test('P2 note kind can change without losing note identity or content',()=>{
+ const e=editor();
+ e.update(()=>{
+  const note=$createNoteNode('editable-note','sidenote');
+  note.append($createTextNode('변경해도 보존'));
+  note.setKind('marginnote');
+  assert.throws(()=>note.setKind('unknown'));
+  $getRoot().append($createSectionNode().append($createParagraphNode().append(note)));
+ },{discrete:true});
+ const note=e.getEditorState().toJSON().root.children[0].children[0].children[0];
+ assert.equal(note.type,'tufte-note');
+ assert.equal(note.noteId,'editable-note');
+ assert.equal(note.kind,'marginnote');
+ assert.equal(note.children[0].text,'변경해도 보존');
+});
