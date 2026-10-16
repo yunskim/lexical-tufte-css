@@ -502,3 +502,8 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - v2→v1 Lexical load projection에서 이중 강제 타입 변환을 제거하고 v1 필드를 명시적으로 구성.
 - v2 envelope에 getter/unknown field가 포함된 경우 거부하는 document 테스트 추가.
 - E035/M032 기록 및 예방 대책 반영. 테스트·타입 검사 미실행, 체크리스트 완료 처리하지 않음. CI 없음.
+
+## 2026-10-16 — R03.c v1/v2 envelope golden fixture
+
+- `fixtures/tufte/server-document-v2.json` 추가. 기존 v1 서버 fixture와 비교하는 migration golden 회귀 테스트 추가.
+- Lexical runtime 버전별 golden과 실제 테스트 실행은 미완. R03.c 체크 보류. CI 없음.
