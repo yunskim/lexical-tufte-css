@@ -1,4 +1,4 @@
-import {$applyNodeReplacement,ElementNode,type EditorConfig,type NodeKey,type SerializedElementNode,type DOMExportOutput} from 'lexical';
+import {$applyNodeReplacement,ElementNode,isHTMLElement,type EditorConfig,type NodeKey,type SerializedElementNode,type DOMExportOutput} from 'lexical';
 
 type SerializedSection=SerializedElementNode&{type:'tufte-section';version:1};
 export class SectionNode extends ElementNode {
@@ -59,7 +59,7 @@ export class TableLayoutNode extends ElementNode {
  exportDOM():DOMExportOutput{
   const layout=this.getLayout();
   return {element:document.createElement('div'),after:generated=>{
-   if(!(generated instanceof HTMLElement))throw Error('Table layout export has no element');
+   if(!isHTMLElement(generated))throw Error('Table layout export has no element');
    const table=generated.querySelector<HTMLTableElement>(':scope > table');
    if(!table||generated.children.length!==1)throw Error('Table layout requires exactly one table');
    if(layout==='scroll'){generated.className='table-wrapper';return generated;}

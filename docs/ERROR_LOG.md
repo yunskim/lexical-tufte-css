@@ -143,3 +143,44 @@
 - 관측: 편집기 JS 약 511.80kB, gzip 160.49kB. TablePlugin을 포함한 개발 예제의 값이다.
 - 상태: open (경고). 기준을 올려 숨기지 않는다. P3/P6에서 lazy loading/분할 및 성능 예산을 검토한다. 독자용 페이지에 편집기 번들을 넣지 않는 기존 경계를 유지한다.
 - 대책 M014: 작성/독자 번들 경계와 실제 번들 크기를 P3/P6에서 확인하고 변경 전후 측정 결과를 기록한다.
+
+## E016 — JSON fixture와 undefined 속성 있는 JS 객체를 직접 비교
+
+- 발생: 2026-10-16 P1.5 headless 비교 실험.
+- 증상: JSON roundtrip 비교에서 textFormat/colWidths 등의 `undefined` 속성이 actual에만 존재해 deepStrictEqual 실패.
+- 확인한 원인: Lexical toJSON()의 JS 객체와 파일에서 읽은 JSON을 동일한 계층으로 비교했다. JSON.stringify는 undefined 속성을 생략하므로 저장 데이터 유실과 다르다.
+- 처리: 저장/재읽기 계약은 JSON.parse(JSON.stringify(...))로 정규화한 JSON 값을 비교한다. 별도의 export 전후 메모리 상태 불변성 비교는 그대로 유지한다.
+- 상태: verified. 대책 M015: JS 내부 객체·JSON 저장 값·발행 HTML의 비교 경계를 테스트마다 명시한다.
+
+## E017 — 서버 DOM adapter에서 전역 HTMLElement 참조 실패
+
+- 발생: 2026-10-16 P1.5 withDOM + headless HTML export 실험.
+- 증상: NoteNode.after에서 `ReferenceError: HTMLElement is not defined`.
+- 확인한 원인: custom export가 전역 constructor 기반 instanceof를 사용했지만 withDOM은 document/window 등을 제공하고 HTMLElement 전역은 설치하지 않는다. 브라우저 한 realm 검사로는 놓친 차이다.
+- 처리: NoteNode/LayoutNodes의 검사에 Lexical isHTMLElement를 사용하여 전역 DOM constructor 의존을 제거한다.
+- 상태: verified (전역 constructor 의존 제거; 전체 DOM export 제한은 E018로 분리). 대책 M016: Node 무DOM·withDOM·실제 브라우저 경로를 모두 회귀 검증하고 DOM node 판별에 전역 constructor를 가정하지 않는다.
+
+## E018 — 고정 Happy DOM의 자기 자신 replaceWith에서 표 제거
+
+- 발생: 2026-10-16 P1.5 withDOM export, TableLayout의 자식 table 누락.
+- 확인: 독립 재현 `parent.append(table); table.replaceWith(table)` 후 parent가 비었다. Lexical HTML export는 after가 같은 element를 반환해도 replaceWith를 호출한다. 단순 :scope 문제라는 추정은 폐기했다.
+- 처리: upstream/전역 prototype을 임시 패치하지 않는다. 고정 adapter의 실패와 finally 전역 복원을 회귀 테스트하고, 발행은 DOM 의존 없는 순수 renderer를 선택했다. DOM export 성공으로 보고하지 않는다.
+- 상태: mitigated. adapter 경로는 미지원; P2.4에서 버전 갱신/명시적 adapter 도입 시 재검증. 대책 M017.
+
+## E019 — package export 경로를 파일 경로처럼 import
+
+- 발생: E018 최소 재현에서 node_modules 아래 `/dom` 파일 경로 import가 ERR_MODULE_NOT_FOUND.
+- 처리: package cwd에서 공개 specifier `@lexical/headless/dom`으로 실행해 재현 성공.
+- 상태: verified. M018: package exports는 공개 specifier로 해석하며 즉석 검증은 해당 package cwd에서 수행한다.
+
+## E020 — JSON import 테스트에서 fixture 함수 호출 누락
+
+- 발생: P1.5 추가 테스트가 객체 대신 fixture 함수 자체를 stringify해 정상 입력 assertion 실패.
+- 처리: `const doc=fixture()`를 명시하고 정상 입력/미래 버전 입력을 같은 문서로 검사한다.
+- 상태: verified (단위 15개와 전체 브라우저 회귀 통과). M019: fixture 생성 함수의 결과를 지역 변수에 고정하고 검증 대상을 명시한다.
+
+## E021 — 대형 Git 변경 목록 출력 잘림을 JSON으로 파싱
+
+- 발생: P1.5 GitHub 업로드 준비. 파일 내용을 모은 실행 결과가 출력 한도로 잘렸고 JSON.parse가 실패했다. 원본 파일은 변경되지 않았다.
+- 처리: 충분한 출력 한도로 다시 읽고 head/tail·완전한 JSON 파싱을 확인한 뒤 tree 항목으로 사용한다. 중단된 결과를 업로드하지 않는다.
+- 상태: verified (20개 파일의 완전한 JSON 파싱 확인). M020: 대형 도구 결과는 출력 예산/완결성을 확인하고 파싱 성공 이후에만 의존 mutation을 실행한다.

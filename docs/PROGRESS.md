@@ -99,3 +99,17 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 제한: 완성된 서버 렌더러가 아닌 브라우저 DOM export prototype과 독립 HTML의 비교다. 노드 삽입/속성 전환 일반 UI, 모든 구조 validation·HTML import·최종 폰트·다른 브라우저·접근성은 후속 작업이다. P1 gate와 F01–F22는 아직 미완료다.
 
 다음: P1.5 시작 전 에러·대책 기록 점검 후 서버 렌더링/스키마 결정.
+
+## P1.5 — 완료, P1 gate 통과 (2026-10-16)
+
+- ADR-0002와 DOCUMENT_SCHEMA_V1.ko.md: canonical JSON envelope, 명시적 JSON import, 발행 API/진단, phrasing-only note 및 namespace 계약 확정.
+- packages/render: DOM·Lexical·React runtime dependency 없는 validator/JSON parser/HTML renderer prototype. unknown node/version/property, 잘못된 자식/중첩/중복 note ID, URL/CSS, 예산 초과를 진단하고 전체 발행 차단. metadata/전체 노드 schema는 P2.1에 남긴다.
+- fixtures/tufte/server-document.json과 생성 script: 두 note 종류, 서식/링크/그림, caption, body/fullwidth/scroll 조합을 같은 저장 문서로 검증.
+- headless JSON roundtrip은 성공. DOM 없는 HTML export는 공식 오류로 거부. withDOM의 전역 복원은 확인했지만 고정 Happy DOM 자기 자신 replaceWith가 table을 제거하므로 현재 DOM adapter 발행은 미지원(E018). 이를 성공으로 보고하지 않고 독립 재현 테스트로 유지.
+- tests/server-browser.mjs: 실제 Lexical 브라우저 export와 서버 출력의 구조·텍스트·노트·caption/table·CSS 폭 비율을 1440/761/760/759/375px에서 비교. JS 비활성 모바일 페이지에서 label 토글과 여러 article ID 격리 통과.
+
+검증: frozen install, pnpm check(정책/CSS72규칙/타입/빌드/단위15개), pnpm test:browser(기존 P1.1–P1.4 회귀 + 서버 비교) 모두 통과. CI 없음. HTML byte 동일성·성능·전체 HTML conformance를 검증했다고 주장하지 않는다.
+
+오류 점검: E016–E021과 M015–M020를 새 경로 테스트/실행 절차에 반영. E018은 순수 renderer로 완화했고 adapter 재검토는 P2.4. 이전 E004/E005의 브라우저 환경 제한, OS IME/P6, W001 편집기 511.76kB(gzip160.48kB)/P3·P6는 유지. 단계 전환 전 전체 기록을 점검했으며 fixture 함수 결과·JSON 값/메모리 상태의 비교 경계를 명시했다.
+
+다음 작업: P2.1. 문서/노드 공유 schema·블로그 metadata·자산 참조 계약과 validator를 P1 prototype에서 확장한다. F01–F22의 전체 제품 완료 체크는 유지하지 않는다.

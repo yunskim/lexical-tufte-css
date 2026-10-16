@@ -32,6 +32,14 @@
 | M013 | E015 | overflow fixture의 줄바꿈·min-content 조건을 확인; 기준 일치와 실제 overflow를 별도 검사, viewport/치수로 실패 식별 | layoutFixture.ts, layout-reference.html, tests/layout-browser.mjs | 5개 폭 검증, fixture 변경 시 확인 |
 | M014 | W001 | 경고 기준을 올리지 않고 작성/독자 번들 분리·지연 로딩과 실제 크기 측정 | P3/P6, PROGRESS의 baseline | 계획, 해당 단계 시작 시 점검 |
 
+| M015 | E016 | JSON roundtrip는 JSON 값으로 정규화, 메모리 불변성은 별도 비교 | server-comparison.test.mjs | 적용 |
+| M016 | E017 | 전역 DOM constructor 대신 Lexical node 판별, 서버/브라우저 경로 분리 검사 | NoteNode/LayoutNodes, server 비교 테스트 | 적용 |
+| M017 | E018 | DOM adapter 최소 재현 유지, 실패 시 순수 renderer로 발행; upstream 전역 패치 금지 | server-comparison.test.mjs, packages/render | 완화, P2.4 재검토 |
+| M018 | E019 | 공개 package specifier와 해당 package cwd로 exports 해석 | 서버 비교 테스트 | 적용 |
+| M019 | E020 | fixture 함수 결과를 지역 변수로 명시 | render.test.mjs | 적용, 단위 15개 통과 |
+
+| M020 | E021 | 대형 결과의 출력 예산·완결성을 확인하고 파싱 후 mutation 실행 | Git 업로드 절차 | 적용 |
+
 ## 점검 기록
 
 | 시점 | 범위 | 확인 결과·개선 | 다음 점검 |
@@ -43,6 +51,9 @@
 | 2026-10-16 P1.3 완료 전 | E001–E012 / M001–M011 | M006/M008–M010 회귀를 유지하면서 DOM 분리의 E012를 추가 발견·수정. nested 상태/history 비교 실험으로 과도한 결론을 피하고 ADR 근거를 구분. 전체 로컬 검사·브라우저 회귀 통과 | P1.4 시작·완료 및 P1 단계 종료 |
 | 2026-10-16 P1.4 시작 | E001–E012 / M001–M011 | 편집/발행 DOM 분리 대책을 새 layout 노드에 적용. TableNode의 공식 export가 tbody를 만드는 것을 소스에서 확인하고 기준 HTML은 table 내부와 CSS direct-child를 구분해 비교할 계획 | P1.4 완료 전 |
 | 2026-10-16 P1.4 완료 전 | E001–E015/W001, M001–M014 | M003 선행 결과 회수·실패 전파가 ad-hoc 묶음에 빠진 점을 E014/M012로 보완. 독립 기준 HTML과 줄바꿈 없는 overflow fixture로 5개 폭 검증. 타입·빌드·단위 6개와 전체 브라우저 회귀 통과. 번들 경고는 P3/P6 후속으로 유지 | P1.5 시작·완료 및 P1 단계 종료 |
+| 2026-10-16 P1.5 시작 | E001–E015/W001, M001–M014 | DOM 전제/속성 유출·실행 순서·독립 기준 비교 대책을 점검. 서버와 브라우저 입력 경로의 차이를 별도 실험하고 미지원 입력은 진단으로 차단할 계획 | P1.5 완료 전 |
+
+| 2026-10-16 P1.5 완료 / P1→P2 전환 | E001–E021/W001, M001–M020 전체 | JSON 값/메모리/HTML 비교 구분, DOM constructor 제거, adapter 최소 재현과 순수 renderer 선택, fixture 결과 명시, 대형 출력 파싱 후 업로드. frozen install·check(단위15)·전체 브라우저 회귀 통과. E018 adapter 제한은 P2.4, 환경/OS IME와 번들 경고 후속은 유지 | P2.1 시작·완료 및 P2.4 adapter 변경 시 |
 
 ## 새 대책/점검 양식
 

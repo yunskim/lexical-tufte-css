@@ -1,0 +1,48 @@
+import {validateDocument,type JsonNode,type Diagnostic} from './document.js';
+export {parseDocument,validateDocument,isSafeURL,RENDER_PROFILE,type TufteDocument,type JsonNode,type Diagnostic,type AssetRef} from './document.js';
+export type RenderResult={ok:true;html:string;diagnostics:Diagnostic[]}|{ok:false;html:null;diagnostics:Diagnostic[]};
+export function escapeHTML(value:string):string{return value.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]!));}
+export function renderArticle(input:unknown,options:{idPrefix?:string}={}):RenderResult{
+ const result=validateDocument(input);if(!result.ok)return {ok:false,html:null,diagnostics:result.diagnostics};
+ const doc=result.document,prefix=options.idPrefix??doc.id;
+ if(typeof prefix!=='string'||!/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(prefix))return {ok:false,html:null,diagnostics:[{code:'INVALID_ID_PREFIX',path:'options.idPrefix',message:'Invalid article namespace'}]};
+ const esc=escapeHTML;
+ const attrs=(n:JsonNode)=>`${n.direction?` dir="${esc(String(n.direction))}"`:''}${n.format&&typeof n.format==='string'?` style="text-align: ${n.format};"`:''}`;
+ function render(n:JsonNode):string{
+  const inner=()=>n.children?.map(render).join('')??'';
+  switch(n.type){
+   case 'root':return inner();
+   case 'tufte-section':return `<section${attrs(n)}>${inner()}</section>`;
+   case 'paragraph':return `<p${attrs(n)}>${inner()}</p>`;
+   case 'text':{
+    let html=`<span style="white-space: pre-wrap;">${esc(String(n.text))}</span>`;
+    for(const [flag,tag] of [[16,'code'],[1,'strong'],[2,'em'],[4,'s'],[8,'u'],[32,'sub'],[64,'sup'],[128,'mark']] as const)if((Number(n.format)&flag)!==0)html=`<${tag}>${html}</${tag}>`;
+    return html;
+   }
+   case 'linebreak':return '<br>';
+   case 'link':{
+    const rel=new Set(String(n.rel??'').split(/\s+/).filter(Boolean));if(n.target==='_blank'){rel.add('noopener');rel.add('noreferrer');}
+    return `<a href="${esc(String(n.url))}"${n.target?` target="${n.target}"`:''}${n.title?` title="${esc(String(n.title))}"`:''}${rel.size?` rel="${esc([...rel].join(' '))}"`:''}${attrs(n)}>${inner()}</a>`;
+   }
+   case 'tufte-inline-image':return `<img src="${esc(String(n.src))}" alt="${esc(String(n.alt))}">`;
+   case 'tufte-note':{
+    const id=`${prefix}-note-${n.noteId}`,kind=String(n.kind);
+    return `<span data-tufte-note="${esc(String(n.noteId))}"><label for="${id}" class="margin-toggle${kind==='sidenote'?' sidenote-number':''}">${kind==='marginnote'?'⊕':''}</label><input id="${id}" type="checkbox" class="margin-toggle"><span class="${kind}"${attrs(n)}>${inner()}</span></span>`;
+   }
+   case 'tufte-figure':return `<figure${n.width==='fullwidth'?' class="fullwidth"':''}${attrs(n)}>${inner()}</figure>`;
+   case 'tufte-caption':return `<figcaption${attrs(n)}>${inner()}</figcaption>`;
+   case 'tufte-table-layout':{
+    const table=render(n.children![0]!);
+    return n.layout==='scroll'?`<div class="table-wrapper"${attrs(n)}>${table}</div>`:n.layout==='fullwidth'?table.replace('<table','<table class="fullwidth"'):table;
+   }
+   case 'table':return `<table${attrs(n)}><tbody>${inner()}</tbody></table>`;
+   case 'tablerow':return `<tr${attrs(n)}>${inner()}</tr>`;
+   case 'tablecell':{const header=Number(n.headerState),tag=header?'th':'td';return `<${tag}${header===1?' scope="col"':header===2?' scope="row"':''}${attrs(n)}>${inner()}</${tag}>`;}
+   default:throw Error('Validated node has no renderer');
+  }
+ }
+ const root=doc.lexicalState.root;
+ const rootStyle=`counter-reset: sidenote-counter;${root.format?` text-align: ${root.format};`:""}`;
+ const html=`<article id="${prefix}-article" lang="${esc(doc.locale)}"${root.direction?` dir="${root.direction}"`:""} style="${rootStyle}"><h1>${esc(doc.title)}</h1>${doc.subtitle!==undefined?`<p class="subtitle">${esc(doc.subtitle)}</p>`:''}${render(doc.lexicalState.root)}</article>`;
+ return {ok:true,html,diagnostics:[]};
+}

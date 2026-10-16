@@ -1,5 +1,5 @@
 import {
-  $applyNodeReplacement, ElementNode,
+  $applyNodeReplacement, ElementNode, isHTMLElement,
   type EditorConfig, type LexicalEditor, type NodeKey,
   type SerializedElementNode, type DOMExportOutput,
 } from 'lexical';
@@ -55,7 +55,7 @@ export class NoteNode extends ElementNode {
     const id = `prototype-${this.getNoteId()}`;
     const kind = this.getKind();
     return {element, after: (generated) => {
-      if (!(generated instanceof HTMLElement)) return generated;
+      if (!isHTMLElement(generated)) return generated;
       const payload = document.createElement('span');
       payload.className = kind;
       while (generated.firstChild) payload.append(generated.firstChild);

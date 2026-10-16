@@ -119,9 +119,9 @@ P0 gate: 저장소 URL, 재현 가능한 설치/빌드, 버전/라이선스/전�
 - [x] P1.2 노트 복사·삭제·split/merge·이동·undo/redo·한국어 IME prototype.
 - [x] P1.3 Lexical 소유 DOM과 export DOM을 분리해 label/input/span 인접성 확인; nested editor vs inline container 결정 ADR.
 - [x] P1.4 section·figure·caption·fullwidth·표를 조합해 CSS direct-child 규칙과 렌더러 일치 검증.
-- [ ] P1.5 headless 렌더링·서버 import 방식 비교, API/문서 schema와 허용 노트 콘텐츠 범위 확정 ADR.
+- [x] P1.5 headless 렌더링·서버 import 방식 비교, API/문서 schema와 허용 노트 콘텐츠 범위 확정 ADR.
 
-P1 gate: 어려운 노트 동작과 SSR 출력이 실제 브라우저에서 통과. 실패하면 구조를 수정한 후 다음 단계로 이동.
+P1 gate: 완료. 노트 편집 회귀와 SSR 출력의 실제 브라우저 비교 통과. 증거: [ADR-0002](adr/0002-document-and-rendering.ko.md), [문서 계약](DOCUMENT_SCHEMA_V1.ko.md), packages/render, tests/server-browser.mjs, docs/PROGRESS.md. 전체 제품/OS IME/타 브라우저 검증은 P6에 남는다.
 
 ### P2 — 문서/노드/변환 (P1 이후)
 
@@ -193,7 +193,7 @@ P6 gate: 로컬 빌드·타입 검사·관련 테스트 통과, 남은 결함과
 
 진행 기록 형식: `작업 ID | 상태(todo/in-progress/blocked/done) | 변경 경로/PR | 검증 명령·결과 | 차단 원인 | 다음 작업`. 증거 없이 체크하지 않는다. 문서 수정만으로 구현 작업을 완료하지 않는다.
 
-현재 다음 작업: P1.5 headless/서버 렌더링·import 방식과 API/schema/주석 허용 콘텐츠 확정 ADR. P1.4 증거는 [레이아웃 검증 문서](LAYOUT_PROTOTYPE.ko.md), LayoutNodes.ts, tests/layout-browser.mjs 및 docs/PROGRESS.md에 기록한다.
+현재 다음 작업: P2.1 envelope·metadata·asset·노드 schema 및 공유 validator 구현. P1.5의 p1-v1 prototype 계약을 확장한다. P1 완료 증거는 ADR-0001/0002, 레이아웃 검증 문서 및 docs/PROGRESS.md에 기록한다.
 
 ## 주요 위험과 처리
 

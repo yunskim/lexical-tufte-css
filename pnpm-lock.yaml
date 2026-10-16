@@ -101,6 +101,12 @@ importers:
         specifier: 13.6.27
         version: 13.6.27
 
+  packages/render:
+    devDependencies:
+      typescript:
+        specifier: 6.0.2
+        version: 6.0.2
+
 packages:
 
   '@floating-ui/core@1.8.0':
