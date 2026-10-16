@@ -839,3 +839,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - packages/lexical/src/index.ts export 및 lexical/test/inline-commands.test.mjs의 변경·거부 회귀 테스트 추가.
 - 이번 변경의 로컬 pnpm check/browser는 미실행. P2.2.b 완료 체크 보류. CI 추가 없음.
 - 다음: 테스트 실행, selection/history 및 실제 React 연결; 목록/정의목록 명령, F03/F05/F06 통합 회귀.
+
+## 2026-10-16 P2.2.b 정의목록 명령 추가
+
+- definitionCommands.ts 신규: 섹션 블록 뒤 정의목록 삽입, 현재 정의목록에 term/description 쌍 추가, 잘못된 선택·IME 조합은 진단 후 거부. index.ts 공개 API 반영.
+- 선택 안정성을 위해 새 항목은 편집 가능한 용어/설명 초기 텍스트를 포함.
+- 테스트 파일 추가 시 연결 도구 요청이 안전 검사에 의해 차단되어 미반영. 실행 검증 미완료이며 P2.2.b 체크 보류.
+- 다음: 테스트 추가/실행 및 React 연결, F03/F05/F06 검증, P2.2.c로 이동. CI 없음.
