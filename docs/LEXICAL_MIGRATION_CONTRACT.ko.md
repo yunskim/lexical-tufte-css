@@ -170,3 +170,10 @@ Migration은 입력을 변경하지 않는 순수 함수여야 하며, 동일 �
 - `REVISION_CONFLICT`, `INVALID_NEXT_REVISION`, `DOCUMENT_ID_MISMATCH`, `POST_SLUG_MISMATCH` 등의 명시적 진단을 반환한다.
 - 이 함수는 순수 preflight다. **동시 쓰기 사이의 경쟁 조건을 해결하지 않는다.** 저장 adapter는 동일 revision 조건을 실제 트랜잭션/CAS에서 다시 검사하고 원자적으로 교체해야 한다. slug 변경은 별도 rename 프로토콜로 처리한다.
 - 단위 테스트 작성, 실행 미확인.
+
+## v2 저장소 CAS 인터페이스와 참조 구현 (2026-10-16)
+
+- `PostRevisionStoreV2.compareAndSwap(next,expectedRevision)` 인터페이스를 추가했다. 실제 adapter는 저장 revision 비교와 문서 교체를 **동일 원자적 트랜잭션**에서 수행해야 한다.
+- `InMemoryPostRevisionStoreV2`는 단일 JS 프로세스 내 동기 검사·교체로 CAS 의미를 구현한 테스트/예제용 저장소다. `read()`는 복제 snapshot을 반환한다.
+- 이 구현은 영속성, 프로세스 간 동기화, 백업, 장애 복구를 제공하지 않는다. SQLite/D1 등의 실제 저장 adapter와 migration backup/atomic replace는 미구현이다.
+- 두 writer가 같은 revision으로 경쟁하는 회귀 테스트 작성, 실행 미확인.
