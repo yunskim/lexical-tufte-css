@@ -25,11 +25,15 @@ export class EmbedNode extends DecoratorNode<null>{
  exportDOM():DOMExportOutput{
   const n=this.getLatest(),outer=document.createElement(n.__wrapper);
   outer.className=(n.__width==='fullwidth'?'fullwidth ':'')+'tufte-embed';
+  outer.dataset.tufteRatio=String(n.__aspectRatio);
+  const spacer=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  spacer.setAttribute('viewBox',`0 0 960 ${960/n.__aspectRatio}`);spacer.setAttribute('width','960');spacer.setAttribute('height',String(960/n.__aspectRatio));
+  spacer.setAttribute('aria-hidden','true');spacer.setAttribute('focusable','false');
   const frame=document.createElement('iframe');frame.src=n.__src;frame.title=n.__title;frame.loading='lazy';frame.referrerPolicy='strict-origin-when-cross-origin';
   frame.setAttribute('sandbox','allow-scripts allow-same-origin allow-presentation');
   frame.setAttribute('allowfullscreen','');
   frame.width='960';frame.height=String(Math.round(960/n.__aspectRatio));
-  outer.append(frame);return {element:outer};
+  outer.append(spacer,frame);return {element:outer};
  }
  exportJSON():SerializedEmbed{
   const n=this.getLatest();return {...super.exportJSON(),type:'tufte-embed',version:1,provider:n.__provider,src:n.__src,title:n.__title,wrapper:n.__wrapper,width:n.__width,aspectRatio:n.__aspectRatio};

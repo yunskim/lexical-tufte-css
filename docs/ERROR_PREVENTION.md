@@ -166,9 +166,51 @@ E024/M023의 beforeinput 이벤트 취소 시점은 discrete update 사용만으
 - 손상이 발견되면 부분 패치로 누적 복구하지 말고 알려진 계약에 맞춰 파일을 완전 재구성한다.
 - 실제 `tsc`/테스트 실행 전에는 해결 여부를 확정하지 않는다.
 
-## M026 — 신규 노드 추가 시 validator 계약 대조 의무화
+## M036 — 신규 노드 추가 시 validator 계약 대조 의무화
 
 - 노드 구현 전에 `schema.ts`의 필드/자식 타입과 `validate.ts`의 값 제약을 모두 읽는다.
 - factory, importJSON, exportJSON, 테스트 fixture가 같은 자료형·필수 속성·허용 범위를 쓰는지 확인한다.
 - 허용값과 거부값을 validator에 직접 넣는 단위 테스트와 editor 왕복 테스트를 구분한다.
 - 정적 대조만 수행한 경우 `verified`로 표시하지 않는다. 실제 `pnpm check` 및 테스트 통과 후 갱신한다.
+
+## M037 — 다른 대화 반영분의 실행 증거 재확인
+
+- 관련 오류: E042. 환경이 다른 대화의 코드 반영·정적 점검을 실행 성공으로 간주하지 않는다.
+- 실행: 고정 main에서 frozen install → check → browser를 선행 결과 확인 후 실행. 실패는 수정 후 해당 검사와 영향 범위 전체를 다시 실행한다. CI는 추가하지 않는다.
+- 작업 시작: 2026-10-16, d78f455 기준. E001–E041 및 M001–M036을 검토하고 중복 ID를 정리했다. 기존 P2.2 로컬 미반영 작업은 별도 worktree에 보존하고 이 감사에 섞지 않는다.
+- 상태: E042 수정 검증 중. 다음 점검은 전체 검사 완료 전.
+
+## M038 — 부정 입력별 안정적인 진단 코드 검증
+
+- 관련 오류: E043. 버전 미지원·알 수 없는 필드·잘못된 값의 진단을 혼동하지 않는다. 입력별 정확한 코드를 검사하고 실패 테스트에 맞추려고 validator를 완화하지 않는다.
+- 적용: editor-boundary.test.mjs. 전체 회귀 재검증 대기.
+
+## M039 — golden 누락과 저장/메모리 비교 경계 확인
+
+- 관련 오류: E044/E016. 저장 snapshot 비교는 JSON 값을 사용하고 undefined optional 속성과 실제 데이터 유실을 구분한다.
+- 골든은 고정 설치 버전을 확인하는 명시적 생성 경로로 생성·검토한다. 통합 확인에서는 REQUIRE_LEXICAL_GOLDEN=1로 누락을 실패 처리하며 skip을 완료로 세지 않는다.
+- 대상: document-bridge.test.mjs 및 검증 보고서.
+
+## M040 — 출력 계약의 실제 브라우저 소비자 검증
+
+- 관련 오류: E046. namespace/CSS/serializer 변경은 의미 selector, 인접성, 실제 출력 ID, 여러 article 독립 토글을 함께 검사한다.
+- 노드 registry 검사는 테스트 factory의 실제 등록 클래스에서 파생한다. 이미 등록한 노드를 예전 목록 때문에 미지원으로 잘못 분류하지 않는다.
+- 신규 발행 기능에는 실제 편집/DOM 및 CSS 비율 검사를 추가하며 iframe 원격 재생과 로컬 레이아웃 검증을 구분한다.
+
+## M041 — 브라우저 harness의 의존성 탐색과 생명주기 고정
+
+- 관련 오류: E047. 실제 UI에 없는 테스트 entry를 동적으로 로드할 때 devserver가 mount 도중 재최적화하지 않도록 테스트 전용 entry 목록에 포함한다.
+- 적용: tests/vite-publication.config.mjs. 서버 readiness 및 finally 종료 원칙은 그대로 유지한다.
+
+## M042 — 속성 검사와 실제 레이아웃·의미 DOM 검사의 구분
+
+- 관련 오류: E048/E049. iframe width/height를 출력했다는 사실만으로 반응형 비율을 보장하지 않는다. 1440/761/760/759/375px에서 실제 bounding rect를 비교한다.
+- ImageQuilt는 자체 자산의 naturalWidth/naturalHeight를 확인한 뒤 비율을 검사한다. remote iframe은 네트워크를 차단한 채 로컬 레이아웃/보안 속성만 확인하고 provider 재생 성공으로 보고하지 않는다.
+- 코드 발행은 pre>code와 정확한 공백·tab·newline을 독립적으로 검사한다. CSS/HTML/script 정책도 함께 확인한다.
+
+## 2026-10-16 통합 검증 완료 점검
+
+- E001–E049 / M001–M042 전수 검토. 중복 ID 재배정, parser/타입/진단/저장 JSON 경계/golden 필수성/브라우저 소비자/CSP/실제 geometry 대책을 코드와 테스트에 반영했다.
+- 결과: frozen install, check140개(skip0), 브라우저6개, diff check PASS. 실제 SQLite 오류 주입과 사용자 입력 경로를 포함한다. 과거 환경 차단을 제품 성공으로 해석하지 않았다.
+- M036–M042의 적용 범위와 E042–E049의 해결 증거는 VERIFICATION_2026-10-16.ko.md를 따른다. M004/M017/M014의 환경·adapter·번들 후속은 유지한다.
+- 다음 점검: 다음 체크리스트 작업 시작/완료, 새 Lexical/CSS/renderer 변경, 오류 재발 및 P단계 전환. CI는 사용하지 않는다.

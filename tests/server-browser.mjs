@@ -13,7 +13,7 @@ const browser=await chromium.launch({headless:true,...(process.env.CHROMIUM_PATH
 import {readFileSync} from 'node:fs';
 import {renderArticle} from '../packages/render/dist/index.js';
 const doc=JSON.parse(readFileSync('fixtures/tufte/server-document.json','utf8'));
-const css=readFileSync('fixtures/tufte/upstream/tufte.css','utf8');
+const css=readFileSync('fixtures/tufte/upstream/tufte.css','utf8')+'\n'+readFileSync('packages/render/styles.css','utf8');
 try {
  const page=await browser.newPage();page.setDefaultTimeout(5000);
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
@@ -46,11 +46,13 @@ try {
  await staticPage.setViewportSize({width:375,height:1100});
  await staticPage.setContent(`<style>${css}</style>${result.html}${second.html}`);
  assert.equal(await staticPage.locator('script').count(),0);
- assert.equal(await staticPage.locator('#server-fixture-note-server-note').isChecked(),false);
- await staticPage.locator('label[for="server-fixture-note-server-note"]').click();
- assert.equal(await staticPage.locator('#server-fixture-note-server-note').isChecked(),true);
- assert.equal(await staticPage.locator('#second-note-server-note').isChecked(),false);
- assert.equal(await staticPage.locator('#server-fixture-article .sidenote').isVisible(),true);
- assert.equal(await staticPage.locator('#second-article .sidenote').isVisible(),false);
+ const firstNote=staticPage.locator('#server-fixture-article [data-tufte-note="server-note"]');
+ const secondNote=staticPage.locator('#second-article [data-tufte-note="server-note"]');
+ const firstId=await firstNote.locator('input').getAttribute('id'),secondId=await secondNote.locator('input').getAttribute('id');
+ assert.notEqual(firstId,secondId);assert.match(firstId,/^tufte-14-server-fixture-/);assert.match(secondId,/^tufte-6-second-/);
+ assert.equal(await firstNote.locator('input').isChecked(),false);
+ await firstNote.locator('label').click();assert.equal(await firstNote.locator('input').isChecked(),true);
+ assert.equal(await secondNote.locator('input').isChecked(),false);
+ assert.equal(await firstNote.locator('.sidenote').isVisible(),true);assert.equal(await secondNote.locator('.sidenote').isVisible(),false);
  console.log('Server/browser semantic and geometry parity: 5 widths; no-JS mobile toggles and article namespaces passed.');
 } finally {await browser.close();server?.kill();}

@@ -228,6 +228,7 @@ test('F18 embeds publish escaped sandboxed iframe with responsive dimensions',()
  assert.match(result.html,/title="Tutorial &quot;quoted&quot; &amp; explained"/);
  assert.match(result.html,/sandbox="allow-scripts allow-same-origin allow-presentation"/);
  assert.match(result.html,/width="960" height="540" allowfullscreen=""/);
+ assert.match(result.html,/<svg viewBox="0 0 960 540" width="960" height="540" aria-hidden="true" focusable="false"><\/svg><iframe/);
  assert.doesNotMatch(result.html,/style=|<script/);
  const css=readFileSync(new URL('../styles.css',import.meta.url),'utf8');
  assert.match(css,/\.tufte-embed iframe/);
@@ -273,4 +274,9 @@ test('F19 ImageQuilt rejects asset source and dimension mismatches before public
   assert.equal(result.html,null);
   assert.ok(result.diagnostics.some(x=>['ASSET_MISMATCH','MISSING_ASSET'].includes(x.code)),JSON.stringify(result.diagnostics));
  }
+});
+
+test('F17 code block preserves validated direction/alignment classes',()=>{
+ const d=fixture();d.lexicalState.root.children[0].children.push({type:'tufte-code',version:1,width:'fullwidth',language:null,direction:'rtl',format:'right',children:[{type:'text',version:1,text:'  code',format:0}]});
+ const r=renderArticle(d);assert.equal(r.ok,true,JSON.stringify(r.diagnostics));assert.match(r.html,/<pre dir="rtl" class="fullwidth tufte-align-right"><code>  code<\/code><\/pre>/);
 });

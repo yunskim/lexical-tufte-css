@@ -291,24 +291,87 @@
 - 조치: 파일을 완전한 단일 구현으로 재작성하고 원격 저장소에 반영. 테스트/타입검사 실행 미확인.
 - 예방: M035 참조.
 
-## E026 — 신규 Lexical 노드와 문서 스키마의 정적 계약 불일치
+## E039 — 신규 Lexical 노드와 문서 스키마의 정적 계약 불일치
 
 - 발견: 2026-10-16, F17/F18/F19 구현 이후 소스 대조.
 - 증상(정적 검토): EmbedNode.aspectRatio는 문자열인데 validator는 유한 숫자 0.1..10을 요구함; 코드 언어 정규식에 점 허용 여부 불일치; ImageQuilt 생성 시 필수 원본 크기를 생략 가능.
 - 원인: 신규 노드 구현 시 `packages/document/src/validate.ts`의 실제 제약을 동시에 대조하지 않음.
 - 처리: 비율 숫자화, 언어 허용 문자 일치, ImageQuilt 필수 크기 검증, 관련 테스트 fixture 수정.
-- 상태: mitigated (소스 수정 확인, 빌드/실행 테스트 미실행). 대책 M026. CI 없음.
+- 상태: mitigated (소스 수정 확인, 빌드/실행 테스트 미실행). 대책 M036. CI 없음.
 
-## E027 — Embed 제목 길이와 ImageQuilt TypeScript 직렬화 계약 불일치
+## E040 — Embed 제목 길이와 ImageQuilt TypeScript 직렬화 계약 불일치
 
 - 발견: 2026-10-16, F17/F18/F19 정적 계약 재점검.
 - 증상: EmbedNode는 제목 최대 500자를 요구하지만 문서 validator는 1000자까지 허용. ImageQuilt는 필수 width/height를 런타임에 검증하지만 직렬화 TypeScript 타입은 선택 속성으로 선언.
 - 처리: 제목 길이 1000자로 통일하고 직렬화 타입의 width/height를 필수화. 유효·무효 직렬화 계약 회귀 테스트 추가.
-- 상태: mitigated (코드 수정; 실제 실행 검증 미완료). M026 재적용.
+- 상태: mitigated (코드 수정; 실제 실행 검증 미완료). M036 재적용.
 
-## E028 — ImageQuilt 직렬화 필수 속성 및 Embed HTML 내보내기 정책 불일치
+## E041 — ImageQuilt 직렬화 필수 속성 및 Embed HTML 내보내기 정책 불일치
 
 - 발견: 2026-10-16, 문서 모델 → 편집기 → 발행 렌더러 정적 계약 재검토.
 - 증상: SerializedImageQuilt.width/height는 필수인데 exportJSON()은 선택적으로만 출력하여 TypeScript 정적 타입과 모순. EmbedNode.exportDOM()은 발행 renderer와 달리 sandbox 및 크기 속성을 출력하지 않음.
 - 조치: ImageQuilt 필수 필드 무조건 출력, Embed DOM export의 sandbox/referrer/iframe 크기 및 wrapper class 정렬.
-- 검증 상태: GitHub 코드 변경 완료, 빌드·실행 테스트 미실행. M026의 node/serializer/render 계약 점검 적용.
+- 검증 상태: GitHub 코드 변경 완료, 빌드·실행 테스트 미실행. M036의 node/serializer/render 계약 점검 적용.
+
+## E042 — 최신 main 전체 검증에서 저장 형식 판별 함수 구문 손상
+
+- 발생: 2026-10-16 통합 재검증, d78f455 기준 pnpm check.
+- 증상: inspectStoredDocument.ts의 미종결 문자열·중복 함수 본문으로 TS1002/TS1005/TS1128. 선행 빌드 실패로 단위/브라우저 검사는 실행하지 않았다.
+- 처리: descriptor 검사와 v1/v2 분기 계약에 맞춰 파일을 단일 구현으로 재구성했다. 접근자를 읽기 전에 거부하는 동작을 보존한다.
+- 상태: verified (통합 check/브라우저 전체 통과). M037: 정적 원격 반영과 실제 파싱·타입·테스트 성공을 구분하고 전체 로컬 검증을 완료 증거로 남긴다.
+
+### 오류 ID 중복 정리 (통합 재검증)
+
+이전 기록에 E026/E027/E028 및 M026이 중복 사용됐다. 기존 최초 ID는 유지하고 후반의 신규 노드 계약 기록을 E039/E040/E041, M036으로 재배정했다. 과거 PROGRESS의 해당 제목별 참조는 이 대응표로 읽는다. 기록은 삭제하지 않았다.
+
+## E043 — v2 unknown-field 입력의 진단 기대값 불일치
+
+- 발생: E042 복구 후 전체 check의 document 테스트 47개 중 1개 실패.
+- 원인: editorFormat.extra 입력은 UNKNOWN_FIELD가 올바른 계약인데 모든 부정 입력을 UNSUPPORTED_*로 묶어 단언했다.
+- 처리: 각 입력과 정확한 오류 코드를 짝지어 버전/engine/unknown field 거부를 구분한다. validator를 약화시키지 않는다.
+- 상태: verified (document47/47 통과). M038: 부정 테스트는 실패 여부뿐 아니라 잘못된 입력의 종류와 안정적인 진단 코드를 함께 확인한다.
+
+## E044 — 저장 golden과 메모리 toJSON 객체 직접 비교 재발
+
+- 발생: 전체 check의 Lexical 테스트에서 v2 golden 왕복 assertion 실패. JSON 파일에 없는 undefined optional 속성이 메모리 toJSON 객체에 존재했다(E016 동일 계열).
+- 처리: 저장 계약 assertion은 JSON으로 직렬화·재읽기한 값끼리 비교한다. 구조 변형/미지원 속성의 fail-closed 검사와 객체 소유권 회귀는 유지한다.
+- 추가 발견: 설치된 Lexical에서 생성한 golden 파일이 없어 1개 테스트가 skip됐다. 명시적 생성 모드로 만들고 내용을 검토한 뒤 커밋하며, 전체 확인은 REQUIRE_LEXICAL_GOLDEN=1로 실행한다.
+- 상태: verified (Lexical67/67, golden 필수·skip0). M015/M039.
+
+## E045 — 통합 브라우저 검증의 고정 실행 파일 부재
+
+- 발생: 전체 check 통과 후 test:browser 시작. Playwright 1.51.1의 chromium_headless_shell-1161 실행 파일이 현재 환경에 없어 launch 실패.
+- 처리: 고정 버전 공식 Playwright 설치기로 headless shell을 설치한 뒤 재실행한다. 이 실패를 제품 동작 실패나 브라우저 통과로 해석하지 않는다.
+- 상태: verified (고정 shell 설치 및 브라우저6개 파일 통과; 이 환경에 한정). M004/M024 적용.
+
+## E046 — 충돌 방지 note namespace 변경 뒤 브라우저 selector 미갱신
+
+- 발생: 기존 브라우저 회귀 5개 중 server-browser의 오래된 ID selector timeout. 앞선 노트/IME/DOM/레이아웃과 5개 폭 서버 비교는 통과했다.
+- 원인: R06에서 `tufte-{prefix.length}-{prefix}-{noteId}`로 출력 계약을 바꾸었지만 테스트는 예전 ID를 고정했다. 새 CSS를 포함하지 않은 상태도 발견했다.
+- 처리: article/note의 의미 selector로 input을 찾고, 길이 접두사와 두 article ID 비동등성을 명시적으로 검사한다. 발행 CSS를 실제 호스트처럼 포함한다.
+- 상태: verified (서버5폭/여러 article 토글 통과). M040: 출력 계약 변경 시 브라우저 소비자·CSS·기능 회귀를 함께 갱신하고 테스트 성공을 확인한다.
+
+## E047 — 신규 브라우저 harness 동적 import 도중 Vite 재탐색 reload
+
+- 발생: 신규 publication-browser가 첫 테스트 모듈을 import하는 동안 Execution context was destroyed.
+- 원인: 기존 UI에 없는 의존성을 동적으로 처음 발견하면서 Vite가 dependency 최적화 후 페이지를 reload했다. 제품 입력 오류와 구분한다.
+- 처리: 테스트 전용 Vite config에 UI와 harness를 optimizeDeps entry로 지정하여 mount 전 의존성을 탐색한다. 실패를 timeout 증가나 무한 재시도로 숨기지 않는다.
+- 상태: verified (test entry 사전 탐색 후 전체 브라우저 통과). M041.
+
+## E048 — iframe 반응형 비율이 실제 브라우저에서 보존되지 않음
+
+- 발생: 신규 publication 브라우저 검사, 1440px에서 16:9/4:3 iframe 모두 폭1260/높이150(비율8.4). unit의 HTML width/height 속성 검사는 통과했었다.
+- 원인: iframe은 CSS height:auto와 aspect-ratio:auto만으로 HTML 속성 비율을 반응형으로 계산하지 않는다. max-width:100%도 Tufte의 body/fullwidth 폭을 덮어썼다.
+- 처리: 안전한 수치로 만든 aria-hidden SVG spacer가 비율을 제공하고 iframe은 wrapper를 채운다. 외부 CSS만 사용하며 body55%/fullwidth90%/모바일90% 경계를 적용한다. Lexical export도 같은 구조로 맞춘다.
+- 테스트 fixture 보완: ImageQuilt는 실제 자체 SVG(120×48)를 정상 로드하고 자연 크기를 확인한다. 실패 이미지를 정상 비율의 증거로 삼지 않는다.
+- 상태: verified (실제 CSP/5개 비율×5폭 통과). M042: iframe 속성뿐 아니라 실제 geometry와 정상 이미지 로드를 여러 폭에서 확인한다.
+
+## E049 — 코드 노드 exportDOM의 pre>code 의미 구조 누락
+
+- 발견: 신규 브라우저 검증 경로 정적 대조. 기본 ElementNode export에 맡겨 pre만 생성하고 code wrapper가 없었다.
+- 처리: 편집용 createDOM과 별도 exportDOM에서 pre>code 및 정확한 text/tab/newline을 내보낸다. 순수 렌더러의 code direction/alignment 속성도 유지한다.
+- 상태: verified (코드 DOM/정확한 공백·방향·정렬 검사 통과). M042에 의미 구조와 원문 공백 비교 포함.
+
+## 2026-10-16 통합 완료 전 오류 전수 점검
+
+E001–E049/M001–M042를 검토했다. E024의 경계 입력은 실제 Chromium 회귀, E026의 충돌 반례는 render 검사, E028–E041의 fixture·소유권·migration·SQLite·신규 노드 계약은 현재 check로 확인했다. 과거 ‘실행 대기’ 서술은 그 당시 이력이며 현재 판정은 통합 보고서를 따른다. E025/E027의 이전 환경은 변경하지 않았고 현재 별도 검증 환경에서 설치·실행에 성공했다. E018 DOM adapter 제한, E004/E005의 다른 환경/브라우저 범위, W001 경고 및 OS 실제 IME 미검증은 유지한다. 기능 확장/복구 UX/폰트/접근성 미구현을 오류 해결로 대신 표시하지 않는다.

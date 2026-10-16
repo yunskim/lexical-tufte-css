@@ -15,7 +15,8 @@ import {NODE_SCHEMA,validateDocument} from '@lexical-tufte/document';
 import {ListNode,ListItemNode,$createListNode,$createListItemNode} from '@lexical/list';
 import {TableNode,TableRowNode,TableCellNode,$createTableNode,$createTableRowNode,$createTableCellNode} from '@lexical/table';
 const fixture=()=>JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document.json',import.meta.url),'utf8'));
-const editor=()=>createHeadlessEditor({namespace:'document-bridge-test',nodes:[SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,TableNode,TableRowNode,TableCellNode,ListNode,ListItemNode,LinkNode,HeadingNode,QuoteNode,HorizontalRuleNode,DefinitionListNode,DefinitionTermNode,DefinitionDescriptionNode,EpigraphNode,AttributionNode,CiteNode,SectionFooterNode,FullwidthNode,TufteCodeNode,ImageQuiltNode,EmbedNode],onError(e){throw e;}});
+const editorNodes=[SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,TableNode,TableRowNode,TableCellNode,ListNode,ListItemNode,LinkNode,HeadingNode,QuoteNode,HorizontalRuleNode,DefinitionListNode,DefinitionTermNode,DefinitionDescriptionNode,EpigraphNode,AttributionNode,CiteNode,SectionFooterNode,FullwidthNode,TufteCodeNode,ImageQuiltNode,EmbedNode];
+const editor=()=>createHeadlessEditor({namespace:'document-bridge-test',nodes:editorNodes,onError(e){throw e;}});
 test('R02 strict Lexical bridge fails closed when a registered node is missing',()=>{
  const source=editor();
  source.update(()=>{
@@ -163,16 +164,9 @@ test('R02 scroll table preserves cell headers and layout in Lexical roundtrip',(
 });
 
 test('R03 editor node registry and document schema coverage are explicit',()=>{
- const registered=[
-  'root','tufte-section','paragraph','text','linebreak','link',
-  'tufte-note','tufte-inline-image','tufte-span','tufte-figure',
-  'tufte-caption','tufte-table-layout','table','tablerow','tablecell',
-  'list','listitem'
- ];
+ const registered=['root','paragraph','text','linebreak','tab',...editorNodes.map(Node=>Node.getType())];
  const unsupported=Object.keys(NODE_SCHEMA).filter(type=>!registered.includes(type));
- assert.ok(unsupported.includes('tufte-code'));
- assert.ok(unsupported.includes('tufte-embed'));
- assert.ok(unsupported.includes('tufte-epigraph'));
+ assert.deepEqual(unsupported,['code-highlight']);
  assert.equal(new Set(registered).size,registered.length);
  for(const type of registered)assert.ok(Object.hasOwn(NODE_SCHEMA,type),type);
 });
@@ -197,7 +191,7 @@ test('R03 document schema rejects a future table cell field without silent clean
  assert.ok(result.diagnostics.some(x=>x.code==='UNKNOWN_FIELD'&&x.path.endsWith('.futureTableField')));
 });
 
-test('R02 Lexical 0.52.0 generated golden snapshot (explicit update only)',t=>{
+test('R02 Lexical 0.52.0 generated golden snapshot is required',()=>{
  const source=editor();
  source.update(()=>{
   $getRoot().append($createSectionNode().append(
@@ -230,10 +224,7 @@ test('R02 Lexical 0.52.0 generated golden snapshot (explicit update only)',t=>{
   mkdirSync(dirname(fileURLToPath(snapshot)),{recursive:true});
   writeFileSync(snapshot,actual,'utf8');
  }
- if(!existsSync(snapshot)){
-  if(process.env.REQUIRE_LEXICAL_GOLDEN==='1')assert.fail('Golden fixture is required; generate and review using UPDATE_LEXICAL_GOLDEN=1');
-  t.skip('Golden fixture not yet generated from installed Lexical 0.52.0; run UPDATE_LEXICAL_GOLDEN=1 and commit reviewed output');return;
- }
+ assert.ok(existsSync(snapshot),'Required golden fixture is missing; generate and review using UPDATE_LEXICAL_GOLDEN=1');
  assert.equal(actual,readFileSync(snapshot,'utf8'));
 });
 
@@ -521,10 +512,10 @@ test('R03 checked-in v2 golden survives real Lexical import and export',()=>{
  const loaded=loadMigratedDocumentIntoEditor(destination,golden);
  assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
  assert.deepEqual(loaded.value,golden);
- assert.deepEqual(destination.getEditorState().toJSON(),golden.lexicalState);
+ assert.deepEqual(JSON.parse(JSON.stringify(destination.getEditorState().toJSON())),golden.lexicalState);
  const exported=exportEditorToDocumentV2(destination,loaded.value);
  assert.equal(exported.ok,true,JSON.stringify(exported.diagnostics));
- assert.deepEqual(exported.value,golden);
+ assert.deepEqual(JSON.parse(JSON.stringify(exported.value)),golden);
  assert.equal(JSON.stringify(golden),original);
 });
 test('R03 checked-in v2 golden rejects unknown editor format without mutation',()=>{

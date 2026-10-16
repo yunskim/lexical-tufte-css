@@ -767,3 +767,13 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - F18 EmbedNode.exportDOM이 발행 renderer와 동일한 iframe sandbox/referrer 정책, width/height, wrapper class를 사용하도록 조정.
 - E028 기록. 현재 Node.js v22.16.0이지만 pnpm 없음; GitHub git 원격은 DNS 해석 실패. 실제 TypeScript 빌드, node/browser 테스트는 미실행. CI 없음.
 - 후속: 로컬 검증 환경 복구 및 전체 테스트 통과 전 체크리스트 완료 표시 금지.
+
+## 2026-10-16 — 다른 대화 반영분 전체 로컬 검증 완료
+
+- 기준 main d78f4559826e13bfcccbdfec4a238613ce096011. 기존 로컬 P2.2 작업을 별도 보존하고 최신 main worktree에서 감사했다.
+- 최초 check는 inspectStoredDocument 구문 손상으로 실패했고, 수정 후 진단 기대값·JSON 저장 값 비교·golden 누락을 발견/수정했다(E042–E044).
+- 단위 140/140 PASS(document47/lexical67/render26), skip/fail/todo0. 실제 SQLite CAS·backup/restore 오류 주입 및 headless History reset 포함. 고정 Lexical golden을 실제 생성·검토해 필수화했다.
+- 브라우저 6개 파일 전체 PASS. 기존 5개 회귀와 신규 publication 검사: 실제 정의목록/cite 편집, pre>code 공백/방향/정렬, 정상 자체 SVG, 5 embed 비율×5폭, CSP script-src none/style-src self. namespace 옛 selector, Vite 재탐색, iframe 비율/폭 및 코드 DOM 구조를 수정(E045–E049)했다.
+- frozen install/typecheck/build/inventory72/diff check PASS. CI 실행/추가 없음. editor 번들516.28kB(gzip161.82kB) W001 유지.
+- 상세 [검증 보고서](VERIFICATION_2026-10-16.ko.md), [R14](LOCAL_VERIFICATION_R14.ko.md), [노드 범위](P2_NODE_COVERAGE.ko.md). 과거 ‘미실행’ 기록은 이력을 보존하고 현재 보고서로 갱신한다.
+- R01/R04/R06–R09/R12/R14 및 R03.a/b/c는 현행 지원 계약의 검증 범위에서 체크했다. R02/R03.d/R05/R10/R11/R13, P2.2–P7 및 전체 F표는 미완료. 웹폰트/OS IME/타 브라우저/접근성/provider 재생/블로그 운영을 검증했다고 주장하지 않는다.

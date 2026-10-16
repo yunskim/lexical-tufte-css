@@ -114,15 +114,15 @@ test('R03 format inspection distinguishes legacy v1 and proposed v2 without muta
  assert.equal(JSON.stringify(legacy),before);
  const v2={...legacy,schemaVersion:2,editorFormat:{engine:'lexical',formatVersion:1}};
  assert.deepEqual(inspectStoredDocument(v2),{ok:true,format:{schemaVersion:2,formatVersion:1},diagnostics:[]});
- for(const input of [
-  {...legacy,schemaVersion:3},
-  {...v2,editorFormat:{engine:'lexical',formatVersion:2}},
-  {...v2,editorFormat:{engine:'other',formatVersion:1}},
-  {...v2,editorFormat:{engine:'lexical',formatVersion:1,extra:true}}
+ for(const [input,code] of [
+  [{...legacy,schemaVersion:3},'UNSUPPORTED_DOCUMENT_VERSION'],
+  [{...v2,editorFormat:{engine:'lexical',formatVersion:2}},'UNSUPPORTED_EDITOR_FORMAT'],
+  [{...v2,editorFormat:{engine:'other',formatVersion:1}},'UNSUPPORTED_EDITOR_FORMAT'],
+  [{...v2,editorFormat:{engine:'lexical',formatVersion:1,extra:true}},'UNKNOWN_FIELD']
  ]){
   const result=inspectStoredDocument(input);
   assert.equal(result.ok,false);
-  assert.ok(result.diagnostics.some(d=>d.code.startsWith('UNSUPPORTED_')));
+  assert.ok(result.diagnostics.some(d=>d.code===code),JSON.stringify(result.diagnostics));
  }
  const malformed={...legacy,unknownField:true};
  const invalid=inspectStoredDocument(malformed);

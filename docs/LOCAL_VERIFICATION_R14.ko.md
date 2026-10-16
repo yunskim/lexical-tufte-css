@@ -41,14 +41,13 @@ pnpm test:browser: PASS | FAIL | BLOCKED
 
 pre-push hook은 사용자 개발 환경에서 **선택적으로만** 설치한다. 저장소에 자동 설치하는 스크립트나 push 강제 차단 정책을 두지 않는다. hook을 사용해도 검증 증거는 실행 기록에 별도로 남긴다.
 
-## 현재 검증 상태 (2026-10-16)
+## 현재 검증 상태 (2026-10-16 통합 재검증)
 
-- 확인: Node.js v22.16.0.
-- 차단: pnpm 실행 파일 부재, github.com DNS 실패로 의존성 설치 불가(E025).
-- `pnpm install --frozen-lockfile`: BLOCKED.
-- `pnpm check`: BLOCKED.
-- `pnpm test:browser`: BLOCKED.
-- 결론: R04 이후 작성된 테스트 코드는 실제 성공이 입증되지 않았다. R06–R14 완료 체크는 검증 증거 확보 전까지 보류한다.
+- Node24.19.0 / pnpm11.25.0 / Chromium134 headless shell 환경에서 실행했다.
+- frozen install, pnpm check(140/140, skip0), pnpm test:browser(6개 파일), diff check 모두 PASS.
+- 기존 E025 환경 차단은 이전 대화 환경의 이력이며 현재 검증 환경에서는 해소됐다.
+- 실제 실패·수정·재실행·남은 제한은 [통합 보고서](VERIFICATION_2026-10-16.ko.md)에 기록했다. 프로젝트 전체 완료를 뜻하지 않는다.
+- Lexical golden은 생성·검토·커밋하며 누락 시 항상 테스트 실패로 처리한다. CI는 추가하지 않았다.
 
 ## 재개 조건
 

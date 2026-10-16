@@ -59,3 +59,7 @@ pnpm test:browser
 - [문서 정본 v1 / 공유 schema와 렌더 profile](docs/DOCUMENT_SCHEMA_V1.ko.md)
 
 `packages/document`는 문서·메타데이터·자산·33개 노드 계약과 validator를 제공합니다. `packages/render`는 공유 검증 뒤 현재 `p1-v1` 출력 지원 범위를 검사합니다. 두 패키지는 DOM/React/Lexical runtime 없이 실행됩니다. 노드별 편집·발행 구현은 P2.2부터 확장합니다.
+
+## 최신 통합 실행 검증
+
+2026-10-16: 단위/통합 테스트 140개(실패·skip0), 브라우저 실행 파일 6개 및 고정 lock 설치/타입/빌드 검사 통과. CI는 생략합니다. [검증 보고서와 미완료 범위](docs/VERIFICATION_2026-10-16.ko.md)를 확인하세요. 현재 구현분의 검증이며 전체 제품 완료 선언은 아닙니다.

@@ -1,4 +1,4 @@
-import {$applyNodeReplacement,ElementNode,type EditorConfig,type NodeKey,type SerializedElementNode} from 'lexical';
+import {$applyNodeReplacement,ElementNode,isHTMLElement,type EditorConfig,type NodeKey,type SerializedElementNode,type DOMExportOutput} from 'lexical';
 
 export type CodeWidth='body'|'fullwidth';
 export type SerializedTufteCode=SerializedElementNode&{type:'tufte-code';version:1;width:CodeWidth;language:string|null};
@@ -26,6 +26,15 @@ export class TufteCodeNode extends ElementNode {
    else dom.dataset.language=this.__language;
   }
   return false;
+ }
+ exportDOM():DOMExportOutput{
+  const pre=document.createElement('pre'),classes:string[]=[];if(this.getWidth()==='fullwidth')classes.push('fullwidth');
+  const format=this.getFormatType(),direction=this.getDirection();if(format)classes.push(`tufte-align-${format}`);if(classes.length)pre.className=classes.join(' ');if(direction)pre.dir=direction;
+  const text=this.getTextContent();
+  return {element:pre,after:generated=>{
+   if(!isHTMLElement(generated))return generated;
+   const code=document.createElement('code');code.textContent=text;generated.replaceChildren(code);return generated;
+  }};
  }
  exportJSON():SerializedTufteCode{return {...super.exportJSON(),type:'tufte-code',version:1,width:this.getWidth(),language:this.getLanguage()};}
  static importJSON(value:SerializedTufteCode):TufteCodeNode{

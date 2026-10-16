@@ -1,0 +1,71 @@
+{
+  "root": {
+    "children": [
+      {
+        "children": [
+          {
+            "children": [
+              {
+                "detail": 0,
+                "format": 0,
+                "mode": "normal",
+                "style": "",
+                "text": "Golden 본문",
+                "type": "text",
+                "version": 1
+              }
+            ],
+            "direction": null,
+            "format": "",
+            "indent": 0,
+            "textFormat": 0,
+            "textStyle": "",
+            "type": "paragraph",
+            "version": 1
+          },
+          {
+            "children": [
+              {
+                "children": [
+                  {
+                    "detail": 0,
+                    "format": 0,
+                    "mode": "normal",
+                    "style": "",
+                    "text": "항목",
+                    "type": "text",
+                    "version": 1
+                  }
+                ],
+                "indent": 0,
+                "value": 3,
+                "direction": null,
+                "format": "",
+                "type": "listitem",
+                "version": 1
+              }
+            ],
+            "listType": "number",
+            "start": 3,
+            "tag": "ol",
+            "direction": null,
+            "format": "",
+            "indent": 0,
+            "type": "list",
+            "version": 1
+          }
+        ],
+        "direction": null,
+        "format": "",
+        "indent": 0,
+        "type": "tufte-section",
+        "version": 1
+      }
+    ],
+    "direction": null,
+    "format": "",
+    "indent": 0,
+    "type": "root",
+    "version": 1
+  }
+}

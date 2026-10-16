@@ -1,40 +1,24 @@
-# P2.2 Lexical 노드 구현 범위와 순서
+# P2 노드 구현과 실행 검증 범위
 
-기준: `packages/document/src/schema.ts`의 33개 타입과 `packages/lexical/src/index.ts`의 공개 커스텀 노드. 이 문서는 코드 정적 점검 결과이며, 실행 검증을 뜻하지 않는다.
+2026-10-16 통합 재검증 기준. [전체 보고서](VERIFICATION_2026-10-16.ko.md)와 [PLAN](PLAN.ko.md)을 정본으로 함께 읽는다.
 
-## 현재 등록 가능한 커스텀 노드 (7개)
+## 확인한 범위
 
-- `tufte-section`: SectionNode
-- `tufte-note`: NoteNode
-- `tufte-inline-image`: InlineImageNode
-- `tufte-span`: TufteSpanNode
-- `tufte-figure`: FigureNode
-- `tufte-caption`: CaptionNode
-- `tufte-table-layout`: TableLayoutNode
+- document schema는 33개 타입이다. strict 왕복 테스트의 실제 등록 클래스와 Lexical 기본 노드에서 coverage를 파생하며 32개 타입을 등록한다(code-highlight 제외).
+- 추가된 정의목록·epigraph/출처/cite·section footer·fullwidth·code·ImageQuilt·embed의 실물 JSON 왕복/입력 거부는 lexical 67개 검사에 포함된다.
+- 새 publication 브라우저 harness는 정의목록/출처를 실제로 편집하고 코드 공백·방향/정렬·이미지 로딩·embed 비율/CSP를 5개 폭에서 검사한다.
+- 생성된 Lexical 0.52.0 golden은 paragraph/ordered list의 고정 출력이다. 모든 노드별 golden이나 과거/미래 npm 버전 호환성 증거는 아니다.
 
-기본 Lexical 패키지로 지원 가능한 타입은 `root`, `paragraph`, `text`, `linebreak`, `link`, `list`, `listitem`, `table`, `tablerow`, `tablecell` 등이다. 지원 가능성과 실제 editor registry 등록 및 왕복 검증은 다르다. `heading`, `quote`, `horizontalrule`은 공식 패키지 노드를 평가하되 Tufte 전용 직렬화 계약을 확인해야 한다.
+## 구현과 제품 지원의 차이
 
-## 구현 대기 노드 및 의존성
+기본 examples/editor UI는 기존 노트·그림·표 registry 중심이다. 새 Node 클래스의 export/단위 테스트 통과만으로 실제 UI에 모든 삽입·속성·키보드·복구 경로가 생기는 것은 아니다. P2.2/P2.3과 F표의 완료 체크는 유지하지 않는다.
 
-| 순서 | 노드/기능 | 관련 F | 우선 검증 |
-| --- | --- | --- | --- |
-| 1 | heading, quote, horizontalrule (공식 노드 매핑) | F02, F07, F08 | h2/h3, export JSON, 섹션 내부 구조 |
-| 2 | tufte-definition-list, tufte-term, tufte-definition | F06 | dt/dd 순서, 복수 정의, 복사·이동 |
-| 3 | tufte-attribution, tufte-cite, tufte-epigraph | F08, F09 | quote footer/cite, 묶음 및 인용 제목 |
-| 4 | tufte-section-footer | F07 | section 직계 구조, 블록 경계 |
-| 5 | tufte-fullwidth | F15 | 중첩 금지, CSS direct-child 보존 |
-| 6 | tufte-code, tab, code-highlight | F17 | 공백·언어·highlight 정보 보존 |
-| 7 | tufte-imagequilt | F19 | 이미지 크기·자산 ID 보존 |
-| 8 | tufte-embed | F18 | provider URL allowlist, title, 비율 |
+남은 우선순위: R02 전체 golden/registry, R03.d UI 문서 교체 history, R05 무효 구조 복구, 이후 P2.2 노드별 commands와 UI 연결. code-highlight·언어 메타데이터 등 발행 미지원 경로는 명시적으로 차단한다. 폰트는 P4, 접근성/다른 브라우저/OS IME는 P6에 남는다.
 
-노트/이미지/표의 심화 편집은 P2.3과 연결하되 기존 구현은 R01/R02 검증 대상으로 유지한다.
+## 노드별 수락 기준
 
-## 각 노드 수락 기준
-
-1. 문서 schema의 타입·필드·허용 자식과 Lexical importJSON/exportJSON을 맞춘다.
-2. 유효하지 않은 버전·속성·자식은 진단하거나 거부한다. 모르는 필드를 조용히 버리지 않는다.
-3. document → editor → document 왕복과 golden fixture를 추가한다.
-4. HTML export는 편집 DOM과 분리하고 P2.4에서 의미적 HTML을 확인한다.
-5. 로컬 build/typecheck/test 명령과 실제 결과를 `docs/PROGRESS.md`에 기록한 뒤에만 완료 체크한다.
-
-우선 다음 구현: 공식 heading/quote/horizontalrule 직렬화 호환성 검사와 최소 왕복 fixture. CI는 사용하지 않는다.
+1. 타입·필드·자식·값 제약을 document와 Lexical에서 일치시킨다.
+2. document→실제 editor→document 무손실 저장 값 및 실패 진단을 검사한다.
+3. 실제 편집/JSON 보존/HTML 의미 구조와 독립 CSS 기준을 검증한다.
+4. 알 수 없는 데이터나 미지원 출력은 삭제/평탄화하지 않고 차단한다.
+5. 로컬 실행 증거와 오류 대책을 기록한 범위만 체크한다. CI는 사용하지 않는다.

@@ -55,7 +55,7 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
      if(child.type==='code-highlight')return element('span',{class:'tufte-code-token'},[String(child.text)]);
      throw Error('Unexpected code child after validation');
     });
-    return [element('pre',n.width==='fullwidth'?{class:'fullwidth'}:{},[
+    return [element('pre',n.width==='fullwidth'?withClass(n,'fullwidth'):attrs(n),[
      element('code',{},codeChildren),
     ])];
    }
@@ -91,7 +91,7 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
     return [element(wrapper,{
      class:[n.width==='fullwidth'?'fullwidth':'','tufte-embed'].filter(Boolean).join(' '),
      'data-tufte-ratio':String(n.aspectRatio)
-    },[frame])];
+    },[element('svg',{'viewBox':`0 0 960 ${960/Number(n.aspectRatio)}`,width:'960',height:String(960/Number(n.aspectRatio)),'aria-hidden':'true',focusable:'false'},[]),frame])];
    }
    case 'tufte-fullwidth':return [element('div',withClass(n,'fullwidth'),inner())];
    case 'tufte-figure':return [element('figure',n.width==='fullwidth'?withClass(n,'fullwidth'):attrs(n),inner())];
