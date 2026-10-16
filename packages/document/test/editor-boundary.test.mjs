@@ -184,3 +184,18 @@ test('R03 v2 validation rejects hostile envelopes without invoking accessors',()
  assert.equal(called,0);
  assert.equal(validateDocumentV2({...base,schemaVersion:2,editorFormat:{engine:'lexical',formatVersion:1},extra:true}).ok,false);
 });
+
+test('R03 v1 to v2 migration matches checked-in envelope golden',()=>{
+ const legacy=fixture();
+ const golden=JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document-v2.json',import.meta.url),'utf8'));
+ const result=migrateStoredDocument(legacy);
+ assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+ assert.deepEqual(result.document,golden);
+ const v2=validateDocumentV2(golden);
+ assert.equal(v2.ok,true,JSON.stringify(v2.diagnostics));
+ assert.deepEqual(v2.document.lexicalState,legacy.lexicalState);
+ assert.deepEqual(v2.document.assets,legacy.assets);
+ const again=migrateStoredDocument(golden);
+ assert.equal(again.ok,true,JSON.stringify(again.diagnostics));
+ assert.deepEqual(again.document,golden);
+});
