@@ -404,3 +404,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - 잘못된 alt, data URL, ID, 크기 등 동일 거부 정책을 확인하는 회귀 테스트를 추가했다.
 - E032/E033의 fixture 제약과 M029/M030 재발 방지 내용을 점검했다. 새로운 실행 오류는 확인되지 않았으나 테스트 자체는 미실행.
 - R01 완료 체크 보류, CI 없음.
+
+## 2026-10-16 — R01 이미지 생성→Lexical 직렬화 검증 보강
+
+- 실제 headless Lexical에서 `$createInlineImageNode`로 이미지를 생성하고 `EditorState.toJSON()` 결과의 src/alt/assetId/width/height 보존을 검사하는 회귀 추가.
+- 해당 JSON을 asset metadata와 함께 문서 envelope에 넣어 `validateDocument` 성공을 검증하도록 구성.
+- 기존 E032/E033, M029/M030 관련 fixture 제약 재점검. 테스트 실행은 미확인으로 R01 체크 보류. CI 추가 없음.
