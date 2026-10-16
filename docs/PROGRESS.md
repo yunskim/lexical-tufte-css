@@ -280,3 +280,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 
 - packages/lexical/test/document-bridge.test.mjs: FigureNode/CaptionNode를 테스트 편집기에 등록하고, fullwidth figure → inline image(assetId/width/height) → caption의 document → 실제 Lexical → document 왕복 테스트 추가.
 - 여전히 테스트 미실행(E025/E027). 그림 테스트 성공을 확정하지 않으며 R02 미완료 유지. 표·목록과 Lexical 0.52.0 골든 fixture는 후속 작업.
+
+## 2026-10-16 — R03 Lexical import 무손실성 검증
+
+- packages/lexical/src/documentBridge.ts: parseEditorState 결과를 즉시 toJSON으로 재직렬화하여 원본 상태와 키 정렬 기준으로 비교. 차이가 있으면 LEXICAL_IMPORT_LOSSY 진단을 반환하고 setEditorState를 호출하지 않음.
+- packages/lexical/test/document-bridge.test.mjs: 필드 삭제를 흉내 낸 편집기에서 실패·무변경을 검증하고 JSON 키 순서 차이는 허용하는 테스트 추가.
+- 테스트 실행 및 실제 Lexical 0.52.0 호환성은 아직 확인하지 못함(E025/E027). R03 완료 체크 보류. 목록·표 확장과 골든 fixture 작업은 남음.
