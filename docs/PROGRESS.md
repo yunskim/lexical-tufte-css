@@ -286,3 +286,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - packages/lexical/src/documentBridge.ts: parseEditorState 결과를 즉시 toJSON으로 재직렬화하여 원본 상태와 키 정렬 기준으로 비교. 차이가 있으면 LEXICAL_IMPORT_LOSSY 진단을 반환하고 setEditorState를 호출하지 않음.
 - packages/lexical/test/document-bridge.test.mjs: 필드 삭제를 흉내 낸 편집기에서 실패·무변경을 검증하고 JSON 키 순서 차이는 허용하는 테스트 추가.
 - 테스트 실행 및 실제 Lexical 0.52.0 호환성은 아직 확인하지 못함(E025/E027). R03 완료 체크 보류. 목록·표 확장과 골든 fixture 작업은 남음.
+
+## 2026-10-16 — R02 목록 왕복 및 오류 재현성 보강
+
+- packages/lexical/test/document-bridge.test.mjs: @lexical/list ListNode/ListItemNode 등록, 시작 번호 7인 ordered list를 실제 headless Lexical에서 생성하여 문서 왕복/시작 번호 보존 검증 코드 추가.
+- 미등록 노드 실패 테스트는 서버 fixture 의존을 제거하고, TufteSpanNode를 명시적으로 누락한 편집기로 변경해 재현 조건을 고정.
+- 오류 대책 M025 재점검: 테스트가 검출해야 할 조건을 fixture에 명시한다. pnpm 실행 차단(E025/E027)으로 새 테스트 통과 미확인. R02/R03 완료 체크 보류.
+- 표 왕복과 Lexical 0.52.0 골든 fixture는 다음 단계로 유지.
