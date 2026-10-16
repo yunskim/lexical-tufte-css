@@ -14,12 +14,14 @@ test('P2.2.b existing span kind command preserves text and rejects invalid paylo
   text.select(2,2);
  },{discrete:true});
  assert.equal(editor.dispatchCommand(SET_TUFTE_SPAN_KIND_COMMAND,'newthought'),true);
+ editor.update(()=>{},{discrete:true});
  editor.getEditorState().read(()=>{
   const span=$getRoot().getFirstChild().getFirstChild();
   assert.equal(span.getKind(),'newthought');
   assert.equal(span.getTextContent(),'Hello Tufte');
  });
  assert.equal(editor.dispatchCommand(SET_TUFTE_SPAN_KIND_COMMAND,'invalid'),true);
+ editor.update(()=>{},{discrete:true});
  assert.ok(diagnostics.some(d=>d.code==='INVALID_SPAN_KIND'));
  editor.getEditorState().read(()=>{
   assert.equal($getRoot().getFirstChild().getFirstChild().getKind(),'newthought');
@@ -33,6 +35,7 @@ test('P2.2.b span kind command rejects missing selection without changing state'
   $getRoot().append($createParagraphNode().append($createTufteSpanNode('numeral').append($createTextNode('123'))));
  },{discrete:true});
  editor.dispatchCommand(SET_TUFTE_SPAN_KIND_COMMAND,'danger');
+ editor.update(()=>{},{discrete:true});
  editor.getEditorState().read(()=>assert.equal($getRoot().getFirstChild().getFirstChild().getKind(),'numeral'));
  assert.ok(diagnostics.some(d=>d.code==='INVALID_SPAN_SELECTION'));
  unregister();
