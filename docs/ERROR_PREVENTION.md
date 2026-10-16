@@ -382,3 +382,9 @@ E059/M052 및 E067/M060의 선행 대책을 그림 주석 명령·회귀 테스�
 ## M064 — 클립보드 ID 출처의 상태 전환 관리
 
 - E071: cut ID는 새로운 copy, 다음 paste, 새 cut에서 적절히 무효화한다. cut→copy→paste 및 연속 붙여넣기를 테스트한다. 클립보드 provenance를 추적하지 못하는 외부 앱 변경·취소된 작업은 보장하지 않으며, 보장 범위를 문서화한다.
+
+## M065 — 자동 복구 debounce 종료 처리
+
+- debounce만 사용하는 자동 저장은 pagehide/visibilitychange/unmount 직전의 마지막 변경을 잃을 수 있다. pending EditorState를 별도 보유하고 종료 이벤트에서 동기 localStorage 쓰기를 시도한다.
+- 최신 상태를 성공적으로 쓴 뒤에만 pending 참조를 비운다. 저장 실패는 사용자에게 표시하고 정상 문서 슬롯을 덮어쓰지 않는다.
+- 종료 이벤트는 강제 종료·OS kill에서 보장되지 않는다. Work 브라우저 검증에 800ms 미만 종료, 숨김, 복귀, quota 실패, 여러 탭 시나리오를 포함한다.
