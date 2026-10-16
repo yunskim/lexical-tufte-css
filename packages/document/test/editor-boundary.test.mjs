@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {documentToEditorJSON,editorJSONToDocument} from '../dist/index.js';
+import {documentToEditorJSON,editorJSONToDocument,canonicalizeDocument,parseCanonicalDocument} from '../dist/index.js';
 const fixture=()=>JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document.json',import.meta.url),'utf8'));
 test('R02 document editor JSON document preserves validated state without mutation',()=>{
  const original=fixture(),before=JSON.stringify(original);
@@ -64,4 +64,34 @@ test('R03 rejected editor export leaves the base document unchanged',()=>{
  assert.ok(exported.diagnostics.some(d=>d.code==='UNKNOWN_FIELD'));
  assert.equal(JSON.stringify(base),before);
  assert.equal(state.root.children[0].unexpectedField,'reject');
+});
+
+test('R03 canonical serialization ignores object key order but preserves array order',()=>{
+ const base=fixture();
+ const reverse=value=>Array.isArray(value)?value.map(reverse):value&&typeof value==='object'?Object.fromEntries(Object.entries(value).reverse().map(([key,v])=>[key,reverse(v)])):value;
+ const first=canonicalizeDocument(base);
+ const second=canonicalizeDocument(reverse(base));
+ assert.equal(first.ok,true,JSON.stringify(first.diagnostics));
+ assert.equal(second.ok,true,JSON.stringify(second.diagnostics));
+ assert.equal(first.value,second.value);
+ const changed=structuredClone(base);
+ changed.lexicalState.root.children.reverse();
+ if(changed.lexicalState.root.children.length>1){
+  const reordered=canonicalizeDocument(changed);
+  assert.equal(reordered.ok,true,JSON.stringify(reordered.diagnostics));
+  assert.notEqual(first.value,reordered.value);
+ }
+ const parsed=parseCanonicalDocument(first.value);
+ assert.equal(parsed.ok,true,JSON.stringify(parsed.diagnostics));
+ assert.deepEqual(parsed.value,base);
+});
+
+test('R03 canonical serialization rejects unknown fields without mutating input',()=>{
+ const base=fixture(),before=JSON.stringify(base);
+ base.lexicalState.root.children[0].futureField='unsupported';
+ const result=canonicalizeDocument(base);
+ assert.equal(result.ok,false);
+ assert.ok(result.diagnostics.some(d=>d.code==='UNKNOWN_FIELD'));
+ delete base.lexicalState.root.children[0].futureField;
+ assert.equal(JSON.stringify(base),before);
 });
