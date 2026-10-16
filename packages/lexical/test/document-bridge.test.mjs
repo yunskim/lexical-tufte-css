@@ -3,10 +3,10 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {createHeadlessEditor} from '@lexical/headless';
 import {$getRoot,$createParagraphNode,$createTextNode} from 'lexical';
-import {SectionNode,NoteNode,InlineImageNode,TufteSpanNode,$createSectionNode,$createNoteNode,$createTufteSpanNode,loadDocumentIntoEditor,exportEditorToDocument} from '../dist/index.js';
+import {SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,$createFigureNode,$createCaptionNode,$createInlineImageNode,$createSectionNode,$createNoteNode,$createTufteSpanNode,loadDocumentIntoEditor,exportEditorToDocument} from '../dist/index.js';
 import {LinkNode} from '@lexical/link';
 const fixture=()=>JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document.json',import.meta.url),'utf8'));
-const editor=()=>createHeadlessEditor({namespace:'document-bridge-test',nodes:[SectionNode,NoteNode,InlineImageNode,TufteSpanNode,LinkNode],onError(e){throw e;}});
+const editor=()=>createHeadlessEditor({namespace:'document-bridge-test',nodes:[SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,LinkNode],onError(e){throw e;}});
 test('R02 strict Lexical bridge fails closed when a registered node is missing',()=>{
  const e=editor(),d=fixture();
  const result=loadDocumentIntoEditor(e,d);
@@ -46,4 +46,27 @@ test('R02 valid document -> real Lexical -> validated document roundtrip',()=>{
  assert.equal(exported.ok,true,JSON.stringify(exported.diagnostics));
  assert.deepEqual(exported.value.lexicalState,document.lexicalState);
  assert.deepEqual(exported.value.assets,document.assets);
+});
+
+test('R02 figure and caption survive real Lexical document roundtrip',()=>{
+ const source=editor();
+ source.update(()=>{
+  $getRoot().append($createSectionNode().append(
+   $createFigureNode('fullwidth').append(
+    $createInlineImageNode('/figures/chart.svg','차트 설명','chart-1',640,360),
+    $createCaptionNode().append($createTextNode('그림 1. 설명'))
+   )
+  ));
+ },{discrete:true});
+ const base=fixture(),document={...base,lexicalState:source.getEditorState().toJSON()};
+ const destination=editor(),loaded=loadDocumentIntoEditor(destination,document);
+ assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
+ const exported=exportEditorToDocument(destination,document);
+ assert.equal(exported.ok,true,JSON.stringify(exported.diagnostics));
+ assert.deepEqual(exported.value.lexicalState,document.lexicalState);
+ const figure=exported.value.lexicalState.root.children[0].children[0];
+ assert.equal(figure.width,'fullwidth');
+ assert.equal(figure.children[0].assetId,'chart-1');
+ assert.equal(figure.children[0].width,640);
+ assert.equal(figure.children[1].type,'tufte-caption');
 });
