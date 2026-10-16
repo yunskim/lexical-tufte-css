@@ -116,3 +116,9 @@ Migration은 입력을 변경하지 않는 순수 함수여야 하며, 동일 �
 - `loadMigratedDocumentIntoEditor`를 별도 opt-in API로 제공한다. migration과 v2 검증 이후 기존 v1 strict bridge의 parse/serialize 무손실 검사를 거쳐 상태를 설치한다.
 - 기존 `loadDocumentIntoEditor`는 v1 전용으로 유지한다. 성공 결과는 v2 snapshot이며 호출자 입력을 직접 수정하지 않는다.
 - HistoryPlugin의 undo/redo 초기화는 아직 구현하지 않았다. 편집기 설치 자체의 예외/부분 변경 및 브라우저 실제 동작은 테스트 실행으로 확인해야 한다.
+
+## History reset 부분 구현 (2026-10-16)
+
+- `loadMigratedDocumentIntoEditor`가 무손실 검사 및 설치 성공 후 `CLEAR_HISTORY_COMMAND`를 dispatch한다. 거부된 입력에는 dispatch하지 않는다.
+- 이 명령을 처리할 HistoryPlugin 등록은 host 책임이다. 명령을 dispatch했다는 사실만으로 실제 undo/redo 스택 초기화를 검증한 것은 아니다.
+- 테스트는 명령 전달 횟수를 검사한다. HistoryPlugin 통합·브라우저 undo/redo·로드 직후 비동기 editor update 순서 검증은 별도 후속 작업이다.
