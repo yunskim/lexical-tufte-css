@@ -507,3 +507,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 
 - `fixtures/tufte/server-document-v2.json` 추가. 기존 v1 서버 fixture와 비교하는 migration golden 회귀 테스트 추가.
 - Lexical runtime 버전별 golden과 실제 테스트 실행은 미완. R03.c 체크 보류. CI 없음.
+
+## 2026-10-16 — R03.c v2 golden headless Lexical 왕복 테스트 작성
+
+- 저장된 `server-document-v2.json`을 실제 Lexical 로드·export 경계에 통과시켜 완전 동등성·입력 불변성을 검사하는 테스트 추가.
+- 지원하지 않는 editor format 거부 시 editor state 불변 테스트 추가.
+- 로컬 의존성/테스트 실행 불가(E025/E027). R03.c 체크 미완료, CI 없음.
