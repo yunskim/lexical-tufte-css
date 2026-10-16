@@ -16,5 +16,8 @@ export function editorJSONToDocument(base:unknown,state:unknown):ValidationResul
  if(!checked.ok)return checked;
  if(typeof state!=='object'||state===null||Array.isArray(state))return {ok:false,diagnostics:[{code:'INVALID_EDITOR_STATE',path:'$.lexicalState',message:'Expected editor state object'}]};
  const candidate={...checked.document,lexicalState:state};
- return validateDocument(candidate);
+ const result=validateDocument(candidate);
+ if(!result.ok)return result;
+ // The editor owns its mutable state; the exported document must not alias it.
+ return {ok:true,document:structuredClone(result.document),diagnostics:result.diagnostics};
 }
