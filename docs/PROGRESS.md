@@ -496,3 +496,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - `exportEditorToDocumentV2` 구현·공개 export. v2 base 검증 → v1 editor state 검증 → v2 재검증으로 편집기 저장 경계에서 editorFormat 손실 방지.
 - migrated v1→v2 load 이후 v2 export roundtrip 및 unsupported editor format 거부 테스트 추가.
 - 타입 검사/테스트 미실행. R03.c 골든·브라우저·HistoryPlugin 검증 및 P5 저장 트랜잭션 미완. CI 없음.
+
+## 2026-10-16 — R03 migration adapter 타입 안전성 개선
+
+- v2→v1 Lexical load projection에서 이중 강제 타입 변환을 제거하고 v1 필드를 명시적으로 구성.
+- v2 envelope에 getter/unknown field가 포함된 경우 거부하는 document 테스트 추가.
+- E035/M032 기록 및 예방 대책 반영. 테스트·타입 검사 미실행, 체크리스트 완료 처리하지 않음. CI 없음.
