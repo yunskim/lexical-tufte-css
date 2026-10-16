@@ -1,4 +1,4 @@
-import {isSafeURL,isIdentifier} from '../../document/src/schema.js';
+import {isSafeURL,isIdentifier} from '@lexical-tufte/document';
 import {$applyNodeReplacement, DecoratorNode, type NodeKey, type SerializedLexicalNode, type DOMExportOutput} from 'lexical';
 export type SerializedInlineImage = SerializedLexicalNode & {type: 'tufte-inline-image'; version: 1; src: string; alt: string; assetId?: string; width?: number; height?: number};
 export class InlineImageNode extends DecoratorNode<null> {
