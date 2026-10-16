@@ -2,7 +2,7 @@
 
 Lexical 기반 Tufte CSS 편집기와 블로그 운영용 TypeScript 라이브러리.
 
-현재 단계: P0 및 P1.1 완료. 노트 편집 prototype을 실행할 수 있습니다. 전체 편집기 및 npm 배포 패키지는 아직 완성되지 않았습니다.
+현재 단계: P0 및 P1.1/P1.2 prototype 완료. 노트 편집 prototype을 실행할 수 있습니다. 전체 편집기 및 npm 배포 패키지는 아직 완성되지 않았습니다.
 
 - [구현 계획 및 실행 체크리스트](docs/PLAN.ko.md)
 - [작업 규약](AGENTS.md)
@@ -42,7 +42,7 @@ pnpm exec playwright install chromium
 pnpm test:browser
 ```
 
-브라우저 테스트는 개발 서버를 자동으로 시작합니다. `EDITOR_URL`로 실행 중인 별도 서버를 지정할 수 있습니다. 한국어 IME·클립보드·undo/redo 검증은 P1.2에서 진행합니다.
+브라우저 테스트는 개발 서버를 자동으로 시작합니다. `EDITOR_URL`로 실행 중인 별도 서버를 지정할 수 있습니다. 노트 복사·삭제·분할·병합·이동·undo/redo와 Chromium 한글 조합 이벤트는 P1.2에서 검증했습니다. 실제 OS별 IME 및 다른 브라우저는 후속 검증 대상입니다.
 
 ## 오류와 개선 기록
 

@@ -21,6 +21,8 @@ export class NoteNode extends ElementNode {
     super(key); this.__noteId = noteId; this.__kind = kind;
   }
   getNoteId(): string { return this.getLatest().__noteId; }
+  setNoteId(id: string): this { this.getWritable().__noteId = id; return this; }
+  extractWithChild(): true { return true; }
   getKind(): NoteKind { return this.getLatest().__kind; }
   isInline(): true { return true; }
   canBeEmpty(): false { return false; }

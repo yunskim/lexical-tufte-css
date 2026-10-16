@@ -1,7 +1,7 @@
 # Lexical Tufte 블로그 라이브러리 계획
 
 작성: 2026-10-16 (Asia/Seoul)
-상태: P0 및 P1.1 완료. 사이드노트 편집 prototype 구현·Chromium 검증, 제품 기능의 전체 검증은 후속 단계.
+상태: P0 및 P1.1/P1.2 prototype 완료. Chromium 자동 회귀와 조합 이벤트 검증 범위이며, OS별 실제 IME 및 제품 전체 검증은 후속 단계.
 저장소: https://github.com/yunskim/lexical-tufte (public, GPL-3.0; 사용자가 생성한 설정 유지).
 
 ## 목표와 완료 정의
@@ -116,7 +116,7 @@ P0 gate: 저장소 URL, 재현 가능한 설치/빌드, 버전/라이선스/전�
 ### P1 — 어려운 편집 동작을 먼저 검증 (P0 이후)
 
 - [x] P1.1 문단 중간 note, 링크/코드/이미지 payload, 키보드 진입/탈출 prototype.
-- [ ] P1.2 노트 복사·삭제·split/merge·이동·undo/redo·한국어 IME prototype.
+- [x] P1.2 노트 복사·삭제·split/merge·이동·undo/redo·한국어 IME prototype.
 - [ ] P1.3 Lexical 소유 DOM과 export DOM을 분리해 label/input/span 인접성 확인; nested editor vs inline container 결정 ADR.
 - [ ] P1.4 section·figure·caption·fullwidth·표를 조합해 CSS direct-child 규칙과 렌더러 일치 검증.
 - [ ] P1.5 headless 렌더링·서버 import 방식 비교, API/문서 schema와 허용 노트 콘텐츠 범위 확정 ADR.
@@ -193,7 +193,7 @@ P6 gate: 로컬 빌드·타입 검사·관련 테스트 통과, 남은 결함과
 
 진행 기록 형식: `작업 ID | 상태(todo/in-progress/blocked/done) | 변경 경로/PR | 검증 명령·결과 | 차단 원인 | 다음 작업`. 증거 없이 체크하지 않는다. 문서 수정만으로 구현 작업을 완료하지 않는다.
 
-현재 다음 작업: P1.2 노트 복사·삭제·split/merge·이동·undo/redo·한국어 IME 검증. P1.1 증거: examples/editor, packages/lexical/src/NoteNode.ts, tests/note-browser.mjs 및 docs/PROGRESS.md.
+현재 다음 작업: P1.3 inline container와 nested editor 비교 ADR. P1.2 증거: packages/lexical/src/noteOperations.ts, tests/note-editing-browser.mjs, examples/editor/src/main.tsx 및 docs/PROGRESS.md. 한국어 IME prototype은 Chromium CDP 조합 이벤트 범위로 검증했으며 OS별 실제 입력은 P6에서 별도 확인한다.
 
 ## 주요 위험과 처리
 
