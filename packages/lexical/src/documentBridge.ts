@@ -1,4 +1,4 @@
-import {documentToEditorJSON,editorJSONToDocument,type Diagnostic,type TufteDocument} from '@lexical-tufte/document';
+import {documentToEditorJSON,editorJSONToDocument,migrateStoredDocument,type TufteDocumentV2,type Diagnostic,type TufteDocument} from '@lexical-tufte/document';
 import type {LexicalEditor} from 'lexical';
 
 type Failure={ok:false;diagnostics:Diagnostic[]};
@@ -27,6 +27,24 @@ export function loadDocumentIntoEditor(editor:LexicalEditor,input:unknown):Failu
  }catch(error){
   return failure('LEXICAL_IMPORT_FAILED',error instanceof Error?error.message:String(error));
  }
+}
+/**
+ * Opt-in v2 import: validate and migrate the envelope before invoking the
+ * existing fail-closed Lexical parser. The original stored document is never
+ * changed, and the editor is only installed after loss detection succeeds.
+ * Undo/redo history reset remains the responsibility of the editor host.
+ */
+export function loadMigratedDocumentIntoEditor(editor:LexicalEditor,input:unknown):Failure|Success<TufteDocumentV2>{
+ const migrated=migrateStoredDocument(input);
+ if(!migrated.ok)return migrated;
+ const envelope={...migrated.document} as Record<string,unknown>;
+ delete envelope.editorFormat;
+ // Existing strict Lexical bridge intentionally accepts only the v1 envelope.
+ const legacy=envelope as TufteDocument;
+ legacy.schemaVersion=1;
+ const imported=loadDocumentIntoEditor(editor,legacy);
+ if(!imported.ok)return imported;
+ return {ok:true,value:structuredClone(migrated.document),diagnostics:[]};
 }
 /** Export is checked against the document schema; no unknown Lexical keys are removed. */
 export function exportEditorToDocument(editor:LexicalEditor,base:unknown):Failure|Success<TufteDocument>{
