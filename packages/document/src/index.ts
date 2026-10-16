@@ -10,3 +10,4 @@ export {validateDocumentV2,type TufteDocumentV2,type V2ValidationResult} from '.
 export {migrateStoredDocument,type MigrationResult} from './migrateStoredDocument.js';
 export {preparePostRevisionV2,type RevisionDecision} from './revision.js';
 export {InMemoryPostRevisionStoreV2,type PostRevisionStoreV2} from './revisionStore.js';
+export {SqlitePostRevisionStoreV2,type SqliteDatabase,type SqliteStatement} from './sqliteRevisionStore.js';
