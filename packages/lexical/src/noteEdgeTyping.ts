@@ -22,11 +22,12 @@ export function registerNoteEdgeTypingGuard(editor:LexicalEditor):()=>void{
  const onBeforeInput=(event:InputEvent):void=>{
   if(event.inputType!=='insertText'||event.isComposing||event.data===null)return;
   // Preserve the synchronous cancelability of beforeinput while Lexical updates.
-  editor.update(()=>{
-   if(!$insertNoteEdgeText(event.data!))return;
+  let handled=false;
+  editor.update(()=>{handled=$insertNoteEdgeText(event.data!);},{discrete:true});
+  if(handled){
    event.preventDefault();
    event.stopImmediatePropagation();
-  });
+  }
  };
  return editor.registerRootListener((root,previous)=>{
   previous?.removeEventListener('beforeinput',onBeforeInput as EventListener,true);
