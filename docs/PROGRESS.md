@@ -946,3 +946,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND({noteId,text}) 구현 및 공개 API/React 예제 버튼 연결. 선택된 figure의 직접 자식 marginnote에 한정, ID/본문 검사, 동일 본문 no-op, history push.
 - figure-commands.test.mjs에 주석 텍스트 변경과 삭제 후 figcaption/이미지 형제 유지 검증 추가.
 - 명령 기반 수정은 기존 rich phrasing을 일반 텍스트로 대체하므로 링크·강조 유지 편집과 구별. 실제 Undo/Redo 및 브라우저 편집 테스트는 Work 일괄 실행 대기. CI 생략, F13 완료 체크 보류.
+
+## 2026-10-16 P2.3 — Work 검증 인계 확대
+
+- figure-commands.test.mjs에 잘못된 수정 내용·존재하지 않는 ID에 대한 원자적 거부 테스트 추가, 연결된 cut payload 테스트 이름을 실제 의미에 맞게 수정.
+- docs/P23_WORK_VERIFICATION.ko.md 신규 작성: figure/주석 삽입·수정·삭제, Undo/Redo, Node/Range clipboard, 자산 참조, 발행 HTML·반응형·접근성 및 비동기 commit 경계 확인.
+- 테스트 실행은 Work로 이관; 아직 통과 증거 없음. CI 생략, 완료 체크 보류.
