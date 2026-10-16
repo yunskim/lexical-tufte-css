@@ -212,3 +212,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - docs/LOCAL_VERIFICATION_R14.ko.md에 Node/pnpm 버전, frozen install → check → test:browser 순서, 실패 기록 양식, 선택적 pre-push 정책을 작성.
 - 실제 환경 확인 기록: Node v22.16.0, pnpm 없음, github.com DNS 실패(E025). install/check/browser 모두 BLOCKED이며 PASS로 간주하지 않음.
 - CI는 추가하지 않았다. 실행 증거 확보 전 R14 완료 체크 보류.
+
+## 2026-10-16 — P2.2 R01–R14 재점검 및 R06 회귀 보강
+
+- R01–R14 체크는 실제 검증 증거가 없어 그대로 미완료 유지. P2.2 선행 안정화 이후 본 구현 단계로 진행한다.
+- R06: 이전 prefix-note-noteId 조합에서 실제 충돌하는 prefix/noteId 쌍으로 회귀 테스트 교체. legacy 충돌 동등성 assertion 추가. 변경: packages/render/test/render.test.mjs.
+- 오류·대책: E026/M025 추가. Corepack pnpm 실행은 registry.npmjs.org DNS EAI_AGAIN(E027)으로 차단. E025/M024 계속 적용.
+- 실행: node --version PASS(v22.16.0), corepack pnpm --version FAIL(DNS). pnpm check 및 pnpm test:browser 미실행. CI 없음.
