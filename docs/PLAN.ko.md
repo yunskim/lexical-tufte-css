@@ -130,6 +130,10 @@ P1 gate: 완료. 노트 편집 회귀와 SSR 출력의 실제 브라우저 비�
 - [ ] R01 document의 isSafeURL/isIdentifier를 Lexical 노드 import/생성 경로에서 재사용하고, assetId/width/height 보존을 검증한다.
 - [ ] R02 모든 지원 노드에 document → editor import → export → document 동등성 왕복 하네스와 골든 JSON을 마련한다. 알 수 없는 데이터는 무조건 삭제하지 않고 진단한다.
 - [ ] R03 Lexical 버전별 JSON 차이를 검증하는 명시적 canonicalization/migration 경계를 설계한다. 버전 업그레이드 때 fixture를 재검증한다.
+  - [ ] R03.a Lexical 직렬화 형식 버전과 문서 schemaVersion을 분리하여 저장하고, 알 수 없는 버전은 진단한다.
+  - [ ] R03.b 기존 저장 JSON → 버전별 명시적 migration → 현행 validator → Lexical parse 순서로 로드한다. migration 없이 기본 필드 차이를 무손실 검사에서 자동 허용하지 않는다.
+  - [ ] R03.c 각 지원 버전의 golden fixture 및 변환 전후 의미 보존·손실 진단 테스트를 마련한다.
+  - [ ] R03.d 로드 시 undo/redo 이력의 초기화 정책을 별도 editor integration 계약으로 정의한다.
 - [ ] R04 예제 main.tsx의 clipboard ID 재발급, 내부 참조 갱신, IME 관련 핵심 불변식을 packages/lexical로 옮기고 회귀 검증한다.
 - [ ] R05 section/figure/table-layout 편집 중 무효 상태의 복구 UX 또는 정규화 transform을 정하고, 무효 상태 저장·발행 정책을 분리한다.
 - [ ] R06 note HTML ID 조합의 모호성을 제거하고 prefix/noteId 충돌 fixture를 추가한다.
