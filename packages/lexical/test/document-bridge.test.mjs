@@ -511,3 +511,27 @@ test('R03 v2 export preserves editor format after migrated import',()=>{
  assert.equal(invalid.ok,false);
  assert.ok(invalid.diagnostics.some(d=>d.code==='UNSUPPORTED_EDITOR_FORMAT'));
 });
+
+test('R03 checked-in v2 golden survives real Lexical import and export',()=>{
+ const golden=JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document-v2.json',import.meta.url),'utf8'));
+ const destination=editor();
+ const original=JSON.stringify(golden);
+ const loaded=loadMigratedDocumentIntoEditor(destination,golden);
+ assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
+ assert.deepEqual(loaded.value,golden);
+ assert.deepEqual(destination.getEditorState().toJSON(),golden.lexicalState);
+ const exported=exportEditorToDocumentV2(destination,loaded.value);
+ assert.equal(exported.ok,true,JSON.stringify(exported.diagnostics));
+ assert.deepEqual(exported.value,golden);
+ assert.equal(JSON.stringify(golden),original);
+});
+test('R03 checked-in v2 golden rejects unknown editor format without mutation',()=>{
+ const golden=JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document-v2.json',import.meta.url),'utf8'));
+ const destination=editor();
+ const before=destination.getEditorState().toJSON();
+ golden.editorFormat.formatVersion=2;
+ const result=loadMigratedDocumentIntoEditor(destination,golden);
+ assert.equal(result.ok,false);
+ assert.ok(result.diagnostics.some(d=>d.code==='UNSUPPORTED_EDITOR_FORMAT'));
+ assert.deepEqual(destination.getEditorState().toJSON(),before);
+});
