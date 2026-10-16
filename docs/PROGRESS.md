@@ -206,3 +206,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 
 - docs/LICENSE_AND_FONTS_R13.ko.md: GPL-3.0-only 현행 상태, 외부 재사용 시나리오, 권리자 결정 필요 항목, 본명조/본고딕 WOFF2 subset 및 unicode-range 검증 체크리스트 작성.
 - 라이선스 변경을 임의로 결정하지 않음. 폰트 실측과 브라우저 검증 미실행. R13 완료 체크 보류.
+
+## 2026-10-16 — R14 CI 없는 로컬 검증 경로
+
+- docs/LOCAL_VERIFICATION_R14.ko.md에 Node/pnpm 버전, frozen install → check → test:browser 순서, 실패 기록 양식, 선택적 pre-push 정책을 작성.
+- 실제 환경 확인 기록: Node v22.16.0, pnpm 없음, github.com DNS 실패(E025). install/check/browser 모두 BLOCKED이며 PASS로 간주하지 않음.
+- CI는 추가하지 않았다. 실행 증거 확보 전 R14 완료 체크 보류.
