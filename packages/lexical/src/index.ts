@@ -33,3 +33,5 @@ export {registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_CO
 export {registerQuotationCommands,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,type TufteQuotationKind} from './quotationCommands.js';
 
 export {registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,type UpdateFigureMarginNote,type InsertTufteFigure,type InsertFigureMarginNote} from './figureCommands.js';
+
+export {registerCodeCommands,INSERT_TUFTE_CODE_COMMAND,type InsertTufteCode} from './codeCommands.js';
