@@ -203,3 +203,10 @@
 - 발견: 2026-10-16 R04 공통 noteEdgeTyping 추출 코드 검토. 비동기/지연 update 콜백 내부에서 native beforeinput의 preventDefault를 호출하면 브라우저 기본 입력 취소가 이미 늦을 수 있다.
 - 처리: discrete Lexical update에서 처리 여부를 동기적으로 수집하고 이벤트 핸들러에서 preventDefault/stopImmediatePropagation을 수행하도록 변경했다.
 - 상태: 코드 수정, 브라우저 검증 대기. 실제 IME·브라우저별 cancelable 이벤트와 Lexical update 동기성은 확인하지 않았다. M023 참조.
+
+## E025 — R04 실행 검증 환경 차단
+
+- 발생: 2026-10-16 R04 테스트 실행 준비. Node.js v22.16.0은 사용 가능하나 pnpm 실행 파일이 없고, git ls-remote에서 github.com DNS 조회 실패.
+- 영향: 의존성 설치 및 pnpm check/test:browser를 실행할 수 없었다. 기존 커밋의 테스트 성공을 주장하지 않는다.
+- 처리: 테스트 코드 보강만 GitHub에 반영하고 실행 검증은 보류한다. CI를 새로 추가하지 않는다.
+- 상태: 환경 차단, 미해결. M024 참조.
