@@ -21,11 +21,10 @@ export function $reidentifyPastedNotes(
 ):Map<string,string[]>{
  const existing=$collectNoteIds();
  const changes=new Map<string,string[]>();
- const processed=new Set<string>();
  const visit=(node:LexicalNode):void=>{
   if(node instanceof NoteNode){
    const oldId=node.getNoteId();
-   if(!cutIds.has(oldId)||existing.has(oldId)||processed.has(oldId)){
+   if(!cutIds.has(oldId)||existing.has(oldId)){
     let fresh:string;
     let attempts=0;
     do{
@@ -36,7 +35,7 @@ export function $reidentifyPastedNotes(
     const updated=changes.get(oldId)??[];
     updated.push(fresh);changes.set(oldId,updated);
     existing.add(fresh);
-   }else {existing.add(oldId);processed.add(oldId);}
+   }else existing.add(oldId);
   }
   if($isElementNode(node))for(const child of node.getChildren())visit(child);
  };
