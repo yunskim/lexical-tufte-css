@@ -98,3 +98,9 @@ Migration은 입력을 변경하지 않는 순수 함수여야 하며, 동일 �
 - `packages/document/src/inspectStoredDocument.ts`에서 버전 식별만 구현했다. v1은 현재 strict validator로 검사하고 `legacy-v1`로 식별한다.
 - v2는 `editorFormat` descriptor의 형태와 버전만 검사한다. **v2 문서 전체의 유효성이나 Lexical 런타임 호환성은 보장하지 않는다.**
 - migration, v2 validator, editor load 통합은 아직 구현되지 않았다. 실행 테스트 미확인.
+
+## v2 validator 구현 (2026-10-16)
+
+- `packages/document/src/validateV2.ts`에 `validateDocumentV2` 추가. v2 envelope와 editorFormat을 엄격히 검사하고, v1 content validator로 본문·자산을 재검증한다.
+- `inspectStoredDocument`도 v2 전체 검증을 통과해야 v2 formatVersion=1을 식별한다. 이전의 descriptor-only 식별 설명은 이 구현으로 대체한다.
+- v1→v2 migration, editor 로드 통합, 버전별 런타임 골든은 미구현이며 타입·테스트 실행은 아직 확인되지 않았다.
