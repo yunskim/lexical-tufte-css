@@ -27,3 +27,5 @@ export {registerSectionCommands,WRAP_TUFTE_ROOT_COMMAND,INSERT_TUFTE_SECTION_COM
 export {registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND} from './inlineCommands.js';
 
 export {registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_TUFTE_DEFINITION_PAIR_COMMAND} from './definitionCommands.js';
+
+export {registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,type TufteListKind} from './listCommands.js';
