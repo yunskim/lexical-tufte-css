@@ -253,3 +253,24 @@ test('R02 missing referenced asset fails before editor mutation',()=>{
  assert.equal(parses,0);
  assert.equal(sets,0);
 });
+
+test('R11 successful import returns detached envelope and editor state',()=>{
+ const base=fixture();
+ let captured;
+ const fake={
+  parseEditorState(){return {toJSON(){return structuredClone(base.lexicalState);}};},
+  setEditorState(state){captured=state;}
+ };
+ const result=loadDocumentIntoEditor(fake,base);
+ assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+ assert.notStrictEqual(result.value,base);
+ assert.notStrictEqual(result.value.assets,base.assets);
+ assert.notStrictEqual(result.value.lexicalState,base.lexicalState);
+ const originalTitle=result.value.title;
+ const originalState=JSON.stringify(result.value.lexicalState);
+ base.title='mutated after import';
+ base.lexicalState.root.children=[];
+ assert.equal(result.value.title,originalTitle);
+ assert.equal(JSON.stringify(result.value.lexicalState),originalState);
+ assert.ok(captured);
+});
