@@ -298,3 +298,10 @@
 - 원인: 신규 노드 구현 시 `packages/document/src/validate.ts`의 실제 제약을 동시에 대조하지 않음.
 - 처리: 비율 숫자화, 언어 허용 문자 일치, ImageQuilt 필수 크기 검증, 관련 테스트 fixture 수정.
 - 상태: mitigated (소스 수정 확인, 빌드/실행 테스트 미실행). 대책 M026. CI 없음.
+
+## E027 — Embed 제목 길이와 ImageQuilt TypeScript 직렬화 계약 불일치
+
+- 발견: 2026-10-16, F17/F18/F19 정적 계약 재점검.
+- 증상: EmbedNode는 제목 최대 500자를 요구하지만 문서 validator는 1000자까지 허용. ImageQuilt는 필수 width/height를 런타임에 검증하지만 직렬화 TypeScript 타입은 선택 속성으로 선언.
+- 처리: 제목 길이 1000자로 통일하고 직렬화 타입의 width/height를 필수화. 유효·무효 직렬화 계약 회귀 테스트 추가.
+- 상태: mitigated (코드 수정; 실제 실행 검증 미완료). M026 재적용.
