@@ -638,3 +638,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - `packages/lexical/test/document-bridge.test.mjs`에 Tufte span 4종과 note 2종의 조합 왕복 테스트 추가.
 - 본문 폭 figure/caption과 fullwidth table-layout 왕복 테스트 추가.
 - 지원되지 않은 노드의 무손실 왕복은 여전히 미구현이며 R02 전체 완료 아님. 실제 테스트 실행 미확인, CI 없음.
+
+## 2026-10-16 — P2.2 노드 커버리지 조사
+
+- `docs/P2_NODE_COVERAGE.ko.md` 작성: 공개 커스텀 노드 7종, 공식 Lexical 노드 재사용 후보, 미구현 노드 우선순위 및 수락 조건 정리.
+- 다음 작업: heading/quote/horizontalrule 공식 노드의 JSON 호환성 및 최소 왕복 fixture 검증.
+- 조사만 완료한 상태이며 P2.2 및 R02 체크 보류. CI 없음.
