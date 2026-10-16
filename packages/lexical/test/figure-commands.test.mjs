@@ -18,6 +18,7 @@ test('figure insertion preserves paragraph and image/caption properties',()=>{
   text.selectEnd();
  },{discrete:true});
  assert.equal(editor.dispatchCommand(INSERT_TUFTE_FIGURE_COMMAND,{src:'/image.png',alt:'diagram',assetId:'image_01',imageWidth:640,imageHeight:480,caption:'caption',width:'fullwidth'}),true);
+ editor.update(()=>{},{discrete:true});
  editor.getEditorState().read(()=>{
   const section=$getRoot().getFirstChild(),figure=section.getLastChild();
   assert.equal(section.getFirstChild().getTextContent(),'original');
@@ -40,7 +41,9 @@ test('invalid figure URL and missing selection do not mutate document',()=>{
  },{discrete:true});
  const before=JSON.stringify(editor.getEditorState().toJSON());
  editor.dispatchCommand(INSERT_TUFTE_FIGURE_COMMAND,{src:'javascript:alert(1)',alt:'bad'});
+ editor.update(()=>{},{discrete:true});
  editor.dispatchCommand(SET_TUFTE_FIGURE_WIDTH_COMMAND,'fullwidth');
+ editor.update(()=>{},{discrete:true});
  assert.equal(JSON.stringify(editor.getEditorState().toJSON()),before);
  assert.deepEqual(diagnostics.map(d=>d.code),['INVALID_FIGURE_PAYLOAD','INVALID_FIGURE_SELECTION']);
  dispose();
@@ -55,7 +58,9 @@ test('invalid asset identity and image dimensions are rejected before mutation',
  },{discrete:true});
  const before=JSON.stringify(editor.getEditorState().toJSON());
  editor.dispatchCommand(INSERT_TUFTE_FIGURE_COMMAND,{src:'/image.png',alt:'diagram',assetId:'not valid'});
+ editor.update(()=>{},{discrete:true});
  editor.dispatchCommand(INSERT_TUFTE_FIGURE_COMMAND,{src:'/image.png',alt:'diagram',imageWidth:-1});
+ editor.update(()=>{},{discrete:true});
  assert.equal(JSON.stringify(editor.getEditorState().toJSON()),before);
  assert.deepEqual(diagnostics.map(d=>d.code),['INVALID_FIGURE_PAYLOAD','INVALID_FIGURE_PAYLOAD']);
  dispose();
@@ -69,6 +74,7 @@ test('figure marginnote is inserted before caption and rejects duplicate IDs',()
   const selection=$createNodeSelection();selection.add(figure.getKey());$setSelection(selection);
  },{discrete:true});
  editor.dispatchCommand(INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,{noteId:'figure-note-1',text:'margin annotation'});
+ editor.update(()=>{},{discrete:true});
  editor.getEditorState().read(()=>{
   const figure=$getRoot().getFirstChild().getFirstChild();
   assert.deepEqual(figure.getChildren().map(n=>n.getType()),['tufte-inline-image','tufte-note','tufte-caption']);
@@ -82,6 +88,7 @@ test('figure marginnote is inserted before caption and rejects duplicate IDs',()
   const selection=$createNodeSelection();selection.add(figure.getKey());$setSelection(selection);
  },{discrete:true});
  editor.dispatchCommand(INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,{noteId:'figure-note-1',text:'duplicate'});
+ editor.update(()=>{},{discrete:true});
  editor.getEditorState().read(()=>assert.equal($getRoot().getFirstChild().getFirstChild().getChildren().length,3));
  assert.deepEqual(diagnostics.map(d=>d.code),['DUPLICATE_NOTE_ID']);
  dispose();
@@ -125,6 +132,7 @@ test('figure marginnote update and removal preserve sibling caption',()=>{
   const selection=$createNodeSelection();selection.add(figure.getKey());$setSelection(selection);
  },{discrete:true});
  editor.dispatchCommand(UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,{noteId:'figure-note',text:'after'});
+ editor.update(()=>{},{discrete:true});
  editor.getEditorState().read(()=>{
   const figure=$getRoot().getFirstChild().getFirstChild();
   assert.equal(figure.getChildAtIndex(1).getTextContent(),'after');
@@ -135,6 +143,7 @@ test('figure marginnote update and removal preserve sibling caption',()=>{
   const selection=$createNodeSelection();selection.add(figure.getKey());$setSelection(selection);
  },{discrete:true});
  editor.dispatchCommand(REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,'figure-note');
+ editor.update(()=>{},{discrete:true});
  editor.getEditorState().read(()=>{
   const figure=$getRoot().getFirstChild().getFirstChild();
   assert.deepEqual(figure.getChildren().map(n=>n.getType()),['tufte-inline-image','tufte-caption']);
@@ -153,8 +162,11 @@ test('figure note commands reject invalid content and missing IDs without changi
  },{discrete:true});
  const before=JSON.stringify(editor.getEditorState().toJSON().root);
  editor.dispatchCommand(UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,{noteId:'kept-note',text:'   '});
+ editor.update(()=>{},{discrete:true});
  editor.dispatchCommand(UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,{noteId:'absent-note',text:'change'});
+ editor.update(()=>{},{discrete:true});
  editor.dispatchCommand(REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,'absent-note');
+ editor.update(()=>{},{discrete:true});
  assert.equal(JSON.stringify(editor.getEditorState().toJSON().root),before);
  assert.deepEqual(diagnostics.map(d=>d.code),['INVALID_FIGURE_NOTE','FIGURE_NOTE_NOT_FOUND','FIGURE_NOTE_NOT_FOUND']);
  dispose();
@@ -168,6 +180,7 @@ test('figure note text replacement retains a selection inside the replacement no
   const selection=$createNodeSelection();selection.add(figure.getKey());$setSelection(selection);
  },{discrete:true});
  editor.dispatchCommand(UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,{noteId:'selection-note',text:'replacement text'});
+ editor.update(()=>{},{discrete:true});
  editor.getEditorState().read(()=>{
   const note=$getRoot().getFirstChild().getFirstChild().getLastChild();
   const selection=$getSelection();
