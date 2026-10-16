@@ -60,6 +60,9 @@ importers:
 
   packages/lexical:
     dependencies:
+      '@lexical-tufte/document':
+        specifier: workspace:*
+        version: link:../document
       '@lexical/code':
         specifier: 0.52.0
         version: 0.52.0(typescript@6.0.2)
