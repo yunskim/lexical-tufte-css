@@ -75,6 +75,19 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
      element('span',withClass(n,kind),inner()),
     ])];
    }
+   case 'tufte-embed':{
+    const wrapper=n.wrapper==='figure'?'figure':'div';
+    const frame=element('iframe',{
+     src:String(n.src),title:String(n.title),loading:'lazy',
+     referrerpolicy:'strict-origin-when-cross-origin',
+     sandbox:'allow-scripts allow-same-origin allow-presentation',
+     allowfullscreen:''
+    },[]);
+    return [element(wrapper,{
+     class:[n.width==='fullwidth'?'fullwidth':'','tufte-embed'].filter(Boolean).join(' '),
+     'data-tufte-ratio':String(n.aspectRatio)
+    },[frame])];
+   }
    case 'tufte-fullwidth':return [element('div',withClass(n,'fullwidth'),inner())];
    case 'tufte-figure':return [element('figure',n.width==='fullwidth'?withClass(n,'fullwidth'):attrs(n),inner())];
    case 'tufte-caption':return [element('figcaption',attrs(n),inner())];
