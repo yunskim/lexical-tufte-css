@@ -162,3 +162,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - packages/render/src/index.ts: 기존 `prefix-note-noteId` 연결은 prefix/noteId 경계가 모호하므로 `tufte-{prefix.length}-{prefix}-{noteId}`로 변경. label.for와 input.id는 같은 값을 사용.
 - packages/render/test/render.test.mjs: 기존 ID 기대값 갱신, `prefix=a-b,noteId=c`와 `prefix=a,noteId=b-c` 충돌 회귀 fixture 추가.
 - 브라우저·단위 테스트 실행 불가(E025). R06은 완료 체크하지 않는다. HTML ID 형식은 프로토타입 공개 계약이 아니며 변경 영향은 P4 발행 호환성 검증 시 재확인.
+
+## 2026-10-16 — R07 CSP-friendly 발행 스타일 (코드 반영, 검증 대기)
+
+- packages/render/src/index.ts: 텍스트 pre-wrap, 문단 정렬, article counter-reset 인라인 style 속성을 scoped CSS class로 전환.
+- packages/render/styles.css: .tufte-article 범위의 스타일 규칙 추가. packages/render/package.json의 ./styles.css export와 배포 files 목록에 등록.
+- packages/render/test/render.test.mjs: 발행 HTML style 속성 부재, CSS 규칙 존재를 검사하는 테스트 추가.
+- 별도 CSS를 실제 호스트에서 로드해야 동일한 시각 효과가 유지된다. CSP style-src 'self' 정책에서의 브라우저 실행과 Tufte 원본 CSS 우선순위 검증은 미실행(E025). R07 체크 보류.
