@@ -248,3 +248,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - 외부 검토에서 브라우저 Chromium 다운로드 차단으로 test:browser 미실행. E025/E027의 환경 차단은 기존 실행 환경 기록으로 보존하되, 모든 환경에서 설치 불가능하다는 일반화는 하지 않음.
 - R02/R03/R04/R05는 각각 document-editor-document 왕복, Lexical 버전 호환 정규화, 명령 등록 이동, 무효 편집 상태 복구가 남아 있음. R01 및 R06–R09도 이 환경의 check/browser 재실행 증거가 없어 완료 체크 보류.
 - 다음 검증: pnpm install --frozen-lockfile; pnpm check; pnpm test:browser. 실패 시 오류/대책 기록.
+
+## 2026-10-16 — F05 Lexical JSON 왕복 회귀 보강
+
+- packages/lexical/test/note.test.mjs의 headless editor 노드 등록에 TufteSpanNode 추가.
+- sans/newthought/numeral/danger 네 종류에 대해 Lexical JSON 저장→parse→복원→동등성 검사 추가. 잘못된 kind 생성·import 거부 테스트 추가.
+- 실행 환경 재확인: node --version v22.16.0 PASS; pnpm --version command not found; corepack pnpm --version registry.npmjs.org EAI_AGAIN. pnpm check/test:browser 실행 불가.
+- 이 테스트는 Lexical JSON 자체 왕복만 검증하도록 작성되었고, R02가 요구하는 document→editor→document 왕복 검증은 여전히 미완료. R05 무효 상태 복구도 미구현.
