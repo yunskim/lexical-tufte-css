@@ -278,3 +278,9 @@
 - 발견: 2026-10-16 R03 정적 점검. `inspectStoredDocument`가 `isRecord`만 확인한 뒤 `input.schemaVersion`을 읽어, plain prototype을 가진 getter 객체가 검사 중 코드를 실행할 수 있었다.
 - 처리: 버전 필드 접근 전에 자체 속성 descriptor와 symbol을 검사해 접근자 포함 객체를 거부한다. getter 미실행 및 실패 진단 경로 회귀 테스트 추가.
 - 상태: 코드·테스트 반영, 실행 검증 대기. M033 참조.
+
+## E037 — SQLite adapter에 문자 그대로 삽입된 `\\n`으로 TypeScript 구문 손상
+
+- 발견: 2026-10-16 후속 코드 점검. `sqliteRevisionStore.ts`를 문자열 치환으로 수정하는 과정에서 실제 줄바꿈 대신 역슬래시+n이 소스에 남았다.
+- 영향: TypeScript 파서가 해당 파일을 읽지 못해 빌드 차단.
+- 조치: literal `\\n`을 실제 줄바꿈으로 교체. 실행 검증 대기. M034 참조.
