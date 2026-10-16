@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {documentToEditorJSON,editorJSONToDocument,canonicalizeDocument,parseCanonicalDocument,inspectStoredDocument,validateDocumentV2} from '../dist/index.js';
+import {documentToEditorJSON,editorJSONToDocument,canonicalizeDocument,parseCanonicalDocument,inspectStoredDocument,validateDocumentV2,migrateStoredDocument} from '../dist/index.js';
 const fixture=()=>JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document.json',import.meta.url),'utf8'));
 test('R02 document editor JSON document preserves validated state without mutation',()=>{
  const original=fixture(),before=JSON.stringify(original);
@@ -148,4 +148,23 @@ test('R03 strict v2 envelope validates existing content without mutation',()=>{
   assert.equal(rejected.ok,false);
   assert.ok(rejected.diagnostics.some(d=>d.code===code),JSON.stringify(rejected.diagnostics));
  }
+});
+
+test('R03 envelope migration preserves v1 content and isolates caller objects',()=>{
+ const legacy=fixture(),before=JSON.stringify(legacy);
+ const result=migrateStoredDocument(legacy);
+ assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+ assert.deepEqual(result.from,{schemaVersion:1,formatVersion:'legacy-v1'});
+ assert.deepEqual(result.to,{schemaVersion:2,formatVersion:1});
+ assert.deepEqual(result.document.lexicalState,legacy.lexicalState);
+ assert.deepEqual(result.document.assets,legacy.assets);
+ assert.notStrictEqual(result.document.lexicalState,legacy.lexicalState);
+ assert.equal(JSON.stringify(legacy),before);
+ const again=migrateStoredDocument(result.document);
+ assert.equal(again.ok,true,JSON.stringify(again.diagnostics));
+ assert.deepEqual(again.document,result.document);
+ assert.notStrictEqual(again.document,result.document);
+ const unsupported=migrateStoredDocument({...result.document,editorFormat:{engine:'lexical',formatVersion:2}});
+ assert.equal(unsupported.ok,false);
+ assert.ok(unsupported.diagnostics.some(d=>d.code==='UNSUPPORTED_EDITOR_FORMAT'));
 });
