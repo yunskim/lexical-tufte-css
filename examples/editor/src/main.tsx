@@ -17,7 +17,7 @@ import {
   SELECTION_INSERT_CLIPBOARD_NODES_COMMAND, CUT_COMMAND, PASTE_COMMAND, KEY_BACKSPACE_COMMAND, KEY_DELETE_COMMAND, HISTORY_PUSH_TAG, UNDO_COMMAND, REDO_COMMAND,
   COMMAND_PRIORITY_HIGH, type LexicalNode, type EditorState,
 } from 'lexical';
-import {registerQuotationCommands,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND,registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_TUFTE_DEFINITION_PAIR_COMMAND,registerSectionCommands,WRAP_TUFTE_ROOT_COMMAND,INSERT_TUFTE_SECTION_COMMAND,SPLIT_TUFTE_SECTION_COMMAND,MERGE_TUFTE_SECTION_COMMAND,SET_TUFTE_BLOCK_COMMAND,inspectEditorStructure,focusStructureIssue,type StructureIssue,replaceEditorDocumentState,TUFTE_NODES,NoteNode, $createNoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, registerNoteEdgeTypingGuard, type NoteKind} from '@lexical-tufte/lexical';
+import {registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,registerQuotationCommands,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND,registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_TUFTE_DEFINITION_PAIR_COMMAND,registerSectionCommands,WRAP_TUFTE_ROOT_COMMAND,INSERT_TUFTE_SECTION_COMMAND,SPLIT_TUFTE_SECTION_COMMAND,MERGE_TUFTE_SECTION_COMMAND,SET_TUFTE_BLOCK_COMMAND,inspectEditorStructure,focusStructureIssue,type StructureIssue,replaceEditorDocumentState,TUFTE_NODES,NoteNode, $createNoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, registerNoteEdgeTypingGuard, type NoteKind} from '@lexical-tufte/lexical';
 import './style.css';
 
 function containingNote(node: LexicalNode | null): NoteNode | null {
@@ -37,6 +37,7 @@ function EditorUI(){
   useEffect(()=>registerInlineCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
   useEffect(()=>registerDefinitionCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
   useEffect(()=>registerQuotationCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
+  useEffect(()=>registerFigureCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
   useEffect(()=>registerListCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
   const [structureIssues,setStructureIssues]=useState<StructureIssue[]>([]);
   const checkpoint=useRef<EditorState|null>(null);
@@ -199,6 +200,16 @@ function EditorUI(){
       <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(SPLIT_TUFTE_SECTION_COMMAND,undefined)}>현재 블록 앞에서 섹션 나누기</button>
       <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(MERGE_TUFTE_SECTION_COMMAND,undefined)}>다음 섹션과 합치기</button>
       {([['paragraph','본문 문단'],['h2','본문 제목 h2'],['h3','본문 제목 h3']] as const).map(([type,label])=><button key={type} onMouseDown={preserve} onClick={()=>editor.dispatchCommand(SET_TUFTE_BLOCK_COMMAND,type)}>{label}</button>)}
+      <button onMouseDown={preserve} onClick={()=>{
+        const src=window.prompt('이미지 URL (허용된 HTTPS 또는 상대 경로)');
+        if(src===null)return;
+        const alt=window.prompt('이미지 대체 텍스트');
+        if(alt===null)return;
+        const caption=window.prompt('그림 설명 (선택 사항)');
+        editor.dispatchCommand(INSERT_TUFTE_FIGURE_COMMAND,{src,alt,...(caption===null?{}:{caption})});
+      }}>그림 삽입</button>
+      <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(SET_TUFTE_FIGURE_WIDTH_COMMAND,'body')}>그림 본문 폭</button>
+      <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(SET_TUFTE_FIGURE_WIDTH_COMMAND,'fullwidth')}>그림 전체 폭</button>
       <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(INSERT_TUFTE_LIST_COMMAND,'bullet')}>글머리표 목록 삽입</button>
       <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(INSERT_TUFTE_LIST_COMMAND,'number')}>번호 목록 삽입</button>
       <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(APPEND_TUFTE_LIST_ITEM_COMMAND,undefined)}>목록 항목 추가</button>
