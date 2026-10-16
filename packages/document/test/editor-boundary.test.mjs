@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {documentToEditorJSON,editorJSONToDocument,canonicalizeDocument,parseCanonicalDocument,inspectStoredDocument} from '../dist/index.js';
+import {documentToEditorJSON,editorJSONToDocument,canonicalizeDocument,parseCanonicalDocument,inspectStoredDocument,validateDocumentV2} from '../dist/index.js';
 const fixture=()=>JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document.json',import.meta.url),'utf8'));
 test('R02 document editor JSON document preserves validated state without mutation',()=>{
  const original=fixture(),before=JSON.stringify(original);
@@ -128,4 +128,24 @@ test('R03 format inspection distinguishes legacy v1 and proposed v2 without muta
  const invalid=inspectStoredDocument(malformed);
  assert.equal(invalid.ok,false);
  assert.ok(invalid.diagnostics.some(d=>d.code==='UNKNOWN_FIELD'));
+});
+
+test('R03 strict v2 envelope validates existing content without mutation',()=>{
+ const legacy=fixture(),before=JSON.stringify(legacy);
+ const v2={...legacy,schemaVersion:2,editorFormat:{engine:'lexical',formatVersion:1}};
+ const result=validateDocumentV2(v2);
+ assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+ assert.deepEqual(result.document,v2);
+ assert.notStrictEqual(result.document,v2);
+ assert.equal(JSON.stringify(legacy),before);
+ for(const [bad,code] of [
+  [{...v2,editorFormat:{...v2.editorFormat,extra:true}},'UNKNOWN_FIELD'],
+  [{...v2,editorFormat:{engine:'lexical',formatVersion:2}},'UNSUPPORTED_EDITOR_FORMAT'],
+  [{...v2,lexicalState:{root:{type:'future',version:1,children:[]}}},'UNKNOWN_NODE'],
+  [{...v2,unknownField:true},'UNKNOWN_FIELD']
+ ]){
+  const rejected=validateDocumentV2(bad);
+  assert.equal(rejected.ok,false);
+  assert.ok(rejected.diagnostics.some(d=>d.code===code),JSON.stringify(rejected.diagnostics));
+ }
 });
