@@ -62,3 +62,15 @@ test('length-delimited namespaces avoid prefix and note ID ambiguity',()=>{
  assert.notEqual(id(first.html),id(second.html));
  for(const result of [first,second])assert.ok(result.html.includes('for="'+id(result.html)+'"'));
 });
+
+test('publication output has no inline style and uses scoped CSS classes',()=>{
+ const d=fixture();
+ const result=renderArticle(d);
+ assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+ assert.doesNotMatch(result.html,/\\sstyle=/);
+ assert.match(result.html,/class="tufte-article/);
+ assert.match(result.html,/class="tufte-pre-wrap"/);
+ const css=readFileSync(new URL('../styles.css',import.meta.url),'utf8');
+ assert.match(css,/counter-reset: sidenote-counter/);
+ assert.match(css,/white-space: pre-wrap/);
+});
