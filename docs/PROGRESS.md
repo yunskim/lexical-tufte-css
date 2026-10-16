@@ -921,3 +921,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - figureCommands의 문서 전체 주석 ID 검색을 기존 $collectNoteIds()로 공통화하여 검사 경로 중복 제거.
 - figure-commands.test.mjs에 figure 내 marginnote 삽입 순서, kind/ID/내용, 중복 ID 거부 및 중첩 figure 복사 노드의 $reidentifyPastedNotes ID 재발급 검증 코드를 추가.
 - 실제 DOM clipboard 이벤트 연결·브라우저 복사/붙여넣기·undo/redo 검증은 Work에서 별도 확인 필요. 테스트 실행하지 않음, CI 생략, 체크리스트 완료 보류.
+
+## 2026-10-16 P2.3 — 그림 포함 cut/paste 주석 ID 처리
+
+- React 편집기 CUT_COMMAND의 cutIds 수집을 RangeSelection/NodeSelection 양쪽으로 확대하고, 선택된 figure 하위 NoteNode를 재귀적으로 수집하도록 수정.
+- $reidentifyPastedNotes에서 cutIds가 중복 등장하는 입력에 대해 첫 원본 ID만 보존하고 후속 동일 ID는 새로 발급하도록 방어.
+- 실제 브라우저 clipboard 이벤트, CUT_COMMAND와 SELECTION_INSERT_CLIPBOARD_NODES_COMMAND 간 이벤트 순서, 편집·삭제·undo/redo는 Work 검증 대기. 실행 테스트 없음, CI 생략, 체크리스트 완료 보류.
