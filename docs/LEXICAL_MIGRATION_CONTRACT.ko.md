@@ -122,3 +122,13 @@ Migration은 입력을 변경하지 않는 순수 함수여야 하며, 동일 �
 - `loadMigratedDocumentIntoEditor`가 무손실 검사 및 설치 성공 후 `CLEAR_HISTORY_COMMAND`를 dispatch한다. 거부된 입력에는 dispatch하지 않는다.
 - 이 명령을 처리할 HistoryPlugin 등록은 host 책임이다. 명령을 dispatch했다는 사실만으로 실제 undo/redo 스택 초기화를 검증한 것은 아니다.
 - 테스트는 명령 전달 횟수를 검사한다. HistoryPlugin 통합·브라우저 undo/redo·로드 직후 비동기 editor update 순서 검증은 별도 후속 작업이다.
+
+## HistoryPlugin 실제 통합 검증 시나리오 (미실행)
+
+1. HistoryPlugin을 등록한 editor에서 문서 A를 편집하여 undo/redo 항목을 생성한다.
+2. 별도 문서 B를 `loadMigratedDocumentIntoEditor`로 교체한다. 성공 후 undo를 수행해도 문서 A가 복원되지 않아야 한다.
+3. 문서 B 교체에 실패하도록 unknown node 또는 unsupported format을 입력한다. editor state 및 기존 undo/redo 이력이 유지되어야 한다.
+4. 동일 문서 내 일반 편집에서는 교체 API를 호출하지 않아 history가 유지되는지 확인한다.
+5. React HistoryPlugin, headless History 등록, 브라우저 키보드 단축키를 각각 검증한다. 명령 dispatch 횟수 테스트만으로 이 시나리오를 대체하지 않는다.
+
+**주의:** 현재 구현은 성공 후 `CLEAR_HISTORY_COMMAND`를 dispatch하지만 실제 history plugin 등록 여부를 검사하지 않는다. 이 기능을 통합하는 host는 HistoryPlugin을 반드시 등록해야 한다. 문서 설치/명령 실행 시점의 순서와 history state 보존은 실행 검증 전까지 미확정이다.
