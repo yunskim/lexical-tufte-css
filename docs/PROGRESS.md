@@ -632,3 +632,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - Lexical bridge 테스트에 unsafe URL, 부적절한 assetId, 0/음수 크기 및 미래 버전 import 거부 검증 추가.
 - 정상 이미지의 src/assetId/width/height 직렬화 보존 테스트 추가.
 - 실행 미확인으로 R01 체크 보류. CI 없음.
+
+## 2026-10-16 — R02 지원 노드 왕복 검증 확대
+
+- `packages/lexical/test/document-bridge.test.mjs`에 Tufte span 4종과 note 2종의 조합 왕복 테스트 추가.
+- 본문 폭 figure/caption과 fullwidth table-layout 왕복 테스트 추가.
+- 지원되지 않은 노드의 무손실 왕복은 여전히 미구현이며 R02 전체 완료 아님. 실제 테스트 실행 미확인, CI 없음.
