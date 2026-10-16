@@ -1,4 +1,4 @@
-import {documentToEditorJSON,editorJSONToDocument,migrateStoredDocument,type TufteDocumentV2,type Diagnostic,type TufteDocument} from '@lexical-tufte/document';
+import {documentToEditorJSON,editorJSONToDocument,migrateStoredDocument,validateDocumentV2,type TufteDocumentV2,type Diagnostic,type TufteDocument} from '@lexical-tufte/document';
 import {CLEAR_HISTORY_COMMAND,type LexicalEditor} from 'lexical';
 
 type Failure={ok:false;diagnostics:Diagnostic[]};
@@ -58,6 +58,29 @@ export function exportEditorToDocument(editor:LexicalEditor,base:unknown):Failur
  }catch(error){
   return failure('LEXICAL_EXPORT_FAILED',error instanceof Error?error.message:String(error));
  }
+}
+
+/**
+ * Export a v2 document without losing its editorFormat descriptor.
+ * The legacy export validates the current Lexical state against the v1
+ * content schema; the v2 validator checks the complete result afterwards.
+ */
+export function exportEditorToDocumentV2(editor:LexicalEditor,base:unknown):Failure|Success<TufteDocumentV2>{
+ const checked=validateDocumentV2(base);
+ if(!checked.ok)return checked;
+ const {id,locale,title,subtitle,assets}=checked.document;
+ const legacy:TufteDocument={
+  schemaVersion:1,id,locale,title,assets:structuredClone(assets),
+  lexicalState:structuredClone(checked.document.lexicalState),
+  ...(subtitle===undefined?{}:{subtitle}),
+ };
+ const exported=exportEditorToDocument(editor,legacy);
+ if(!exported.ok)return exported;
+ const candidate={...exported.value,schemaVersion:2,editorFormat:{engine:'lexical',formatVersion:1}};
+ const validated=validateDocumentV2(candidate);
+ return validated.ok
+  ?{ok:true,value:validated.document,diagnostics:[]}
+  :{ok:false,diagnostics:validated.diagnostics};
 }
 
 /** Canonical key ordering for loss detection; array order remains significant. */
