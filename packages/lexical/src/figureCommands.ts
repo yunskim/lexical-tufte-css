@@ -1,10 +1,10 @@
 import {$addUpdateTag,$createTextNode,$getSelection,$isRangeSelection,$isNodeSelection,createCommand,COMMAND_PRIORITY_EDITOR,HISTORY_PUSH_TAG,type LexicalCommand,type LexicalEditor,type LexicalNode} from 'lexical';
-import {NODE_SCHEMA,isSafeURL,type Diagnostic} from '@lexical-tufte/document';
+import {NODE_SCHEMA,isSafeURL,isIdentifier,type Diagnostic} from '@lexical-tufte/document';
 import {SectionNode,FigureNode,CaptionNode,$createFigureNode,$createCaptionNode,type FigureWidth} from './LayoutNodes.js';
 import {InlineImageNode,$createInlineImageNode} from './InlineImageNode.js';
 import {$getContainingNote} from './noteOperations.js';
 
-export type InsertTufteFigure={src:string;alt:string;width?:FigureWidth;caption?:string};
+export type InsertTufteFigure={src:string;alt:string;assetId?:string;imageWidth?:number;imageHeight?:number;width?:FigureWidth;caption?:string};
 export const INSERT_TUFTE_FIGURE_COMMAND:LexicalCommand<InsertTufteFigure>=createCommand('INSERT_TUFTE_FIGURE');
 export const SET_TUFTE_FIGURE_WIDTH_COMMAND:LexicalCommand<FigureWidth>=createCommand('SET_TUFTE_FIGURE_WIDTH');
 
@@ -22,6 +22,9 @@ export function registerFigureCommands(editor:LexicalEditor,onDiagnostic?:(diagn
  const registrations=[
   editor.registerCommand(INSERT_TUFTE_FIGURE_COMMAND,payload=>{
    if(!payload||!isSafeURL(payload.src,'image')||typeof payload.alt!=='string'
+     ||(payload.assetId!==undefined&&!isIdentifier(payload.assetId))
+     ||(payload.imageWidth!==undefined&&(!Number.isSafeInteger(payload.imageWidth)||payload.imageWidth<=0))
+     ||(payload.imageHeight!==undefined&&(!Number.isSafeInteger(payload.imageHeight)||payload.imageHeight<=0))
      ||(payload.width!==undefined&&!['body','fullwidth'].includes(payload.width))
      ||(payload.caption!==undefined&&(typeof payload.caption!=='string'||payload.caption.length>2000)))
     return reject('INVALID_FIGURE_PAYLOAD','그림 URL, 대체 텍스트, 너비 또는 설명이 올바르지 않습니다.');
@@ -33,7 +36,7 @@ export function registerFigureCommands(editor:LexicalEditor,onDiagnostic?:(diagn
    if(!block.getParent()?.is(section)||!NODE_SCHEMA['tufte-section']!.children!.includes(block.getType()))
     return reject('INVALID_FIGURE_SELECTION','유효한 섹션 블록을 선택하세요.');
    $addUpdateTag(HISTORY_PUSH_TAG);
-   const figure=$createFigureNode(payload.width??'body').append($createInlineImageNode(payload.src,payload.alt));
+   const figure=$createFigureNode(payload.width??'body').append($createInlineImageNode(payload.src,payload.alt,payload.assetId,payload.imageWidth,payload.imageHeight));
    if(payload.caption!==undefined)figure.append($createCaptionNode().append($createTextNode(payload.caption)));
    block.insertAfter(figure);figure.selectEnd();return true;
   },COMMAND_PRIORITY_EDITOR),
