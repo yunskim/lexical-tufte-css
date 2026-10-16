@@ -18,6 +18,7 @@ test('definition list insertion and pair append preserve existing paragraph',()=
   text.selectEnd();
  },{discrete:true});
  assert.equal(editor.dispatchCommand(INSERT_TUFTE_DEFINITION_LIST_COMMAND,undefined),true);
+ editor.update(()=>{},{discrete:true});
  editor.getEditorState().read(()=>{
   const section=$getRoot().getFirstChild();
   assert.deepEqual(section.getChildren().map(n=>n.getType()),['paragraph','tufte-definition-list']);
@@ -25,6 +26,7 @@ test('definition list insertion and pair append preserve existing paragraph',()=
   assert.equal(section.getFirstChild().getTextContent(),'original');
  });
  assert.equal(editor.dispatchCommand(APPEND_TUFTE_DEFINITION_PAIR_COMMAND,undefined),true);
+ editor.update(()=>{},{discrete:true});
  editor.getEditorState().read(()=>{
   const list=$getRoot().getFirstChild().getLastChild();
   assert.deepEqual(list.getChildren().map(n=>n.getType()),['tufte-term','tufte-definition','tufte-term','tufte-definition']);
@@ -39,7 +41,9 @@ test('definition commands reject missing selection without modifying document',(
  },{discrete:true});
  const before=JSON.stringify(editor.getEditorState().toJSON());
  editor.dispatchCommand(INSERT_TUFTE_DEFINITION_LIST_COMMAND,undefined);
+ editor.update(()=>{},{discrete:true});
  editor.dispatchCommand(APPEND_TUFTE_DEFINITION_PAIR_COMMAND,undefined);
+ editor.update(()=>{},{discrete:true});
  assert.equal(JSON.stringify(editor.getEditorState().toJSON()),before);
  assert.equal(diagnostics.length,2);
  unregister();
