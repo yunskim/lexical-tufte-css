@@ -53,3 +53,34 @@ test('failed rename preserves previous backup and removes temporary file',async(
   assert.deepEqual(await readdir(directory),['post.json']);
  }finally{await rm(directory,{recursive:true,force:true});}
 });
+
+test('failed temp write preserves prior backup and removes temp file',async()=>{
+ const directory=await mkdtemp(join(tmpdir(),'lexical-tufte-write-failure-'));
+ try{
+  const path=join(directory,'post.json');
+  const document=JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document-v2.json',import.meta.url),'utf8'));
+  const metadata={slug:'write-failure',summary:'original',tags:[],authors:['editor'],status:'draft',
+   createdAt:'2026-10-16T00:00:00Z',updatedAt:'2026-10-16T00:00:00Z',revision:1};
+  assert.equal((await writePostBackupFile(path,{document,metadata})).ok,true);
+  const before=await readFile(path,'utf8');
+  const real=await import('node:fs/promises');
+  const filesystem={
+   mkdir:real.mkdir,rename:real.rename,rm:real.rm,
+   async open(target,...args){
+    const handle=await real.open(target,...args);
+    if(target===directory)return handle;
+    return {
+     async writeFile(){await handle.writeFile('partial');throw new Error('injected disk full');},
+     sync:()=>handle.sync(),close:()=>handle.close(),
+    };
+   },
+  };
+  await assert.rejects(
+   writePostBackupFile(path,{document,metadata:{...metadata,summary:'new'}},{filesystem}),
+   /injected disk full/,
+  );
+  assert.equal(await readFile(path,'utf8'),before);
+  const {readdir}=await import('node:fs/promises');
+  assert.deepEqual(await readdir(directory),['post.json']);
+ }finally{await rm(directory,{recursive:true,force:true});}
+});
