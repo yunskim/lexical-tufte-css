@@ -110,8 +110,9 @@ export function registerFigureCommands(editor:LexicalEditor,onDiagnostic?:(diagn
    const previous=note.getChildren();
    const replacement=$createTextNode(payload.text);
    note.append(replacement);
+   replacement.selectEnd();
    for(const child of previous)child.remove();
-   replacement.selectEnd();return true;
+   return true;
   },COMMAND_PRIORITY_EDITOR)
  ];
  return ()=>registrations.forEach(dispose=>dispose());
