@@ -410,3 +410,16 @@ E001–E049/M001–M042를 검토했다. E024의 경계 입력은 실제 Chromiu
 - 원인: parse/set만 가진 최소 fake가 새 history 통합 경계를 모사하지 못했다.
 - 처리: 성공 경로 double에 dispatchCommand를 추가하고 기준 재설치 횟수를 반영한다. 실제 registerHistory/React 흐름으로 제품 동작을 별도 검증한다. production에 fake 호환 분기를 추가하지 않는다.
 - 상태: verified (전체180개·브라우저7개 통과). M047 참조.
+
+## E055 — R05 비파괴 검사에서 저장 JSON과 메모리 객체 비교 재발
+
+- 발견: R05 전체 검사에서 33종 문서의 undefined optional 필드 때문에 deepStrictEqual 실패. E016/E044와 같은 비교 경계 실수다.
+- 원인: 검사 전후 메모리 불변성 검증과 저장 JSON 동등성을 하나의 assertion으로 혼합했다. 기존 대책을 새 테스트 작성에 일관되게 적용하지 못했다.
+- 처리: 검사 전 메모리 snapshot과 검사 후 snapshot을 직접 비교하고, 별도 JSON 직렬화 값으로 저장 fixture와 비교한다. null은 그대로 보존한다.
+- 상태: verified (전체187개·브라우저7개). M048 참조.
+
+## E056 — R05 브라우저 fixture의 섹션 위치 가정
+
+- 발견: 첫 섹션에 figure가 있다고 가정한 테스트 입력 변경기가 undefined.children으로 실패했다. 실제 golden은 그림/표가 두 번째 섹션에 있다.
+- 처리: 전체 트리에서 type으로 fixture 대상을 찾는다. 제품 오류와 테스트 준비 오류를 구분한다.
+- 상태: verified (React 3종 구조 복구와 전체187개·브라우저7개). M049 참조.

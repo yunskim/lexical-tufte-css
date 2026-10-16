@@ -135,7 +135,7 @@ P1 gate: 완료. 노트 편집 회귀와 SSR 출력의 실제 브라우저 비�
   - [x] R03.c 각 지원 버전의 golden fixture 및 변환 전후 의미 보존·손실 진단 테스트를 마련한다.
   - [x] R03.d 로드 시 undo/redo 이력의 초기화 정책을 별도 editor integration 계약으로 정의한다. [통합 계약과 검증](HISTORY_R03.ko.md): 두 loader와 실제 React 교체/실패/첫 수정/반복 로드 검증, 전체180개·브라우저7개 통과.
 - [x] R04 예제 main.tsx의 clipboard ID 재발급, 내부 참조 갱신, IME 관련 핵심 불변식을 packages/lexical로 옮기고 회귀 검증한다.
-- [ ] R05 section/figure/table-layout 편집 중 무효 상태의 복구 UX 또는 정규화 transform을 정하고, 무효 상태 저장·발행 정책을 분리한다.
+- [x] R05 section/figure/table-layout 편집 중 무효 상태의 복구 UX 또는 정규화 transform을 정하고, 무효 상태 저장·발행 정책을 분리한다. [복구 UI·정책](STRUCTURE_RECOVERY_R05.ko.md), 187개·브라우저7개 통과.
 - [x] R06 note HTML ID 조합의 모호성을 제거하고 prefix/noteId 충돌 fixture를 추가한다.
 - [x] R07 inline style을 class/CSS로 이전하고 CSP 호환성을 검증한다.
 - [x] R08 문자열 치환 기반 렌더링을 작은 typed render tree + serializer로 대체한다. prototype exportDOM은 발행 정본이 아님을 명시한다.
@@ -146,7 +146,7 @@ P1 gate: 완료. 노트 편집 회귀와 SSR 출력의 실제 브라우저 비�
 - [ ] R13 GPL-3.0-only 유지 여부와 재사용 정책을 P7 전에 명시적으로 결정한다. 한글 Source Han 폰트의 subset unicode-range woff2 전략을 P4 전에 검증한다.
 - [x] R14 CI 없이 로컬 check + test:browser 실행 경로(pre-push hook은 선택)를 문서화하고 실제 실행 결과를 남긴다.
 
-2026-10-16 통합 검증: [실행 보고서](VERIFICATION_2026-10-16.ko.md). 140개 단위/통합 및 6개 브라우저 실행 파일 통과. 체크한 R 항목은 보고서의 범위에 한정한다. R05/R10/R11/R13 및 P2.2–P7/F표는 미완료다. R02는 후속 [전체 노드 왕복 검증](ROUNDTRIP_R02.ko.md)으로 완료(178개·브라우저7개)했다.
+2026-10-16 통합 검증: [실행 보고서](VERIFICATION_2026-10-16.ko.md). 140개 단위/통합 및 6개 브라우저 실행 파일 통과. 체크한 R 항목은 보고서의 범위에 한정한다. R10/R11/R13 및 P2.2–P7/F표는 미완료다. R02는 후속 [전체 노드 왕복 검증](ROUNDTRIP_R02.ko.md)으로 완료(178개·브라우저7개)했다.
 
 완료 판정: 각 항목은 변경 파일, 테스트 명령, 실행 결과를 docs/PROGRESS.md에 기록한 뒤 체크한다. 코드 실행을 하지 않은 설계 검토만으로 완료 처리하지 않는다.
 
@@ -220,7 +220,7 @@ P6 gate: 로컬 빌드·타입 검사·관련 테스트 통과, 남은 결함과
 
 진행 기록 형식: `작업 ID | 상태(todo/in-progress/blocked/done) | 변경 경로/PR | 검증 명령·결과 | 차단 원인 | 다음 작업`. 증거 없이 체크하지 않는다. 문서 수정만으로 구현 작업을 완료하지 않는다.
 
-현재 다음 작업: 미완료 R05 등 선행 안정화 범위를 마무리한 후 P2.2 F01–F09 노드/속성/commands와 JSON serialization 구현. P2.1의 33개 노드 계약을 순서대로 편집/발행 구현에 연결한다. 구조 검증 통과와 제품 기능 완료는 구분한다.
+현재 다음 작업: 미완료 R10 등 선행 안정화 범위를 마무리한 후 P2.2 F01–F09 노드/속성/commands와 JSON serialization 구현. P2.1의 33개 노드 계약을 순서대로 편집/발행 구현에 연결한다. 구조 검증 통과와 제품 기능 완료는 구분한다.
 
 ## 주요 위험과 처리
 

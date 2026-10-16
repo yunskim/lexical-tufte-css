@@ -794,3 +794,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - [통합 계약](HISTORY_R03.ko.md): HistoryPlugin 등록, update 밖 호출, 기준 재설치의 listener 중복 가능성, 공유 history 및 Yjs 범위 명시. 레이아웃 예제 삽입은 기존 편집 이력 유지.
 - 실제 registerHistory 두 loader 흐름 및 React UI 복원/첫 수정/실패 후 redo/재열기 검사. check180/180(document47·lexical106·render27, fail/skip0), browser7, diff check 통과. CI 생략.
 - E053(clear 후 첫 수정 기준 소실)/E054(test double 통합 누락)와 M046/M047 기록·반영·검증. R03.d 및 현행 R03 완료 체크. 다음 R05. 전체 P2–P7 기능 완료를 뜻하지 않는다.
+
+
+## 2026-10-16 R05 — 무효 레이아웃 복구 완료
+
+- structureRecovery.ts의 비파괴 검사/문제 위치 이동, 실제 예제 복구 패널·undo 가능한 checkpoint 복구·항상 노출된 복구 사본 열기 구현. 자동 삭제나 임의 이미지/표 생성 없음.
+- 무효 raw 상태는 별도 recovery localStorage에만 저장. 일반 저장 보호, prototype HTML 생성 차단 및 정본 renderArticle 전체 발행 차단. [정책](STRUCTURE_RECOVERY_R05.ko.md)에 전체 validator와 구조 검사 차이/메모리 checkpoint 제한 명시.
+- check187/187(document47·lexical112·render28, fail/skip0), browser7, diff check 통과. E055/E056 및 M048/M049 기록·반영. CI 생략. R05 체크, 다음 R10.

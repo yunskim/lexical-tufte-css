@@ -286,3 +286,15 @@ test('R02 complete editor golden does not bypass unsupported publication capabil
  assert.equal(validateDocument(doc).ok,true);const r=renderArticle(doc);assert.equal(r.ok,false);assert.equal(r.html,null);
  assert.ok(r.diagnostics.some(d=>d.path.endsWith('highlightType')));assert.ok(r.diagnostics.every(d=>d.code==='UNSUPPORTED_RENDER_PROPERTY'));
 });
+
+test('R05 invalid section/figure/table wrapper blocks all publication without mutating recovery JSON',()=>{
+ for(const [type,code,mutate]of [
+  ['tufte-section','EMPTY_NODE',n=>n.children=[]],
+  ['tufte-figure','INVALID_FIGURE',n=>n.children.shift()],
+  ['tufte-table-layout','INVALID_TABLE_LAYOUT',n=>n.children=[]],
+ ]){
+  const d=fixture(),collect=n=>[n,...(n.children?.flatMap(collect)??[])];
+  const node=collect(d.lexicalState.root).find(n=>n.type===type);assert.ok(node,type);mutate(node);
+  const before=JSON.stringify(d),result=renderArticle(d);assert.equal(result.ok,false);assert.equal(result.html,null);assert.ok(result.diagnostics.some(d=>d.code===code));assert.equal(JSON.stringify(d),before);
+ }
+});

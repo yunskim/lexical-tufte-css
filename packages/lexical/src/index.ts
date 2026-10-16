@@ -19,3 +19,5 @@ export {ImageQuiltNode,$createImageQuiltNode,type SerializedImageQuilt} from './
 export {EmbedNode,$createEmbedNode,type EmbedProvider,type EmbedWrapper,type SerializedEmbed} from './EmbedNode.js';
 export {TUFTE_NODES,TUFTE_NODE_CLASSES,TUFTE_NODE_TYPES,TESTED_LEXICAL_VERSION} from './nodes.js';
 export {TufteCodeHighlightNode,$createTufteCodeHighlightNode,type SerializedTufteCodeHighlight} from './CodeHighlightNode.js';
+
+export {$inspectEditorStructure,inspectEditorStructure,focusStructureIssue,type StructureIssue} from './structureRecovery.js';

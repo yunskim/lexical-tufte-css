@@ -15,9 +15,9 @@ import {
   $createParagraphNode, $createTextNode, $createLineBreakNode, $isParagraphNode,
   FORMAT_TEXT_COMMAND, KEY_ESCAPE_COMMAND, KEY_ARROW_DOWN_COMMAND, KEY_ENTER_COMMAND,
   SELECTION_INSERT_CLIPBOARD_NODES_COMMAND, CUT_COMMAND, PASTE_COMMAND, KEY_BACKSPACE_COMMAND, KEY_DELETE_COMMAND, HISTORY_PUSH_TAG, UNDO_COMMAND, REDO_COMMAND,
-  COMMAND_PRIORITY_HIGH, type LexicalNode,
+  COMMAND_PRIORITY_HIGH, type LexicalNode, type EditorState,
 } from 'lexical';
-import {replaceEditorDocumentState,TUFTE_NODES,NoteNode, $createNoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, registerNoteEdgeTypingGuard, type NoteKind} from '@lexical-tufte/lexical';
+import {inspectEditorStructure,focusStructureIssue,type StructureIssue,replaceEditorDocumentState,TUFTE_NODES,NoteNode, $createNoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, registerNoteEdgeTypingGuard, type NoteKind} from '@lexical-tufte/lexical';
 import './style.css';
 
 function containingNote(node: LexicalNode | null): NoteNode | null {
@@ -33,6 +33,19 @@ function EditorUI(){
   const [status,setStatus]=useState('본문을 선택하고 노트를 삽입하세요.');
   const [html,setHtml]=useState('');
   const [json,setJson]=useState('');
+  const [structureIssues,setStructureIssues]=useState<StructureIssue[]>([]);
+  const checkpoint=useRef<EditorState|null>(null);
+  useEffect(()=>{
+    const inspect=()=>{const issues=inspectEditorStructure(editor);setStructureIssues(issues);if(issues.length===0)checkpoint.current=editor.getEditorState();};
+    inspect();return editor.registerUpdateListener(inspect);
+  },[editor]);
+  function recoverStructure(){
+    if(!checkpoint.current){setStatus('복구할 정상 구조가 없습니다. 문제 위치를 수정하거나 실행 취소하세요.');return;}
+    try{
+      localStorage.setItem('lexical-tufte-recovery-v1',JSON.stringify(editor.getEditorState().toJSON()));
+      editor.setEditorState(checkpoint.current,{tag:HISTORY_PUSH_TAG});setStatus('복구용 사본을 보존하고 마지막 정상 구조로 돌아왔습니다.');
+    }catch{setStatus('복구용 사본 저장에 실패했습니다. 현재 내용은 유지합니다.');}
+  }
   const textarea=useRef<HTMLTextAreaElement>(null);
   function enterNote():boolean {
     const selection=$getSelection();
@@ -158,11 +171,12 @@ function EditorUI(){
     });editor.focus();
   }
   function exportDocument(){
+    if(inspectEditorStructure(editor).length){setHtml('');setJson(JSON.stringify(editor.getEditorState().toJSON(),null,2));setStatus('구조를 수정해야 HTML을 생성할 수 있습니다. JSON은 복구용으로 보존합니다.');return;}
     editor.getEditorState().read(()=>setHtml($generateHtmlFromNodes(editor)));
     setJson(JSON.stringify(editor.getEditorState().toJSON(),null,2));setStatus('JSON과 HTML을 생성했습니다.');
   }
   function save(){
-    try{localStorage.setItem('lexical-tufte-p1',JSON.stringify(editor.getEditorState().toJSON()));setStatus('이 브라우저에 저장했습니다.');}
+    try{const invalid=inspectEditorStructure(editor).length>0;localStorage.setItem(invalid?'lexical-tufte-recovery-v1':'lexical-tufte-p1',JSON.stringify(editor.getEditorState().toJSON()));setStatus(invalid?'구조 오류가 있어 복구용 사본에만 저장했습니다. 마지막 저장 문서는 유지합니다.':'이 브라우저에 저장했습니다.');}
     catch{setStatus('저장 실패: 저장 공간을 확인하세요.');}
   }
   function restore(){
@@ -197,7 +211,8 @@ function EditorUI(){
       <HistoryPlugin/><TablePlugin/>
     </main>
     <p role="status">{status}</p>
-    <div className="actions"><button onClick={save}>저장</button><button onClick={restore}>불러오기</button><button onClick={exportDocument}>JSON·HTML 확인</button><button onClick={()=>{editor.update($loadLayoutFixture,{tag:HISTORY_PUSH_TAG});setStatus('레이아웃 예제를 불러왔습니다. 실행 취소할 수 있습니다.');}}>레이아웃 예제 불러오기</button></div>
+    {structureIssues.length>0&&<aside role="alert" aria-label="문서 구조 복구"><p>문서 구조를 수정하세요. 내용은 자동 삭제하지 않으며 HTML 생성은 차단됩니다.</p><ul>{structureIssues.map((issue,i)=><li key={`${issue.key}-${i}`}><button onClick={()=>focusStructureIssue(editor,issue.key)}>{issue.message}</button> <code>{issue.path}</code></li>)}</ul><button onClick={()=>editor.dispatchCommand(UNDO_COMMAND,undefined)}>구조 변경 실행 취소</button><button onClick={recoverStructure} disabled={!checkpoint.current}>마지막 정상 구조로 복구</button></aside>}
+    <div className="actions"><button onClick={save}>저장</button><button onClick={restore}>불러오기</button><button onClick={()=>{try{const raw=localStorage.getItem('lexical-tufte-recovery-v1');if(!raw){setStatus('복구용 사본이 없습니다.');return;}replaceEditorDocumentState(editor,editor.parseEditorState(raw));setStatus('복구용 사본을 열었습니다. 구조를 수정하세요.');}catch{setStatus('복구용 사본을 열지 못했습니다.');}}}>복구용 사본 열기</button><button onClick={exportDocument}>JSON·HTML 확인</button><button onClick={()=>{editor.update($loadLayoutFixture,{tag:HISTORY_PUSH_TAG});setStatus('레이아웃 예제를 불러왔습니다. 실행 취소할 수 있습니다.');}}>레이아웃 예제 불러오기</button></div>
     <details><summary>JSON과 발행 HTML 검사</summary><label>JSON<textarea ref={textarea} aria-label="문서 JSON" value={json} readOnly/></label><label>HTML<textarea aria-label="발행 HTML" value={html} readOnly/></label></details>
     <p className="notice">프로토타입: 공개 발행·모바일 여백 배치·OS별 실제 IME와 다른 브라우저 검증은 후속 단계에서 진행합니다. 한글 웹폰트 자산 연결은 P4 대상입니다.</p>
   </>;
