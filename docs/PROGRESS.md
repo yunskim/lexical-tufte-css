@@ -889,3 +889,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - examples/editor/src/main.tsx에 그림 삽입 URL/alt/caption 입력, 본문 폭·전체 폭 명령 버튼 추가. 기존 toolbar selection 유지 방식 사용.
 - 현재 width 명령은 figure 내부의 collapsed selection이 있어야 하며, 삽입 직후 이미지 노드 선택/캡션 없는 figure에서의 접근성은 Work 통합 검증 및 후속 UX 보완 대상.
 - 테스트 실행은 사용자 지시에 따라 Work에서 일괄 처리. F13/F14 및 P2.3 체크 보류, CI 없음.
+
+## 2026-10-16 P2.3 — 그림 선택 UX 보완
+
+- SET_TUFTE_FIGURE_WIDTH_COMMAND: 기존 collapsed range selection에 더해 단일 figure/image node selection, 섹션의 element offset이 가리키는 figure도 대상으로 허용. IME 조합 및 노트 내부 selection은 거부.
+- 섹션 offset 해석은 anchor.type==='element'일 때만 수행해 텍스트 offset과 혼동하지 않음.
+- 실행 테스트는 Work 일괄 처리 대기. 신규 선택 분기·undo/redo·caption 없는 figure 검증이 필요. CI 없음, 완료 체크 보류.
