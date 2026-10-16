@@ -831,3 +831,11 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - registerSectionCommands 및 root 묶기/section 추가·블록 앞 분할·속성 일치 병합/paragraph·h2·h3 변환 명령과 실제 툴바 연결. 원본 rich payload·note ID·선택 offset·직렬화 속성 보존, 무효 selection/주석/표 셀/다중 블록/속성 불일치 거부. [계약](SECTION_COMMANDS_P22A.ko.md).
 - 신규13개 단위/통합 및 실제 React 명령·undo/redo·저장/재열기·정본 renderer 검사. 패키지 fresh declaration 소비에도 새 명령 API 추가. check214/214(document47·lexical127·render28·blog12, fail/skip0), browser10, package4, frozen/diff 통과.
 - E067 fixture 구문/E068 상태 관찰 순서 및 M060/M061 반영. CI 생략. P2.2.a만 체크. P2.2.b/c/d와 전체 F표는 계속 미완료.
+
+## 2026-10-16 P2.2.b — 대화 통합 및 인라인 명령 착수
+
+- 다른 대화의 최신 main과 체크리스트를 재조회: R01–R14 완료, P2.2.a 완료(check214/browser10/package4), 다음은 P2.2.b. 이전 대화의 검증 수치를 이번 환경의 재실행으로 혼동하지 않는다.
+- packages/lexical/src/inlineCommands.ts 신규: SET_TUFTE_SPAN_KIND_COMMAND, registerInlineCommands. 기존 span에서 같은 요소 내 selection만 허용하고 IME 중·무효 kind·다른 span 선택은 진단 후 원자적 거부. 기존 자식과 note ID 보존.
+- packages/lexical/src/index.ts export 및 lexical/test/inline-commands.test.mjs의 변경·거부 회귀 테스트 추가.
+- 이번 변경의 로컬 pnpm check/browser는 미실행. P2.2.b 완료 체크 보류. CI 추가 없음.
+- 다음: 테스트 실행, selection/history 및 실제 React 연결; 목록/정의목록 명령, F03/F05/F06 통합 회귀.
