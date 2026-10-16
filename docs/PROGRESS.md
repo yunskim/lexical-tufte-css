@@ -262,3 +262,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - packages/document/test/editor-boundary.test.mjs: 유효 문서의 JSON 왕복, unknown field, unknown node 검사 작성.
 - 범위 제한: 실제 Lexical runtime parse/export, 전체 33개 노드와 버전별 fixture/migration은 미구현. R02/R03 체크 보류.
 - 실행 증거: pnpm 및 Corepack DNS 환경 차단(E025/E027)으로 신규 테스트 미실행. CI 없음.
+
+## 2026-10-16 — R02/R03 Lexical runtime bridge
+
+- packages/lexical/src/documentBridge.ts: loadDocumentIntoEditor(parseEditorState/setEditorState), exportEditorToDocument(toJSON + document schema validation) 도입. 실패는 diagnostics로 반환하며 미지원 필드 자동 삭제 없음.
+- packages/lexical/src/index.ts: bridge API 공개.
+- packages/lexical/test/document-bridge.test.mjs: 미등록 노드·문서 버전·무효 내보내기 거부 회귀 작성.
+- 제한: 성공적인 full document→Lexical→document 왕복과 33개 노드 등록, Lexical 버전별 골든 fixture는 아직 없음. 실행 검증도 미완료(E025/E027). R02/R03 완료 체크 보류.
