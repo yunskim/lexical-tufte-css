@@ -7,3 +7,7 @@
 .tufte-article.tufte-align-justify, .tufte-article .tufte-align-justify { text-align: justify; }
 .tufte-article.tufte-align-start, .tufte-article .tufte-align-start { text-align: start; }
 .tufte-article.tufte-align-end, .tufte-article .tufte-align-end { text-align: end; }
+
+/* Intrinsic iframe dimensions preserve each validated embed's aspect ratio. */
+.tufte-article .tufte-embed { max-width: 100%; }
+.tufte-article .tufte-embed iframe { display: block; width: 100%; height: auto; aspect-ratio: auto; border: 0; }
