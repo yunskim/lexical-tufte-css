@@ -367,3 +367,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - `packages/document/test/editor-boundary.test.mjs`에 canonicalizeDocument의 객체 키 순서 불변성, 배열 순서 보존, parseCanonicalDocument 왕복, unknown field 거부 및 입력 비변경 회귀 추가.
 - 배열 순서 변경 검사는 root에 섹션이 둘 이상 있을 때만 수행하도록 조건화했으므로 단일 섹션 fixture에서는 해당 단언이 실행되지 않는다. 다중 섹션 fixture로 강화할 여지가 있다.
 - 테스트 실행 미확인. R03 체크 보류, CI 생략 유지.
+
+## 2026-10-16 — R03 배열 순서 검증 공백 보완
+
+- 이전 canonical serialization 테스트의 `children.length > 1` 조건 때문에 단일 섹션 fixture에서는 배열 순서 보존 단언이 생략되던 문제를 수정했다.
+- 테스트가 서로 다른 두 개의 유효한 section을 명시적으로 구성하고 순서 반전 전후 직렬화 차이를 무조건 검사한다.
+- 실행 검증은 여전히 대기. R03 완료 체크 보류, CI 생략 유지.
