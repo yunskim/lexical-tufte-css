@@ -12,6 +12,8 @@ export const SET_TUFTE_FIGURE_WIDTH_COMMAND:LexicalCommand<FigureWidth>=createCo
 export type InsertFigureMarginNote={noteId:string;text:string};
 export const INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND:LexicalCommand<InsertFigureMarginNote>=createCommand('INSERT_TUFTE_FIGURE_MARGINNOTE');
 export const REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND:LexicalCommand<string>=createCommand('REMOVE_TUFTE_FIGURE_MARGINNOTE');
+export type UpdateFigureMarginNote={noteId:string;text:string};
+export const UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND:LexicalCommand<UpdateFigureMarginNote>=createCommand('UPDATE_TUFTE_FIGURE_MARGINNOTE');
 
 export function registerFigureCommands(editor:LexicalEditor,onDiagnostic?:(diagnostic:Diagnostic)=>void):()=>void{
  if(!editor.hasNodes([SectionNode,FigureNode,CaptionNode]))throw Error('Figure commands require TUFTE_NODES');
@@ -95,6 +97,17 @@ export function registerFigureCommands(editor:LexicalEditor,onDiagnostic?:(diagn
    $addUpdateTag(HISTORY_PUSH_TAG);
    note.remove();
    figure.selectEnd();return true;
+  },COMMAND_PRIORITY_EDITOR),
+  editor.registerCommand(UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,payload=>{
+   if(!payload||!isIdentifier(payload.noteId)||typeof payload.text!=='string'||!payload.text.trim()||payload.text.length>2000)
+    return reject('INVALID_FIGURE_NOTE','수정할 주석 ID와 내용을 확인하세요.');
+   const figure=selectedFigure();
+   if(!figure)return reject('INVALID_FIGURE_SELECTION','그림을 선택한 후 여백 주석을 수정하세요.');
+   const note=figure.getChildren().find(child=>child instanceof NoteNode&&child.getKind()==='marginnote'&&child.getNoteId()===payload.noteId);
+   if(!(note instanceof NoteNode))return reject('FIGURE_NOTE_NOT_FOUND','선택한 그림에 해당 여백 주석이 없습니다.');
+   if(note.getTextContent()===payload.text)return true;
+   $addUpdateTag(HISTORY_PUSH_TAG);
+   note.clear();note.append($createTextNode(payload.text));note.selectEnd();return true;
   },COMMAND_PRIORITY_EDITOR)
  ];
  return ()=>registrations.forEach(dispose=>dispose());
