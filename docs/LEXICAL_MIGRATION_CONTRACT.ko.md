@@ -205,3 +205,10 @@ Migration은 입력을 변경하지 않는 순수 함수여야 하며, 동일 �
 - `restorePostBackupV2`: 현재 record와 백업의 id/slug를 대조하고, 기존 revision을 유지한 채 덮어쓰지 않고 `expectedRevision+1`로 CAS 복원한다. 오래된 revision을 사용한 재시도는 거부한다.
 - 복원 시 `createdAt`/`updatedAt`은 현재 record 값을 유지한다. 운영 시 변경 시각을 갱신하고 상태 전환을 검사하는 별도 게시물 서비스 계층이 필요하다.
 - 이는 메모리상의 백업 데이터 계약이며 파일 내구성, 자동 백업, 삭제 복구, 원자적 백업 파일 쓰기를 구현하지 않는다. 단위 테스트 미실행.
+
+## Node 로컬 파일 백업 어댑터 (2026-10-16)
+
+- `packages/document/scripts/backup-file.mjs`: host가 지정한 경로에만 백업. `wx` 임시 파일, 파일 fsync, 동일 디렉터리 rename, 가능한 경우 디렉터리 fsync를 수행한다.
+- `readPostBackupFile`은 기본 16 MiB 상한, JSON 파싱, 백업 형식 검증을 수행한다. 백업 파일 roundtrip/손상/크기 초과 테스트 추가.
+- 경로 권한 검증과 symlink 방어는 host 책임이다. 디렉터리 fsync 실패는 현재 best-effort로 처리하며 모든 파일시스템의 crash durability를 보장하지 않는다. D1 환경에는 이 Node 스크립트를 사용할 수 없다.
+- 실제 테스트 실행 미확인. 원자적 DB snapshot과 파일 백업 간 일관성, 삭제 복구는 미구현.
