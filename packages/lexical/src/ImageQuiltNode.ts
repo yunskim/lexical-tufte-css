@@ -1,7 +1,7 @@
 import {isSafeURL,isIdentifier} from '@lexical-tufte/document';
 import {$applyNodeReplacement,DecoratorNode,type NodeKey,type SerializedLexicalNode,type DOMExportOutput} from 'lexical';
 
-export type SerializedImageQuilt=SerializedLexicalNode&{type:'tufte-imagequilt';version:1;src:string;alt:string;assetId?:string;width?:number;height?:number};
+export type SerializedImageQuilt=SerializedLexicalNode&{type:'tufte-imagequilt';version:1;src:string;alt:string;assetId?:string;width:number;height:number};
 function validate(src:unknown,alt:unknown,assetId:unknown,width:unknown,height:unknown):void{
  if(!isSafeURL(src,'image')||typeof alt!=='string'||width===undefined||height===undefined
   ||(assetId!==undefined&&!isIdentifier(assetId))
@@ -10,10 +10,10 @@ function validate(src:unknown,alt:unknown,assetId:unknown,width:unknown,height:u
 }
 /** Inserts an already composed ImageQuilt asset; not an image-composition editor. */
 export class ImageQuiltNode extends DecoratorNode<null>{
- __src:string;__alt:string;__assetId?:string;__width?:number;__height?:number;
+ __src:string;__alt:string;__assetId?:string;__width:number;__height:number;
  static getType():string{return 'tufte-imagequilt';}
  static clone(node:ImageQuiltNode):ImageQuiltNode{return new ImageQuiltNode(node.__src,node.__alt,node.__assetId,node.__width,node.__height,node.__key);}
- constructor(src:string,alt:string,assetId?:string,width?:number,height?:number,key?:NodeKey){
+ constructor(src:string,alt:string,assetId?:string,width:number=0,height:number=0,key?:NodeKey){
   super(key);this.__src=src;this.__alt=alt;this.__assetId=assetId;this.__width=width;this.__height=height;
  }
  decorate():null{return null;}
@@ -43,7 +43,7 @@ export class ImageQuiltNode extends DecoratorNode<null>{
   return $createImageQuiltNode(value.src,value.alt,value.assetId,value.width,value.height);
  }
 }
-export function $createImageQuiltNode(src:string,alt:string,assetId?:string,width?:number,height?:number):ImageQuiltNode{
+export function $createImageQuiltNode(src:string,alt:string,assetId?:string,width:number=0,height:number=0):ImageQuiltNode{
  validate(src,alt,assetId,width,height);
  return $applyNodeReplacement(new ImageQuiltNode(src,alt,assetId,width,height));
 }
