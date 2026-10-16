@@ -21,3 +21,9 @@ details {margin-top:2rem;} .notice {color:#555;font-size:.9rem;}
 .editor figcaption {font-size:1rem;}
 .editor [data-tufte-editor=table-layout] {overflow-x:auto;margin:1rem 0;}
 .editor td,.editor th {border:1px solid #999;padding:.4rem;}
+
+.text-underline {text-decoration:underline;}
+.text-strike {text-decoration:line-through;}
+.text-underline-strike {text-decoration:underline line-through;}
+.text-highlight {background:#fff09b;color:#111;}
+@media(prefers-color-scheme:dark){.text-highlight {background:#6b5700;color:#fff;}}

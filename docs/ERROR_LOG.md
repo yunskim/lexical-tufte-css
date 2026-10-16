@@ -423,3 +423,23 @@ E001–E049/M001–M042를 검토했다. E024의 경계 입력은 실제 Chromiu
 - 발견: 첫 섹션에 figure가 있다고 가정한 테스트 입력 변경기가 undefined.children으로 실패했다. 실제 golden은 그림/표가 두 번째 섹션에 있다.
 - 처리: 전체 트리에서 type으로 fixture 대상을 찾는다. 제품 오류와 테스트 준비 오류를 구분한다.
 - 상태: verified (React 3종 구조 복구와 전체187개·브라우저7개). M049 참조.
+
+## E057 — R10 링크 전체 텍스트 교체와 내부 수정의 기대값 혼동
+
+- 발견: 포맷 토글은 링크 URL을 보존했으나 링크 전체 텍스트 선택 후 입력으로 교체하면 Lexical이 링크 컨테이너를 제거해 URL 유지 assertion이 실패했다.
+- 처리: 포맷 토글 후 URL 보존을 별도 확인하고, 내부 caret 입력의 포맷·링크 유지 회귀를 추가한다. 전체 링크를 지우고 새 텍스트를 넣는 기본 동작을 내부 텍스트 수정과 혼동하지 않는다. 링크 전체 교체 UX 정책은 P2 편집 기능에서 별도 다룬다.
+- 상태: verified (포맷/내부 수정의 URL 보존과 전체189개·브라우저8개). M050 참조. 링크 전체 교체 동작 자체를 수정했다고 주장하지 않는다.
+
+## E058 — 주석 전체 payload에 붙여넣을 때 주석 컨테이너 유실
+
+- 발견: R10 clipboard 실제 입력에서 여백 주석의 전체 텍스트를 선택해 붙여넣으면 note가 제거되어 noteId를 찾을 수 없었다.
+- 원인: 기본 RangeSelection.insertNodes가 선택한 inline container까지 교체한다. 기존 helper는 collapsed edge만 처리했다.
+- 처리: 같은 주석의 처음부터 끝까지 선택한 payload 교체는 NoteNode를 유지한 채 자식만 바꾼다. forward/backward 단위 회귀와 실제 clipboard로 noteId/kind/format 보존을 검사한다.
+- 상태: verified (실제 clipboard 및 양방향 회귀, 전체189개·브라우저8개). M051 참조.
+
+## E059 — 주석 교체 수정에서 일시적 빈 컨테이너와 선택 유실
+
+- 발견: E058 첫 수정의 note.clear() 후 append가 실제 단위 테스트에서 selection lost를 발생시켰다.
+- 원인: NoteNode.canBeEmpty=false이므로 자식을 먼저 모두 지우면 컨테이너가 제거된다. 최종 상태만 생각하고 중간 상태의 Lexical 불변식을 놓쳤다.
+- 처리: 새 payload를 먼저 append한 후 이전 자식을 제거하고 새 끝으로 선택을 이동한다. 빈 중간 상태를 만들지 않는다.
+- 상태: verified (양방향 선택과 clipboard 및 전체 회귀). M052 참조.

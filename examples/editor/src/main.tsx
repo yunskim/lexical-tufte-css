@@ -196,6 +196,7 @@ function EditorUI(){
       <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(FORMAT_TEXT_COMMAND,'bold')}>굵게</button>
       <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(FORMAT_TEXT_COMMAND,'italic')}>기울임</button>
       <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(FORMAT_TEXT_COMMAND,'code')}>코드</button>
+      {([['underline','밑줄'],['strikethrough','취소선'],['highlight','마크']] as const).map(([format,label])=><button key={format} onMouseDown={preserve} onClick={()=>editor.update(()=>{editor.dispatchCommand(FORMAT_TEXT_COMMAND,format);},{tag:HISTORY_PUSH_TAG})}>{label}</button>)}
       <button onMouseDown={preserve} onClick={()=>insertPayload('link')}>노트 링크 삽입</button>
       <button onMouseDown={preserve} onClick={()=>insertPayload('image')}>노트 이미지 삽입</button>
       <button onMouseDown={preserve} onClick={()=>noteOperation('split')}>노트 나누기</button>
@@ -217,4 +218,4 @@ function EditorUI(){
     <p className="notice">프로토타입: 공개 발행·모바일 여백 배치·OS별 실제 IME와 다른 브라우저 검증은 후속 단계에서 진행합니다. 한글 웹폰트 자산 연결은 P4 대상입니다.</p>
   </>;
 }
-createRoot(document.getElementById('root')!).render(<LexicalComposer initialConfig={{namespace:'tufte-p1',nodes:TUFTE_NODES,editorState:seed,onError(error){throw error;},theme:{text:{bold:'text-bold',italic:'text-italic',code:'text-code'}}}}><EditorUI/></LexicalComposer>);
+createRoot(document.getElementById('root')!).render(<LexicalComposer initialConfig={{namespace:'tufte-p1',nodes:TUFTE_NODES,editorState:seed,onError(error){throw error;},theme:{text:{bold:'text-bold',italic:'text-italic',code:'text-code',underline:'text-underline',strikethrough:'text-strike',underlineStrikethrough:'text-underline-strike',highlight:'text-highlight'}}}}><EditorUI/></LexicalComposer>);

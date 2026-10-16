@@ -801,3 +801,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - structureRecovery.ts의 비파괴 검사/문제 위치 이동, 실제 예제 복구 패널·undo 가능한 checkpoint 복구·항상 노출된 복구 사본 열기 구현. 자동 삭제나 임의 이미지/표 생성 없음.
 - 무효 raw 상태는 별도 recovery localStorage에만 저장. 일반 저장 보호, prototype HTML 생성 차단 및 정본 renderArticle 전체 발행 차단. [정책](STRUCTURE_RECOVERY_R05.ko.md)에 전체 validator와 구조 검사 차이/메모리 checkpoint 제한 명시.
 - check187/187(document47·lexical112·render28, fail/skip0), browser7, diff check 통과. E055/E056 및 M048/M049 기록·반영. CI 생략. R05 체크, 다음 R10.
+
+
+## 2026-10-16 R10 — 텍스트 포맷 편집·발행 완료
+
+- React 툴바에 밑줄/취소선/마크, 결합 decoration 및 light/dark 마크 CSS 연결. 본문·굵은 주석·링크에서 각 비트/조합/해제/undo·redo/내부 수정/저장 재열기를 검증했다.
+- 실제 clipboard의 전체 주석 payload 교체에서 컨테이너 유실(E058)과 첫 수정의 빈 중간 상태(E059)를 수정. 기존 noteId/kind 및 포맷·주변 본문 보존, forward/backward 회귀 통과. E057의 전체 링크 교체는 기본 입력 의미로 별도 문서화.
+- 정본 renderer의 u/s/mark 의미·URL·주석/strong 관계 및 실제 결합 CSS 확인. [계약](TEXT_FORMAT_R10.ko.md). check189/189(document47·lexical114·render28, fail/skip0), browser8 및 대상 clipboard 실행 통과. diff check 통과. CI 생략. R10 체크, 다음 R11.

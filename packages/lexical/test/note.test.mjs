@@ -1,9 +1,9 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createHeadlessEditor} from '@lexical/headless';
-import {$getRoot,$createParagraphNode,$createTextNode} from 'lexical';
+import {$getRoot,$createParagraphNode,$createTextNode,$getSelection} from 'lexical';
 import {LinkNode,$createLinkNode} from '@lexical/link';
-import {NoteNode,InlineImageNode,$createNoteNode,$createInlineImageNode,$reidentifyPastedNotes,$prepareNoteComposition,TufteSpanNode,$createTufteSpanNode} from '../dist/index.js';
+import {NoteNode,InlineImageNode,$createNoteNode,$createInlineImageNode,$reidentifyPastedNotes,$prepareNoteComposition,TufteSpanNode,$createTufteSpanNode,$insertNotePhrasing} from '../dist/index.js';
 function editor(){return createHeadlessEditor({namespace:'note-test',nodes:[NoteNode,InlineImageNode,LinkNode,TufteSpanNode],onError(error){throw error;}});}
 test('rich inline note survives JSON restore with type, identity and body position',()=>{
  const e=editor();
@@ -138,4 +138,14 @@ test('F05 rejects unknown Tufte inline kind during import',()=>{
   assert.throws(()=>$createTufteSpanNode('unexpected'),/Invalid Tufte span kind/);
   assert.throws(()=>TufteSpanNode.importJSON({type:'tufte-span',version:1,kind:'unexpected',children:[]}),/Unsupported Tufte span/);
  },{discrete:true});
+});
+
+for(const backward of [false,true])test(`R10 full note payload paste retains identity and formats (${backward?'backward':'forward'})`,()=>{
+ const e=editor();e.update(()=>{
+  const old=$createTextNode('old payload'),note=$createNoteNode('replace-payload','marginnote').append(old);
+  $getRoot().append($createParagraphNode().append($createTextNode('before'),note,$createTextNode('after')));
+  old.select(backward?old.getTextContentSize():0,backward?0:old.getTextContentSize());
+  $insertNotePhrasing($getSelection(),[$createTextNode('new payload').setFormat(140)]);
+ },{discrete:true});
+ const nodes=e.getEditorState().toJSON().root.children[0].children;assert.equal(nodes[1].noteId,'replace-payload');assert.equal(nodes[1].kind,'marginnote');assert.equal(nodes[1].children[0].text,'new payload');assert.equal(nodes[1].children[0].format,140);assert.equal(nodes[0].text,'before');assert.equal(nodes[2].text,'after');
 });

@@ -52,6 +52,16 @@ export function $moveNote(note:NoteNode,direction:'previous'|'next'):boolean {
 /** Keep programmatic insertion at a note edge in the note, like native typing. */
 export function $insertNotePhrasing(selection:RangeSelection,nodes:LexicalNode[]):void {
   const anchor=selection.anchor.getNode();
+  const note=$getContainingNote(anchor),focus=selection.focus.getNode();
+  if(note&&nodes.length&&!selection.isCollapsed()&&note.is($getContainingNote(focus))){
+    const start=selection.isBackward()?selection.focus:selection.anchor;
+    const end=selection.isBackward()?selection.anchor:selection.focus;
+    const first=note.getFirstDescendant(),last=note.getLastDescendant();
+    if(first&&last&&start.getNode().is(first)&&start.offset===0&&$isTextNode(last)&&end.getNode().is(last)&&end.offset===last.getTextContentSize()){
+      // Replacing the whole payload must retain its note identity/container.
+      const previous=note.getChildren();note.append(...nodes);for(const child of previous)child.remove();note.selectEnd();return;
+    }
+  }
   if(selection.isCollapsed()&&$isTextNode(anchor)&&anchor.getParent() instanceof NoteNode){
     const offset=selection.anchor.offset;
     if(offset===0||offset===anchor.getTextContentSize()){

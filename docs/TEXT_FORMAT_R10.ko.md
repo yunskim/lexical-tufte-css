@@ -23,4 +23,13 @@ Lexical 텍스트의 format bitmask 중 underline(8), strikethrough(4), highligh
 
 ## 검증
 
-`packages/render/test/render.test.mjs`에 각 비트 및 조합의 의미 태그 직렬화 검사를 추가했다. 테스트 실행과 편집기 입력 검증은 E025 환경 차단으로 보류한다. R10 완료 조건은 발행 테스트 실행과 편집기에서 해당 포맷의 생성·수정·저장·재열기 확인이다.
+`packages/render/test/render.test.mjs`의 각 비트/조합 의미 태그 검사를 실행했다. 실제 React 툴바에 밑줄·취소선·마크 버튼과 결합 decoration class를 연결했다. `tests/text-format-browser.mjs`가 본문·굵은 주석·링크에서 각 비트/조합/토글 해제/undo·redo/내부 caret 수정/저장·재열기 및 정본 renderer의 의미 태그·URL·주석 소속을 확인한다. 실제 clipboard로 본문의 조합 포맷을 여백 주석에 붙여넣는 경로도 검사한다.
+
+포맷 토글과 링크 내부 수정은 URL을 유지한다. 링크 전체 텍스트 선택 후 새 텍스트로 교체하면 현재 Lexical 기본 동작이 링크 컨테이너를 제거할 수 있다(E057). 이를 포맷 토글의 부작용이나 내부 수정과 동일하게 취급하지 않는다. 전체 링크 교체 UX는 P2 입력 정책에서 다룬다.
+
+밑줄+취소선은 `.text-underline-strike`로 두 장식을 함께 표시한다. 편집기 마크는 light/dark 색상을 제공하지만 전체 접근성 대비·OS 실제 IME·다른 브라우저 검증은 P6에 남는다. 현재 검증은 Chromium의 실제 입력/clipboard 및 기존 합성 composition 회귀 범위다. CI는 생략한다.
+
+
+전체 주석 payload 붙여넣기는 기존 noteId/kind를 유지한 채 자식만 교체한다. 새 자식을 먼저 추가하고 이전 자식을 제거해 canBeEmpty=false 컨테이너와 선택을 보존한다(E058/E059, M051/M052). 양방향 선택 단위 검사와 실제 clipboard 검사를 실행한다.
+
+2026-10-16 결과: `pnpm check` 189/189(document47·lexical114·render28), 실패/skip0. `pnpm test:browser` 8개 실행 파일 및 대상 clipboard 별도 실행 통과. diff check 통과. CI 생략.
