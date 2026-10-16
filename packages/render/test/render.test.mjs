@@ -51,14 +51,16 @@ test('valid future node/data schemas do not imply renderer support',()=>{
 
 test('length-delimited namespaces avoid prefix and note ID ambiguity',()=>{
  const a=fixture(),b=fixture();
- note(a).noteId='c';note(b).noteId='b-c';
- const first=renderArticle(a,{idPrefix:'a-b'});
+ note(a).noteId='c';note(b).noteId='b-note-c';
+ const first=renderArticle(a,{idPrefix:'a-note-b'});
  const second=renderArticle(b,{idPrefix:'a'});
+ // Legacy "prefix-note-noteId" yielded "a-note-b-note-c" for both.
+ assert.equal('a-note-b'+'-note-'+'c','a'+'-note-'+'b-note-c');
  assert.equal(first.ok,true,JSON.stringify(first.diagnostics));
  assert.equal(second.ok,true,JSON.stringify(second.diagnostics));
  const id=html=>html.match(/<input id="([^"]+)" type="checkbox"/)?.[1];
- assert.equal(id(first.html),'tufte-3-a-b-c');
- assert.equal(id(second.html),'tufte-1-a-b-c');
+ assert.equal(id(first.html),'tufte-8-a-note-b-c');
+ assert.equal(id(second.html),'tufte-1-a-b-note-c');
  assert.notEqual(id(first.html),id(second.html));
  for(const result of [first,second])assert.ok(result.html.includes('for="'+id(result.html)+'"'));
 });
