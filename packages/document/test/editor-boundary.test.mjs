@@ -76,8 +76,9 @@ test('R03 canonical serialization ignores object key order but preserves array o
  assert.equal(first.value,second.value);
  const changed=structuredClone(base);
  // Force two distinct, valid sections so this assertion cannot silently skip.
- const section=structuredClone(changed.lexicalState.root.children[0]);
- assert.equal(section.type,'tufte-section');
+ const originalSection=changed.lexicalState.root.children[0];
+ assert.equal(originalSection.type,'tufte-section');
+ const section={type:'tufte-section',version:1,children:[]};
  // Distinguish the sections without duplicating note IDs or asset references.
  // A plain paragraph with a unique text node satisfies the section contract.
  section.children=[{
