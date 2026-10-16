@@ -14,3 +14,4 @@ export {DefinitionListNode,DefinitionTermNode,DefinitionDescriptionNode,$createD
 export {EpigraphNode,AttributionNode,CiteNode,$createEpigraphNode,$createAttributionNode,$createCiteNode} from './QuotationNodes.js';
 export {SectionFooterNode,$createSectionFooterNode} from './SectionFooterNode.js';
 export {FullwidthNode,$createFullwidthNode} from './FullwidthNode.js';
+export {TufteCodeNode,$createTufteCodeNode,type CodeWidth,type SerializedTufteCode} from './CodeBlockNode.js';
