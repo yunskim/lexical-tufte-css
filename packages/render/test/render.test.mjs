@@ -95,7 +95,7 @@ test('a mixed or non-leading column header row remains in tbody',()=>{
  first.children[0].headerState=0;
  const rendered=renderArticle(d);
  assert.equal(rendered.ok,true,JSON.stringify(rendered.diagnostics));
- const tables=[...rendered.html.matchAll(/<table(?: [^>]*)?>[\\s\\S]*?<\\/table>/g)].map(m=>m[0]);
+ const tables=[...rendered.html.matchAll(/<table(?: [^>]*)?>[\s\S]*?<\/table>/g)].map(m=>m[0]);
  assert.ok(tables.length>=1);
  assert.doesNotMatch(tables[0],/<thead>/);
  assert.match(tables[0],/<tbody><tr/);
