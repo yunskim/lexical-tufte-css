@@ -201,3 +201,8 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - R11: docs/PUBLICATION_LIFECYCLE_R11.ko.md에서 초안·불변 공개 스냅샷 분리, 최초 발행 시각, publishedRevision, 원자적 공개 포인터 전환을 정의했다. 실제 저장 구현과 테스트는 미완료.
 - R12: packages/document/src/storageKeys.ts에 ID 기반 상대 저장 경로, Windows 예약 장치명 차단, slug 대소문자 충돌 키를 구현했다. test/storage-keys.test.mjs와 docs/STORAGE_PATH_R12.ko.md 추가.
 - R12의 실제 adapter-fs 경로 해석·심볼릭 링크·원자 저장·다중 OS 검증 및 테스트 실행은 미완료(E025). 완료 체크 보류.
+
+## 2026-10-16 — R13 라이선스 및 한글 폰트 배포 정책
+
+- docs/LICENSE_AND_FONTS_R13.ko.md: GPL-3.0-only 현행 상태, 외부 재사용 시나리오, 권리자 결정 필요 항목, 본명조/본고딕 WOFF2 subset 및 unicode-range 검증 체크리스트 작성.
+- 라이선스 변경을 임의로 결정하지 않음. 폰트 실측과 브라우저 검증 미실행. R13 완료 체크 보류.
