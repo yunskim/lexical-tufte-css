@@ -141,3 +141,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - 테스트 추가: note.test.mjs에 노트·이미지·링크의 JSON 왕복 사례와 잘못된 이미지/노트 입력 거부 사례를 추가했다.
 - 검증: 미실행. 이 세션에서는 GitHub 직접 clone이 DNS 해석에 실패했고 pnpm 명령이 설치되어 있지 않다. pnpm check 및 브라우저 테스트 통과를 주장하지 않는다.
 - R01/R02는 완료 처리하지 않는다. 다음: 검증 환경에서 install --frozen-lockfile, check, test:browser를 실행하고 결과를 기록한다.
+
+## 2026-10-16 — R04 브라우저 회귀 보강
+
+- tests/note-editing-browser.mjs: 노트 시작 경계에서 단일 키 입력이 정확히 한 번만 삽입되고 노트 JSON 내부에 남는 회귀 시나리오 추가.
+- 기존 브라우저 시나리오: 복사/붙여넣기 시 noteId 충돌, cut/paste ID 유지, 한글 조합 시작/끝 및 취소 검사가 이미 존재함을 재확인.
+- E024/M023의 실제 브라우저 검증은 미실행. 로컬 pnpm check/test:browser 및 OS별 IME 실행 증거가 없어 R04 체크리스트는 열어 둔다.
+- 다음: 클립보드 내부 참조 형식 확정, ID 재발급 시 참조 갱신 정책 구현, 실제 브라우저 테스트 실행.
