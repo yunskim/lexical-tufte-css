@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync,writeFileSync,existsSync,mkdirSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {dirname} from 'node:path';
+import {createRequire} from 'node:module';
 import {createHeadlessEditor} from '@lexical/headless';
 import {$getRoot,$createParagraphNode,$createTextNode} from 'lexical';
 import {SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,$createTableLayoutNode,$createFigureNode,$createCaptionNode,$createInlineImageNode,$createSectionNode,$createNoteNode,$createTufteSpanNode,loadDocumentIntoEditor,exportEditorToDocument} from '../dist/index.js';
@@ -205,6 +206,12 @@ test('R02 Lexical 0.52.0 generated golden snapshot (explicit update only)',t=>{
  const snapshot=new URL('./golden/lexical-0.52.0-document.json',import.meta.url);
  const actual=JSON.stringify(state,null,2)+'\n';
  if(process.env.UPDATE_LEXICAL_GOLDEN==='1'){
+  const require=createRequire(import.meta.url);
+  const installed=require('lexical/package.json').version;
+  assert.equal(installed,'0.52.0','Refuse to record golden output from a different Lexical version');
+  if(existsSync(snapshot)&&process.env.OVERWRITE_LEXICAL_GOLDEN!=='1'){
+   assert.fail('Existing golden is protected; review changes and explicitly set OVERWRITE_LEXICAL_GOLDEN=1');
+  }
   mkdirSync(dirname(fileURLToPath(snapshot)),{recursive:true});
   writeFileSync(snapshot,actual,'utf8');
  }
