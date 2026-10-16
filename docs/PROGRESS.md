@@ -583,3 +583,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - `readSqlitePostSnapshotV2` 추가: 단일 SELECT로 id/slug/revision/payload 조회 및 행-문서 일치 검증.
 - 실제 SQLite 엔진용 조회/CAS 후 최신 스냅샷 회귀 테스트 작성. 실행 미확인.
 - D1 실행 검증과 장애 복구는 미완료. CI 없음.
+
+## 2026-10-16 — SQLite snapshot→파일 백업 연결
+
+- `scripts/sqlite-backup.mjs`에서 단일 SQLite 조회, expectedRevision 검사, 파일 백업을 연결.
+- 조회 실패 및 revision 충돌 시 기존 백업 파일을 보존하는 실제 SQLite 통합 테스트 작성.
+- 코드 리뷰 중 Result 봉투를 record로 전달하는 초안 오류를 발견하여 같은 작업에서 수정. 실행 검증 미완, CI 없음.
