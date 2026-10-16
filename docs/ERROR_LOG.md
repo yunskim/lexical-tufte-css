@@ -246,3 +246,9 @@
 - 발견: 2026-10-16 R11 점검. `editorJSONToDocument()`가 validateDocument 결과를 그대로 반환하므로 lexicalState가 호출자/편집기 소유의 mutable state를 참조할 수 있었다.
 - 처리: 성공 시 문서 전체를 structuredClone하여 반환. editor state와 base metadata를 사후 변경하는 회귀 추가.
 - 상태: 코드·테스트 반영, 실행 검증 대기(E025/E027). M028 확대 적용.
+
+## E032 — R03 테스트 fixture의 빈 섹션 생성
+
+- 발견: 2026-10-16 테스트 자체 검토. 배열 순서 검사를 무조건 수행하도록 변경하면서 synthetic section의 children을 비웠으나 schema는 빈 tufte-section을 거부한다.
+- 수정: 유효한 원본 section을 복제하고 기존 자식 하나를 추가해 유효하고 서로 다른 두 섹션을 구성한다.
+- 검증: 코드 검토 완료, 실행 테스트 미확인.
