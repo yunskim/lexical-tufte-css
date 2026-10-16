@@ -150,3 +150,9 @@ Migration은 입력을 변경하지 않는 순수 함수여야 하며, 동일 �
 - v1 기준: `fixtures/tufte/server-document.json`; v2 예상 결과: `fixtures/tufte/server-document-v2.json`.
 - 두 fixture는 문서 envelope의 v1→v2 필드 추가만 다르며, document 테스트에서 migration 출력과 v2 golden의 전체 구조 동등성 및 lexicalState/assets 보존을 검사한다.
 - **주의:** v2 fixture는 v1에서 정적으로 파생된 envelope golden이며, 서로 다른 Lexical npm 버전에서 생성한 runtime golden이 아니다. Lexical 0.52.0 실물 parse/serialize 검증과 버전 업그레이드 비교는 아직 미완이다.
+
+## 저장된 v2 golden의 Lexical 경계 검증 (2026-10-16)
+
+- `packages/lexical/test/document-bridge.test.mjs`에서 `fixtures/tufte/server-document-v2.json`을 직접 로드해 `loadMigratedDocumentIntoEditor` → 실제 headless editor state → `exportEditorToDocumentV2` 전체 문서 동등성을 검사한다.
+- 지원하지 않는 `editorFormat.formatVersion`을 입력한 경우 로드 거부 및 editor state 불변성도 검사한다.
+- 이 검사는 고정된 저장 JSON의 현행 런타임 왕복을 위한 테스트 코드다. **실행하지 않았으며**, 과거/미래 Lexical npm 버전 간 호환성을 증명하지 않는다.
