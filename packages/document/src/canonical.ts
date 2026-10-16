@@ -9,7 +9,7 @@ export function canonicalizeDocument(input:unknown):Result<string>{
  const stable=(value:unknown):unknown=>{
   if(Array.isArray(value))return value.map(stable);
   if(value!==null&&typeof value==='object'){
-   const result:Record<string,unknown>={};
+   const result:Record<string,unknown>=Object.create(null) as Record<string,unknown>;
    for(const key of Object.keys(value).sort())result[key]=stable((value as Record<string,unknown>)[key]);
    return result;
   }
