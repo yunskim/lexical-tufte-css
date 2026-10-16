@@ -13,3 +13,4 @@ export {loadDocumentIntoEditor,loadMigratedDocumentIntoEditor,exportEditorToDocu
 export {DefinitionListNode,DefinitionTermNode,DefinitionDescriptionNode,$createDefinitionListNode,$createDefinitionTermNode,$createDefinitionDescriptionNode} from './DefinitionListNodes.js';
 export {EpigraphNode,AttributionNode,CiteNode,$createEpigraphNode,$createAttributionNode,$createCiteNode} from './QuotationNodes.js';
 export {SectionFooterNode,$createSectionFooterNode} from './SectionFooterNode.js';
+export {FullwidthNode,$createFullwidthNode} from './FullwidthNode.js';
