@@ -6,7 +6,7 @@ import {dirname,join,parse} from 'node:path';
 import {createRequire} from 'node:module';
 import {createHeadlessEditor} from '@lexical/headless';
 import {$getRoot,$createParagraphNode,$createTextNode,CLEAR_HISTORY_COMMAND,COMMAND_PRIORITY_CRITICAL} from 'lexical';
-import {SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,$createTableLayoutNode,$createFigureNode,$createCaptionNode,$createInlineImageNode,$createSectionNode,$createNoteNode,$createTufteSpanNode,loadDocumentIntoEditor,loadMigratedDocumentIntoEditor,exportEditorToDocument} from '../dist/index.js';
+import {SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,$createTableLayoutNode,$createFigureNode,$createCaptionNode,$createInlineImageNode,$createSectionNode,$createNoteNode,$createTufteSpanNode,loadDocumentIntoEditor,loadMigratedDocumentIntoEditor,exportEditorToDocument,exportEditorToDocumentV2} from '../dist/index.js';
 import {LinkNode} from '@lexical/link';
 import {createEmptyHistoryState,registerHistory} from '@lexical/history';
 import {NODE_SCHEMA,validateDocument} from '@lexical-tufte/document';
@@ -490,4 +490,24 @@ test('R03 actual HistoryPlugin state is cleared after document replacement',()=>
  assert.equal(history.undoStack.length,0);
  assert.equal(history.redoStack.length,0);
  unregister();
+});
+
+test('R03 v2 export preserves editor format after migrated import',()=>{
+ const source=editor();
+ source.update(()=>$getRoot().append($createSectionNode().append(
+  $createParagraphNode().append($createTextNode('v2 export'))
+ )),{discrete:true});
+ const legacy={...fixture(),lexicalState:source.getEditorState().toJSON()};
+ const destination=editor();
+ const loaded=loadMigratedDocumentIntoEditor(destination,legacy);
+ assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
+ const exported=exportEditorToDocumentV2(destination,loaded.value);
+ assert.equal(exported.ok,true,JSON.stringify(exported.diagnostics));
+ assert.equal(exported.value.schemaVersion,2);
+ assert.deepEqual(exported.value.editorFormat,{engine:'lexical',formatVersion:1});
+ assert.deepEqual(exported.value.lexicalState,legacy.lexicalState);
+ assert.notStrictEqual(exported.value,loaded.value);
+ const invalid=exportEditorToDocumentV2(destination,{...loaded.value,editorFormat:{engine:'lexical',formatVersion:99}});
+ assert.equal(invalid.ok,false);
+ assert.ok(invalid.diagnostics.some(d=>d.code==='UNSUPPORTED_EDITOR_FORMAT'));
 });
