@@ -1,8 +1,8 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createHeadlessEditor} from '@lexical/headless';
-import {$getRoot,$createParagraphNode,$createTextNode} from 'lexical';
-import {TUFTE_NODES,$createSectionNode,registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND} from '../dist/index.js';
+import {$getRoot,$createParagraphNode,$createTextNode,$createNodeSelection,$setSelection} from 'lexical';
+import {TUFTE_NODES,$createSectionNode,registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,$createFigureNode,$createInlineImageNode,$createCaptionNode,$createNoteNode,$reidentifyPastedNotes} from '../dist/index.js';
 
 function setup(){
  const diagnostics=[];
@@ -58,5 +58,46 @@ test('invalid asset identity and image dimensions are rejected before mutation',
  editor.dispatchCommand(INSERT_TUFTE_FIGURE_COMMAND,{src:'/image.png',alt:'diagram',imageWidth:-1});
  assert.equal(JSON.stringify(editor.getEditorState().toJSON()),before);
  assert.deepEqual(diagnostics.map(d=>d.code),['INVALID_FIGURE_PAYLOAD','INVALID_FIGURE_PAYLOAD']);
+ dispose();
+});
+
+test('figure marginnote is inserted before caption and rejects duplicate IDs',()=>{
+ const {editor,diagnostics,dispose}=setup();
+ editor.update(()=>{
+  const figure=$createFigureNode('body').append($createInlineImageNode('/image.png','diagram'),$createCaptionNode().append($createTextNode('caption')));
+  $getRoot().append($createSectionNode().append(figure));
+  const selection=$createNodeSelection();selection.add(figure.getKey());$setSelection(selection);
+ },{discrete:true});
+ editor.dispatchCommand(INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,{noteId:'figure-note-1',text:'margin annotation'});
+ editor.getEditorState().read(()=>{
+  const figure=$getRoot().getFirstChild().getFirstChild();
+  assert.deepEqual(figure.getChildren().map(n=>n.getType()),['tufte-inline-image','tufte-note','tufte-caption']);
+  const note=figure.getChildAtIndex(1);
+  assert.equal(note.getNoteId(),'figure-note-1');
+  assert.equal(note.getKind(),'marginnote');
+  assert.equal(note.getTextContent(),'margin annotation');
+ });
+ editor.update(()=>{
+  const figure=$getRoot().getFirstChild().getFirstChild();
+  const selection=$createNodeSelection();selection.add(figure.getKey());$setSelection(selection);
+ },{discrete:true});
+ editor.dispatchCommand(INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,{noteId:'figure-note-1',text:'duplicate'});
+ editor.getEditorState().read(()=>assert.equal($getRoot().getFirstChild().getFirstChild().getChildren().length,3));
+ assert.deepEqual(diagnostics.map(d=>d.code),['DUPLICATE_NOTE_ID']);
+ dispose();
+});
+
+test('clipboard note reidentification traverses notes nested inside figures',()=>{
+ const {editor,dispose}=setup();
+ editor.update(()=>{
+  const existing=$createNoteNode('figure-note-1','marginnote').append($createTextNode('original'));
+  const original=$createFigureNode().append($createInlineImageNode('/original.png','original'),existing);
+  const pasted=$createFigureNode().append($createInlineImageNode('/copy.png','copy'),$createNoteNode('figure-note-1','marginnote').append($createTextNode('copied')));
+  $getRoot().append($createSectionNode().append(original,pasted));
+  const changes=$reidentifyPastedNotes([pasted],new Set(),()=> 'figure-note-2');
+  assert.deepEqual(changes.get('figure-note-1'),['figure-note-2']);
+  assert.equal(existing.getNoteId(),'figure-note-1');
+  assert.equal(pasted.getLastChild().getNoteId(),'figure-note-2');
+ },{discrete:true});
  dispose();
 });
