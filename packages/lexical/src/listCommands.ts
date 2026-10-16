@@ -30,7 +30,7 @@ export function registerListCommands(editor:LexicalEditor,onDiagnostic?:(diagnos
    while(block.getParent()&&!block.getParent()!.is(section))block=block.getParent()!;
    if(!block.getParent()?.is(section))return reject('유효한 섹션 블록을 선택하세요.');
    $addUpdateTag(HISTORY_PUSH_TAG);
-   const item=$createListItemNode().append();
+   const item=$createListItemNode();
    const list=$createListNode(kind).append(item);
    block.insertAfter(list);item.selectStart();return true;
   },COMMAND_PRIORITY_EDITOR),
