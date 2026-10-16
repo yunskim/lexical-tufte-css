@@ -122,3 +122,9 @@ E024/M023의 beforeinput 이벤트 취소 시점은 discrete update 사용만으
 
 - E030/M028을 내보내기 경계까지 확장했다(E031). 가져오기뿐 아니라 `editorJSONToDocument` 성공 결과도 원본 state·base와 참조를 공유하지 않도록 복제한다.
 - 다음 검증: R11 양방향 alias 회귀, pnpm check. 실제 실행 전에는 완료 체크하지 않는다.
+
+## M029 — 회귀 테스트 fixture도 문서 계약으로 검증
+
+- 스키마 검증을 대상으로 하는 테스트에서 새로 만든 성공 fixture는 먼저 validateDocument/canonicalizeDocument 성공을 단언한다.
+- 조건부 단언을 제거할 때도 테스트 데이터의 노드별 비어 있음 제약과 자식 배치 규칙을 확인한다.
+- E032 수정에 반영. 실행 검증은 후속.
