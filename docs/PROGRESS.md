@@ -490,3 +490,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 
 - @lexical/history의 실제 history state와 registerHistory를 이용한 테스트 추가. 거부된 문서에서는 undo/redo 유지, 성공한 교체에서는 양쪽 스택 비움을 단언.
 - 환경 제약으로 테스트/타입 검사 미실행. 실행 결과가 없으므로 R03 완료 체크 보류, CI 없음.
+
+## 2026-10-16 — R03 v2 export API
+
+- `exportEditorToDocumentV2` 구현·공개 export. v2 base 검증 → v1 editor state 검증 → v2 재검증으로 편집기 저장 경계에서 editorFormat 손실 방지.
+- migrated v1→v2 load 이후 v2 export roundtrip 및 unsupported editor format 거부 테스트 추가.
+- 타입 검사/테스트 미실행. R03.c 골든·브라우저·HistoryPlugin 검증 및 P5 저장 트랜잭션 미완. CI 없음.
