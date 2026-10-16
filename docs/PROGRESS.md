@@ -384,3 +384,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 
 - synthetic section 복제 시 noteId가 중복될 수 있는 문제(E033)를 발견하고, 두 번째 section의 자식을 독립 text paragraph로 대체.
 - M030 예방 규약 반영. 실행 검증 미확인, R03 체크 보류, CI 없음.
+
+## 2026-10-16 — R03 최소 fixture 구성
+
+- canonical 배열 순서 테스트의 두 번째 section을 기존 section 복제 대신 `{type:'tufte-section',version:1,children:[...]}`로 직접 구성.
+- E032/E033/M029/M030에서 발견한 빈 노드 및 전역 note ID 중복 위험을 fixture 구조 차원에서 차단.
+- 실제 테스트 실행은 미확인. R03 완료 체크 보류, CI 없음.
