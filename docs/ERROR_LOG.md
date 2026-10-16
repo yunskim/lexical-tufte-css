@@ -234,3 +234,9 @@
 - 발견: 2026-10-16 R02 검토. `require('lexical/package.json')`는 패키지의 exports 설정에 따라 ERR_PACKAGE_PATH_NOT_EXPORTED를 낼 수 있어 버전 확인 방법으로 불안정하다.
 - 처리: 공개 엔트리 `require.resolve('lexical')`의 실제 설치 위치에서 상위 package.json을 탐색하고 name=lexical인 manifest의 version을 검사하도록 수정.
 - 상태: 코드 수정, 의존성 설치 후 실제 검증 대기(E025/E027). M027 참조.
+
+## E030 — 가져오기 성공 결과의 호출자 객체 alias
+
+- 발견: 2026-10-16 R11 코드 점검. `loadDocumentIntoEditor()`가 검증 성공 후 `input as TufteDocument`를 그대로 반환하여 호출자 수정이 성공 결과를 바꾸는 alias가 있었다.
+- 처리: editor 상태 적용 전 구조화 복제본을 만들고 성공 결과로 반환. 호출자 title 및 lexicalState 변경 후 결과 불변성을 검사하는 회귀 테스트 추가.
+- 상태: 코드/테스트 반영, 실행 검증 대기(E025/E027). M028 참조.
