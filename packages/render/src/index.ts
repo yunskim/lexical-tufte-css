@@ -1,6 +1,6 @@
 import {validateDocument,type JsonNode,type Diagnostic,type ElementFields} from '@lexical-tufte/document';
 import {validateRenderProfile} from './profile.js';
-import {element,serializeHTML,type RenderChild} from './tree.js';
+import {element,serializeHTML} from './tree.js';
 export {element,serializeHTML,type RenderElement,type RenderChild} from './tree.js';
 export {parseDocument,validateDocument,isSafeURL,type TufteDocument,type JsonNode,type Diagnostic,type AssetRef} from '@lexical-tufte/document';
 export {RENDER_PROFILE} from './profile.js';
@@ -48,6 +48,13 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
  }
  const root=doc.lexicalState.root;
  const rootClass=`tufte-article${root.format?` tufte-align-${root.format}`:""}`;
- const html=`<article id="${prefix}-article" lang="${esc(doc.locale)}"${root.direction?` dir="${root.direction}"`:""} class="${rootClass}"><h1>${esc(doc.title)}</h1>${doc.subtitle!==undefined?`<p class="subtitle">${esc(doc.subtitle)}</p>`:''}${render(doc.lexicalState.root)}</article>`;
+ const article=element('article',{
+  id:`${prefix}-article`,lang:doc.locale,class:rootClass,
+  ...(root.direction?{dir:String(root.direction)}:{}),
+ },[element('h1',{},[doc.title]),...(doc.subtitle!==undefined?[element('p',{class:'subtitle'},[doc.subtitle])]:[])]);
+ // Existing node renderer remains a legacy HTML-string adapter until all
+ // node cases have been migrated to the typed tree.
+ const opening=serializeHTML(article).replace('</article>','');
+ const html=opening+render(doc.lexicalState.root)+'</article>';
  return {ok:true,html,diagnostics:[]};
 }
