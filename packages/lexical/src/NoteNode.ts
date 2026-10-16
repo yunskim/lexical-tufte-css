@@ -1,4 +1,4 @@
-import {isIdentifier} from '../../document/src/schema.js';
+import {isIdentifier} from '@lexical-tufte/document';
 import {
   $applyNodeReplacement, ElementNode, isHTMLElement,
   type EditorConfig, type LexicalEditor, type NodeKey,
