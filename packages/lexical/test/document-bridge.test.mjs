@@ -6,7 +6,7 @@ import {dirname,join,parse} from 'node:path';
 import {createRequire} from 'node:module';
 import {createHeadlessEditor} from '@lexical/headless';
 import {$getRoot,$createParagraphNode,$createTextNode} from 'lexical';
-import {SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,$createTableLayoutNode,$createFigureNode,$createCaptionNode,$createInlineImageNode,$createSectionNode,$createNoteNode,$createTufteSpanNode,loadDocumentIntoEditor,exportEditorToDocument} from '../dist/index.js';
+import {SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,$createTableLayoutNode,$createFigureNode,$createCaptionNode,$createInlineImageNode,$createSectionNode,$createNoteNode,$createTufteSpanNode,loadDocumentIntoEditor,loadMigratedDocumentIntoEditor,exportEditorToDocument} from '../dist/index.js';
 import {LinkNode} from '@lexical/link';
 import {NODE_SCHEMA,validateDocument} from '@lexical-tufte/document';
 import {ListNode,ListItemNode,$createListNode,$createListItemNode} from '@lexical/list';
@@ -396,4 +396,30 @@ test('P2 note kind can change without losing note identity or content',()=>{
  assert.equal(note.noteId,'editable-note');
  assert.equal(note.kind,'marginnote');
  assert.equal(note.children[0].text,'변경해도 보존');
+});
+
+test('R03 migrated loader imports compatible v1 and preserves v2 snapshot',()=>{
+ const source=editor();
+ source.update(()=>$getRoot().append($createSectionNode().append(
+  $createParagraphNode().append($createTextNode('migrated'))
+ )),{discrete:true});
+ const legacy={...fixture(),lexicalState:source.getEditorState().toJSON()};
+ const original=JSON.stringify(legacy);
+ const destination=editor();
+ const imported=loadMigratedDocumentIntoEditor(destination,legacy);
+ assert.equal(imported.ok,true,JSON.stringify(imported.diagnostics));
+ assert.equal(imported.value.schemaVersion,2);
+ assert.deepEqual(imported.value.editorFormat,{engine:'lexical',formatVersion:1});
+ assert.deepEqual(destination.getEditorState().toJSON(),legacy.lexicalState);
+ assert.equal(JSON.stringify(legacy),original);
+ const second=loadMigratedDocumentIntoEditor(editor(),imported.value);
+ assert.equal(second.ok,true,JSON.stringify(second.diagnostics));
+});
+test('R03 migrated loader refuses unsupported format before editor replacement',()=>{
+ const destination=editor(),before=destination.getEditorState().toJSON();
+ const invalid={...fixture(),schemaVersion:2,editorFormat:{engine:'lexical',formatVersion:999}};
+ const result=loadMigratedDocumentIntoEditor(destination,invalid);
+ assert.equal(result.ok,false);
+ assert.ok(result.diagnostics.some(d=>d.code==='UNSUPPORTED_EDITOR_FORMAT'));
+ assert.deepEqual(destination.getEditorState().toJSON(),before);
 });
