@@ -45,7 +45,7 @@ export function registerFigureCommands(editor:LexicalEditor,onDiagnostic?:(diagn
    if($isRangeSelection(current)&&current.isCollapsed()&&!$getContainingNote(current.anchor.getNode())){
     const anchor=current.anchor.getNode();
     figure=ancestor(anchor,'tufte-figure');
-    if(!figure&&anchor instanceof SectionNode){
+    if(!figure&&anchor instanceof SectionNode&&current.anchor.type==='element'){
      const candidate=anchor.getChildAtIndex(current.anchor.offset);
      if(candidate instanceof FigureNode)figure=candidate;
     }
