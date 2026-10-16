@@ -479,3 +479,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - 성공한 migrated load에 한해 `CLEAR_HISTORY_COMMAND` dispatch 구현. 실패한 migration에서는 history를 건드리지 않음.
 - Lexical 단위 테스트에 성공 1회·실패 0회 dispatch 검증 추가.
 - 실제 HistoryPlugin undo/redo 통합과 브라우저 테스트 미실행; 환경 제약으로 타입 검사/테스트 미실행. R03/P2.5 체크 보류. CI 없음.
+
+## 2026-10-16 — R03 history 실패 경로 회귀 보강
+
+- migrated load에서 unknown node 거부 시 editor state 불변 및 CLEAR_HISTORY_COMMAND 미전달을 검사하는 테스트 추가.
+- HistoryPlugin 실물 undo/redo 시나리오와 호스트 등록 요건을 migration 계약 문서에 명시.
+- 명령 전달 단위 테스트 외 실제 HistoryPlugin 통합은 미검증. 환경 제약으로 테스트 미실행; R03 완료 체크 보류. CI 없음.
