@@ -42,3 +42,24 @@ test('recovery rejects malformed JSON and oversized payload',async()=>{
   assert.equal((await store.save(input(1,JSON.stringify({text:'a'.repeat(2_000_001)})),0)).diagnostics[0].code,'INVALID_RECOVERY_INPUT');
  }finally{db.close();}
 });
+
+test('recovery revision advances and stale delete cannot remove newer work',async()=>{
+ const {db,store}=setup();try{
+  assert.equal((await store.save(input(),0)).ok,true);
+  const second=await store.save(input(2,'{"draft":"newer"}'),1);
+  assert.equal(second.ok,true,JSON.stringify(second.diagnostics));
+  const stale=store.remove('post-1','session-1',1);
+  assert.equal(stale.ok,false);assert.equal(stale.diagnostics[0].code,'RECOVERY_CONFLICT');
+  assert.equal((await store.read('post-1','session-1')).value.sequence,2);
+  assert.equal(store.remove('post-1','session-1',2).ok,true);
+  assert.equal((await store.read('post-1','session-1')).value,null);
+ }finally{db.close();}
+});
+test('recovery sessions are independent and cannot overwrite each other',async()=>{
+ const {db,store}=setup();try{
+  assert.equal((await store.save(input(),0)).ok,true);
+  assert.equal((await store.save({...input(),sessionId:'session-2',payload:'{"different":true}'},0)).ok,true);
+  assert.equal(store.remove('post-1','session-1',1).ok,true);
+  assert.equal((await store.read('post-1','session-2')).value.payload,'{"different":true}');
+ }finally{db.close();}
+});
