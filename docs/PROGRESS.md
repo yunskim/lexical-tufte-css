@@ -663,3 +663,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - 공개 API에 노드/팩토리 추가. 복수 dd 왕복 및 orphan dd의 문서 validator 거부 테스트 작성.
 - 테스트·typecheck 실행은 미확인. P2.2/F06/R02 완료 체크 보류. CI 없음.
 - 다음 순서: F08/F09 attribution/cite/epigraph 노드 및 구조 왕복 검증.
+
+## 2026-10-16 — P2.2 F08/F09 인용 노드
+
+- `packages/lexical/src/QuotationNodes.ts`에 EpigraphNode/AttributionNode/CiteNode 추가, index API 노출.
+- quote 내부 attribution/cite 포함 왕복 및 내용 없는 quote 구조 거부 테스트 작성.
+- Lexical 정규화와 schema의 실제 호환성은 테스트 미실행으로 미확인. P2.2/F08/F09 완료 체크 보류, CI 없음.
+- 다음 순서: tufte-section-footer 노드 및 직계 섹션 왕복 검증.
