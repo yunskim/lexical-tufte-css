@@ -272,3 +272,9 @@
 - 영향: v2 계약 변경 시 projection 누락 또는 잔존 필드가 컴파일러에 드러나지 않을 위험.
 - 처리: v1 필드를 명시적으로 구성하는 타입 검사 가능한 projection으로 교체하고 hostile v2 envelope 회귀 테스트 추가.
 - 상태: 코드/테스트 반영, 실제 타입 검사·테스트 미실행. M032 참조.
+
+## E036 — 저장 문서 버전 판별 전 접근자 실행 위험
+
+- 발견: 2026-10-16 R03 정적 점검. `inspectStoredDocument`가 `isRecord`만 확인한 뒤 `input.schemaVersion`을 읽어, plain prototype을 가진 getter 객체가 검사 중 코드를 실행할 수 있었다.
+- 처리: 버전 필드 접근 전에 자체 속성 descriptor와 symbol을 검사해 접근자 포함 객체를 거부한다. getter 미실행 및 실패 진단 경로 회귀 테스트 추가.
+- 상태: 코드·테스트 반영, 실행 검증 대기. M033 참조.
