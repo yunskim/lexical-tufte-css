@@ -461,3 +461,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - `validateDocumentV2` 구현·공개 export: v2 envelope, editorFormat strict 검사 및 v1 본문 계약 재사용. `inspectStoredDocument`가 v2 전체 유효성 검사 후 형식을 반환하도록 수정.
 - document 테스트에 v2 복제 독립성, unknown field, 미지원 formatVersion 및 노드 거부 사례 추가.
 - v1→v2 migration 및 editor 설치는 아직 구현하지 않았다. 타입 검사·단위 테스트는 환경 제약으로 미실행; 체크리스트 완료 처리하지 않음. CI 없음.
+
+## 2026-10-16 — R03.b envelope migration 구현
+
+- `migrateStoredDocument` 구현 및 공개 export: v1→v2 외피 승격, v2 복제, unsupported format 거부.
+- 단위 테스트에 입력 불변, 본문·자산 보존, 복제 분리, 반복 변환 결정성, 미지원 버전 진단 추가.
+- **Lexical runtime 호환성 확인/로드 통합 미완**이며 실제 테스트 미실행. migration API 성공만으로 R03/P2.5 완료 체크하지 않음. CI 없음.
