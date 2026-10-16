@@ -115,3 +115,27 @@ test('R10 underline, strike and highlight compose without losing text',()=>{
  assert.match(combined.html,/<mark><u><s><span class="tufte-pre-wrap">/);
  assert.match(combined.html,/<\/span><\/s><\/u><\/mark>/);
 });
+
+test('P2.2 F02-F09 headings, lists, definitions and quotations render semantically',()=>{
+ const d=fixture(),section=d.lexicalState.root.children[0];
+ const text=value=>({type:'text',version:1,text:value,format:0});
+ const para=value=>({type:'paragraph',version:1,children:[text(value)]});
+ section.children.push(
+  {type:'heading',version:1,tag:'h2',children:[text('Heading')]},
+  {type:'horizontalrule',version:1},
+  {type:'list',version:1,listType:'bullet',tag:'ul',start:1,children:[
+   {type:'listitem',version:1,value:1,children:[text('Item')]}
+  ]},
+  {type:'tufte-definition-list',version:1,children:[
+   {type:'tufte-term',version:1,children:[text('Term')]},
+   {type:'tufte-definition',version:1,children:[para('Meaning')]}
+  ]},
+  {type:'tufte-epigraph',version:1,children:[
+   {type:'quote',version:1,children:[text('Quotation')]}
+  ]},
+  {type:'tufte-span',version:1,kind:'sans',children:[text('Sans')]}
+ );
+ const result=renderArticle(d);
+ assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+ for(const pattern of [/<h2>/,/<hr>/,/<ul>/,/<li>/,/<dl>/,/<dt>/,/<dd>/,/<div class="epigraph">/,/<blockquote>/,/<span class="sans">/])assert.match(result.html,pattern);
+});
