@@ -410,3 +410,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - 실제 headless Lexical에서 `$createInlineImageNode`로 이미지를 생성하고 `EditorState.toJSON()` 결과의 src/alt/assetId/width/height 보존을 검사하는 회귀 추가.
 - 해당 JSON을 asset metadata와 함께 문서 envelope에 넣어 `validateDocument` 성공을 검증하도록 구성.
 - 기존 E032/E033, M029/M030 관련 fixture 제약 재점검. 테스트 실행은 미확인으로 R01 체크 보류. CI 추가 없음.
+
+## 2026-10-16 — R01 자산 참조 무결성 회귀
+
+- 실제 Lexical image JSON과 envelope의 asset 목록이 불일치할 때 `loadDocumentIntoEditor`가 MISSING_ASSET/ASSET_MISMATCH로 거부하는 테스트 추가.
+- 자산 누락, URL 변경, width 변경, height 변경 네 가지 사례에서 거부 전후 editor state 불변성 검사.
+- E032/E033/M029/M030 재검토: fixture의 note ID 복제 없이 독립 image state를 구성하고 asset metadata는 사례별로 변경.
+- 로컬 실행 검증 미확인, R01 미완료, CI 추가 없음.
