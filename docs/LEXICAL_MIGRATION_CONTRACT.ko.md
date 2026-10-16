@@ -144,3 +144,9 @@ Migration은 입력을 변경하지 않는 순수 함수여야 하며, 동일 �
 - `exportEditorToDocumentV2(editor, base)` 추가: v2 base를 엄격히 검증하고 v1 내보내기 경계에서 현행 Lexical JSON을 검증한 다음, `schemaVersion:2`와 `editorFormat:{engine:'lexical',formatVersion:1}`을 보존하여 다시 v2 검증한다.
 - 기존 v1 `exportEditorToDocument`는 호환성을 위해 유지한다. v2 사용자는 새 API를 명시적으로 호출해야 한다.
 - roundtrip 테스트를 작성했지만 실행하지 못했다. 저장소 revision 충돌 처리·원자적 쓰기 및 실제 Lexical 버전별 골든은 후속 작업이다.
+
+## v1/v2 envelope golden fixture (2026-10-16)
+
+- v1 기준: `fixtures/tufte/server-document.json`; v2 예상 결과: `fixtures/tufte/server-document-v2.json`.
+- 두 fixture는 문서 envelope의 v1→v2 필드 추가만 다르며, document 테스트에서 migration 출력과 v2 golden의 전체 구조 동등성 및 lexicalState/assets 보존을 검사한다.
+- **주의:** v2 fixture는 v1에서 정적으로 파생된 envelope golden이며, 서로 다른 Lexical npm 버전에서 생성한 runtime golden이 아니다. Lexical 0.52.0 실물 parse/serialize 검증과 버전 업그레이드 비교는 아직 미완이다.
