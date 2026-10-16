@@ -102,7 +102,7 @@ test('clipboard note reidentification traverses notes nested inside figures',()=
  dispose();
 });
 
-test('cut-paste preserves one nested figure note ID and renews duplicate copies',()=>{
+test('attached cut payload with colliding note IDs renews both copies',()=>{
  const {editor,dispose}=setup();
  editor.update(()=>{
   const first=$createFigureNode().append($createInlineImageNode('/a.png','a'),$createNoteNode('shared-cut','marginnote').append($createTextNode('a')));
@@ -140,5 +140,21 @@ test('figure marginnote update and removal preserve sibling caption',()=>{
   assert.equal(figure.getLastChild().getTextContent(),'caption');
  });
  assert.deepEqual(diagnostics,[]);
+ dispose();
+});
+
+test('figure note commands reject invalid content and missing IDs without changing figure',()=>{
+ const {editor,diagnostics,dispose}=setup();
+ editor.update(()=>{
+  const figure=$createFigureNode().append($createInlineImageNode('/figure.png','figure'),$createNoteNode('kept-note','marginnote').append($createTextNode('keep')));
+  $getRoot().append($createSectionNode().append(figure));
+  const selection=$createNodeSelection();selection.add(figure.getKey());$setSelection(selection);
+ },{discrete:true});
+ const before=JSON.stringify(editor.getEditorState().toJSON().root);
+ editor.dispatchCommand(UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,{noteId:'kept-note',text:'   '});
+ editor.dispatchCommand(UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,{noteId:'absent-note',text:'change'});
+ editor.dispatchCommand(REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,'absent-note');
+ assert.equal(JSON.stringify(editor.getEditorState().toJSON().root),before);
+ assert.deepEqual(diagnostics.map(d=>d.code),['INVALID_FIGURE_NOTE','FIGURE_NOTE_NOT_FOUND','FIGURE_NOTE_NOT_FOUND']);
  dispose();
 });
