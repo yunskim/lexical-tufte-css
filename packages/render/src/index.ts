@@ -26,8 +26,8 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
    case 'paragraph':return [element('p',attrs(n),inner())];
    case 'heading':return [element(n.tag,attrs(n),inner())];
    case 'horizontalrule':return [element('hr',{},[],true)];
-   case 'list':return [element(n.tag,attrs(n),inner())];
-   case 'listitem':return [element('li',attrs(n),inner())];
+   case 'list':return [element(n.tag,{...attrs(n),...(n.tag==='ol'&&n.start!==1?{start:String(n.start)}:{})},inner())];
+   case 'listitem':return [element('li',{...attrs(n),...(n.value!==1?{value:String(n.value)}:{})},inner())];
    case 'tufte-definition-list':return [element('dl',attrs(n),inner())];
    case 'tufte-term':return [element('dt',attrs(n),inner())];
    case 'tufte-definition':return [element('dd',attrs(n),inner())];
