@@ -846,3 +846,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - 선택 안정성을 위해 새 항목은 편집 가능한 용어/설명 초기 텍스트를 포함.
 - 테스트 파일 추가 시 연결 도구 요청이 안전 검사에 의해 차단되어 미반영. 실행 검증 미완료이며 P2.2.b 체크 보류.
 - 다음: 테스트 추가/실행 및 React 연결, F03/F05/F06 검증, P2.2.c로 이동. CI 없음.
+
+## 2026-10-16 P2.2.b — 정의목록 테스트·실제 편집기 연결
+
+- `packages/lexical/test/definition-commands.test.mjs`: 기존 문단 보존·정의목록 삽입·term/description 쌍 추가 및 선택 부재 원자적 거부 테스트 작성. 이전 도구 차단 상태 해소.
+- `examples/editor/src/main.tsx`: registerInlineCommands/registerDefinitionCommands 등록 및 툴바에서 span kind 전환·정의목록 삽입·항목 추가 호출. 기존 mouseDown selection 보존 규약 적용.
+- 로컬 환경에서 pnpm/저장소 checkout 미확보로 이번 커밋의 빌드·브라우저 테스트 실행은 아직 미검증. CI 없음. P2.2.b 체크 보류.
+- 다음: 테스트 실제 실행, 명령 동작·undo/redo 및 F06 구조 검증, ol/ul 목록 명령 추가.
