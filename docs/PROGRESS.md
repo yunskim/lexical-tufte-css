@@ -337,3 +337,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - loadDocumentIntoEditor 성공 반환이 입력 문서 원본을 그대로 참조하던 문제(E030)를 수정하여 structuredClone된 독립 envelope를 반환한다.
 - 호출자가 가져오기 이후 title/lexicalState를 변경해도 반환된 값이 바뀌지 않는 R11 회귀 테스트 추가. M028 기록.
 - 현재 환경에서 pnpm과 로컬 프로젝트 의존성 미확보. 실제 테스트 미실행, R11/R02/R03 완료 체크 보류. CI 생략 유지.
+
+## 2026-10-16 — R11 내보내기 스냅샷 분리
+
+- `editorJSONToDocument` 성공 결과의 lexicalState가 입력 editor state를 참조하던 문제(E031)를 수정했다. 성공 시 문서 전체 structuredClone 반환.
+- R11 회귀: 내보내기 후 editor state와 base title/assets를 변경해도 반환된 문서가 바뀌지 않는지 검사.
+- E031/M028 점검 반영. pnpm 실행 불가로 테스트 미검증; R11/R02/R03 완료 체크 보류. CI 추가 없음.
