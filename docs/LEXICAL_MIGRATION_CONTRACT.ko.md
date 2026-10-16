@@ -138,3 +138,9 @@ Migration은 입력을 변경하지 않는 순수 함수여야 하며, 동일 �
 - `packages/lexical/test/document-bridge.test.mjs`에 `@lexical/history`의 `createEmptyHistoryState`/`registerHistory`를 사용하는 통합 테스트를 추가했다.
 - 사전 undo/redo 항목을 삽입한 후 지원하지 않는 문서 버전 거부 시 스택 유지, 정상 문서 교체 시 두 스택 초기화를 단언한다.
 - 이는 **테스트 코드 추가**이지 실행 통과 증거가 아니다. 설치된 Lexical 0.52.0의 History API 시그니처 및 비동기 update 순서를 실제 실행에서 확인해야 한다.
+
+## v2 편집기 내보내기 경계 (2026-10-16)
+
+- `exportEditorToDocumentV2(editor, base)` 추가: v2 base를 엄격히 검증하고 v1 내보내기 경계에서 현행 Lexical JSON을 검증한 다음, `schemaVersion:2`와 `editorFormat:{engine:'lexical',formatVersion:1}`을 보존하여 다시 v2 검증한다.
+- 기존 v1 `exportEditorToDocument`는 호환성을 위해 유지한다. v2 사용자는 새 API를 명시적으로 호출해야 한다.
+- roundtrip 테스트를 작성했지만 실행하지 못했다. 저장소 revision 충돌 처리·원자적 쓰기 및 실제 Lexical 버전별 골든은 후속 작업이다.
