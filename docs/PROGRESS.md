@@ -430,3 +430,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - 저장소에서 render 정규식, note 이미지 오류 메시지 기대값, R11 alias 자산 fixture를 각각 수정.
 - E034/M031에 원인과 재발 방지 조치를 기록. **수정 후** `pnpm check` 및 단위 테스트 실행 결과는 아직 확보하지 못했으며 통과로 표기하지 않음.
 - R02 전체 노드 왕복, R03 버전별 migration, R05 무효 상태 복구 및 undo history 정리 문제는 여전히 미완. CI 추가 없음.
+
+## 2026-10-16 — 실행 검증 보류, R03 호환성 설계 우선
+
+- 현 환경에서는 `pnpm check`와 브라우저 테스트를 실제 실행할 수 없어 추가 테스트 기반 완료 판정을 보류했다.
+- R03을 R03.a–d로 세분화: 별도 Lexical format version, 명시적 migration, 버전별 golden fixture, 문서 교체 시 undo/redo 정책.
+- 현행 `loadDocumentIntoEditor`의 엄격한 JSON 동등성은 손실 방지에 유용하지만 구버전 저장 문서의 호환성을 보장하지 않는다. 버전별 변환이 구현되기 전에는 로드 호환성이 해결된 것으로 간주하지 않는다.
+- CI 추가 없음. 다음은 format version 저장 위치 및 migration 입력·출력 계약 설계.
