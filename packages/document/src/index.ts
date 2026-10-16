@@ -7,3 +7,4 @@ export {assertStorageId,postStorageKey,slugCollisionKey,assertUniqueSlugs} from 
 export {documentToEditorJSON,editorJSONToDocument} from './editorBoundary.js';
 export {inspectStoredDocument,type StoredFormat,type FormatInspection} from './inspectStoredDocument.js';
 export {validateDocumentV2,type TufteDocumentV2,type V2ValidationResult} from './validateV2.js';
+export {migrateStoredDocument,type MigrationResult} from './migrateStoredDocument.js';
