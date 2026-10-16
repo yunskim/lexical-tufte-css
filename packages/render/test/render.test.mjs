@@ -74,3 +74,25 @@ test('publication output has no inline style and uses scoped CSS classes',()=>{
  assert.match(css,/counter-reset: sidenote-counter/);
  assert.match(css,/white-space: pre-wrap/);
 });
+
+test('table column headers use thead and preserve tbody and scope',()=>{
+ const d=fixture();
+ const table=d.lexicalState.root.children[0].children[4].children[0];
+ const first=table.children[0];
+ assert.ok(first.children.every(cell=>cell.headerState===1));
+ const rendered=renderArticle(d);
+ assert.equal(rendered.ok,true,JSON.stringify(rendered.diagnostics));
+ assert.match(rendered.html,/<thead><tr[^>]*><th scope="col">/);
+ assert.match(rendered.html,/<\/thead><tbody>/);
+ assert.match(rendered.html,/<\/tbody><\/table>/);
+});
+test('a mixed or non-leading column header row remains in tbody',()=>{
+ const d=fixture();
+ const table=d.lexicalState.root.children[0].children[4].children[0];
+ const first=table.children[0];
+ first.children[0].headerState=0;
+ const rendered=renderArticle(d);
+ assert.equal(rendered.ok,true,JSON.stringify(rendered.diagnostics));
+ assert.doesNotMatch(rendered.html,/<thead>/);
+ assert.match(rendered.html,/<tbody><tr/);
+});
