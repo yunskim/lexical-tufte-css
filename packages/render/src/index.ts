@@ -81,6 +81,7 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
      src:String(n.src),title:String(n.title),loading:'lazy',
      referrerpolicy:'strict-origin-when-cross-origin',
      sandbox:'allow-scripts allow-same-origin allow-presentation',
+     width:'960',height:String(Math.round(960/Number(n.aspectRatio))),
      allowfullscreen:''
     },[]);
     return [element(wrapper,{
