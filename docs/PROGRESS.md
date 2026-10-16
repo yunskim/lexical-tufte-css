@@ -319,3 +319,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - 현재 컨테이너 Node v22.16.0 확인, pnpm 실행 파일 없음. 테스트는 미실행이며 골든 fixture는 미생성. R02/R03 미완료 유지.
 
 검증 명령(의존성 설치 가능한 환경): `pnpm install --frozen-lockfile && pnpm check`; 골든 생성은 `UPDATE_LEXICAL_GOLDEN=1 pnpm --filter @lexical-tufte/lexical test` 후 생성된 JSON을 검토·커밋. 이후 `REQUIRE_LEXICAL_GOLDEN=1 pnpm --filter @lexical-tufte/lexical test`로 필수 검증.
+
+## 2026-10-16 — R02 골든 생성 안전장치
+
+- UPDATE_LEXICAL_GOLDEN=1 경로에서 설치된 lexical/package.json 버전이 0.52.0인지 확인하고 기존 골든 파일을 기본적으로 덮어쓰지 않도록 보호했다. 기존 파일 변경은 OVERWRITE_LEXICAL_GOLDEN=1을 추가로 지정해야 한다.
+- 현재 실행 환경 확인: Node v22.16.0, pnpm 명령 없음, 로컬 의존성 없음. 골든 생성/테스트 실행을 성공으로 기록하지 않는다. require('lexical/package.json')의 package exports 호환성도 실제 의존성 설치 후 확인할 것.
+- R02/R03 미완료, CI 추가 없음.
