@@ -62,6 +62,7 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
      element('span',withClass(n,kind),inner()),
     ])];
    }
+   case 'tufte-fullwidth':return [element('div',withClass(n,'fullwidth'),inner())];
    case 'tufte-figure':return [element('figure',n.width==='fullwidth'?withClass(n,'fullwidth'):attrs(n),inner())];
    case 'tufte-caption':return [element('figcaption',attrs(n),inner())];
    case 'tufte-table-layout':{
