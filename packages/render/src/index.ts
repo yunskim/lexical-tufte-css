@@ -1,15 +1,18 @@
-import {validateDocument,type JsonNode,type Diagnostic} from './document.js';
-export {parseDocument,validateDocument,isSafeURL,RENDER_PROFILE,type TufteDocument,type JsonNode,type Diagnostic,type AssetRef} from './document.js';
+import {validateDocument,type JsonNode,type Diagnostic,type ElementFields} from '@lexical-tufte/document';
+import {validateRenderProfile} from './profile.js';
+export {parseDocument,validateDocument,isSafeURL,type TufteDocument,type JsonNode,type Diagnostic,type AssetRef} from '@lexical-tufte/document';
+export {RENDER_PROFILE} from './profile.js';
 export type RenderResult={ok:true;html:string;diagnostics:Diagnostic[]}|{ok:false;html:null;diagnostics:Diagnostic[]};
 export function escapeHTML(value:string):string{return value.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]!));}
 export function renderArticle(input:unknown,options:{idPrefix?:string}={}):RenderResult{
  const result=validateDocument(input);if(!result.ok)return {ok:false,html:null,diagnostics:result.diagnostics};
+ const capabilities=validateRenderProfile(result.document);if(capabilities.length)return {ok:false,html:null,diagnostics:capabilities};
  const doc=result.document,prefix=options.idPrefix??doc.id;
  if(typeof prefix!=='string'||!/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(prefix))return {ok:false,html:null,diagnostics:[{code:'INVALID_ID_PREFIX',path:'options.idPrefix',message:'Invalid article namespace'}]};
  const esc=escapeHTML;
- const attrs=(n:JsonNode)=>`${n.direction?` dir="${esc(String(n.direction))}"`:''}${n.format&&typeof n.format==='string'?` style="text-align: ${n.format};"`:''}`;
+ const attrs=(n:ElementFields)=>`${n.direction?` dir="${esc(String(n.direction))}"`:''}${n.format&&typeof n.format==='string'?` style="text-align: ${n.format};"`:''}`;
  function render(n:JsonNode):string{
-  const inner=()=>n.children?.map(render).join('')??'';
+  const inner=()=>'children'in n?n.children.map(render).join(''):'';
   switch(n.type){
    case 'root':return inner();
    case 'tufte-section':return `<section${attrs(n)}>${inner()}</section>`;

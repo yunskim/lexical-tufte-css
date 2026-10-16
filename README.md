@@ -2,7 +2,7 @@
 
 Lexical 기반 Tufte CSS 편집기와 블로그 운영용 TypeScript 라이브러리.
 
-현재 단계: P0 및 P1 완료. 노트 편집 prototype을 실행할 수 있습니다. 전체 편집기 및 npm 배포 패키지는 아직 완성되지 않았습니다.
+현재 단계: P0·P1·P2.1 완료. 노트 편집 prototype을 실행할 수 있습니다. 전체 편집기 및 npm 배포 패키지는 아직 완성되지 않았습니다.
 
 - [구현 계획 및 실행 체크리스트](docs/PLAN.ko.md)
 - [작업 규약](AGENTS.md)
@@ -56,6 +56,6 @@ pnpm test:browser
 - [섹션·그림·표 레이아웃 조합 검증](docs/LAYOUT_PROTOTYPE.ko.md)
 
 - [문서·서버 렌더링 결정 ADR-0002](docs/adr/0002-document-and-rendering.ko.md)
-- [문서 정본 v1 / P1 렌더 profile](docs/DOCUMENT_SCHEMA_V1.ko.md)
+- [문서 정본 v1 / 공유 schema와 렌더 profile](docs/DOCUMENT_SCHEMA_V1.ko.md)
 
-`packages/render`의 `parseDocument`, `validateDocument`, `renderArticle`은 DOM/React/Lexical runtime 없이 실행됩니다. 현재는 제한된 P1 profile이며, 전체 문서 schema와 노드 지원은 P2에서 확장합니다.
+`packages/document`는 문서·메타데이터·자산·33개 노드 계약과 validator를 제공합니다. `packages/render`는 공유 검증 뒤 현재 `p1-v1` 출력 지원 범위를 검사합니다. 두 패키지는 DOM/React/Lexical runtime 없이 실행됩니다. 노드별 편집·발행 구현은 P2.2부터 확장합니다.

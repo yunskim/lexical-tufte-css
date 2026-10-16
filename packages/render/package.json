@@ -20,5 +20,8 @@
   },
   "devDependencies": {
     "typescript": "6.0.2"
+  },
+  "dependencies": {
+    "@lexical-tufte/document": "workspace:*"
   }
 }

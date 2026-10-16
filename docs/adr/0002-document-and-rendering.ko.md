@@ -2,6 +2,8 @@
 
 상태: 채택. 2026-10-16, P1.5. 적용 기준 Lexical 0.52.0 / render profile `p1-v1`.
 
+> P2.1 후속: 정본 타입·registry·validator는 packages/document로 이동했다. render는 공유 검증 뒤 별도 p1-v1 capability를 검사한다. 아래 실험 결과는 P1 시점의 기록이다.
+
 ## 결정
 
 문서 정본은 `schemaVersion: 1` envelope와 Lexical JSON이다. 발행은 `@lexical-tufte/render`의 순수 JSON→HTML 함수로 수행한다. 이 패키지는 React·Lexical·DOM runtime dependency가 없다. 편집 상태 생성/복원에는 Lexical을 사용한다. 발행 HTML은 읽기 결과이며 편집 정본을 대체하지 않는다.

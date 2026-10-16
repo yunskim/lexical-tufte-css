@@ -184,3 +184,16 @@
 - 발생: P1.5 GitHub 업로드 준비. 파일 내용을 모은 실행 결과가 출력 한도로 잘렸고 JSON.parse가 실패했다. 원본 파일은 변경되지 않았다.
 - 처리: 충분한 출력 한도로 다시 읽고 head/tail·완전한 JSON 파싱을 확인한 뒤 tree 항목으로 사용한다. 중단된 결과를 업로드하지 않는다.
 - 상태: verified (20개 파일의 완전한 JSON 파싱 확인). M020: 대형 도구 결과는 출력 예산/완결성을 확인하고 파싱 성공 이후에만 의존 mutation을 실행한다.
+
+## E022 — 로컬 hard reset 자동 승인 거부
+
+- 발생: P1 업로드 후 origin 동기화 명령의 reset --hard가 로컬 미커밋 작업 유실 가능성으로 자동 승인 검토에서 거부됐다. 명령은 실행되지 않았다.
+- 처리: 기존 디렉터리를 보존하고 fetch 후 별도 worktree(work-p2)를 생성해 검증된 P1 커밋에서 재개했다.
+- 상태: mitigated. M021: 동기화 시 미커밋 작업을 버리는 명령을 기본으로 쓰지 않고 독립 worktree/commit 등 보존 가능한 방법을 사용한다.
+
+## E023 — 재귀 generic intersection type의 순환 alias 오류
+
+- 발생: P2.1 document 최초 build, TS2456 JsonNode circularly references itself.
+- 원인: generic Element alias가 intersection과 JsonNode children을 통해 순환했다.
+- 처리: children을 interface ElementBase로 분리해 재귀 구조의 명시적 경계를 둔다. 선행 build 실패로 render typecheck는 실행되지 않았다.
+- 상태: verified (공유 build·소비자 typecheck·단위 26개 통과). M022: 재귀 노드 계약은 interface 경계를 사용하고 소비자 타입 검사까지 통과 후 완료 처리한다.

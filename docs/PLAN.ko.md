@@ -1,7 +1,7 @@
 # Lexical Tufte 블로그 라이브러리 계획
 
 작성: 2026-10-16 (Asia/Seoul)
-상태: P0 및 P1.1–P1.4 완료. Chromium 자동 회귀와 조합 이벤트 검증 범위이며, OS별 실제 IME 및 제품 전체 검증은 후속 단계.
+상태: P0·P1·P2.1 완료. Chromium 자동 회귀와 조합 이벤트 검증 범위이며, OS별 실제 IME 및 제품 전체 검증은 후속 단계.
 저장소: https://github.com/yunskim/lexical-tufte (public, GPL-3.0; 사용자가 생성한 설정 유지).
 
 ## 목표와 완료 정의
@@ -49,7 +49,7 @@ TypeScript + pnpm workspace를 제안한다. React 편집기를 첫 UI로 제공
 
 노트는 anchor와 payload가 함께 이동하는 논리적 단위로 관리한다. note ID는 영구 식별자이고 화면 번호는 문서 순서에서 파생한다. 복사 시 ID를 재발급하고 내부 참조를 재연결한다. HTML은 label→input→span.sidenote/marginnote 인접 구조와 article별 고유 namespace를 유지한다. 여러 글을 한 화면에 표시해도 DOM ID와 카운터가 충돌하지 않아야 한다.
 
-노트 본문은 링크·강조·코드·이미지 등 유효한 phrasing content를 지원한다. [ADR-0001](adr/0001-note-editor-model.ko.md)에 따라 v1은 단일 EditorState의 inline container를 사용한다. 블록 노트는 후속 별도 모델 설계 대상으로 두고 span 안에 p/div를 내보내거나 조용히 평탄화하지 않는다. 구체적인 허용 목록·진단은 P1.5/P2에서 확정한다. 중첩 노트 및 동일 노트의 다중 참조는 v1에서 명시적으로 거부하고 진단한다.
+노트 본문은 링크·강조·코드·이미지 등 유효한 phrasing content를 지원한다. [ADR-0001](adr/0001-note-editor-model.ko.md)에 따라 v1은 단일 EditorState의 inline container를 사용한다. 블록 노트는 후속 별도 모델 설계 대상으로 두고 span 안에 p/div를 내보내거나 조용히 평탄화하지 않는다. 허용 목록·진단은 [공유 문서 계약](DOCUMENT_SCHEMA_V1.ko.md)과 packages/document에서 구현한다. 중첩 노트 및 동일 노트의 다중 참조는 v1에서 명시적으로 거부하고 진단한다.
 
 ## Tufte 전체 기능 검증표
 
@@ -82,7 +82,7 @@ TypeScript + pnpm workspace를 제안한다. React 편집기를 첫 UI로 제공
 
 ## API 초안
 
-이름은 설계 제안이며 구현된 API가 아니다.
+validateDocument/parseDocument/validateMetadata/validatePostRecord 및 제한된 renderArticle은 구현했다. 나머지는 후속 설계 API다.
 
 - `validateDocument(input) -> Result<Document, Diagnostic[]>`
 - `migrateDocument(input, targetVersion) -> Result<Document, Diagnostic[]>`
@@ -125,7 +125,7 @@ P1 gate: 완료. 노트 편집 회귀와 SSR 출력의 실제 브라우저 비�
 
 ### P2 — 문서/노드/변환 (P1 이후)
 
-- [ ] P2.1 envelope·metadata·asset·노드 schema 및 validator 구현.
+- [x] P2.1 envelope·metadata·asset·노드 schema 및 validator 구현. 증거: packages/document, DOCUMENT_SCHEMA_V1.ko.md, document-contract.test.mjs, PROGRESS.md.
 - [ ] P2.2 F01–F09 노드/속성/commands와 JSON serialization 구현.
 - [ ] P2.3 F10–F19 노트·그림·표·코드·embed 구현.
 - [ ] P2.4 JSON 및 HTML import/export, 지원 subset 명시, 손실 진단과 unknown-node 발행 차단.
@@ -193,7 +193,7 @@ P6 gate: 로컬 빌드·타입 검사·관련 테스트 통과, 남은 결함과
 
 진행 기록 형식: `작업 ID | 상태(todo/in-progress/blocked/done) | 변경 경로/PR | 검증 명령·결과 | 차단 원인 | 다음 작업`. 증거 없이 체크하지 않는다. 문서 수정만으로 구현 작업을 완료하지 않는다.
 
-현재 다음 작업: P2.1 envelope·metadata·asset·노드 schema 및 공유 validator 구현. P1.5의 p1-v1 prototype 계약을 확장한다. P1 완료 증거는 ADR-0001/0002, 레이아웃 검증 문서 및 docs/PROGRESS.md에 기록한다.
+현재 다음 작업: P2.2 F01–F09 노드/속성/commands와 JSON serialization 구현. P2.1의 33개 노드 계약을 순서대로 편집/발행 구현에 연결한다. 구조 검증 통과와 제품 기능 완료는 구분한다.
 
 ## 주요 위험과 처리
 

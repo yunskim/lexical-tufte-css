@@ -113,3 +113,23 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 오류 점검: E016–E021과 M015–M020를 새 경로 테스트/실행 절차에 반영. E018은 순수 renderer로 완화했고 adapter 재검토는 P2.4. 이전 E004/E005의 브라우저 환경 제한, OS IME/P6, W001 편집기 511.76kB(gzip160.48kB)/P3·P6는 유지. 단계 전환 전 전체 기록을 점검했으며 fixture 함수 결과·JSON 값/메모리 상태의 비교 경계를 명시했다.
 
 다음 작업: P2.1. 문서/노드 공유 schema·블로그 metadata·자산 참조 계약과 validator를 P1 prototype에서 확장한다. F01–F22의 전체 제품 완료 체크는 유지하지 않는다.
+
+## P2.1 — 완료 (2026-10-16)
+
+- packages/document: runtime dependency 없는 공유 계약. TufteDocument/AssetRef/PostMetadata/PostRecord 및 33개 노드 타입·동결 registry, validateDocument/parseDocument/validateMetadata/validatePostRecord 구현.
+- 데이터 구조: h2/h3, Tufte inline class, 목록/정의목록, 인용/epigraph/cite/footer, 주석/그림/ImageQuilt/fullwidth/표/코드/embed 계약. 중첩·버전·알 수 없는 필드·허용 자식·중복 ID·직사각 표·노드/깊이/text/자산 한도 검사. 이 항목은 노드별 편집·HTML 변환 완료를 뜻하지 않는다.
+- 자산: 선택적 assetId의 존재와 src/크기 일치, 양의 크기/byteLength, SHA-256 메타데이터 검사. 실제 파일 신뢰성·고아 자산 삭제 보호는 P5 후속.
+- 메타데이터: NFC 한글 slug, tags/authors, 상태/revision, 달력 유효성·timezone·발행일 순서 검사. 저장 충돌·상태 전이·발행 snapshot은 P5 후속.
+- render: 중복 정본 validator를 제거하고 공유 패키지에 의존. 구조 검증 이후 별도 profile.ts에서 구현 없는 노드/속성을 UNSUPPORTED_RENDER_*로 차단한다. 신규 계약 통과가 부분 HTML 발행으로 이어지지 않는 회귀 추가.
+- packages/lexical/test/document-contract.test.mjs: 실제 공식 Heading/Quote/List/ListItem이 생성한 JSON과 validator 일치. 공식 ListItem의 paragraph 평탄화 방식에 맞춰 direct phrasing 계약으로 확정했다.
+
+검증:
+
+- pnpm check 통과: 정책 검사, CSS72규칙, 타입·빌드, 단위26개(document9+lexical9+render8).
+- pnpm test:browser 전체 통과: P1.1–P1.4 편집 회귀, 서버/브라우저 출력의 5개 폭 비교, JS 비활성 모바일 토글/article ID 분리.
+- document/dist를 임시 보존 위치로 옮긴 뒤 pnpm typecheck 통과. 공유 declaration을 선행 빌드하도록 루트 명령을 보강해 fresh 설치에서도 소비자 타입을 해석한다(M003).
+- pnpm install --frozen-lockfile 및 git diff --check 통과. CI 없음.
+
+오류·대책 점검: E022 자동 승인 거부 후 기존 작업을 보존하고 새 worktree에서 재개(M021). E023 재귀 alias 타입 실패를 interface 경계로 해결하고 소비자 검사까지 확인(M022). E001–E023/M001–M022 전수 점검, E018 고정 adapter 제한/P2.4, 환경·OS IME/P6, W001 번들 경고/P3·P6는 유지한다. 체크리스트 작업 시작·완료 및 단계 전환 점검 주기는 계속 적용한다.
+
+다음: P2.2. F01–F09의 실제 노드·속성·command와 JSON 보존 및 renderer 지원을 구현한다. F01–F22의 전체 기능 완료 체크는 아직 하지 않는다.
