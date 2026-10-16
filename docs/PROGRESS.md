@@ -305,3 +305,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - packages/lexical/test/document-bridge.test.mjs: headless 테스트 등록 노드와 NODE_SCHEMA 사이의 지원/미지원 유형을 명시적으로 비교하는 회귀 추가. 아직 구현하지 않은 tufte-code/embed/epigraph를 지원 완료로 오인하지 않음.
 - TableCellNode 직렬화 결과에 futureTableField를 삽입해 validateDocument가 UNKNOWN_FIELD를 반환하는지 검사 추가.
 - Node v22.16.0 확인, pnpm 실행 파일 부재. 의존성 설치와 전체 테스트 실행 증거가 없어 R02/R03 완료 보류. 실제 Lexical 0.52.0 출력 기반 골든 fixture는 아직 생성하지 않음(추측 fixture 금지).
+
+## 2026-10-16 — R02 골든 fixture 생성 준비 및 E028 수정
+
+- 실제 Lexical 0.52.0 직렬화 기반 스냅샷을 생성/비교하는 테스트를 추가했다. UPDATE_LEXICAL_GOLDEN=1로 생성하며 아직 fixture가 없어 해당 테스트는 skip으로 보고되도록 했다. 골든 fixture를 실제로 생성했다고 주장하지 않는다.
+- 그림 왕복 테스트의 assetId=chart-1에 대한 문서 자산 메타데이터 누락을 발견하여 수정했다. ERROR_LOG E028, ERROR_PREVENTION M026에 기록.
+- 환경에 pnpm이 없어 테스트 미실행. R02/R03 및 골든 fixture 완료 체크 보류. 다음에는 의존성 확보 후 생성 결과 검토·커밋, pnpm check 실행.
