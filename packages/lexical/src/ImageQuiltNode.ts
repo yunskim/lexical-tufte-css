@@ -34,8 +34,7 @@ export class ImageQuiltNode extends DecoratorNode<null>{
   const n=this.getLatest();
   return {...super.exportJSON(),type:'tufte-imagequilt',version:1,src:n.__src,alt:n.__alt,
    ...(n.__assetId===undefined?{}:{assetId:n.__assetId}),
-   ...(n.__width===undefined?{}:{width:n.__width}),
-   ...(n.__height===undefined?{}:{height:n.__height})};
+   width:n.__width,height:n.__height};
  }
  static importJSON(value:SerializedImageQuilt):ImageQuiltNode{
   if(value.version!==1)throw Error('Unsupported ImageQuilt version');
