@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync,writeFileSync,existsSync,mkdirSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
-import {dirname} from 'node:path';
+import {dirname,join,parse} from 'node:path';
 import {createRequire} from 'node:module';
 import {createHeadlessEditor} from '@lexical/headless';
 import {$getRoot,$createParagraphNode,$createTextNode} from 'lexical';
@@ -207,7 +207,19 @@ test('R02 Lexical 0.52.0 generated golden snapshot (explicit update only)',t=>{
  const actual=JSON.stringify(state,null,2)+'\n';
  if(process.env.UPDATE_LEXICAL_GOLDEN==='1'){
   const require=createRequire(import.meta.url);
-  const installed=require('lexical/package.json').version;
+  let directory=dirname(require.resolve('lexical'));
+  let manifest;
+  while(true){
+   const candidate=join(directory,'package.json');
+   if(existsSync(candidate)){
+    const data=JSON.parse(readFileSync(candidate,'utf8'));
+    if(data.name==='lexical'){manifest=data;break;}
+   }
+   if(directory===parse(directory).root)break;
+   directory=dirname(directory);
+  }
+  assert.ok(manifest,'Cannot locate the installed lexical package manifest');
+  const installed=manifest.version;
   assert.equal(installed,'0.52.0','Refuse to record golden output from a different Lexical version');
   if(existsSync(snapshot)&&process.env.OVERWRITE_LEXICAL_GOLDEN!=='1'){
    assert.fail('Existing golden is protected; review changes and explicitly set OVERWRITE_LEXICAL_GOLDEN=1');
