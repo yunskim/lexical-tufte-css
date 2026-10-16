@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {documentToEditorJSON,editorJSONToDocument,canonicalizeDocument,parseCanonicalDocument,inspectStoredDocument,validateDocumentV2,migrateStoredDocument,validatePostRecordV2,preparePostRevisionV2} from '../dist/index.js';
+import {documentToEditorJSON,editorJSONToDocument,canonicalizeDocument,parseCanonicalDocument,inspectStoredDocument,validateDocumentV2,migrateStoredDocument,validatePostRecordV2,preparePostRevisionV2,InMemoryPostRevisionStoreV2} from '../dist/index.js';
 const fixture=()=>JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document.json',import.meta.url),'utf8'));
 test('R02 document editor JSON document preserves validated state without mutation',()=>{
  const original=fixture(),before=JSON.stringify(original);
@@ -274,4 +274,29 @@ test('R03 v2 revision preflight rejects stale writers and revision gaps',()=>{
  assert.ok(renamed.diagnostics.some(d=>d.code==='POST_SLUG_MISMATCH'));
  assert.equal(current.metadata.revision,3);
  assert.equal(next.metadata.revision,4);
+});
+
+test('R03 in-process CAS store allows exactly one concurrent writer',async()=>{
+ const document=JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document-v2.json',import.meta.url),'utf8'));
+ const metadata={
+  slug:'cas-test',summary:'test',tags:[],authors:['editor'],status:'draft',
+  createdAt:'2026-10-16T00:00:00Z',updatedAt:'2026-10-16T00:00:00Z',revision:1,
+ };
+ const store=new InMemoryPostRevisionStoreV2({document,metadata});
+ const a={document,metadata:{...metadata,revision:2,summary:'writer-a'}};
+ const b={document,metadata:{...metadata,revision:2,summary:'writer-b'}};
+ const [first,second]=await Promise.all([
+  store.compareAndSwap(a,1),store.compareAndSwap(b,1),
+ ]);
+ assert.equal(first.ok,true,JSON.stringify(first.diagnostics));
+ assert.equal(second.ok,false);
+ assert.ok(second.diagnostics.some(d=>d.code==='REVISION_CONFLICT'));
+ assert.equal(store.read().metadata.summary,'writer-a');
+ assert.equal(store.read().metadata.revision,2);
+ const snapshot=store.read();
+ snapshot.metadata.summary='mutated outside store';
+ assert.equal(store.read().metadata.summary,'writer-a');
+ const retry=await store.compareAndSwap({...b,metadata:{...b.metadata,revision:3}},2);
+ assert.equal(retry.ok,true,JSON.stringify(retry.diagnostics));
+ assert.equal(store.read().metadata.revision,3);
 });
