@@ -5,6 +5,7 @@ import {createHeadlessEditor} from '@lexical/headless';
 import {$getRoot,$createParagraphNode,$createTextNode} from 'lexical';
 import {SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,$createTableLayoutNode,$createFigureNode,$createCaptionNode,$createInlineImageNode,$createSectionNode,$createNoteNode,$createTufteSpanNode,loadDocumentIntoEditor,exportEditorToDocument} from '../dist/index.js';
 import {LinkNode} from '@lexical/link';
+import {NODE_SCHEMA,validateDocument} from '@lexical-tufte/document';
 import {ListNode,ListItemNode,$createListNode,$createListItemNode} from '@lexical/list';
 import {TableNode,TableRowNode,TableCellNode,$createTableNode,$createTableRowNode,$createTableCellNode} from '@lexical/table';
 const fixture=()=>JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document.json',import.meta.url),'utf8'));
@@ -153,4 +154,39 @@ test('R02 scroll table preserves cell headers and layout in Lexical roundtrip',(
  assert.equal(layout.layout,'scroll');
  assert.equal(layout.children[0].type,'table');
  assert.equal(layout.children[0].children[0].children[0].headerState,1);
+});
+
+test('R03 editor node registry and document schema coverage are explicit',()=>{
+ const registered=[
+  'root','tufte-section','paragraph','text','linebreak','link',
+  'tufte-note','tufte-inline-image','tufte-span','tufte-figure',
+  'tufte-caption','tufte-table-layout','table','tablerow','tablecell',
+  'list','listitem'
+ ];
+ const unsupported=Object.keys(NODE_SCHEMA).filter(type=>!registered.includes(type));
+ assert.ok(unsupported.includes('tufte-code'));
+ assert.ok(unsupported.includes('tufte-embed'));
+ assert.ok(unsupported.includes('tufte-epigraph'));
+ assert.equal(new Set(registered).size,registered.length);
+ for(const type of registered)assert.ok(Object.hasOwn(NODE_SCHEMA,type),type);
+});
+test('R03 document schema rejects a future table cell field without silent cleanup',()=>{
+ const source=editor();
+ source.update(()=>{
+  $getRoot().append($createSectionNode().append(
+   $createTableLayoutNode('body').append(
+    $createTableNode().append(
+     $createTableRowNode().append(
+      $createTableCellNode(1).append($createParagraphNode().append($createTextNode('값')))
+     )
+    )
+   )
+  ));
+ },{discrete:true});
+ const base=fixture(),document={...base,lexicalState:source.getEditorState().toJSON()};
+ const cell=document.lexicalState.root.children[0].children[0].children[0].children[0].children[0];
+ cell.futureTableField='unrecognized';
+ const result=validateDocument(document);
+ assert.equal(result.ok,false);
+ assert.ok(result.diagnostics.some(x=>x.code==='UNKNOWN_FIELD'&&x.path.endsWith('.futureTableField')));
 });
