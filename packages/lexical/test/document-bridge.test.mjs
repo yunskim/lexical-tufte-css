@@ -277,6 +277,7 @@ test('R11 successful import returns detached envelope and editor state',()=>{
 
 test('R11 exported document cannot alias mutable editor JSON or base metadata',()=>{
  const base=fixture();
+ base.assets.push({id:'alias-asset',src:'/images/alias.png',mimeType:'image/png',width:8,height:8});
  const state=structuredClone(base.lexicalState);
  const fake={getEditorState(){return {toJSON(){return state;}};}};
  const result=exportEditorToDocument(fake,base);
