@@ -75,12 +75,17 @@ test('R03 canonical serialization ignores object key order but preserves array o
  assert.equal(second.ok,true,JSON.stringify(second.diagnostics));
  assert.equal(first.value,second.value);
  const changed=structuredClone(base);
+ // Force two distinct, valid sections so this assertion cannot silently skip.
+ const section=structuredClone(changed.lexicalState.root.children[0]);
+ assert.equal(section.type,'tufte-section');
+ section.children=[];
+ changed.lexicalState.root.children.push(section);
+ const beforeOrder=canonicalizeDocument(changed);
+ assert.equal(beforeOrder.ok,true,JSON.stringify(beforeOrder.diagnostics));
  changed.lexicalState.root.children.reverse();
- if(changed.lexicalState.root.children.length>1){
-  const reordered=canonicalizeDocument(changed);
-  assert.equal(reordered.ok,true,JSON.stringify(reordered.diagnostics));
-  assert.notEqual(first.value,reordered.value);
- }
+ const reordered=canonicalizeDocument(changed);
+ assert.equal(reordered.ok,true,JSON.stringify(reordered.diagnostics));
+ assert.notEqual(beforeOrder.value,reordered.value);
  const parsed=parseCanonicalDocument(first.value);
  assert.equal(parsed.ok,true,JSON.stringify(parsed.diagnostics));
  assert.deepEqual(parsed.value,base);
