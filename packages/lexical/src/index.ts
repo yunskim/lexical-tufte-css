@@ -5,3 +5,4 @@ export {$createNoteNode, NoteNode, type NoteKind, type SerializedNoteNode} from 
 export {$createInlineImageNode, InlineImageNode} from './InlineImageNode.js';
 export {$getContainingNote,$splitNoteAtSelection,$mergeNoteWithNext,$moveNote,$insertNotePhrasing} from './noteOperations.js';
 export {SectionNode,FigureNode,CaptionNode,TableLayoutNode,$createSectionNode,$createFigureNode,$createCaptionNode,$createTableLayoutNode,type FigureWidth,type TableLayout} from './LayoutNodes.js';
+export {$collectNoteIds,$reidentifyPastedNotes} from './clipboardNotes.js';
