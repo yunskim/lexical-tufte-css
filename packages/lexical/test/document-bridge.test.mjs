@@ -444,3 +444,27 @@ test('R03 migrated document replacement dispatches history reset only on success
  assert.equal(cleared,1);
  unregister();
 });
+
+test('R03 lossy Lexical import leaves editor state and history untouched',()=>{
+ const destination=editor();
+ let clearCount=0;
+ const unregister=destination.registerCommand(CLEAR_HISTORY_COMMAND,()=>{
+  clearCount+=1;
+  return false;
+ },COMMAND_PRIORITY_CRITICAL);
+ const source=editor();
+ source.update(()=>$getRoot().append($createSectionNode().append(
+  $createParagraphNode().append($createTextNode('loss detection'))
+ )),{discrete:true});
+ const valid={...fixture(),lexicalState:source.getEditorState().toJSON()};
+ // This is schema-valid but Lexical will normalize or reject an unsupported
+ // serialized text format, so a successful import must never be assumed.
+ const malformed=structuredClone(valid);
+ malformed.lexicalState.root.children[0].children[0].children[0].format=255;
+ const before=destination.getEditorState().toJSON();
+ const result=loadMigratedDocumentIntoEditor(destination,malformed);
+ assert.equal(result.ok,false,JSON.stringify(result.diagnostics));
+ assert.deepEqual(destination.getEditorState().toJSON(),before);
+ assert.equal(clearCount,0);
+ unregister();
+});
