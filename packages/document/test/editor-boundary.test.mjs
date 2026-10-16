@@ -328,3 +328,26 @@ test('R03 SQLite CAS uses one parameterized conditional update',async()=>{
  assert.ok(invalid.diagnostics.some(d=>d.code==='INVALID_NEXT_REVISION'));
  assert.equal(calls.length,before);
 });
+
+test('R03 SQLite insert refuses duplicate rows and requires initial revision',async()=>{
+ const document=JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document-v2.json',import.meta.url),'utf8'));
+ const metadata={slug:'new-post',summary:'new',tags:[],authors:['editor'],status:'draft',
+  createdAt:'2026-10-16T00:00:00Z',updatedAt:'2026-10-16T00:00:00Z',revision:1};
+ const sql=[];
+ let changes=1;
+ const db={prepare(query){sql.push(query);return {bind(...args){sql.push(args);return this;},
+  async run(){return {meta:{changes}};}};}};
+ const store=new SqlitePostRevisionStoreV2(db);
+ const first=await store.insert({document,metadata});
+ assert.equal(first.ok,true,JSON.stringify(first.diagnostics));
+ assert.match(sql[0],/^INSERT OR IGNORE INTO posts_v2/);
+ changes=0;
+ const duplicate=await store.insert({document,metadata});
+ assert.equal(duplicate.ok,false);
+ assert.ok(duplicate.diagnostics.some(d=>d.code==='POST_ALREADY_EXISTS'));
+ const before=sql.length;
+ const bad=await store.insert({document,metadata:{...metadata,revision:2}});
+ assert.equal(bad.ok,false);
+ assert.ok(bad.diagnostics.some(d=>d.code==='INVALID_INITIAL_REVISION'));
+ assert.equal(sql.length,before);
+});
