@@ -9,3 +9,4 @@ export {inspectStoredDocument,type StoredFormat,type FormatInspection} from './i
 export {validateDocumentV2,type TufteDocumentV2,type V2ValidationResult} from './validateV2.js';
 export {migrateStoredDocument,type MigrationResult} from './migrateStoredDocument.js';
 export {preparePostRevisionV2,type RevisionDecision} from './revision.js';
+export {InMemoryPostRevisionStoreV2,type PostRevisionStoreV2} from './revisionStore.js';
