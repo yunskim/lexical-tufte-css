@@ -1,7 +1,7 @@
 # Lexical Tufte 블로그 라이브러리 계획
 
 작성: 2026-10-16 (Asia/Seoul)
-상태: P0 및 P1.1/P1.2 prototype 완료. Chromium 자동 회귀와 조합 이벤트 검증 범위이며, OS별 실제 IME 및 제품 전체 검증은 후속 단계.
+상태: P0 및 P1.1–P1.3 완료. Chromium 자동 회귀와 조합 이벤트 검증 범위이며, OS별 실제 IME 및 제품 전체 검증은 후속 단계.
 저장소: https://github.com/yunskim/lexical-tufte (public, GPL-3.0; 사용자가 생성한 설정 유지).
 
 ## 목표와 완료 정의
@@ -49,7 +49,7 @@ TypeScript + pnpm workspace를 제안한다. React 편집기를 첫 UI로 제공
 
 노트는 anchor와 payload가 함께 이동하는 논리적 단위로 관리한다. note ID는 영구 식별자이고 화면 번호는 문서 순서에서 파생한다. 복사 시 ID를 재발급하고 내부 참조를 재연결한다. HTML은 label→input→span.sidenote/marginnote 인접 구조와 article별 고유 namespace를 유지한다. 여러 글을 한 화면에 표시해도 DOM ID와 카운터가 충돌하지 않아야 한다.
 
-노트 본문은 링크·강조·코드·이미지 등 유효한 phrasing content를 지원한다. 블록 노트는 별도 문서 모델로 유지하되 span 안에 p/div를 내보내지 않는다. 해당 모델과 인라인 변환 범위는 P1에서 확정한다. nested editor 채택 시 선택 이동·undo·IME·직렬화의 원자성을 먼저 검증한다. 중첩 노트 및 동일 노트의 다중 참조는 v1에서 명시적으로 거부하고 진단한다.
+노트 본문은 링크·강조·코드·이미지 등 유효한 phrasing content를 지원한다. [ADR-0001](adr/0001-note-editor-model.ko.md)에 따라 v1은 단일 EditorState의 inline container를 사용한다. 블록 노트는 후속 별도 모델 설계 대상으로 두고 span 안에 p/div를 내보내거나 조용히 평탄화하지 않는다. 구체적인 허용 목록·진단은 P1.5/P2에서 확정한다. 중첩 노트 및 동일 노트의 다중 참조는 v1에서 명시적으로 거부하고 진단한다.
 
 ## Tufte 전체 기능 검증표
 
@@ -117,7 +117,7 @@ P0 gate: 저장소 URL, 재현 가능한 설치/빌드, 버전/라이선스/전�
 
 - [x] P1.1 문단 중간 note, 링크/코드/이미지 payload, 키보드 진입/탈출 prototype.
 - [x] P1.2 노트 복사·삭제·split/merge·이동·undo/redo·한국어 IME prototype.
-- [ ] P1.3 Lexical 소유 DOM과 export DOM을 분리해 label/input/span 인접성 확인; nested editor vs inline container 결정 ADR.
+- [x] P1.3 Lexical 소유 DOM과 export DOM을 분리해 label/input/span 인접성 확인; nested editor vs inline container 결정 ADR.
 - [ ] P1.4 section·figure·caption·fullwidth·표를 조합해 CSS direct-child 규칙과 렌더러 일치 검증.
 - [ ] P1.5 headless 렌더링·서버 import 방식 비교, API/문서 schema와 허용 노트 콘텐츠 범위 확정 ADR.
 
@@ -193,7 +193,7 @@ P6 gate: 로컬 빌드·타입 검사·관련 테스트 통과, 남은 결함과
 
 진행 기록 형식: `작업 ID | 상태(todo/in-progress/blocked/done) | 변경 경로/PR | 검증 명령·결과 | 차단 원인 | 다음 작업`. 증거 없이 체크하지 않는다. 문서 수정만으로 구현 작업을 완료하지 않는다.
 
-현재 다음 작업: P1.3 inline container와 nested editor 비교 ADR. P1.2 증거: packages/lexical/src/noteOperations.ts, tests/note-editing-browser.mjs, examples/editor/src/main.tsx 및 docs/PROGRESS.md. 한국어 IME prototype은 Chromium CDP 조합 이벤트 범위로 검증했으며 OS별 실제 입력은 P6에서 별도 확인한다.
+현재 다음 작업: P1.4 section·figure·caption·fullwidth·표 조합의 CSS direct-child 규칙과 renderer 일치 검증. P1.3 결정과 증거는 [ADR-0001](adr/0001-note-editor-model.ko.md), nested-comparison.test.mjs, tests/note-dom-browser.mjs 및 docs/PROGRESS.md에 기록한다.
 
 ## 주요 위험과 처리
 

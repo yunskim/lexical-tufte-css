@@ -103,3 +103,12 @@
 - 처리: 경계의 phrasing 삽입을 전용 helper로 처리하고 toolbar·paste에 적용했다. split 후 merge에서 경계의 동일 속성 LinkNode를 다시 합쳐 wrapper 분할도 복원한다.
 - 검증: 노트 시작점 링크/이미지 삽입, rich clipboard, 링크 내부 분할/병합과 undo/redo 통과.
 - 상태: verified (prototype 지원 경로). 대책 M010: 실제 삽입 위치와 링크·이미지·노트 ID·내용을 단계별로 검사하고 명확한 assertion 위치를 기록한다.
+
+## E012 — 이미지 발행 HTML에 편집 전용 속성 유출
+
+- 발생: 2026-10-16 P1.3 DOM 분리 Chromium 검사.
+- 증상: 발행 HTML의 img에 `contenteditable="false"`가 남아 편집 전용 속성 배제 assertion 실패.
+- 확인한 원인: InlineImageNode.exportDOM이 편집용 createDOM을 그대로 재사용했다.
+- 처리: 의미적 이미지 속성(src/alt) 생성만 공유하고 편집 전용 contentEditable 속성은 createDOM에서만 설정하도록 분리했다.
+- 검증: tests/note-dom-browser.mjs에서 두 note 종류의 편집 속성 배제·마크업·export JSON 불변성·모바일 CSS 토글 및 전체 P1.1/P1.2 회귀 통과.
+- 상태: verified (현재 주석·이미지 DOM export 범위). 대책 M011: 편집 DOM과 발행 DOM을 별도로 검사하고 발행 결과의 편집 class/data/contenteditable 유출을 회귀 테스트로 차단한다.

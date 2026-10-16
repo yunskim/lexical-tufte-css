@@ -10,15 +10,18 @@ export class InlineImageNode extends DecoratorNode<null> {
   constructor(src = '', alt = '', key?: NodeKey) { super(key); this.__src=src; this.__alt=alt; }
   isInline(): true { return true; }
   decorate(): null { return null; }
-  createDOM(): HTMLElement {
+  private createImageElement(): HTMLImageElement {
     const img=document.createElement('img');
     const src=this.getLatest().__src;
     if (!safeImageURL(src)) throw Error('Unsupported image URL');
-    img.src=src; img.alt=this.getLatest().__alt; img.contentEditable='false';
+    img.src=src; img.alt=this.getLatest().__alt;
     return img;
   }
+  createDOM(): HTMLElement {
+    const img=this.createImageElement();img.contentEditable='false';return img;
+  }
   updateDOM(previous: InlineImageNode): boolean { return previous.__src!==this.__src || previous.__alt!==this.__alt; }
-  exportDOM(): DOMExportOutput { return {element:this.createDOM()}; }
+  exportDOM(): DOMExportOutput { return {element:this.createImageElement()}; }
   exportJSON(): SerializedInlineImage { return {...super.exportJSON(),type:'tufte-inline-image',version:1,src:this.getLatest().__src,alt:this.getLatest().__alt}; }
   static importJSON(value: SerializedInlineImage): InlineImageNode {
     if(value.version!==1 || typeof value.src!=='string' || typeof value.alt!=='string' || !safeImageURL(value.src)) throw Error('Unsupported image');

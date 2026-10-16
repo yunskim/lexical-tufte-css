@@ -13,7 +13,7 @@
     "lint": "node scripts/lint.mjs",
     "inventory:check": "node scripts/inventory.mjs",
     "test": "pnpm -r --if-present test",
-    "test:browser": "pnpm build && node tests/note-browser.mjs && node tests/note-editing-browser.mjs",
+    "test:browser": "pnpm build && node tests/note-browser.mjs && node tests/note-editing-browser.mjs && node tests/note-dom-browser.mjs",
     "dev:editor": "pnpm --filter @lexical-tufte/lexical build && pnpm --filter @lexical-tufte/editor-prototype dev"
   },
   "devDependencies": {

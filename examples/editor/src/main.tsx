@@ -15,7 +15,7 @@ import {
   COMPOSITION_START_COMMAND, SELECTION_INSERT_CLIPBOARD_NODES_COMMAND, CUT_COMMAND, PASTE_COMMAND, KEY_BACKSPACE_COMMAND, KEY_DELETE_COMMAND, HISTORY_PUSH_TAG, UNDO_COMMAND, REDO_COMMAND,
   COMMAND_PRIORITY_HIGH, type LexicalNode,
 } from 'lexical';
-import {NoteNode, InlineImageNode, $createNoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing} from '@lexical-tufte/lexical';
+import {NoteNode, InlineImageNode, $createNoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, type NoteKind} from '@lexical-tufte/lexical';
 import './style.css';
 
 function containingNote(node: LexicalNode | null): NoteNode | null {
@@ -167,12 +167,12 @@ function EditorUI(){
     });
     return()=>{escape();down();typing();cutting();pasting();plainPaste();backspace();forwardDelete();composing();enter();};
   },[editor]);
-  function insertNote(){
+  function insertNote(kind:NoteKind='sidenote'){
     editor.update(()=>{
       const s=$getSelection();
       if(!$isRangeSelection(s)||!s.isCollapsed()){setStatus('본문의 삽입 위치 한 곳을 선택하세요.');return;}
       if(containingNote(s.anchor.getNode())){setStatus('노트 안에 노트를 넣을 수 없습니다.');return;}
-      const note=$createNoteNode(crypto.randomUUID()).append($createTextNode('새 노트'));
+      const note=$createNoteNode(crypto.randomUUID(),kind).append($createTextNode('새 노트'));
       s.insertNodes([note]);note.selectStart();setStatus('새 노트를 삽입했습니다. Escape로 본문에 돌아갑니다.');
     });editor.focus();
   }
@@ -213,7 +213,8 @@ function EditorUI(){
   return <>
     <header><h1>사이드노트 편집 프로토타입</h1><p>P1.2 · 본문과 노트를 한 편집 상태에서 작성합니다.</p></header>
     <div className="toolbar" role="toolbar" aria-label="노트 편집">
-      <button onMouseDown={preserve} onClick={insertNote}>노트 삽입</button>
+      <button onMouseDown={preserve} onClick={()=>insertNote()}>노트 삽입</button>
+      <button onMouseDown={preserve} onClick={()=>insertNote('marginnote')}>여백 주석 삽입</button>
       <button onMouseDown={preserve} onClick={()=>editor.update(()=>{if(!enterNote())setStatus('뒤에 있는 노트를 찾지 못했습니다.');})}>다음 노트로</button>
       <button onMouseDown={preserve} onClick={()=>editor.update(leaveNote)}>본문으로</button>
       <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(FORMAT_TEXT_COMMAND,'bold')}>굵게</button>

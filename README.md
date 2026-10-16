@@ -2,7 +2,7 @@
 
 Lexical 기반 Tufte CSS 편집기와 블로그 운영용 TypeScript 라이브러리.
 
-현재 단계: P0 및 P1.1/P1.2 prototype 완료. 노트 편집 prototype을 실행할 수 있습니다. 전체 편집기 및 npm 배포 패키지는 아직 완성되지 않았습니다.
+현재 단계: P0 및 P1.1–P1.3 완료. 노트 편집 prototype을 실행할 수 있습니다. 전체 편집기 및 npm 배포 패키지는 아직 완성되지 않았습니다.
 
 - [구현 계획 및 실행 체크리스트](docs/PLAN.ko.md)
 - [작업 규약](AGENTS.md)
@@ -50,3 +50,5 @@ pnpm test:browser
 - [재발 방지 대책·정기 점검](docs/ERROR_PREVENTION.md)
 
 각 작업 시작·완료와 단계 전환 때 점검하고, 대책을 코드·테스트·작업 절차에 반영합니다.
+
+- [주석 편집 구조 결정 ADR-0001](docs/adr/0001-note-editor-model.ko.md)
