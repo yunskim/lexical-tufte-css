@@ -41,6 +41,7 @@ export function registerQuotationCommands(editor:LexicalEditor,onDiagnostic?:(di
    const s=selected();if(!s)return reject('인용문 안의 한 삽입 위치를 선택하세요.');
    const q=ancestor(s.anchor.getNode(),'quote');
    if(!(q instanceof QuoteNode))return reject('인용문 안에서만 출처를 추가할 수 있습니다.');
+   if(!q.getParent()||!NODE_SCHEMA[q.getParent()!.getType()]?.children?.includes('quote'))return reject('문서 스키마에 허용된 인용문에서만 출처를 추가할 수 있습니다.');
    if(q.getChildren().some(n=>n.getType()==='tufte-attribution'))return reject('인용문에 출처가 이미 있습니다.');
    if(!NODE_SCHEMA.quote!.children!.includes('tufte-attribution'))return reject('인용문에 출처를 추가할 수 없습니다.');
    $addUpdateTag(HISTORY_PUSH_TAG);
