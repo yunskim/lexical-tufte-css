@@ -5,8 +5,9 @@ import {createHeadlessEditor} from '@lexical/headless';
 import {$getRoot,$createParagraphNode,$createTextNode} from 'lexical';
 import {SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,$createFigureNode,$createCaptionNode,$createInlineImageNode,$createSectionNode,$createNoteNode,$createTufteSpanNode,loadDocumentIntoEditor,exportEditorToDocument} from '../dist/index.js';
 import {LinkNode} from '@lexical/link';
+import {ListNode,ListItemNode,$createListNode,$createListItemNode} from '@lexical/list';
 const fixture=()=>JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document.json',import.meta.url),'utf8'));
-const editor=()=>createHeadlessEditor({namespace:'document-bridge-test',nodes:[SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,LinkNode],onError(e){throw e;}});
+const editor=()=>createHeadlessEditor({namespace:'document-bridge-test',nodes:[SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,ListNode,ListItemNode,LinkNode],onError(e){throw e;}});
 test('R02 strict Lexical bridge fails closed when a registered node is missing',()=>{
  const source=editor();
  source.update(()=>{
@@ -104,4 +105,23 @@ test('R03 field ordering alone is not considered import loss',()=>{
  const result=loadDocumentIntoEditor(fake,base);
  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
  assert.equal(mutations,1);
+});
+
+test('R02 ordered list survives Lexical roundtrip',()=>{
+ const source=editor();
+ source.update(()=>{
+  $getRoot().append($createSectionNode().append(
+   $createListNode('number',7).append(
+    $createListItemNode().append($createTextNode('일곱')),
+    $createListItemNode().append($createTextNode('여덟'))
+   )
+  ));
+ },{discrete:true});
+ const base=fixture(),document={...base,lexicalState:source.getEditorState().toJSON()};
+ const destination=editor(),loaded=loadDocumentIntoEditor(destination,document);
+ assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
+ const exported=exportEditorToDocument(destination,document);
+ assert.equal(exported.ok,true,JSON.stringify(exported.diagnostics));
+ assert.deepEqual(exported.value.lexicalState,document.lexicalState);
+ assert.equal(exported.value.lexicalState.root.children[0].children[0].start,7);
 });
