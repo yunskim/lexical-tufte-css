@@ -691,3 +691,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - 공개 API 및 선행 공백·탭·개행을 포함한 왕복 테스트 추가.
 - `@lexical/code`의 실제 TabNode/LineBreakNode와 구문 강조 노드 호환성 및 pre>code 발행 구조는 별도 검증 필요. 빌드·테스트 실행 미확인, F17 완료 체크 보류. CI 없음.
 - 다음: F19 ImageQuilt 노드와 자산·크기 계약.
+
+## 2026-10-16 — F19 ImageQuilt node
+
+- `packages/lexical/src/ImageQuiltNode.ts`: ImageQuilt 이미지 자산의 URL/alt/assetId/width/height 검증과 JSON import/export 추가.
+- 공개 API 연결, fullwidth figure 내부 이미지 자산 왕복 및 잘못된 URL/크기 거부 테스트 작성.
+- 실제 빌드·테스트 미실행, asset fixture의 metadata 계약 일치 및 CSS 레이아웃 확인 필요. F19/P2.3 완료 체크 보류. CI 없음.
+- 다음 순서: F18 embed node의 provider URL allowlist, wrapper/비율/제목 보존.
