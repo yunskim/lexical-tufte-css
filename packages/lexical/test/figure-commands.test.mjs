@@ -101,3 +101,17 @@ test('clipboard note reidentification traverses notes nested inside figures',()=
  },{discrete:true});
  dispose();
 });
+
+test('cut-paste preserves one nested figure note ID and renews duplicate copies',()=>{
+ const {editor,dispose}=setup();
+ editor.update(()=>{
+  const first=$createFigureNode().append($createInlineImageNode('/a.png','a'),$createNoteNode('shared-cut','marginnote').append($createTextNode('a')));
+  const second=$createFigureNode().append($createInlineImageNode('/b.png','b'),$createNoteNode('shared-cut','marginnote').append($createTextNode('b')));
+  $getRoot().append($createSectionNode().append(first,second));
+  const changes=$reidentifyPastedNotes([first,second],new Set(['shared-cut']),()=> 'renewed-copy');
+  assert.equal(first.getLastChild().getNoteId(),'renewed-copy');
+  assert.equal(second.getLastChild().getNoteId(),'renewed-copy');
+  assert.equal(changes.get('shared-cut')?.length,2);
+ },{discrete:true});
+ dispose();
+});
