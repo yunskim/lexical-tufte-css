@@ -895,3 +895,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - SET_TUFTE_FIGURE_WIDTH_COMMAND: 기존 collapsed range selection에 더해 단일 figure/image node selection, 섹션의 element offset이 가리키는 figure도 대상으로 허용. IME 조합 및 노트 내부 selection은 거부.
 - 섹션 offset 해석은 anchor.type==='element'일 때만 수행해 텍스트 offset과 혼동하지 않음.
 - 실행 테스트는 Work 일괄 처리 대기. 신규 선택 분기·undo/redo·caption 없는 figure 검증이 필요. CI 없음, 완료 체크 보류.
+
+## 2026-10-16 저장소 이름 변경
+
+- GitHub 저장소 이름을 yunskim/lexical-tufte-css로 변경한 것을 API로 확인. README 제목·저장소 URL 갱신.
+- npm 워크스페이스/패키지 식별자(@lexical-tufte/*)는 공개 API 호환성을 위해 그대로 유지. 저장소 rename과 패키지 rename을 혼동하지 않음.
+- 후속 GitHub 작업은 yunskim/lexical-tufte-css를 정본 주소로 사용. CI 생략, Work 일괄 테스트 정책 유지.
