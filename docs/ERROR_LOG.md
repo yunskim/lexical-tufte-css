@@ -240,3 +240,9 @@
 - 발견: 2026-10-16 R11 코드 점검. `loadDocumentIntoEditor()`가 검증 성공 후 `input as TufteDocument`를 그대로 반환하여 호출자 수정이 성공 결과를 바꾸는 alias가 있었다.
 - 처리: editor 상태 적용 전 구조화 복제본을 만들고 성공 결과로 반환. 호출자 title 및 lexicalState 변경 후 결과 불변성을 검사하는 회귀 테스트 추가.
 - 상태: 코드/테스트 반영, 실행 검증 대기(E025/E027). M028 참조.
+
+## E031 — 내보내기 성공 결과의 편집기 상태 alias
+
+- 발견: 2026-10-16 R11 점검. `editorJSONToDocument()`가 validateDocument 결과를 그대로 반환하므로 lexicalState가 호출자/편집기 소유의 mutable state를 참조할 수 있었다.
+- 처리: 성공 시 문서 전체를 structuredClone하여 반환. editor state와 base metadata를 사후 변경하는 회귀 추가.
+- 상태: 코드·테스트 반영, 실행 검증 대기(E025/E027). M028 확대 적용.
