@@ -182,3 +182,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - packages/render/src/index.ts: 지원 중인 root/section/paragraph/text/linebreak/link/image/note/figure/caption/table-layout/table/row/cell 모두 RenderChild[] 생성 방식으로 이전. article envelope와 본문을 하나의 typed tree로 구성해 serializeHTML 한 번으로 출력.
 - table-layout fullwidth는 문자열 replace가 아닌 table element의 class 속성 갱신으로 처리. HTML 문자열 어댑터 제거.
 - 기존 render.test.mjs와 tree.test.mjs의 실제 실행은 E025 환경 차단으로 미검증. 구조적 전환은 반영되었지만 R08 완료 체크는 테스트 통과 후 진행.
+
+## 2026-10-16 — R09 표 header 구조 개선
+
+- packages/render/src/index.ts: table의 선행 연속 열 머리글 행(모든 cell.headerState=1)을 thead로 묶고 나머지 행을 tbody에 배치. th scope=col/row는 유지.
+- packages/render/src/tree.ts: thead를 typed tree 허용 태그에 추가.
+- packages/render/test/render.test.mjs: thead/tbody 경계 및 혼합 머리글 행이 tbody에 남는 회귀 검사 추가. fixture의 첫 행은 headerState=[1,1], 두 번째 행은 [0,0] 확인.
+- 실제 실행 검증 미완료(E025), R09 체크 보류. headerState 조합의 세부 정책 및 접근성 검증은 추후 보강.
