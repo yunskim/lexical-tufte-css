@@ -535,3 +535,26 @@ test('R03 checked-in v2 golden rejects unknown editor format without mutation',(
  assert.ok(result.diagnostics.some(d=>d.code==='UNSUPPORTED_EDITOR_FORMAT'));
  assert.deepEqual(destination.getEditorState().toJSON(),before);
 });
+
+
+test('R01 image import rejects unsafe URL and invalid asset identifier',()=>{
+ const valid={type:'tufte-inline-image',version:1,src:'/assets/chart.png',alt:'chart',assetId:'chart_1',width:640,height:360};
+ assert.throws(()=>InlineImageNode.importJSON({...valid,src:'javascript:alert(1)'}),/Invalid image properties/);
+ assert.throws(()=>InlineImageNode.importJSON({...valid,assetId:'../escape'}),/Invalid image properties/);
+ assert.throws(()=>InlineImageNode.importJSON({...valid,width:0}),/Invalid image properties/);
+ assert.throws(()=>InlineImageNode.importJSON({...valid,height:-1}),/Invalid image properties/);
+ assert.throws(()=>InlineImageNode.importJSON({...valid,version:99}),/Unsupported image version/);
+});
+test('R01 image export preserves validated asset and dimensions',()=>{
+ const source=editor();
+ source.update(()=>{
+  $getRoot().append($createSectionNode().append(
+   $createParagraphNode().append($createInlineImageNode('/assets/chart.png','chart','chart_1',640,360))
+  ));
+ },{discrete:true});
+ const node=source.getEditorState().toJSON().root.children[0].children[0].children[0];
+ assert.equal(node.src,'/assets/chart.png');
+ assert.equal(node.assetId,'chart_1');
+ assert.equal(node.width,640);
+ assert.equal(node.height,360);
+});
