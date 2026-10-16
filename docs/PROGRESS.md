@@ -293,3 +293,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - 미등록 노드 실패 테스트는 서버 fixture 의존을 제거하고, TufteSpanNode를 명시적으로 누락한 편집기로 변경해 재현 조건을 고정.
 - 오류 대책 M025 재점검: 테스트가 검출해야 할 조건을 fixture에 명시한다. pnpm 실행 차단(E025/E027)으로 새 테스트 통과 미확인. R02/R03 완료 체크 보류.
 - 표 왕복과 Lexical 0.52.0 골든 fixture는 다음 단계로 유지.
+
+## 2026-10-16 — R02 스크롤 표 왕복 테스트 추가
+
+- packages/lexical/test/document-bridge.test.mjs: TableLayoutNode 및 @lexical/table TableNode/TableRowNode/TableCellNode를 headless registry에 등록. 2x2 표, 헤더 셀, scroll 레이아웃을 생성하고 document→Lexical→document JSON 동등성 검사 작성.
+- 신규 테스트 실행은 여전히 미확인(E025/E027). Lexical 0.52.0의 실제 table 직렬화 필드가 document schema와 일치하는지는 실행 후 확인해야 함. R02 체크 보류.
+- 다음: frozen install/check에서 실패가 드러나면 ERROR_LOG/ERROR_PREVENTION 갱신, 이어서 0.52.0 골든 fixture 구축.
