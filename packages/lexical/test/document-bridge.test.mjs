@@ -481,6 +481,10 @@ test('R03 actual HistoryPlugin state is cleared after document replacement',()=>
  // Seed an old-document undo/redo stack. A successful replacement must clear both.
  history.undoStack.push({editor:destination,editorState:destination.getEditorState()});
  history.redoStack.push({editor:destination,editorState:destination.getEditorState()});
+ const rejected=loadMigratedDocumentIntoEditor(destination,{...document,schemaVersion:99});
+ assert.equal(rejected.ok,false);
+ assert.equal(history.undoStack.length,1);
+ assert.equal(history.redoStack.length,1);
  const loaded=loadMigratedDocumentIntoEditor(destination,document);
  assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
  assert.equal(history.undoStack.length,0);
