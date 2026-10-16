@@ -1,12 +1,15 @@
-import {$addUpdateTag,$createTextNode,$getSelection,$isRangeSelection,$isNodeSelection,createCommand,COMMAND_PRIORITY_EDITOR,HISTORY_PUSH_TAG,type LexicalCommand,type LexicalEditor,type LexicalNode} from 'lexical';
+import {$addUpdateTag,$createTextNode,$getRoot,$getSelection,$isRangeSelection,$isNodeSelection,createCommand,COMMAND_PRIORITY_EDITOR,HISTORY_PUSH_TAG,type LexicalCommand,type LexicalEditor,type LexicalNode} from 'lexical';
 import {NODE_SCHEMA,isSafeURL,isIdentifier,type Diagnostic} from '@lexical-tufte/document';
 import {SectionNode,FigureNode,CaptionNode,$createFigureNode,$createCaptionNode,type FigureWidth} from './LayoutNodes.js';
 import {InlineImageNode,$createInlineImageNode} from './InlineImageNode.js';
+import {$createNoteNode,NoteNode} from './NoteNode.js';
 import {$getContainingNote} from './noteOperations.js';
 
 export type InsertTufteFigure={src:string;alt:string;assetId?:string;imageWidth?:number;imageHeight?:number;width?:FigureWidth;caption?:string};
 export const INSERT_TUFTE_FIGURE_COMMAND:LexicalCommand<InsertTufteFigure>=createCommand('INSERT_TUFTE_FIGURE');
 export const SET_TUFTE_FIGURE_WIDTH_COMMAND:LexicalCommand<FigureWidth>=createCommand('SET_TUFTE_FIGURE_WIDTH');
+export type InsertFigureMarginNote={noteId:string;text:string};
+export const INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND:LexicalCommand<InsertFigureMarginNote>=createCommand('INSERT_TUFTE_FIGURE_MARGINNOTE');
 
 export function registerFigureCommands(editor:LexicalEditor,onDiagnostic?:(diagnostic:Diagnostic)=>void):()=>void{
  if(!editor.hasNodes([SectionNode,FigureNode,CaptionNode]))throw Error('Figure commands require TUFTE_NODES');
@@ -18,6 +21,26 @@ export function registerFigureCommands(editor:LexicalEditor,onDiagnostic?:(diagn
  const selection=()=>{
   const s=$getSelection();
   return $isRangeSelection(s)&&s.isCollapsed()&&!editor.isComposing()&&!$getContainingNote(s.anchor.getNode())?s:null;
+ };
+ const selectedFigure=():FigureNode|null=>{
+  const current=$getSelection();
+  if(editor.isComposing())return null;
+  if($isRangeSelection(current)&&current.isCollapsed()&&!$getContainingNote(current.anchor.getNode())){
+   const anchor=current.anchor.getNode();
+   const figure=ancestor(anchor,'tufte-figure');
+   if(figure instanceof FigureNode)return figure;
+   if(anchor instanceof SectionNode&&current.anchor.type==='element'){
+    const candidate=anchor.getChildAtIndex(current.anchor.offset);
+    return candidate instanceof FigureNode?candidate:null;
+   }
+  }else if($isNodeSelection(current)){
+   const nodes=current.getNodes();
+   if(nodes.length===1){const node=nodes[0]!;
+    if(node instanceof FigureNode)return node;
+    if(node instanceof InlineImageNode){const figure=ancestor(node,'tufte-figure');return figure instanceof FigureNode?figure:null;}
+   }
+  }
+  return null;
  };
  const registrations=[
   editor.registerCommand(INSERT_TUFTE_FIGURE_COMMAND,payload=>{
@@ -42,27 +65,29 @@ export function registerFigureCommands(editor:LexicalEditor,onDiagnostic?:(diagn
   },COMMAND_PRIORITY_EDITOR),
   editor.registerCommand(SET_TUFTE_FIGURE_WIDTH_COMMAND,width=>{
    if(width!=='body'&&width!=='fullwidth')return reject('INVALID_FIGURE_WIDTH','그림 너비는 body/fullwidth만 허용합니다.');
-   if(editor.isComposing())return reject('INVALID_FIGURE_SELECTION','IME 조합 중에는 그림 너비를 변경할 수 없습니다.');
-   const current=$getSelection();
-   let figure:LexicalNode|null=null;
-   if($isRangeSelection(current)&&current.isCollapsed()&&!$getContainingNote(current.anchor.getNode())){
-    const anchor=current.anchor.getNode();
-    figure=ancestor(anchor,'tufte-figure');
-    if(!figure&&anchor instanceof SectionNode&&current.anchor.type==='element'){
-     const candidate=anchor.getChildAtIndex(current.anchor.offset);
-     if(candidate instanceof FigureNode)figure=candidate;
-    }
-   }else if($isNodeSelection(current)){
-    const nodes=current.getNodes();
-    if(nodes.length===1){
-     const node=nodes[0]!;
-     if(node instanceof FigureNode)figure=node;
-     else if(node instanceof InlineImageNode)figure=ancestor(node,'tufte-figure');
-    }
-   }
+   const figure=selectedFigure();
    if(!(figure instanceof FigureNode))return reject('INVALID_FIGURE_SELECTION','그림 안에서만 너비를 변경할 수 있습니다.');
    if(figure.getWidth()===width)return true;
    $addUpdateTag(HISTORY_PUSH_TAG);figure.setWidth(width);return true;
+  },COMMAND_PRIORITY_EDITOR),
+  editor.registerCommand(INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,payload=>{
+   if(!payload||!isIdentifier(payload.noteId)||typeof payload.text!=='string'||!payload.text.trim()||payload.text.length>2000)
+    return reject('INVALID_FIGURE_NOTE','여백 주석 ID와 내용을 확인하세요.');
+   const figure=selectedFigure();
+   if(!figure)return reject('INVALID_FIGURE_SELECTION','그림을 선택한 후 여백 주석을 삽입하세요.');
+   const ids=new Set<string>();
+   const visit=(node:LexicalNode):void=>{
+    if(node instanceof NoteNode)ids.add(node.getNoteId());
+    if('getChildren' in node&&typeof node.getChildren==='function')for(const child of node.getChildren() as LexicalNode[])visit(child);
+   };
+   visit($getRoot());
+   if(ids.has(payload.noteId))return reject('DUPLICATE_NOTE_ID','이미 사용 중인 여백 주석 ID입니다.');
+   $addUpdateTag(HISTORY_PUSH_TAG);
+   const note=$createNoteNode(payload.noteId,'marginnote').append($createTextNode(payload.text));
+   const caption=figure.getChildren().find(child=>child instanceof CaptionNode);
+   if(caption)caption.insertBefore(note);
+   else figure.append(note);
+   note.selectEnd();return true;
   },COMMAND_PRIORITY_EDITOR)
  ];
  return ()=>registrations.forEach(dispose=>dispose());
