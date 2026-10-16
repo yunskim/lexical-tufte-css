@@ -54,7 +54,22 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
     if(n.layout==='fullwidth')return [element('table',{...table.attrs,class:[table.attrs.class,'fullwidth'].filter(Boolean).join(' ')},table.children)];
     return [table];
    }
-   case 'table':return [element('table',attrs(n),[element('tbody',{},inner())])];
+   case 'table':{
+    const rows=n.children.map(row=>render(row)[0] as RenderElement);
+    const headerRows:RenderElement[]=[];
+    const bodyRows:RenderElement[]=[];
+    let bodyStarted=false;
+    for(const [i,row] of rows.entries()){
+     const source=n.children[i]!;
+     const columnHeader=source.type==='tablerow'&&source.children.length>0&&source.children.every(cell=>cell.type==='tablecell'&&cell.headerState===1);
+     if(!bodyStarted&&columnHeader)headerRows.push(row);
+     else{bodyStarted=true;bodyRows.push(row);}
+    }
+    return [element('table',attrs(n),[
+     ...(headerRows.length?[element('thead',{},headerRows)]:[]),
+     element('tbody',{},bodyRows),
+    ])];
+   }
    case 'tablerow':return [element('tr',attrs(n),inner())];
    case 'tablecell':{
     const header=Number(n.headerState),tag=header?'th':'td';
