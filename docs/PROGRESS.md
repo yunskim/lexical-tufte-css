@@ -255,3 +255,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - sans/newthought/numeral/danger 네 종류에 대해 Lexical JSON 저장→parse→복원→동등성 검사 추가. 잘못된 kind 생성·import 거부 테스트 추가.
 - 실행 환경 재확인: node --version v22.16.0 PASS; pnpm --version command not found; corepack pnpm --version registry.npmjs.org EAI_AGAIN. pnpm check/test:browser 실행 불가.
 - 이 테스트는 Lexical JSON 자체 왕복만 검증하도록 작성되었고, R02가 요구하는 document→editor→document 왕복 검증은 여전히 미완료. R05 무효 상태 복구도 미구현.
+
+## 2026-10-16 — R02/R03 JSON 변환 경계 시작
+
+- packages/document/src/editorBoundary.ts 및 index.ts: documentToEditorJSON / editorJSONToDocument 도입. 스키마 검증 전후에 상태를 복사하고, 미지원 Lexical 필드/노드는 진단으로 차단하며 묵시적으로 삭제하지 않음.
+- packages/document/test/editor-boundary.test.mjs: 유효 문서의 JSON 왕복, unknown field, unknown node 검사 작성.
+- 범위 제한: 실제 Lexical runtime parse/export, 전체 33개 노드와 버전별 fixture/migration은 미구현. R02/R03 체크 보류.
+- 실행 증거: pnpm 및 Corepack DNS 환경 차단(E025/E027)으로 신규 테스트 미실행. CI 없음.
