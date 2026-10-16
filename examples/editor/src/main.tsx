@@ -14,7 +14,7 @@ import {
   $getRoot, $getSelection, $isRangeSelection, $isNodeSelection, $isElementNode, $isTextNode,
   $createParagraphNode, $createTextNode, $createLineBreakNode, $isParagraphNode,
   FORMAT_TEXT_COMMAND, KEY_ESCAPE_COMMAND, KEY_ARROW_DOWN_COMMAND, KEY_ENTER_COMMAND,
-  SELECTION_INSERT_CLIPBOARD_NODES_COMMAND, CUT_COMMAND, PASTE_COMMAND, KEY_BACKSPACE_COMMAND, KEY_DELETE_COMMAND, HISTORY_PUSH_TAG, UNDO_COMMAND, REDO_COMMAND,
+  SELECTION_INSERT_CLIPBOARD_NODES_COMMAND, COPY_COMMAND, CUT_COMMAND, PASTE_COMMAND, KEY_BACKSPACE_COMMAND, KEY_DELETE_COMMAND, HISTORY_PUSH_TAG, UNDO_COMMAND, REDO_COMMAND,
   COMMAND_PRIORITY_HIGH, type LexicalNode, type EditorState,
 } from 'lexical';
 import {registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,registerQuotationCommands,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND,registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_TUFTE_DEFINITION_PAIR_COMMAND,registerSectionCommands,WRAP_TUFTE_ROOT_COMMAND,INSERT_TUFTE_SECTION_COMMAND,SPLIT_TUFTE_SECTION_COMMAND,MERGE_TUFTE_SECTION_COMMAND,SET_TUFTE_BLOCK_COMMAND,inspectEditorStructure,focusStructureIssue,type StructureIssue,replaceEditorDocumentState,TUFTE_NODES,NoteNode, $createNoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, registerNoteEdgeTypingGuard, type NoteKind} from '@lexical-tufte/lexical';
@@ -87,6 +87,7 @@ function EditorUI(){
       if(!event.altKey||!enterNote())return false;event.preventDefault();return true;
     },COMMAND_PRIORITY_HIGH);
     const cutIds=new Set<string>();
+    const copying=editor.registerCommand(COPY_COMMAND,()=>{cutIds.clear();return false;},COMMAND_PRIORITY_HIGH);
     const cutting=editor.registerCommand(CUT_COMMAND,()=>{
       cutIds.clear();const s=$getSelection();
       if($isRangeSelection(s)||$isNodeSelection(s)){
@@ -154,7 +155,7 @@ function EditorUI(){
       event?.preventDefault();s.insertLineBreak();return true;
     },COMMAND_PRIORITY_HIGH);
     const typing=registerNoteEdgeTypingGuard(editor);
-    return()=>{escape();down();typing();cutting();pasting();plainPaste();backspace();forwardDelete();composing();enter();};
+    return()=>{escape();down();typing();copying();cutting();pasting();plainPaste();backspace();forwardDelete();composing();enter();};
   },[editor]);
   function insertNote(kind:NoteKind='sidenote'){
     editor.update(()=>{
