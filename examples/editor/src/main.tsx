@@ -58,17 +58,31 @@ function EditorUI(){
   useEffect(()=>{
     try{setRecoveryAvailable(localStorage.getItem(recoveryKey)!==null);}catch{setAutoSaveState('복구 저장소에 접근할 수 없습니다.');}
     let pending:ReturnType<typeof setTimeout>|undefined;
+    let latest:EditorState|null=null;
+    const persist=()=>{
+      if(pending!==undefined){clearTimeout(pending);pending=undefined;}
+      if(latest===null)return;
+      try{
+        localStorage.setItem(recoveryKey,JSON.stringify(latest.toJSON()));
+        latest=null;
+        setRecoveryAvailable(true);setAutoSaveState('현재 편집 상태를 복구용으로 저장했습니다.');
+      }catch{setAutoSaveState('자동 복구 저장 실패: 저장 공간을 확인하세요.');}
+    };
     const unregister=editor.registerUpdateListener(({editorState,dirtyElements,dirtyLeaves})=>{
       if(dirtyElements.size===0&&dirtyLeaves.size===0)return;
+      latest=editorState;
       if(pending!==undefined)clearTimeout(pending);
-      pending=setTimeout(()=>{
-        try{
-          localStorage.setItem(recoveryKey,JSON.stringify(editorState.toJSON()));
-          setRecoveryAvailable(true);setAutoSaveState('현재 편집 상태를 복구용으로 저장했습니다.');
-        }catch{setAutoSaveState('자동 복구 저장 실패: 저장 공간을 확인하세요.');}
-      },800);
+      pending=setTimeout(persist,800);
     });
-    return()=>{unregister();if(pending!==undefined)clearTimeout(pending);};
+    const flush=()=>{if(document.visibilityState==='hidden')persist();};
+    const onPageHide=()=>persist();
+    document.addEventListener('visibilitychange',flush);
+    window.addEventListener('pagehide',onPageHide);
+    return()=>{
+      unregister();persist();
+      document.removeEventListener('visibilitychange',flush);
+      window.removeEventListener('pagehide',onPageHide);
+    };
   },[editor]);
   function restoreRecovery(){
     try{
