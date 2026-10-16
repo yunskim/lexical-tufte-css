@@ -30,6 +30,27 @@ export class SqliteEditorRecoveryStore{
    this.db.exec('COMMIT');started=false;return {ok:true,value:slot,diagnostics:[]};
   }catch{if(started)try{this.db.exec('ROLLBACK');}catch{}return fail('RECOVERY_STORAGE_ERROR','Recovery save failed');}
  }
+ remove(postId:string,sessionId:string,expectedSequence:number):Result<boolean>{
+  if(!isIdentifier(postId)||!isIdentifier(sessionId)||!integer(expectedSequence,1))
+   return fail('INVALID_RECOVERY_INPUT','Invalid recovery identity or sequence');
+  let started=false;
+  try{
+   this.db.exec('BEGIN IMMEDIATE');started=true;
+   const row=this.db.prepare('SELECT sequence FROM editor_recovery_v1 WHERE post_id=? AND session_id=?')
+    .get(postId,sessionId) as {sequence:number}|undefined;
+   if(!row||row.sequence!==expectedSequence){
+    this.db.exec('ROLLBACK');started=false;
+    return fail('RECOVERY_CONFLICT','Recovery missing or sequence changed');
+   }
+   this.db.prepare('DELETE FROM editor_recovery_v1 WHERE post_id=? AND session_id=? AND sequence=?')
+    .run(postId,sessionId,expectedSequence);
+   this.db.exec('COMMIT');started=false;
+   return {ok:true,value:true,diagnostics:[]};
+  }catch{
+   if(started)try{this.db.exec('ROLLBACK');}catch{}
+   return fail('RECOVERY_STORAGE_ERROR','Recovery removal failed');
+  }
+ }
  async read(postId:string,sessionId:string):Promise<Result<RecoverySlot|null>>{
   if(!isIdentifier(postId)||!isIdentifier(sessionId))return fail('INVALID_RECOVERY_INPUT','Invalid recovery identity');
   try{
