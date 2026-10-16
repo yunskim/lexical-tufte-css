@@ -110,3 +110,9 @@ Migration은 입력을 변경하지 않는 순수 함수여야 하며, 동일 �
 - `migrateStoredDocument`는 strict v1 검증 → 깊은 복제 → v2 `editorFormat` 추가 → strict v2 재검증을 수행한다. v2 입력은 재검증 후 복제한다.
 - **성공은 문서 외피 변환 성공만 의미한다.** 실제 Lexical parse/serialize 무손실 호환성을 증명하지 않으며, 이 결과만으로 저장된 원본을 덮어쓰거나 editor에 설치해서는 안 된다.
 - 이후 Lexical bridge에서 migration 결과를 parse/serialize 비교한 다음에만 editor state를 교체해야 한다. HistoryPlugin 이력 초기화는 별도 미완.
+
+## Lexical bridge 연결 (2026-10-16)
+
+- `loadMigratedDocumentIntoEditor`를 별도 opt-in API로 제공한다. migration과 v2 검증 이후 기존 v1 strict bridge의 parse/serialize 무손실 검사를 거쳐 상태를 설치한다.
+- 기존 `loadDocumentIntoEditor`는 v1 전용으로 유지한다. 성공 결과는 v2 snapshot이며 호출자 입력을 직접 수정하지 않는다.
+- HistoryPlugin의 undo/redo 초기화는 아직 구현하지 않았다. 편집기 설치 자체의 예외/부분 변경 및 브라우저 실제 동작은 테스트 실행으로 확인해야 한다.
