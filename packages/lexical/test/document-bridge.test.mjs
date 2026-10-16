@@ -866,3 +866,34 @@ test('F18 embed disallows arbitrary iframe domains and query strings',()=>{
  assert.throws(()=>$createEmbedNode('youtube','https://www.youtube-nocookie.com/embed/abcdefghijk?autoplay=1','unsafe'));
  assert.throws(()=>$createEmbedNode('vimeo','https://player.vimeo.com/video/12345',''));
 });
+
+test('F17/F18/F19 serialized contract rejects invalid fields before Lexical import',()=>{
+ const base=fixture();
+ const make=(node)=>({...base,lexicalState:{...base.lexicalState,root:{...base.lexicalState.root,
+  children:[{type:'tufte-section',version:1,children:[node],direction:null,format:'',indent:0}]}}});
+ const embed={type:'tufte-embed',version:1,provider:'youtube',
+  src:'https://www.youtube-nocookie.com/embed/abcdefghijk',
+  title:'Video',wrapper:'figure',width:'body',aspectRatio:16/9};
+ const valid=make(embed);
+ assert.equal(validateDocument(valid).ok,true,JSON.stringify(validateDocument(valid).diagnostics));
+ for(const [change,expected] of [
+  [{aspectRatio:'16:9'},'INVALID_EMBED_LAYOUT'],
+  [{aspectRatio:0},'INVALID_EMBED_LAYOUT'],
+  [{title:''},'INVALID_EMBED_TITLE'],
+  [{src:'https://www.youtube.com/embed/abcdefghijk'},'UNSAFE_EMBED']
+ ]){
+  const result=validateDocument(make({...embed,...change}));
+  assert.equal(result.ok,false);
+  assert.ok(result.diagnostics.some(d=>d.code===expected),JSON.stringify(result.diagnostics));
+ }
+ const code={type:'tufte-code',version:1,width:'body',language:'typescript',
+  children:[{type:'text',version:1,text:'  code',format:0,detail:0,mode:'normal',style:''}]};
+ assert.equal(validateDocument(make(code)).ok,true,JSON.stringify(validateDocument(make(code)).diagnostics));
+ const invalidCode=validateDocument(make({...code,language:'foo.bar'}));
+ assert.ok(invalidCode.diagnostics.some(d=>d.code==='INVALID_LANGUAGE'));
+ const quilt={type:'tufte-imagequilt',version:1,src:'/assets/quilt.png',alt:'Quilt',width:640,height:480};
+ const figure={type:'tufte-figure',version:1,width:'body',children:[quilt]};
+ assert.equal(validateDocument(make(figure)).ok,true,JSON.stringify(validateDocument(make(figure)).diagnostics));
+ const invalidQuilt=validateDocument(make({...figure,children:[{...quilt,height:undefined}]}));
+ assert.ok(invalidQuilt.diagnostics.some(d=>d.code==='INVALID_IMAGE_SIZE'));
+});
