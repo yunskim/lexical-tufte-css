@@ -41,3 +41,27 @@ test('R11 exported document owns a snapshot independent of editor state and base
  imported.state.root.children.length=0;
  assert.equal(JSON.stringify(exported.document),before);
 });
+
+test('R11 imported editor state is detached from the source document',()=>{
+ const base=fixture();
+ const imported=documentToEditorJSON(base);
+ assert.equal(imported.ok,true,JSON.stringify(imported.diagnostics));
+ assert.notStrictEqual(imported.state,base.lexicalState);
+ assert.notStrictEqual(imported.state.root,base.lexicalState.root);
+ const original=JSON.stringify(imported.state);
+ base.lexicalState.root.children.length=0;
+ assert.equal(JSON.stringify(imported.state),original);
+ imported.state.root.children.length=0;
+ assert.notEqual(JSON.stringify(base.lexicalState),original);
+});
+
+test('R03 rejected editor export leaves the base document unchanged',()=>{
+ const base=fixture(),before=JSON.stringify(base);
+ const state=structuredClone(base.lexicalState);
+ state.root.children[0].unexpectedField='reject';
+ const exported=editorJSONToDocument(base,state);
+ assert.equal(exported.ok,false);
+ assert.ok(exported.diagnostics.some(d=>d.code==='UNKNOWN_FIELD'));
+ assert.equal(JSON.stringify(base),before);
+ assert.equal(state.root.children[0].unexpectedField,'reject');
+});
