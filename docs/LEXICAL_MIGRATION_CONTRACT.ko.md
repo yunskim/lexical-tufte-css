@@ -163,3 +163,10 @@ Migration은 입력을 변경하지 않는 순수 함수여야 하며, 동일 �
 - v1 `validatePostRecord`는 호환성 유지를 위해 그대로 둔다. v2 저장은 새 validator를 명시적으로 호출해야 한다.
 - 검증된 성공 결과의 metadata는 복제한다. revision 값 자체의 유효성 검사만 수행하며, 저장소의 이전 revision과 비교하는 낙관적 동시성 검사·원자적 저장은 아직 구현하지 않았다.
 - 저장 fixture 기반 성공/복합 실패 테스트를 작성했지만 실제 실행은 미완이다.
+
+## v2 revision 충돌 사전 검사 (2026-10-16)
+
+- `preparePostRevisionV2(current,next,expectedRevision)` 추가. 두 v2 PostRecord를 검증한 후 저장 revision과 기대 revision 비교, 정확히 +1 증가, 동일 document id/slug 유지 여부를 검사한다.
+- `REVISION_CONFLICT`, `INVALID_NEXT_REVISION`, `DOCUMENT_ID_MISMATCH`, `POST_SLUG_MISMATCH` 등의 명시적 진단을 반환한다.
+- 이 함수는 순수 preflight다. **동시 쓰기 사이의 경쟁 조건을 해결하지 않는다.** 저장 adapter는 동일 revision 조건을 실제 트랜잭션/CAS에서 다시 검사하고 원자적으로 교체해야 한다. slug 변경은 별도 rename 프로토콜로 처리한다.
+- 단위 테스트 작성, 실행 미확인.
