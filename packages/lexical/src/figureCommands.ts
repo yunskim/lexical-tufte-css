@@ -1,6 +1,6 @@
 import {$addUpdateTag,$createTextNode,$getSelection,$isRangeSelection,createCommand,COMMAND_PRIORITY_EDITOR,HISTORY_PUSH_TAG,type LexicalCommand,type LexicalEditor,type LexicalNode} from 'lexical';
 import {NODE_SCHEMA,isSafeURL,type Diagnostic} from '@lexical-tufte/document';
-import {SectionNode,FigureNode,$createFigureNode,$createCaptionNode,type FigureWidth} from './LayoutNodes.js';
+import {SectionNode,FigureNode,CaptionNode,$createFigureNode,$createCaptionNode,type FigureWidth} from './LayoutNodes.js';
 import {$createInlineImageNode} from './InlineImageNode.js';
 import {$getContainingNote} from './noteOperations.js';
 
@@ -9,7 +9,7 @@ export const INSERT_TUFTE_FIGURE_COMMAND:LexicalCommand<InsertTufteFigure>=creat
 export const SET_TUFTE_FIGURE_WIDTH_COMMAND:LexicalCommand<FigureWidth>=createCommand('SET_TUFTE_FIGURE_WIDTH');
 
 export function registerFigureCommands(editor:LexicalEditor,onDiagnostic?:(diagnostic:Diagnostic)=>void):()=>void{
- if(!editor.hasNodes([SectionNode,FigureNode]))throw Error('Figure commands require TUFTE_NODES');
+ if(!editor.hasNodes([SectionNode,FigureNode,CaptionNode]))throw Error('Figure commands require TUFTE_NODES');
  const reject=(code:string,message:string)=>{onDiagnostic?.({code,path:'$.selection',message});return true;};
  const ancestor=(node:LexicalNode,type:string):LexicalNode|null=>{
   for(let n:LexicalNode|null=node;n;n=n.getParent())if(n.getType()===type)return n;
