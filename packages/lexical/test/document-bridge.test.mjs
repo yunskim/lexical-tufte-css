@@ -8,6 +8,7 @@ import {createHeadlessEditor} from '@lexical/headless';
 import {$getRoot,$createParagraphNode,$createTextNode,CLEAR_HISTORY_COMMAND,COMMAND_PRIORITY_CRITICAL} from 'lexical';
 import {SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,$createTableLayoutNode,$createFigureNode,$createCaptionNode,$createInlineImageNode,$createSectionNode,$createNoteNode,$createTufteSpanNode,loadDocumentIntoEditor,loadMigratedDocumentIntoEditor,exportEditorToDocument} from '../dist/index.js';
 import {LinkNode} from '@lexical/link';
+import {createEmptyHistoryState,registerHistory} from '@lexical/history';
 import {NODE_SCHEMA,validateDocument} from '@lexical-tufte/document';
 import {ListNode,ListItemNode,$createListNode,$createListItemNode} from '@lexical/list';
 import {TableNode,TableRowNode,TableCellNode,$createTableNode,$createTableRowNode,$createTableCellNode} from '@lexical/table';
@@ -465,5 +466,24 @@ test('R03 malformed migrated import leaves editor state and history untouched',(
  assert.equal(result.ok,false,JSON.stringify(result.diagnostics));
  assert.deepEqual(destination.getEditorState().toJSON(),before);
  assert.equal(clearCount,0);
+ unregister();
+});
+
+test('R03 actual HistoryPlugin state is cleared after document replacement',()=>{
+ const destination=editor();
+ const history=createEmptyHistoryState();
+ const unregister=registerHistory(destination,history,300);
+ const source=editor();
+ source.update(()=>$getRoot().append($createSectionNode().append(
+  $createParagraphNode().append($createTextNode('replacement'))
+ )),{discrete:true});
+ const document={...fixture(),lexicalState:source.getEditorState().toJSON()};
+ // Seed an old-document undo/redo stack. A successful replacement must clear both.
+ history.undoStack.push({editor:destination,editorState:destination.getEditorState()});
+ history.redoStack.push({editor:destination,editorState:destination.getEditorState()});
+ const loaded=loadMigratedDocumentIntoEditor(destination,document);
+ assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
+ assert.equal(history.undoStack.length,0);
+ assert.equal(history.redoStack.length,0);
  unregister();
 });
