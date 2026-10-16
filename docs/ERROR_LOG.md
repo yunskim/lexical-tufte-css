@@ -305,3 +305,10 @@
 - 증상: EmbedNode는 제목 최대 500자를 요구하지만 문서 validator는 1000자까지 허용. ImageQuilt는 필수 width/height를 런타임에 검증하지만 직렬화 TypeScript 타입은 선택 속성으로 선언.
 - 처리: 제목 길이 1000자로 통일하고 직렬화 타입의 width/height를 필수화. 유효·무효 직렬화 계약 회귀 테스트 추가.
 - 상태: mitigated (코드 수정; 실제 실행 검증 미완료). M026 재적용.
+
+## E028 — ImageQuilt 직렬화 필수 속성 및 Embed HTML 내보내기 정책 불일치
+
+- 발견: 2026-10-16, 문서 모델 → 편집기 → 발행 렌더러 정적 계약 재검토.
+- 증상: SerializedImageQuilt.width/height는 필수인데 exportJSON()은 선택적으로만 출력하여 TypeScript 정적 타입과 모순. EmbedNode.exportDOM()은 발행 renderer와 달리 sandbox 및 크기 속성을 출력하지 않음.
+- 조치: ImageQuilt 필수 필드 무조건 출력, Embed DOM export의 sandbox/referrer/iframe 크기 및 wrapper class 정렬.
+- 검증 상태: GitHub 코드 변경 완료, 빌드·실행 테스트 미실행. M026의 node/serializer/render 계약 점검 적용.
