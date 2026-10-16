@@ -901,3 +901,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - GitHub 저장소 이름을 yunskim/lexical-tufte-css로 변경한 것을 API로 확인. README 제목·저장소 URL 갱신.
 - npm 워크스페이스/패키지 식별자(@lexical-tufte/*)는 공개 API 호환성을 위해 그대로 유지. 저장소 rename과 패키지 rename을 혼동하지 않음.
 - 후속 GitHub 작업은 yunskim/lexical-tufte-css를 정본 주소로 사용. CI 생략, Work 일괄 테스트 정책 유지.
+
+## 2026-10-16 P2.3 — 그림 자산 메타데이터 보존
+
+- INSERT_TUFTE_FIGURE_COMMAND에 assetId/imageWidth/imageHeight 옵션 추가. isIdentifier 및 양의 안전한 정수 검증 후 InlineImageNode에 전달해 직렬화 필드를 유지.
+- figure-commands.test.mjs에 assetId/width/height 직렬화 필드 확인, 잘못된 식별자·음수 크기의 원자적 거부 회귀 코드 추가.
+- 외부 자산 스토어 업로드/조회 연동은 아직 구현하지 않음. 기존 자산 참조를 편집 문서에 전달하는 범위만 지원.
+- 테스트 실행은 Work 일괄 처리 대기. P2.3 완료 표시 보류, CI 없음.
