@@ -222,3 +222,9 @@
 - 발견: 2026-10-16 R14 재점검. `corepack pnpm --version` 명령이 registry.npmjs.org DNS EAI_AGAIN으로 실패. Node v22.16.0은 정상.
 - 처리: 테스트 통과로 기록하지 않고 환경 차단을 유지한다. M024에 따라 네트워크 정상 환경에서 재시도한다.
 - 상태: 환경 차단, 미해결.
+
+## E028 — 그림 왕복 fixture의 자산 참조 누락
+
+- 발견: 2026-10-16 R02 정적 코드 점검. 그림 테스트가 assetId=chart-1을 포함하지만 document.assets에 해당 자산을 추가하지 않아 MISSING_ASSET 진단이 발생하는 입력이었다.
+- 처리: 테스트 문서의 assets에 chart-1 URL, MIME, 크기를 명시해 검증 조건을 충족시켰다.
+- 상태: 코드 수정, 실행 검증 대기(E025/E027). M026 참조.
