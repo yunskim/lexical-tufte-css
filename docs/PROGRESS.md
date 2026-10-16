@@ -589,3 +589,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - `scripts/sqlite-backup.mjs`에서 단일 SQLite 조회, expectedRevision 검사, 파일 백업을 연결.
 - 조회 실패 및 revision 충돌 시 기존 백업 파일을 보존하는 실제 SQLite 통합 테스트 작성.
 - 코드 리뷰 중 Result 봉투를 record로 전달하는 초안 오류를 발견하여 같은 작업에서 수정. 실행 검증 미완, CI 없음.
+
+## 2026-10-16 — 파일→SQLite CAS 복원
+
+- `scripts/sqlite-restore.mjs` 추가: 파일 백업 검증, 단일 SELECT 현재 게시물 조회, CAS revision 증가 복원.
+- SQLite 통합 테스트 작성: 정상 복원, stale revision 거부, 손상 JSON 시 기존 데이터 보존.
+- 실제 테스트 실행 미확인. 복원 파일 읽기 시 최대 크기 제한은 기본 16 MiB. D1 실환경/장애 주입 미검증, CI 없음.
