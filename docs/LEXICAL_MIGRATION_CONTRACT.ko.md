@@ -185,3 +185,10 @@ Migration은 입력을 변경하지 않는 순수 함수여야 하며, 동일 �
 - `meta.changes===1`만 성공. 0이면 충돌/행 없음/identity 불일치로 거부, 값이 없거나 그 외면 `STORAGE_RESULT_UNKNOWN`으로 거부한다.
 - 이 구현은 D1 호환 prepared statement 최소 인터페이스만 의존한다. 실제 D1/SQLite 연결 테스트, 테이블 생성 migration, 최초 insert, 백업, 삭제·복원은 미완이다. 호출자는 DB 에러를 처리해야 한다.
 - Mock statement 테스트 작성, 미실행. 프로세스 간 CAS는 실제 DB 엔진에서 검증해야 한다.
+
+## SQLite/D1 최초 저장과 스키마 (2026-10-16)
+
+- `packages/document/sql/001_posts_v2.sql` 추가: id/slug 고유성, 양의 revision, JSON 유효성 및 payload의 id/slug/revision/schemaVersion 일치 CHECK.
+- `SqlitePostRevisionStoreV2.insert()` 추가: v2 record 검증, revision 1 필수, `INSERT OR IGNORE`로 기존 게시물 덮어쓰기 금지. 1행 삽입만 성공으로 인정.
+- SQLite JSON1/JSON 함수가 활성화된 환경을 전제로 한다. 실제 SQLite/D1 엔진에 스키마 적용 및 동시 실행 테스트는 아직 수행하지 않았다.
+- 초기 insert는 create만 지원하며 공개 snapshot, backup, restore는 아직 지원하지 않는다.
