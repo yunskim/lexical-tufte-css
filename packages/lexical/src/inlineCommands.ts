@@ -1,4 +1,4 @@
-import {$getSelection,$isRangeSelection,createCommand,COMMAND_PRIORITY_EDITOR,HISTORY_PUSH_TAG,$addUpdateTag,type LexicalCommand,type LexicalEditor} from 'lexical';
+import {$getSelection,$isRangeSelection,createCommand,COMMAND_PRIORITY_EDITOR,HISTORY_PUSH_TAG,$addUpdateTag,type LexicalCommand,type LexicalEditor,type LexicalNode} from 'lexical';
 import type {Diagnostic} from '@lexical-tufte/document';
 import {TufteSpanNode,type TufteSpanKind} from './TufteSpanNode.js';
 
@@ -14,8 +14,8 @@ export function registerInlineCommands(editor:LexicalEditor,onDiagnostic?:(diagn
   const selection=$getSelection();
   if(!$isRangeSelection(selection)||editor.isComposing())
    return reject('INVALID_SPAN_SELECTION','텍스트 선택이 필요하며 IME 조합 중에는 속성을 변경하지 않습니다.');
-  const nearest=(node:ReturnType<typeof selection.anchor.getNode>)=>{
-   for(let n:typeof node|null=node;n;n=n.getParent())if(n instanceof TufteSpanNode)return n;
+  const nearest=(node:LexicalNode):TufteSpanNode|null=>{
+   for(let n:LexicalNode|null=node;n;n=n.getParent())if(n instanceof TufteSpanNode)return n;
    return null;
   };
   const first=nearest(selection.anchor.getNode()),last=nearest(selection.focus.getNode());
