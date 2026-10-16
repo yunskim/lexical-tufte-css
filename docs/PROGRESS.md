@@ -760,3 +760,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - renderer tests: 기존 미지원 F19 회귀 테스트를 지원 기대값으로 갱신; 자산 메타데이터 일치 정상 발행, URL/크기/누락 asset ID 거부, 입력 불변성 테스트 추가.
 - 실제 pnpm check, unit/browser 테스트 미실행. F19 완료 체크 보류, CI 생략 유지.
 - 다음: 누적 렌더러 계약 감사, 실제 테스트 실행 환경 복구 및 문서/에디터/렌더러 end-to-end 회귀.
+
+## 2026-10-16 — F18/F19 편집기·발행 HTML 정적 계약 대조
+
+- F19 ImageQuilt exportJSON이 필수 width/height를 항상 포함하도록 변경 (타입 선언과 실제 JSON 일치).
+- F18 EmbedNode.exportDOM이 발행 renderer와 동일한 iframe sandbox/referrer 정책, width/height, wrapper class를 사용하도록 조정.
+- E028 기록. 현재 Node.js v22.16.0이지만 pnpm 없음; GitHub git 원격은 DNS 해석 실패. 실제 TypeScript 빌드, node/browser 테스트는 미실행. CI 없음.
+- 후속: 로컬 검증 환경 복구 및 전체 테스트 통과 전 체크리스트 완료 표시 금지.
