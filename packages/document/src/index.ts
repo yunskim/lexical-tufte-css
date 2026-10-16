@@ -4,3 +4,4 @@ export {validateDocument,parseDocument} from './validate.js';
 export {validateMetadata,validatePostRecord,isTimestamp} from './metadata.js';
 export {canonicalizeDocument,parseCanonicalDocument} from './canonical.js';
 export {assertStorageId,postStorageKey,slugCollisionKey,assertUniqueSlugs} from './storageKeys.js';
+export {documentToEditorJSON,editorJSONToDocument} from './editorBoundary.js';
