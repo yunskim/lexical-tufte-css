@@ -199,3 +199,33 @@ test('R03 v1 to v2 migration matches checked-in envelope golden',()=>{
  assert.equal(again.ok,true,JSON.stringify(again.diagnostics));
  assert.deepEqual(again.document,golden);
 });
+
+test('R03 format inspection never executes top-level getters',()=>{
+ const document=fixture();
+ let invoked=0;
+ Object.defineProperty(document,'schemaVersion',{enumerable:true,get(){
+  invoked++;
+  throw Error('untrusted accessor executed');
+ }});
+ const inspected=inspectStoredDocument(document);
+ assert.equal(inspected.ok,false);
+ assert.ok(inspected.diagnostics.some(d=>d.code==='INVALID_DOCUMENT'&&d.path==='$'));
+ const migrated=migrateStoredDocument(document);
+ assert.equal(migrated.ok,false);
+ assert.equal(invoked,0);
+});
+test('R03 version failures preserve stable diagnostic paths',()=>{
+ const legacy=fixture();
+ const v2={...legacy,schemaVersion:2,editorFormat:{engine:'lexical',formatVersion:1}};
+ const cases=[
+  [{...legacy,schemaVersion:99},'UNSUPPORTED_DOCUMENT_VERSION','$.schemaVersion'],
+  [{...v2,editorFormat:{engine:'lexical',formatVersion:9}},'UNSUPPORTED_EDITOR_FORMAT','$.editorFormat'],
+  [{...v2,editorFormat:{engine:'future-editor',formatVersion:1}},'UNSUPPORTED_EDITOR_FORMAT','$.editorFormat'],
+  [{...v2,editorFormat:{engine:'lexical',formatVersion:1,extra:true}},'UNKNOWN_FIELD','$.editorFormat'],
+ ];
+ for(const [input,code,path] of cases){
+  const result=migrateStoredDocument(input);
+  assert.equal(result.ok,false);
+  assert.ok(result.diagnostics.some(d=>d.code===code&&d.path===path),JSON.stringify(result.diagnostics));
+ }
+});
