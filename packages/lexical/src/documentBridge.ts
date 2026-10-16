@@ -40,7 +40,7 @@ export function loadMigratedDocumentIntoEditor(editor:LexicalEditor,input:unknow
  const envelope={...migrated.document} as Record<string,unknown>;
  delete envelope.editorFormat;
  // Existing strict Lexical bridge intentionally accepts only the v1 envelope.
- const legacy=envelope as TufteDocument;
+ const legacy=envelope as unknown as TufteDocument;
  legacy.schemaVersion=1;
  const imported=loadDocumentIntoEditor(editor,legacy);
  if(!imported.ok)return imported;
