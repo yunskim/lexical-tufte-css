@@ -6,7 +6,7 @@ import {dirname,join,parse} from 'node:path';
 import {createRequire} from 'node:module';
 import {createHeadlessEditor} from '@lexical/headless';
 import {$getRoot,$createParagraphNode,$createTextNode,CLEAR_HISTORY_COMMAND,COMMAND_PRIORITY_CRITICAL} from 'lexical';
-import {SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,$createTableLayoutNode,$createFigureNode,$createCaptionNode,$createInlineImageNode,$createSectionNode,$createNoteNode,$createTufteSpanNode,loadDocumentIntoEditor,loadMigratedDocumentIntoEditor,exportEditorToDocument,exportEditorToDocumentV2,DefinitionListNode,DefinitionTermNode,DefinitionDescriptionNode,$createDefinitionListNode,$createDefinitionTermNode,$createDefinitionDescriptionNode,EpigraphNode,AttributionNode,CiteNode,$createEpigraphNode,$createAttributionNode,$createCiteNode,SectionFooterNode,$createSectionFooterNode,FullwidthNode,$createFullwidthNode,TufteCodeNode,$createTufteCodeNode,ImageQuiltNode,$createImageQuiltNode} from '../dist/index.js';
+import {SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,$createTableLayoutNode,$createFigureNode,$createCaptionNode,$createInlineImageNode,$createSectionNode,$createNoteNode,$createTufteSpanNode,loadDocumentIntoEditor,loadMigratedDocumentIntoEditor,exportEditorToDocument,exportEditorToDocumentV2,DefinitionListNode,DefinitionTermNode,DefinitionDescriptionNode,$createDefinitionListNode,$createDefinitionTermNode,$createDefinitionDescriptionNode,EpigraphNode,AttributionNode,CiteNode,$createEpigraphNode,$createAttributionNode,$createCiteNode,SectionFooterNode,$createSectionFooterNode,FullwidthNode,$createFullwidthNode,TufteCodeNode,$createTufteCodeNode,ImageQuiltNode,$createImageQuiltNode,EmbedNode,$createEmbedNode} from '../dist/index.js';
 import {LinkNode} from '@lexical/link';
 import {HeadingNode,QuoteNode,$createHeadingNode,$createQuoteNode} from '@lexical/rich-text';
 import {HorizontalRuleNode,$createHorizontalRuleNode} from '@lexical/react/LexicalHorizontalRuleNode';
@@ -15,7 +15,7 @@ import {NODE_SCHEMA,validateDocument} from '@lexical-tufte/document';
 import {ListNode,ListItemNode,$createListNode,$createListItemNode} from '@lexical/list';
 import {TableNode,TableRowNode,TableCellNode,$createTableNode,$createTableRowNode,$createTableCellNode} from '@lexical/table';
 const fixture=()=>JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document.json',import.meta.url),'utf8'));
-const editor=()=>createHeadlessEditor({namespace:'document-bridge-test',nodes:[SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,TableNode,TableRowNode,TableCellNode,ListNode,ListItemNode,LinkNode,HeadingNode,QuoteNode,HorizontalRuleNode,DefinitionListNode,DefinitionTermNode,DefinitionDescriptionNode,EpigraphNode,AttributionNode,CiteNode,SectionFooterNode,FullwidthNode,TufteCodeNode,ImageQuiltNode],onError(e){throw e;}});
+const editor=()=>createHeadlessEditor({namespace:'document-bridge-test',nodes:[SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,TableNode,TableRowNode,TableCellNode,ListNode,ListItemNode,LinkNode,HeadingNode,QuoteNode,HorizontalRuleNode,DefinitionListNode,DefinitionTermNode,DefinitionDescriptionNode,EpigraphNode,AttributionNode,CiteNode,SectionFooterNode,FullwidthNode,TufteCodeNode,ImageQuiltNode,EmbedNode],onError(e){throw e;}});
 test('R02 strict Lexical bridge fails closed when a registered node is missing',()=>{
  const source=editor();
  source.update(()=>{
@@ -835,4 +835,26 @@ test('F19 ImageQuilt retains src alt assetId dimensions and figure width',()=>{
 test('F19 ImageQuilt rejects unsafe source and invalid dimensions',()=>{
  assert.throws(()=>$createImageQuiltNode('javascript:alert(1)','bad'));
  assert.throws(()=>$createImageQuiltNode('/assets/q.png','bad',undefined,0));
+});
+
+test('F18 embed retains provider title wrapper width and ratio through document roundtrip',()=>{
+ const source=editor();
+ source.update(()=>{
+  $getRoot().append($createSectionNode().append(
+   $createEmbedNode('youtube','https://www.youtube-nocookie.com/embed/abcdefghijk','Demonstration','figure','fullwidth','16:9')
+  ));
+ },{discrete:true});
+ const document={...fixture(),lexicalState:source.getEditorState().toJSON()};
+ const target=editor(),loaded=loadDocumentIntoEditor(target,document);
+ assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
+ const saved=exportEditorToDocument(target,document);
+ assert.equal(saved.ok,true,JSON.stringify(saved.diagnostics));
+ assert.deepEqual(saved.value.lexicalState,document.lexicalState);
+ const embed=saved.value.lexicalState.root.children[0].children[0];
+ assert.deepEqual([embed.provider,embed.wrapper,embed.width,embed.aspectRatio],['youtube','figure','fullwidth','16:9']);
+});
+test('F18 embed disallows arbitrary iframe domains and query strings',()=>{
+ assert.throws(()=>$createEmbedNode('youtube','https://example.com/embed/abcdefghijk','unsafe'));
+ assert.throws(()=>$createEmbedNode('youtube','https://www.youtube-nocookie.com/embed/abcdefghijk?autoplay=1','unsafe'));
+ assert.throws(()=>$createEmbedNode('vimeo','https://player.vimeo.com/video/12345',''));
 });
