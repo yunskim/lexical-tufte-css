@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {documentToEditorJSON,editorJSONToDocument,canonicalizeDocument,parseCanonicalDocument} from '../dist/index.js';
+import {documentToEditorJSON,editorJSONToDocument,canonicalizeDocument,parseCanonicalDocument,inspectStoredDocument} from '../dist/index.js';
 const fixture=()=>JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document.json',import.meta.url),'utf8'));
 test('R02 document editor JSON document preserves validated state without mutation',()=>{
  const original=fixture(),before=JSON.stringify(original);
@@ -106,4 +106,26 @@ test('R03 canonical serialization rejects unknown fields without mutating input'
  assert.ok(result.diagnostics.some(d=>d.code==='UNKNOWN_FIELD'));
  delete base.lexicalState.root.children[0].futureField;
  assert.equal(JSON.stringify(base),before);
+});
+
+test('R03 format inspection distinguishes legacy v1 and proposed v2 without mutation',()=>{
+ const legacy=fixture(),before=JSON.stringify(legacy);
+ assert.deepEqual(inspectStoredDocument(legacy),{ok:true,format:{schemaVersion:1,formatVersion:'legacy-v1'},diagnostics:[]});
+ assert.equal(JSON.stringify(legacy),before);
+ const v2={...legacy,schemaVersion:2,editorFormat:{engine:'lexical',formatVersion:1}};
+ assert.deepEqual(inspectStoredDocument(v2),{ok:true,format:{schemaVersion:2,formatVersion:1},diagnostics:[]});
+ for(const input of [
+  {...legacy,schemaVersion:3},
+  {...v2,editorFormat:{engine:'lexical',formatVersion:2}},
+  {...v2,editorFormat:{engine:'other',formatVersion:1}},
+  {...v2,editorFormat:{engine:'lexical',formatVersion:1,extra:true}}
+ ]){
+  const result=inspectStoredDocument(input);
+  assert.equal(result.ok,false);
+  assert.ok(result.diagnostics.some(d=>d.code.startsWith('UNSUPPORTED_')));
+ }
+ const malformed={...legacy,unknownField:true};
+ const invalid=inspectStoredDocument(malformed);
+ assert.equal(invalid.ok,false);
+ assert.ok(invalid.diagnostics.some(d=>d.code==='UNKNOWN_FIELD'));
 });
