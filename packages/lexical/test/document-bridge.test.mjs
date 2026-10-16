@@ -334,3 +334,23 @@ test('R01 image factory and JSON import use the same input policy',()=>{
   assert.throws(()=>$createInlineImageNode(candidate.src,candidate.alt,candidate.assetId,candidate.width,candidate.height));
  }
 });
+
+test('R01 image factory preserves optional asset metadata through real Lexical JSON',()=>{
+ const e=editor();
+ e.update(()=>{
+  $getRoot().append($createSectionNode().append(
+   $createParagraphNode().append($createInlineImageNode('/figures/chart.svg','차트','chart-1',640,360))
+  ));
+ },{discrete:true});
+ const image=e.getEditorState().toJSON().root.children[0].children[0].children[0];
+ assert.equal(image.type,'tufte-inline-image');
+ assert.equal(image.src,'/figures/chart.svg');
+ assert.equal(image.alt,'차트');
+ assert.equal(image.assetId,'chart-1');
+ assert.equal(image.width,640);
+ assert.equal(image.height,360);
+ const base=fixture();
+ const document={...base,assets:[...base.assets,{id:'chart-1',src:'/figures/chart.svg',mimeType:'image/svg+xml',width:640,height:360}],lexicalState:e.getEditorState().toJSON()};
+ const valid=validateDocument(document);
+ assert.equal(valid.ok,true,JSON.stringify(valid.diagnostics));
+});
