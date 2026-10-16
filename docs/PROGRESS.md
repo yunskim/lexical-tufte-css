@@ -744,3 +744,11 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - 공백/이스케이프/미지원 메타데이터 테스트 추가. 기존 미지원 노드 회귀 테스트는 F18 embed로 교체하여 F17 지원과 충돌하지 않도록 조정.
 - 빌드 및 테스트 실행 미완료; CSS/시각 회귀와 language/highlight 발행을 검증하기 전 F17 완료 체크 보류. CI 없음.
 - 다음: F18 iframe 안전 속성, 화면 비율과 CSP를 검토하고 순수 HTML 렌더러를 확장.
+
+## 2026-10-16 — F18 iframe HTML 발행
+
+- `packages/render`: YouTube/Vimeo 허용 URL은 document validator에서 검증하고, 순수 renderer는 iframe(title, lazy loading, strict-origin-when-cross-origin, sandbox, allowfullscreen)을 figure/div wrapper에 생성.
+- aspectRatio 숫자를 iframe width=960 및 계산된 height로 출력, 반응형 CSS로 너비 100%와 intrinsic ratio를 사용하도록 구성. inline style은 사용하지 않음.
+- F18 정상 출력·HTML escape·sandbox·URL 거부 테스트 추가. 이전 미지원 노드 테스트는 F19 ImageQuilt로 변경.
+- 실제 빌드·브라우저 테스트 및 provider별 iframe 재생 호환성·CSP 검증 미완료. F18 완료 체크 보류. CI 없음.
+- 다음: 렌더링 보안 정책과 iframe CSS 실제 동작 검증, F19 ImageQuilt 발행 및 asset 일치 검증.
