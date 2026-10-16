@@ -530,3 +530,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 
 - `preparePostRevisionV2` 구현·공개 export. stale expected revision, revision gap, slug 변경 거부 테스트 추가.
 - 사전 검사만 구현됨. CAS/원자적 저장 및 실제 테스트 실행은 미완. CI 없음.
+
+## 2026-10-16 — v2 저장소 CAS 계약 및 in-memory 참조 adapter
+
+- `PostRevisionStoreV2` 인터페이스와 `InMemoryPostRevisionStoreV2` 구현·export.
+- 동일 revision의 경쟁 저장 시 단일 성공, snapshot 격리, 후속 revision 테스트 추가.
+- 영속 저장소 트랜잭션/백업·복구는 미구현. 테스트 실행 미확인, R03/P2.5 체크 보류, CI 없음.
