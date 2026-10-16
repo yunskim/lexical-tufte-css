@@ -572,3 +572,8 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - `packages/document/scripts/backup-file.mjs` 추가: 임시 파일+fsync+rename 및 크기 제한 읽기.
 - 파일 백업 roundtrip, 손상 JSON, 용량 초과 테스트 추가.
 - Node 테스트 미실행, 파일시스템 장애 복구·권한 정책·DB snapshot 정합성 미검증. P5.1 완료 보류, CI 없음.
+
+## 2026-10-16 — 백업 snapshot revision guard
+
+- `backup-snapshot.mjs` 추가: 기대 revision과 조회 결과가 다르면 기존 파일을 변경하지 않음.
+- 회귀 테스트 추가, 실행 미확인. DB 조회 일관성은 호출자 책임. CI 없음.
