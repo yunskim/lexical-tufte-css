@@ -110,3 +110,10 @@ E024/M023의 beforeinput 이벤트 취소 시점은 discrete update 사용만으
 - 절차: 외부 패키지의 비공개 package.json subpath를 직접 require하지 않는다. 공개 엔트리의 resolve 경로에서 설치 패키지 manifest를 찾아 name/version을 확인한다.
 - 검증: pnpm 설치 후 골든 생성 테스트에서 버전 0.52.0 확인, 다른 버전의 생성 거부 여부 확인.
 - 상태: 코드 반영, 실행 대기.
+
+## M028 — 경계 함수의 입력·출력 소유권 분리
+
+- 관련 오류: E030.
+- 절차: document/editor 경계 성공 반환값은 호출자 소유의 입력 객체를 직접 노출하지 않는다. 입력과 반환 envelope·assets·lexicalState의 참조 비공유 및 사후 변경 내성을 회귀 테스트로 확인한다.
+- 검증: R11 snapshot regression과 pnpm check 실행.
+- 상태: 코드 반영, 실행 대기.
