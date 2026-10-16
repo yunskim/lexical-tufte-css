@@ -41,3 +41,41 @@ test('file-to-SQLite restore advances revision and rejects stale or invalid back
   assert.equal((await readSqlitePostSnapshotV2(adapter,id)).value.metadata.revision,3);
  }finally{db.close();await rm(dir,{recursive:true,force:true});}
 });
+
+test('restore conflict injected between read and CAS preserves competing update',async()=>{
+ const db=new DatabaseSync(':memory:');
+ const dir=await mkdtemp(join(tmpdir(),'tufte-conflict-'));
+ try{
+  db.exec(readFileSync(new URL('../sql/001_posts_v2.sql',import.meta.url),'utf8'));
+  const adapter={prepare(sql){return {bind(...args){return {
+   async run(){return {meta:{changes:db.prepare(sql).run(...args).changes}};},
+   async first(){return db.prepare(sql).get(...args)??null;}
+  };}};}};
+  const document=JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document-v2.json',import.meta.url),'utf8'));
+  const metadata={slug:'race-restore',summary:'original',tags:[],authors:['editor'],status:'draft',
+   createdAt:'2026-10-16T00:00:00Z',updatedAt:'2026-10-16T00:00:00Z',revision:1};
+  const store=new SqlitePostRevisionStoreV2(adapter);
+  assert.equal((await store.insert({document,metadata})).ok,true);
+  const path=join(dir,'backup.json');
+  assert.equal((await writeSqlitePostBackupFile(path,adapter,document.id,1)).ok,true);
+  assert.equal((await store.compareAndSwap({document,metadata:{...metadata,revision:2,summary:'edited'}},1)).ok,true);
+  let injected=false;
+  const racing={prepare(sql){return {bind(...args){return {
+   async first(){return db.prepare(sql).get(...args)??null;},
+   async run(){
+    if(!injected&&sql.startsWith('UPDATE posts_v2')){
+     injected=true;
+     assert.equal((await store.compareAndSwap({document,metadata:{...metadata,revision:3,summary:'winner'}},2)).ok,true);
+    }
+    return {meta:{changes:db.prepare(sql).run(...args).changes}};
+   }
+  };}};}};
+  const result=await restoreSqlitePostBackupFile(path,racing,document.id,2);
+  assert.equal(injected,true);
+  assert.equal(result.ok,false);
+  assert.ok(result.diagnostics.some(d=>d.code==='REVISION_CONFLICT'));
+  const latest=await readSqlitePostSnapshotV2(adapter,document.id);
+  assert.equal(latest.value.metadata.revision,3);
+  assert.equal(latest.value.metadata.summary,'winner');
+ }finally{db.close();await rm(dir,{recursive:true,force:true});}
+});
