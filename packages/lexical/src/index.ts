@@ -32,4 +32,4 @@ export {registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_CO
 
 export {registerQuotationCommands,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,type TufteQuotationKind} from './quotationCommands.js';
 
-export {registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,type InsertTufteFigure} from './figureCommands.js';
+export {registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,type InsertTufteFigure,type InsertFigureMarginNote} from './figureCommands.js';
