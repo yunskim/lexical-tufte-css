@@ -698,3 +698,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - 공개 API 연결, fullwidth figure 내부 이미지 자산 왕복 및 잘못된 URL/크기 거부 테스트 작성.
 - 실제 빌드·테스트 미실행, asset fixture의 metadata 계약 일치 및 CSS 레이아웃 확인 필요. F19/P2.3 완료 체크 보류. CI 없음.
 - 다음 순서: F18 embed node의 provider URL allowlist, wrapper/비율/제목 보존.
+
+## 2026-10-16 — F18 embed 및 Lexical/Tufte 선행 사례 조사
+
+- `packages/lexical/src/EmbedNode.ts`: YouTube/Vimeo 제한 URL, provider/title/wrapper/width/aspectRatio 직렬화 및 편집 DOM, 공개 API 추가.
+- 왕복·URL allowlist 거부 테스트 작성. 실제 빌드·테스트 미실행; 발행 렌더러 및 iframe 비율·CSP 검증 전 F18 체크 보류.
+- `docs/LEXICAL_TUFTE_REFERENCES.ko.md`: Lexical + Tufte CSS 직접 통합 공개 사례 미발견(검색 범위 한정), Tufte CSS 원본·Pandoc·txt2tufte·classless 변형·Lexical UI 참고 사례와 적용 원칙 기록.
+- CI 없음. 다음: 새 노드들의 로컬 실행 검증 환경 복구 및 문서 계약 차이 수정이 우선.
