@@ -14,6 +14,12 @@ export function loadDocumentIntoEditor(editor:LexicalEditor,input:unknown):Failu
  if(!checked.ok)return checked;
  try{
   const state=editor.parseEditorState(JSON.stringify(checked.state));
+  // Lexical may normalize, discard or rewrite fields while importing.
+  // Reject that conversion rather than claiming a lossless document roundtrip.
+  const parsed=state.toJSON();
+  if(JSON.stringify(sortJSON(parsed))!==JSON.stringify(sortJSON(checked.state))){
+   return failure('LEXICAL_IMPORT_LOSSY','Lexical import changed the serialized document state');
+  }
   editor.setEditorState(state);
   return {ok:true,value:input as TufteDocument,diagnostics:[]};
  }catch(error){
@@ -29,4 +35,14 @@ export function exportEditorToDocument(editor:LexicalEditor,base:unknown):Failur
  }catch(error){
   return failure('LEXICAL_EXPORT_FAILED',error instanceof Error?error.message:String(error));
  }
+}
+
+/** Canonical key ordering for loss detection; array order remains significant. */
+function sortJSON(value:unknown):unknown{
+ if(Array.isArray(value))return value.map(sortJSON);
+ if(value!==null&&typeof value==='object'){
+  const source=value as Record<string,unknown>;
+  return Object.fromEntries(Object.keys(source).sort().map(key=>[key,sortJSON(source[key])]));
+ }
+ return value;
 }
