@@ -536,3 +536,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - `PostRevisionStoreV2` 인터페이스와 `InMemoryPostRevisionStoreV2` 구현·export.
 - 동일 revision의 경쟁 저장 시 단일 성공, snapshot 격리, 후속 revision 테스트 추가.
 - 영속 저장소 트랜잭션/백업·복구는 미구현. 테스트 실행 미확인, R03/P2.5 체크 보류, CI 없음.
+
+## 2026-10-16 — SQLite/D1 단일 SQL revision CAS
+
+- `SqlitePostRevisionStoreV2` 추가: ID/slug/revision 조건부 단일 UPDATE, 1행 갱신만 성공 처리.
+- SQL 바인딩·0행 충돌·revision 오류 mock 테스트 추가. 실제 DB 연동/DDL 적용/백업은 미구현, 실행 검증 미확인.
+- CI 생략, R03/P5 완료 체크 보류.
