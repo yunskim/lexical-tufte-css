@@ -417,3 +417,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - 자산 누락, URL 변경, width 변경, height 변경 네 가지 사례에서 거부 전후 editor state 불변성 검사.
 - E032/E033/M029/M030 재검토: fixture의 note ID 복제 없이 독립 image state를 구성하고 asset metadata는 사례별로 변경.
 - 로컬 실행 검증 미확인, R01 미완료, CI 추가 없음.
+
+## 2026-10-16 — P2 주석 종류 편집 API
+
+- `packages/lexical/src/NoteNode.ts`에 `setKind('sidenote'|'marginnote')` 추가, 잘못된 종류 거부.
+- 실제 Lexical editor update에서 종류를 전환해 noteId·텍스트 보존과 JSON 직렬화 결과를 검사하는 회귀 테스트 추가.
+- E032/E033 및 M029/M030의 synthetic fixture 제약을 재점검. 테스트 실행은 미확인, P2.3 및 F기능 완료 체크 보류. CI 없음.
