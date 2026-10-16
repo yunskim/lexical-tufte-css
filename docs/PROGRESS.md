@@ -311,3 +311,11 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - 실제 Lexical 0.52.0 직렬화 기반 스냅샷을 생성/비교하는 테스트를 추가했다. UPDATE_LEXICAL_GOLDEN=1로 생성하며 아직 fixture가 없어 해당 테스트는 skip으로 보고되도록 했다. 골든 fixture를 실제로 생성했다고 주장하지 않는다.
 - 그림 왕복 테스트의 assetId=chart-1에 대한 문서 자산 메타데이터 누락을 발견하여 수정했다. ERROR_LOG E028, ERROR_PREVENTION M026에 기록.
 - 환경에 pnpm이 없어 테스트 미실행. R02/R03 및 골든 fixture 완료 체크 보류. 다음에는 의존성 확보 후 생성 결과 검토·커밋, pnpm check 실행.
+
+## 2026-10-16 — R02 골든 fixture 필수 검증 게이트·자산 오류 회귀
+
+- packages/lexical/test/document-bridge.test.mjs: REQUIRE_LEXICAL_GOLDEN=1일 때 fixture가 없으면 명시적으로 실패하게 수정. UPDATE_LEXICAL_GOLDEN=1은 설치된 Lexical 0.52.0의 실제 결과를 생성하므로 검토 후에만 커밋한다.
+- M026에 따라 assetId가 assets에 존재하지 않는 그림을 이용해 MISSING_ASSET 오류와 편집기 파싱·변경 호출 0회를 검사하는 회귀 추가.
+- 현재 컨테이너 Node v22.16.0 확인, pnpm 실행 파일 없음. 테스트는 미실행이며 골든 fixture는 미생성. R02/R03 미완료 유지.
+
+검증 명령(의존성 설치 가능한 환경): `pnpm install --frozen-lockfile && pnpm check`; 골든 생성은 `UPDATE_LEXICAL_GOLDEN=1 pnpm --filter @lexical-tufte/lexical test` 후 생성된 JSON을 검토·커밋. 이후 `REQUIRE_LEXICAL_GOLDEN=1 pnpm --filter @lexical-tufte/lexical test`로 필수 검증.
