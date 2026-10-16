@@ -994,3 +994,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 
 - `docs/PUBLICATION_PURGE_AND_RECOVERY.ko.md` 신규: 현재 snapshot 불변 트리거/FK, 긴급 비공개와 영구 purge 분리, 감사·권한·generation 재검사, 백업/CDN 삭제 범위, 정식 posts_v2와 격리된 무효 Lexical 복구 슬롯의 저장·충돌·보안 계약 정의.
 - SQL migration·purge API·recovery adapter는 미구현. Work 검증 전 설계 완료를 기능 완료로 표시하지 않음. CI 생략.
+
+## 2026-10-16 editor recovery v1 초기 구현
+
+- blog/sql/002_editor_recovery_v1.sql에 정식 posts_v2와 분리된 세션별 복구 슬롯 추가.
+- blog/src/recovery.ts에 원본 JSON 복구 저장/읽기, 2MB 크기 제한, sequence CAS, BEGIN IMMEDIATE, SHA-256 checksum 검증 추가. blog 공개 API에 export.
+- blog/test/recovery.test.mjs에 구조적으로 무효한 JSON의 복구, stale CAS, 변조, 잘못된 JSON/크기 회귀 fixture 추가.
+- 아직 실행 검증 전. 편집기 자동 저장 UI, 복구 선택, 권한/보존 정책, purge 구현은 미완료. CI 생략.
