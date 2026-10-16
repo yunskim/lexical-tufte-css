@@ -274,3 +274,21 @@ test('R11 successful import returns detached envelope and editor state',()=>{
  assert.equal(JSON.stringify(result.value.lexicalState),originalState);
  assert.ok(captured);
 });
+
+test('R11 exported document cannot alias mutable editor JSON or base metadata',()=>{
+ const base=fixture();
+ const state=structuredClone(base.lexicalState);
+ const fake={getEditorState(){return {toJSON(){return state;}};}};
+ const result=exportEditorToDocument(fake,base);
+ assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+ assert.notStrictEqual(result.value.lexicalState,state);
+ assert.notStrictEqual(result.value.assets,base.assets);
+ const original=JSON.stringify(result.value.lexicalState);
+ const title=result.value.title;
+ state.root.children=[];
+ base.title='changed after export';
+ base.assets.length=0;
+ assert.equal(JSON.stringify(result.value.lexicalState),original);
+ assert.equal(result.value.title,title);
+ assert.ok(result.value.assets.length>0);
+});
