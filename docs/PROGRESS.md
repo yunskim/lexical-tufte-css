@@ -325,3 +325,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - UPDATE_LEXICAL_GOLDEN=1 경로에서 설치된 lexical/package.json 버전이 0.52.0인지 확인하고 기존 골든 파일을 기본적으로 덮어쓰지 않도록 보호했다. 기존 파일 변경은 OVERWRITE_LEXICAL_GOLDEN=1을 추가로 지정해야 한다.
 - 현재 실행 환경 확인: Node v22.16.0, pnpm 명령 없음, 로컬 의존성 없음. 골든 생성/테스트 실행을 성공으로 기록하지 않는다. require('lexical/package.json')의 package exports 호환성도 실제 의존성 설치 후 확인할 것.
 - R02/R03 미완료, CI 추가 없음.
+
+## 2026-10-16 — R02 골든 버전 검사 수정 및 환경 재점검
+
+- `require('lexical/package.json')`의 비공개 exports 의존을 제거하고 `require.resolve('lexical')` 공개 엔트리 기준 manifest 탐색으로 변경(E029/M027).
+- 컨테이너에서 `node -v`는 v22.16.0, `pnpm` 없음, `/mnt/data`에 checkout 없음, `git ls-remote`는 github.com DNS 조회 실패를 재확인했다. 의존성 설치·실제 골든 fixture 생성·테스트는 실행하지 못함.
+- R02/R03 체크 보류. CI 추가 없음. 다음은 연결 가능한 환경에서 pnpm install --frozen-lockfile 및 pnpm check, 골든 생성과 리뷰.
