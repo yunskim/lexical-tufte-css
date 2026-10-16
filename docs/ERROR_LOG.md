@@ -258,3 +258,10 @@
 - 발견: 2026-10-16 테스트 fixture 재점검. 원본 section의 자식을 복제하면 기존 sidenote/marginnote의 noteId까지 중복될 수 있어 schema가 거부한다.
 - 처리: 두 번째 section은 주석을 포함하지 않는 고유 text paragraph로 구성하여 순서 차이만 검증.
 - 상태: 코드 수정, 실행 검증 대기.
+
+## E034 — 외부 전체 검증에서 발견된 세 가지 테스트 실패 (2026-10-16)
+
+- `packages/render/test/render.test.mjs`의 테이블 정규식 이스케이프 오류로 테스트 파일 구문 분석 실패.
+- `packages/lexical/test/note.test.mjs`의 이미지 오류 메시지 기대값이 검증 함수 통합 이후 변경된 메시지와 불일치.
+- `packages/lexical/test/document-bridge.test.mjs`의 R11 alias 테스트는 빈 assets fixture를 사용하면서 비어 있지 않음을 단언.
+- 조치: 각각 정규식 수정, 메시지 허용 범위 수정, 실제 asset fixture 추가. 외부 보고에서 임시 수정 후 render 17/17, document 20/20, lexical 2건 실패를 확인했다고 전달받음. 저장소 수정 후 재실행은 아직 확인되지 않음.
