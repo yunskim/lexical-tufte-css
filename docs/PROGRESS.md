@@ -343,3 +343,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - `editorJSONToDocument` 성공 결과의 lexicalState가 입력 editor state를 참조하던 문제(E031)를 수정했다. 성공 시 문서 전체 structuredClone 반환.
 - R11 회귀: 내보내기 후 editor state와 base title/assets를 변경해도 반환된 문서가 바뀌지 않는지 검사.
 - E031/M028 점검 반영. pnpm 실행 불가로 테스트 미검증; R11/R02/R03 완료 체크 보류. CI 추가 없음.
+
+## 2026-10-16 — R11 document 패키지 단위 회귀
+
+- `packages/document/test/editor-boundary.test.mjs`에 editorJSONToDocument 성공 결과가 원본 editor state 및 base metadata/assets와 참조를 공유하지 않는지 검사하는 테스트 추가.
+- 기존 Lexical bridge 회귀와 별도로 문서 패키지 경계에서 스냅샷 독립성을 검증하도록 범위를 분리했다.
+- 테스트 코드는 커밋했지만 실행은 미확인. R11 완료 체크 보류, CI 추가 없음.
