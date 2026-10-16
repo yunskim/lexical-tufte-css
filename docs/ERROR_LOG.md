@@ -499,3 +499,21 @@ E001–E049/M001–M042를 검토했다. E024의 경계 입력은 실제 Chromiu
 - 발견: P2.2.a UI의 거부 원자성 검증은 통과했지만 snapshot helper가 JSON·HTML 버튼을 눌러 status를 바꾼 뒤 이전 주석 진단을 기대해 실패했다.
 - 처리: 거부 직후 상태 문구를 확인하고 그 다음 snapshot으로 내용 불변성을 검사한다. 제품 거부 로직과 검사 도구의 부수 효과를 구분한다.
 - 상태: verified (실제 UI 진단/원자성 및 전체 회귀). M061 참조.
+
+## E069 — 그림 주석 ID 재발급 테스트가 동일 ID를 반복 생성
+
+- 발견: 연결된 그림 두 개의 중복 noteId를 재발급하는 신규 테스트가 고정 ID 생성기 `()=> 'renewed-copy'`를 사용했다. 두 번째 호출은 첫 번째가 점유한 ID와 충돌해 100회 제한 후 예외가 발생할 수 있었다.
+- 처리: 호출마다 고유 ID를 생성하도록 fixture를 수정하고 두 결과의 고유성을 각각 확인한다. 연결된 노드와 실제 분리된 clipboard payload를 구분한다.
+- 상태: 코드 수정, Work 실행 검증 대기. M062 참조.
+
+## E070 — 그림 주석 수정에서 E059의 빈 NoteNode 중간 상태 재도입
+
+- 발견: UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND가 `note.clear()` 후 새 텍스트를 추가하여, 빈 컨테이너 불허·selection 유실 위험을 다시 도입했다.
+- 처리: 새 텍스트 append → 새 텍스트 끝 선택 → 이전 자식 제거로 순서를 변경하고 선택 유지 회귀를 추가했다.
+- 상태: 코드 수정, Work 실행 검증 대기. E059/M052 및 M063 참조.
+
+## E071 — cut 이후 copy에서 이전 주석 ID 출처 상태 잔류
+
+- 발견: 예제 편집기의 cutIds는 cut 또는 paste 때만 초기화되어 cut→copy→paste에서 오래된 cut ID를 새 클립보드 내용에 적용할 수 있었다.
+- 처리: COPY_COMMAND에 초기화 핸들러를 추가하고 Work 검증에 cut→copy→paste 시나리오를 등록했다.
+- 상태: 코드 수정, Work 실행 검증 대기. 외부 앱의 clipboard 변경과 취소된 cut/copy는 미해결. M064 참조.
