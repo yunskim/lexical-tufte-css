@@ -1,6 +1,8 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+import {readFileSync,writeFileSync,existsSync,mkdirSync} from 'node:fs';
+import {fileURLToPath} from 'node:url';
+import {dirname} from 'node:path';
 import {createHeadlessEditor} from '@lexical/headless';
 import {$getRoot,$createParagraphNode,$createTextNode} from 'lexical';
 import {SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,$createTableLayoutNode,$createFigureNode,$createCaptionNode,$createInlineImageNode,$createSectionNode,$createNoteNode,$createTufteSpanNode,loadDocumentIntoEditor,exportEditorToDocument} from '../dist/index.js';
@@ -189,4 +191,23 @@ test('R03 document schema rejects a future table cell field without silent clean
  const result=validateDocument(document);
  assert.equal(result.ok,false);
  assert.ok(result.diagnostics.some(x=>x.code==='UNKNOWN_FIELD'&&x.path.endsWith('.futureTableField')));
+});
+
+test('R02 Lexical 0.52.0 generated golden snapshot (explicit update only)',()=>{
+ const source=editor();
+ source.update(()=>{
+  $getRoot().append($createSectionNode().append(
+   $createParagraphNode().append($createTextNode('Golden 본문')),
+   $createListNode('number',3).append($createListItemNode().append($createTextNode('항목')))
+  ));
+ },{discrete:true});
+ const state=source.getEditorState().toJSON();
+ const snapshot=new URL('./golden/lexical-0.52.0-document.json',import.meta.url);
+ const actual=JSON.stringify(state,null,2)+'\n';
+ if(process.env.UPDATE_LEXICAL_GOLDEN==='1'){
+  mkdirSync(dirname(fileURLToPath(snapshot)),{recursive:true});
+  writeFileSync(snapshot,actual,'utf8');
+ }
+ assert.ok(existsSync(snapshot),'Run UPDATE_LEXICAL_GOLDEN=1 after verifying Lexical 0.52.0 to generate and review the snapshot');
+ assert.equal(actual,readFileSync(snapshot,'utf8'));
 });
