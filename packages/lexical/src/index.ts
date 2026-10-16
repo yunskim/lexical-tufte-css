@@ -15,3 +15,4 @@ export {EpigraphNode,AttributionNode,CiteNode,$createEpigraphNode,$createAttribu
 export {SectionFooterNode,$createSectionFooterNode} from './SectionFooterNode.js';
 export {FullwidthNode,$createFullwidthNode} from './FullwidthNode.js';
 export {TufteCodeNode,$createTufteCodeNode,type CodeWidth,type SerializedTufteCode} from './CodeBlockNode.js';
+export {ImageQuiltNode,$createImageQuiltNode,type SerializedImageQuilt} from './ImageQuiltNode.js';
