@@ -320,8 +320,17 @@ test('R01 image JSON import rejects unsafe URLs and invalid asset dimensions bef
  const valid={type:'tufte-inline-image',version:1,src:'/figures/chart.svg',alt:'차트',assetId:'chart-1',width:640,height:360};
  for(const change of [
   {src:'javascript:alert(1)'},{src:'//external.example/image.svg'},
-  {assetId:'bad id'},{width:0},{height:-1},{width:1.5},{version:2}
+  {assetId:'bad id'},{alt:null},{width:0},{height:-1},{width:1.5},{version:2}
  ]){
   assert.throws(()=>InlineImageNode.importJSON({...valid,...change}),undefined,JSON.stringify(change));
+ }
+});
+
+test('R01 image factory and JSON import use the same input policy',()=>{
+ const valid={type:'tufte-inline-image',version:1,src:'/figures/chart.svg',alt:'차트',assetId:'chart-1',width:640,height:360};
+ for(const change of [{src:'data:image/svg+xml;base64,AA=='},{alt:null},{assetId:'bad id'},{width:0},{height:Infinity}]){
+  const candidate={...valid,...change};
+  assert.throws(()=>InlineImageNode.importJSON(candidate));
+  assert.throws(()=>$createInlineImageNode(candidate.src,candidate.alt,candidate.assetId,candidate.width,candidate.height));
  }
 });
