@@ -11,3 +11,6 @@
 /* Intrinsic iframe dimensions preserve each validated embed's aspect ratio. */
 .tufte-article .tufte-embed { max-width: 100%; }
 .tufte-article .tufte-embed iframe { display: block; width: 100%; height: auto; aspect-ratio: auto; border: 0; }
+
+/* Composed ImageQuilt: retain its intrinsic ratio within a Tufte figure. */
+.tufte-article figure img.imagequilt { display: block; max-width: 100%; height: auto; }
