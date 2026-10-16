@@ -331,3 +331,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - `require('lexical/package.json')`의 비공개 exports 의존을 제거하고 `require.resolve('lexical')` 공개 엔트리 기준 manifest 탐색으로 변경(E029/M027).
 - 컨테이너에서 `node -v`는 v22.16.0, `pnpm` 없음, `/mnt/data`에 checkout 없음, `git ls-remote`는 github.com DNS 조회 실패를 재확인했다. 의존성 설치·실제 골든 fixture 생성·테스트는 실행하지 못함.
 - R02/R03 체크 보류. CI 추가 없음. 다음은 연결 가능한 환경에서 pnpm install --frozen-lockfile 및 pnpm check, 골든 생성과 리뷰.
+
+## 2026-10-16 — R11 가져오기 스냅샷 분리
+
+- loadDocumentIntoEditor 성공 반환이 입력 문서 원본을 그대로 참조하던 문제(E030)를 수정하여 structuredClone된 독립 envelope를 반환한다.
+- 호출자가 가져오기 이후 title/lexicalState를 변경해도 반환된 값이 바뀌지 않는 R11 회귀 테스트 추가. M028 기록.
+- 현재 환경에서 pnpm과 로컬 프로젝트 의존성 미확보. 실제 테스트 미실행, R11/R02/R03 완료 체크 보류. CI 생략 유지.
