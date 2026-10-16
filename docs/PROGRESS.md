@@ -390,3 +390,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - canonical 배열 순서 테스트의 두 번째 section을 기존 section 복제 대신 `{type:'tufte-section',version:1,children:[...]}`로 직접 구성.
 - E032/E033/M029/M030에서 발견한 빈 노드 및 전역 note ID 중복 위험을 fixture 구조 차원에서 차단.
 - 실제 테스트 실행은 미확인. R03 완료 체크 보류, CI 없음.
+
+## 2026-10-16 — R01 이미지 import 거부 경로 회귀
+
+- `packages/lexical/test/document-bridge.test.mjs`에 `InlineImageNode.importJSON`의 위험 URL(`javascript:`, protocol-relative), 잘못된 assetId, 0/음수/소수 크기, 미래 노드 버전 거부 테스트 추가.
+- 정상 이미지의 assetId/width/height 왕복 테스트와 함께 R01 경계를 추적한다.
+- 기존 E032/E033 및 M029/M030을 재점검해 synthetic section은 독립 최소 노드로 유지했다.
+- 실행 검증 미확인으로 R01/R03 체크 보류. CI 추가 없음.
