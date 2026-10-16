@@ -970,3 +970,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - React 예제 COPY_COMMAND에서 이전 CUT_COMMAND로 수집된 cutIds를 초기화하도록 변경하고 cleanup을 등록. 잘라내기 후 복사 전환의 stale ID 위험 완화.
 - P23_WORK_VERIFICATION.ko.md에 cut→copy→paste 및 clipboard 이벤트 순서 검증을 추가. 외부 앱 clipboard 변경·취소된 copy/cut의 provenance는 미해결 제한.
 - 테스트 실행하지 않음, CI 생략. Work 검증 후 완료 여부 판정.
+
+## 2026-10-16 P2.3 — 오류/대책 문서 정기 점검
+
+- E069–E071에 최근 figure note 테스트 ID factory, 빈 NoteNode 교체, cut→copy provenance 문제를 실제 원인·수정·미검증 상태로 등록.
+- M062–M064에 고유 ID 생성 계약, 새 자식 선택 후 이전 자식 제거, clipboard 상태 전환 규칙을 추가. E059/M052 및 E067/M060 재점검.
+- Work 일괄 실행과 브라우저 검증 전까지 수정 사항을 verified로 승격하지 않음. CI 생략.
