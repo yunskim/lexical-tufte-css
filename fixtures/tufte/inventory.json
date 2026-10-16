@@ -1,0 +1,580 @@
+{
+  "upstream": "edwardtufte/tufte-css",
+  "version": "1.9.0",
+  "commit": "b5d7b7bbe5ce9c4c50fcfad4f19ee3646cfd7ae1",
+  "sha256": "4ca43dfac57225714c8d903a6e59e44b25fe6424db90240a7c378bd80991765c",
+  "rules": [
+    {
+      "selector": "@font-face",
+      "context": [],
+      "features": [
+        "F04"
+      ]
+    },
+    {
+      "selector": "@font-face",
+      "context": [],
+      "features": [
+        "F04"
+      ]
+    },
+    {
+      "selector": "@font-face",
+      "context": [],
+      "features": [
+        "F04"
+      ]
+    },
+    {
+      "selector": "@font-face",
+      "context": [],
+      "features": [
+        "F04"
+      ]
+    },
+    {
+      "selector": "html",
+      "context": [],
+      "features": [
+        "F01"
+      ]
+    },
+    {
+      "selector": "body",
+      "context": [],
+      "features": [
+        "F01"
+      ]
+    },
+    {
+      "selector": "body",
+      "context": [
+        "@media (prefers-color-scheme: dark)"
+      ],
+      "features": [
+        "F01",
+        "F21"
+      ]
+    },
+    {
+      "selector": "h1",
+      "context": [],
+      "features": [
+        "F02"
+      ]
+    },
+    {
+      "selector": "h2",
+      "context": [],
+      "features": [
+        "F02"
+      ]
+    },
+    {
+      "selector": "h3",
+      "context": [],
+      "features": [
+        "F02"
+      ]
+    },
+    {
+      "selector": "hr",
+      "context": [],
+      "features": [
+        "F07"
+      ]
+    },
+    {
+      "selector": "p.subtitle",
+      "context": [],
+      "features": [
+        "F02"
+      ]
+    },
+    {
+      "selector": ".numeral",
+      "context": [],
+      "features": [
+        "F05"
+      ]
+    },
+    {
+      "selector": ".danger",
+      "context": [],
+      "features": [
+        "F05"
+      ]
+    },
+    {
+      "selector": "article",
+      "context": [],
+      "features": [
+        "F01"
+      ]
+    },
+    {
+      "selector": "section",
+      "context": [],
+      "features": [
+        "F01"
+      ]
+    },
+    {
+      "selector": "p, dl, ol, ul",
+      "context": [],
+      "features": [
+        "F06"
+      ]
+    },
+    {
+      "selector": "p",
+      "context": [],
+      "features": [
+        "F03"
+      ]
+    },
+    {
+      "selector": "sup",
+      "context": [],
+      "features": [
+        "F03"
+      ]
+    },
+    {
+      "selector": "div.epigraph",
+      "context": [],
+      "features": [
+        "F09"
+      ]
+    },
+    {
+      "selector": "div.epigraph > blockquote",
+      "context": [],
+      "features": [
+        "F08",
+        "F09"
+      ]
+    },
+    {
+      "selector": "div.epigraph > blockquote, div.epigraph > blockquote > p",
+      "context": [],
+      "features": [
+        "F08",
+        "F09"
+      ]
+    },
+    {
+      "selector": "div.epigraph > blockquote > footer",
+      "context": [],
+      "features": [
+        "F08",
+        "F09"
+      ]
+    },
+    {
+      "selector": "div.epigraph > blockquote > footer > cite",
+      "context": [],
+      "features": [
+        "F08",
+        "F09"
+      ]
+    },
+    {
+      "selector": "blockquote",
+      "context": [],
+      "features": [
+        "F08"
+      ]
+    },
+    {
+      "selector": "blockquote p",
+      "context": [],
+      "features": [
+        "F08"
+      ]
+    },
+    {
+      "selector": "blockquote footer",
+      "context": [],
+      "features": [
+        "F08"
+      ]
+    },
+    {
+      "selector": "section > p, section > footer, section > table",
+      "context": [],
+      "features": [
+        "F07",
+        "F16"
+      ]
+    },
+    {
+      "selector": "section > dl, section > ol, section > ul",
+      "context": [],
+      "features": [
+        "F06"
+      ]
+    },
+    {
+      "selector": "dt:not(:first-child), li:not(:first-child)",
+      "context": [],
+      "features": [
+        "F06"
+      ]
+    },
+    {
+      "selector": "figure",
+      "context": [],
+      "features": [
+        "F13"
+      ]
+    },
+    {
+      "selector": "figcaption",
+      "context": [],
+      "features": [
+        "F13"
+      ]
+    },
+    {
+      "selector": "figure.fullwidth figcaption",
+      "context": [],
+      "features": [
+        "F14"
+      ]
+    },
+    {
+      "selector": "a:link, a:visited",
+      "context": [],
+      "features": [
+        "F03"
+      ]
+    },
+    {
+      "selector": "img",
+      "context": [],
+      "features": [
+        "F13"
+      ]
+    },
+    {
+      "selector": "figure.fullwidth img",
+      "context": [],
+      "features": [
+        "F14"
+      ]
+    },
+    {
+      "selector": ".sidenote, .marginnote",
+      "context": [],
+      "features": [
+        "F10",
+        "F11"
+      ]
+    },
+    {
+      "selector": ".sidenote-number",
+      "context": [],
+      "features": [
+        "F10"
+      ]
+    },
+    {
+      "selector": ".sidenote-number:after, .sidenote:before",
+      "context": [],
+      "features": [
+        "F10"
+      ]
+    },
+    {
+      "selector": ".sidenote-number:after",
+      "context": [],
+      "features": [
+        "F10"
+      ]
+    },
+    {
+      "selector": ".sidenote:before",
+      "context": [],
+      "features": [
+        "F10"
+      ]
+    },
+    {
+      "selector": "blockquote .sidenote, blockquote .marginnote",
+      "context": [],
+      "features": [
+        "F08",
+        "F10",
+        "F11"
+      ]
+    },
+    {
+      "selector": "div.fullwidth, table.fullwidth",
+      "context": [],
+      "features": [
+        "F15",
+        "F16"
+      ]
+    },
+    {
+      "selector": "div.table-wrapper",
+      "context": [],
+      "features": [
+        "F16"
+      ]
+    },
+    {
+      "selector": ".sans",
+      "context": [],
+      "features": [
+        "F05"
+      ]
+    },
+    {
+      "selector": "code, pre > code",
+      "context": [],
+      "features": [
+        "F17"
+      ]
+    },
+    {
+      "selector": ".sans > code",
+      "context": [],
+      "features": [
+        "F05",
+        "F17"
+      ]
+    },
+    {
+      "selector": "h1 > code, h2 > code, h3 > code",
+      "context": [],
+      "features": [
+        "F02",
+        "F17"
+      ]
+    },
+    {
+      "selector": ".marginnote > code, .sidenote > code",
+      "context": [],
+      "features": [
+        "F10",
+        "F11",
+        "F17"
+      ]
+    },
+    {
+      "selector": "pre > code",
+      "context": [],
+      "features": [
+        "F17"
+      ]
+    },
+    {
+      "selector": "pre.fullwidth > code",
+      "context": [],
+      "features": [
+        "F17"
+      ]
+    },
+    {
+      "selector": ".fullwidth",
+      "context": [],
+      "features": [
+        "F15"
+      ]
+    },
+    {
+      "selector": "span.newthought",
+      "context": [],
+      "features": [
+        "F05"
+      ]
+    },
+    {
+      "selector": "input.margin-toggle",
+      "context": [],
+      "features": [
+        "F11"
+      ]
+    },
+    {
+      "selector": "label.sidenote-number",
+      "context": [],
+      "features": [
+        "F10"
+      ]
+    },
+    {
+      "selector": "label.margin-toggle:not(.sidenote-number)",
+      "context": [],
+      "features": [
+        "F10",
+        "F11"
+      ]
+    },
+    {
+      "selector": ".iframe-wrapper",
+      "context": [],
+      "features": [
+        "F18"
+      ]
+    },
+    {
+      "selector": ".iframe-wrapper iframe",
+      "context": [],
+      "features": [
+        "F18"
+      ]
+    },
+    {
+      "selector": "body",
+      "context": [
+        "@media (max-width: 760px)"
+      ],
+      "features": [
+        "F01",
+        "F20"
+      ]
+    },
+    {
+      "selector": "hr, section > p, section > footer, section > table",
+      "context": [
+        "@media (max-width: 760px)"
+      ],
+      "features": [
+        "F07",
+        "F16",
+        "F20"
+      ]
+    },
+    {
+      "selector": "pre > code",
+      "context": [
+        "@media (max-width: 760px)"
+      ],
+      "features": [
+        "F17",
+        "F20"
+      ]
+    },
+    {
+      "selector": "section > dl, section > ol, section > ul",
+      "context": [
+        "@media (max-width: 760px)"
+      ],
+      "features": [
+        "F06",
+        "F20"
+      ]
+    },
+    {
+      "selector": "figure",
+      "context": [
+        "@media (max-width: 760px)"
+      ],
+      "features": [
+        "F13",
+        "F20"
+      ]
+    },
+    {
+      "selector": "figcaption, figure.fullwidth figcaption",
+      "context": [
+        "@media (max-width: 760px)"
+      ],
+      "features": [
+        "F14",
+        "F20"
+      ]
+    },
+    {
+      "selector": "blockquote",
+      "context": [
+        "@media (max-width: 760px)"
+      ],
+      "features": [
+        "F08",
+        "F20"
+      ]
+    },
+    {
+      "selector": "blockquote p, blockquote footer",
+      "context": [
+        "@media (max-width: 760px)"
+      ],
+      "features": [
+        "F08",
+        "F20"
+      ]
+    },
+    {
+      "selector": "label.margin-toggle:not(.sidenote-number)",
+      "context": [
+        "@media (max-width: 760px)"
+      ],
+      "features": [
+        "F10",
+        "F11",
+        "F20"
+      ]
+    },
+    {
+      "selector": ".sidenote, .marginnote",
+      "context": [
+        "@media (max-width: 760px)"
+      ],
+      "features": [
+        "F10",
+        "F11",
+        "F20"
+      ]
+    },
+    {
+      "selector": ".margin-toggle:checked + .sidenote, .margin-toggle:checked + .marginnote",
+      "context": [
+        "@media (max-width: 760px)"
+      ],
+      "features": [
+        "F10",
+        "F11",
+        "F20"
+      ]
+    },
+    {
+      "selector": "label",
+      "context": [
+        "@media (max-width: 760px)"
+      ],
+      "features": [
+        "F11",
+        "F20"
+      ]
+    },
+    {
+      "selector": "div.table-wrapper, table",
+      "context": [
+        "@media (max-width: 760px)"
+      ],
+      "features": [
+        "F16",
+        "F20"
+      ]
+    },
+    {
+      "selector": "img",
+      "context": [
+        "@media (max-width: 760px)"
+      ],
+      "features": [
+        "F13",
+        "F20"
+      ]
+    }
+  ],
+  "supplemental": {
+    "F12": "Margin images: marginnote plus img; demo HTML fixture required in P2.",
+    "F19": "ImageQuilts: regular or fullwidth figure; no dedicated CSS selector.",
+    "F22": "Multiple articles/long notes: composition regression fixtures required in P4."
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "name": "@lexical-tufte/lexical",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "license": "GPL-3.0-only",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "lexical": "0.52.0",
+    "@lexical/react": "0.52.0",
+    "@lexical/headless": "0.52.0",
+    "@lexical/html": "0.52.0",
+    "@lexical/rich-text": "0.52.0",
+    "@lexical/list": "0.52.0",
+    "@lexical/link": "0.52.0",
+    "@lexical/table": "0.52.0",
+    "@lexical/code": "0.52.0",
+    "@lexical/history": "0.52.0"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18",
+    "yjs": ">=13.5.37"
+  },
+  "devDependencies": {
+    "typescript": "6.0.2",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "yjs": "13.6.27"
+  }
+}

@@ -1,7 +1,7 @@
 # Lexical Tufte 블로그 라이브러리 계획
 
 작성: 2026-10-16 (Asia/Seoul)
-상태: 계획 수립 완료, 원격 저장소 생성 완료, 계획 업로드, 구현 미착수.
+상태: P0 기반 구성 완료, P1 prototype 미착수. 편집기 제품 기능은 아직 미구현.
 저장소: https://github.com/yunskim/lexical-tufte (public, GPL-3.0; 사용자가 생성한 설정 유지).
 
 ## 목표와 완료 정의
@@ -107,11 +107,11 @@ CI는 구성하지 않으며 GitHub Actions 실행이나 CI 상태를 완료·�
 - [x] P0.2 Tufte 기준 commit과 F01–F22 추적표 작성. 증거: 이 문서.
 - [x] P0.3 단계·완료 조건·작업 규약 작성. 증거: 이 문서 및 AGENTS.md.
 - [x] P0.4 사용자가 `yunskim/lexical-tufte` 저장소 생성, 계획·규약·README 업로드. 증거: main의 README.md, AGENTS.md, docs/PLAN.ko.md.
-- [ ] P0.5 Lexical 안정 릴리스 및 peer dependency 호환 확인, 모든 @lexical 패키지 버전 통일·lockfile 고정.
-- [ ] P0.6 workspace/TS/lint/build 및 로컬 검증 명령 구성, CSS·폰트·이미지별 라이선스/고지 확인, 기존 GPL-3.0 LICENSE에 맞는 패키지 메타데이터·고지 반영. 데모 이미지 무단 재배포 없이 자체 fixture 제작.
-- [ ] P0.7 upstream CSS selector·media·font 규칙을 추출해 F표와 전수 대조; 누락 시 항목 추가. 초기 feature inventory snapshot 커밋.
+- [x] P0.5 Lexical 안정 릴리스 및 peer dependency 호환 확인, 모든 @lexical 패키지 버전 통일·lockfile 고정.
+- [x] P0.6 workspace/TS/lint/build 및 로컬 검증 명령 구성, CSS·폰트·이미지별 라이선스/고지 확인, 기존 GPL-3.0 LICENSE에 맞는 패키지 메타데이터·고지 반영. 데모 이미지 무단 재배포 없이 자체 fixture 제작.
+- [x] P0.7 upstream CSS selector·media·font 규칙을 추출해 F표와 전수 대조; 누락 시 항목 추가. 초기 feature inventory snapshot 커밋.
 
-P0 gate: 저장소 URL, 재현 가능한 설치/빌드, 버전/라이선스/전수 목록이 기록되어 있다.
+P0 gate: 저장소 URL, 재현 가능한 설치/빌드, 버전/라이선스/전수 목록이 기록되어 있다. 완료 증거: package.json, pnpm-lock.yaml, docs/DEPENDENCIES.md, THIRD_PARTY_NOTICES.md, fixtures/tufte/inventory.json, docs/PROGRESS.md.
 
 ### P1 — 어려운 편집 동작을 먼저 검증 (P0 이후)
 
@@ -191,7 +191,7 @@ P6 gate: 로컬 빌드·타입 검사·관련 테스트 통과, 남은 결함과
 
 진행 기록 형식: `작업 ID | 상태(todo/in-progress/blocked/done) | 변경 경로/PR | 검증 명령·결과 | 차단 원인 | 다음 작업`. 증거 없이 체크하지 않는다. 문서 수정만으로 구현 작업을 완료하지 않는다.
 
-현재 다음 작업: P0.5 Lexical 안정 릴리스·호환 버전 확인. 이어 P0.6/P0.7에서 workspace·로컬 검증 명령·기능 전수 목록을 구축한다.
+현재 다음 작업: P1.1 노트 편집 prototype. P0 검증 증거는 docs/PROGRESS.md와 docs/DEPENDENCIES.md에 기록한다.
 
 ## 주요 위험과 처리
 

@@ -1,0 +1,16 @@
+{
+  "name": "lexical-tufte-workspace",
+  "private": true,
+  "license": "GPL-3.0-only",
+  "packageManager": "pnpm@11.25.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "check": "pnpm lint && pnpm inventory:check && pnpm typecheck && pnpm build",
+    "lint": "node scripts/lint.mjs",
+    "inventory:check": "node scripts/inventory.mjs"
+  }
+}
