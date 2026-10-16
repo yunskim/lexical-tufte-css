@@ -915,3 +915,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - 공개 API 및 examples/editor의 그림 여백 주석 입력 버튼 연결.
 - noteId 자동 생성, 이미지 업로드, 그림-주석 이동/복사 시 ID 재발급, 렌더러·접근성·undo/redo 검증은 후속 작업.
 - 테스트 실행은 Work 일괄 처리 대기. P2.3/F13 체크 보류, CI 없음.
+
+## 2026-10-16 P2.3 — 그림 주석 ID/클립보드 회귀 보강
+
+- figureCommands의 문서 전체 주석 ID 검색을 기존 $collectNoteIds()로 공통화하여 검사 경로 중복 제거.
+- figure-commands.test.mjs에 figure 내 marginnote 삽입 순서, kind/ID/내용, 중복 ID 거부 및 중첩 figure 복사 노드의 $reidentifyPastedNotes ID 재발급 검증 코드를 추가.
+- 실제 DOM clipboard 이벤트 연결·브라우저 복사/붙여넣기·undo/redo 검증은 Work에서 별도 확인 필요. 테스트 실행하지 않음, CI 생략, 체크리스트 완료 보류.
