@@ -548,3 +548,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - `packages/document/sql/001_posts_v2.sql` 추가, payload/행 키 일관성 CHECK와 id/slug unique 정의.
 - `SqlitePostRevisionStoreV2.insert` 추가: revision 1만 허용, 중복 덮어쓰기 금지. mock 단위 테스트 추가.
 - 실제 DB 통합 테스트 및 백업·복원 미완. CI 없음, P5.1 체크 보류.
+
+## 2026-10-16 — 실제 SQLite 통합 테스트 코드
+
+- Node `node:sqlite` 기반 스키마/insert/CAS/constraint 통합 테스트 추가.
+- 환경 SQLite 3.46.1에서 동일 DDL과 revision 조건 UPDATE 1행 성공·재시도 0행 smoke 확인.
+- 저장소의 TS 빌드 및 node 통합 테스트는 미실행. D1 실제 연결/백업·복원 미완. CI 없음.
