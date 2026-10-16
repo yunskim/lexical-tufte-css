@@ -46,6 +46,19 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
      if((Number(n.format)&flag)!==0)child=element(tag,{},[child]);
     return [child];
    }
+   case 'tab':return ['\t'];
+   case 'code-highlight':return [element('span',{'class':'tufte-code-token'},[String(n.text)])];
+   case 'tufte-code':{
+    const codeChildren:RenderChild[]=n.children.map(child=>{
+     if(child.type==='text'||child.type==='tab')return String(child.text);
+     if(child.type==='linebreak')return '\n';
+     if(child.type==='code-highlight')return element('span',{class:'tufte-code-token'},[String(child.text)]);
+     throw Error('Unexpected code child after validation');
+    });
+    return [element('pre',n.width==='fullwidth'?{class:'fullwidth'}:{},[
+     element('code',{},codeChildren),
+    ])];
+   }
    case 'linebreak':return [element('br',{},[],true)];
    case 'link':{
     const rel=new Set(String(n.rel??'').split(/\s+/).filter(Boolean));
