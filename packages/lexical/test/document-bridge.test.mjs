@@ -9,12 +9,13 @@ import {$getRoot,$createParagraphNode,$createTextNode,CLEAR_HISTORY_COMMAND,COMM
 import {SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,$createTableLayoutNode,$createFigureNode,$createCaptionNode,$createInlineImageNode,$createSectionNode,$createNoteNode,$createTufteSpanNode,loadDocumentIntoEditor,loadMigratedDocumentIntoEditor,exportEditorToDocument,exportEditorToDocumentV2} from '../dist/index.js';
 import {LinkNode} from '@lexical/link';
 import {HeadingNode,QuoteNode,$createHeadingNode,$createQuoteNode} from '@lexical/rich-text';
+import {HorizontalRuleNode,$createHorizontalRuleNode} from '@lexical/react/LexicalHorizontalRuleNode';
 import {createEmptyHistoryState,registerHistory} from '@lexical/history';
 import {NODE_SCHEMA,validateDocument} from '@lexical-tufte/document';
 import {ListNode,ListItemNode,$createListNode,$createListItemNode} from '@lexical/list';
 import {TableNode,TableRowNode,TableCellNode,$createTableNode,$createTableRowNode,$createTableCellNode} from '@lexical/table';
 const fixture=()=>JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document.json',import.meta.url),'utf8'));
-const editor=()=>createHeadlessEditor({namespace:'document-bridge-test',nodes:[SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,TableNode,TableRowNode,TableCellNode,ListNode,ListItemNode,LinkNode,HeadingNode,QuoteNode],onError(e){throw e;}});
+const editor=()=>createHeadlessEditor({namespace:'document-bridge-test',nodes:[SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,TableNode,TableRowNode,TableCellNode,ListNode,ListItemNode,LinkNode,HeadingNode,QuoteNode,HorizontalRuleNode],onError(e){throw e;}});
 test('R02 strict Lexical bridge fails closed when a registered node is missing',()=>{
  const source=editor();
  source.update(()=>{
@@ -630,4 +631,22 @@ test('P2.2 heading h2/h3 and quote roundtrip through real Lexical',()=>{
  const blocks=saved.value.lexicalState.root.children[0].children;
  assert.deepEqual(blocks.map(node=>node.type),['heading','heading','quote']);
  assert.deepEqual(blocks.slice(0,2).map(node=>node.tag),['h2','h3']);
+});
+
+test('P2.2 horizontal rule retains node type and position across editor roundtrip',()=>{
+ const source=editor();
+ source.update(()=>{
+  $getRoot().append($createSectionNode().append(
+   $createParagraphNode().append($createTextNode('before')),
+   $createHorizontalRuleNode(),
+   $createParagraphNode().append($createTextNode('after'))
+  ));
+ },{discrete:true});
+ const base=fixture(),document={...base,lexicalState:source.getEditorState().toJSON()};
+ const target=editor(),loaded=loadDocumentIntoEditor(target,document);
+ assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
+ const saved=exportEditorToDocument(target,document);
+ assert.equal(saved.ok,true,JSON.stringify(saved.diagnostics));
+ assert.deepEqual(saved.value.lexicalState,document.lexicalState);
+ assert.deepEqual(saved.value.lexicalState.root.children[0].children.map(node=>node.type),['paragraph','horizontalrule','paragraph']);
 });
