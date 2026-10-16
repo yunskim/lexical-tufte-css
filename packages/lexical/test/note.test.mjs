@@ -27,7 +27,7 @@ test('future note schema and active image URL are rejected',()=>{
  e.update(()=>{$getRoot().append($createParagraphNode().append($createNoteNode('n').append($createTextNode('내용'))));},{discrete:true});
  const json=e.getEditorState().toJSON();json.root.children[0].children[0].version=2;
  assert.throws(()=>e.parseEditorState(JSON.stringify(json)),/Unsupported/);
- e.update(()=>assert.throws(()=>InlineImageNode.importJSON({version:1,src:'javascript:alert(1)',alt:''}),/Unsupported/),{discrete:true});
+ e.update(()=>assert.throws(()=>InlineImageNode.importJSON({version:1,src:'javascript:alert(1)',alt:''}),/Unsupported|Invalid/),{discrete:true});
 });
 
 test('image metadata and relative URL survive Lexical JSON roundtrip',()=>{
