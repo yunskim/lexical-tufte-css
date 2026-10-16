@@ -44,7 +44,7 @@ test('canonical JSON import validates without HTML fallback',async()=>{
 });
 
 test('valid future node/data schemas do not imply renderer support',()=>{
- const d=fixture();d.lexicalState.root.children[0].children.push({type:'heading',version:1,tag:'h2',children:[{type:'text',version:1,text:'제목',format:0}]});
+ const d=fixture();d.lexicalState.root.children[0].children.push({type:'tufte-code',version:1,width:'body',children:[{type:'text',version:1,text:'code',format:0}]});
  assert.equal(validateDocument(d).ok,true);const r=renderArticle(d);assert.equal(r.ok,false);assert.equal(r.html,null);assert.ok(r.diagnostics.some(x=>x.code==='UNSUPPORTED_RENDER_NODE'));
  const imageDoc=fixture(),image=note(imageDoc).children[2];image.width=800;assert.equal(validateDocument(imageDoc).ok,true);assert.ok(renderArticle(imageDoc).diagnostics.some(x=>x.code==='UNSUPPORTED_RENDER_PROPERTY'));
 });
@@ -95,8 +95,10 @@ test('a mixed or non-leading column header row remains in tbody',()=>{
  first.children[0].headerState=0;
  const rendered=renderArticle(d);
  assert.equal(rendered.ok,true,JSON.stringify(rendered.diagnostics));
- assert.doesNotMatch(rendered.html,/<thead>/);
- assert.match(rendered.html,/<tbody><tr/);
+ const tables=[...rendered.html.matchAll(/<table(?: [^>]*)?>[\\s\\S]*?<\\/table>/g)].map(m=>m[0]);
+ assert.ok(tables.length>=1);
+ assert.doesNotMatch(tables[0],/<thead>/);
+ assert.match(tables[0],/<tbody><tr/);
 });
 
 test('R10 underline, strike and highlight compose without losing text',()=>{
