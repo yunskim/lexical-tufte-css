@@ -198,3 +198,10 @@ Migration은 입력을 변경하지 않는 순수 함수여야 하며, 동일 �
 - `packages/document/test/sqlite-integration.test.mjs`에 Node `node:sqlite` DatabaseSync 기반 실제 SQLite 테스트 추가. DDL 실행, insert, duplicate, 동시 CAS의 단일 승자, payload 일관성 CHECK 위반을 확인하도록 구성.
 - `node:sqlite`는 Node 22에서 experimental일 수 있으므로 환경별 경고/지원 상태를 확인해야 한다. D1 실제 런타임과는 별도 검증이 필요하다.
 - 현재 작업 환경의 Python sqlite3(3.46.1)로 동일 DDL 및 UPDATE의 1행→0행 동작을 독립 smoke 확인했다. **저장소의 node 테스트 전체는 아직 실행하지 못했다.**
+
+## v2 백업 및 CAS 복원 초안 (2026-10-16)
+
+- `createPostBackupV2`/`inspectPostBackupV2`: 명시적 `backupFormat`, `backupVersion:1`, v2 record 봉투를 검증하고 복제한다.
+- `restorePostBackupV2`: 현재 record와 백업의 id/slug를 대조하고, 기존 revision을 유지한 채 덮어쓰지 않고 `expectedRevision+1`로 CAS 복원한다. 오래된 revision을 사용한 재시도는 거부한다.
+- 복원 시 `createdAt`/`updatedAt`은 현재 record 값을 유지한다. 운영 시 변경 시각을 갱신하고 상태 전환을 검사하는 별도 게시물 서비스 계층이 필요하다.
+- 이는 메모리상의 백업 데이터 계약이며 파일 내구성, 자동 백업, 삭제 복구, 원자적 백업 파일 쓰기를 구현하지 않는다. 단위 테스트 미실행.
