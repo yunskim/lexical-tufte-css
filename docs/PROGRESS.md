@@ -625,3 +625,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - `backup-file.test.mjs`: 임시 파일 기록 후 파일 동기화 예외를 주입하는 회귀 테스트 추가.
 - 기존 백업 불변과 임시 파일 정리를 단언. 실제 실행 결과 미확인.
 - P2.2 및 R01–R08 선행 안정화는 계획 순서대로 남아 있음. CI 없음.
+
+## 2026-10-16 — P2.2 R01 이미지 노드 검증 보강
+
+- 기존 `InlineImageNode`가 공통 `isSafeURL`/`isIdentifier`를 사용함을 재확인.
+- Lexical bridge 테스트에 unsafe URL, 부적절한 assetId, 0/음수 크기 및 미래 버전 import 거부 검증 추가.
+- 정상 이미지의 src/assetId/width/height 직렬화 보존 테스트 추가.
+- 실행 미확인으로 R01 체크 보류. CI 없음.
