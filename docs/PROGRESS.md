@@ -467,3 +467,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - `migrateStoredDocument` 구현 및 공개 export: v1→v2 외피 승격, v2 복제, unsupported format 거부.
 - 단위 테스트에 입력 불변, 본문·자산 보존, 복제 분리, 반복 변환 결정성, 미지원 버전 진단 추가.
 - **Lexical runtime 호환성 확인/로드 통합 미완**이며 실제 테스트 미실행. migration API 성공만으로 R03/P2.5 완료 체크하지 않음. CI 없음.
+
+## 2026-10-16 — R03 Lexical migration 로드 경로 연결
+
+- `loadMigratedDocumentIntoEditor` 구현 및 export: v1/v2 migration 결과를 기존 strict Lexical bridge의 parse/serialize 무손실 검사 후 editor에 설치하는 opt-in 경로.
+- Lexical 단위 테스트에 v1→v2 로드/스냅샷 및 미지원 버전 시 기존 상태 불변 사례 추가.
+- 실행 테스트 미확인. undo/redo history reset, 저장 경로 및 브라우저 검증 미완. R03/P2.5 완료 체크 보류, CI 없음.
