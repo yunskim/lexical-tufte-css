@@ -29,7 +29,7 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
    }
    case 'tufte-inline-image':return `<img src="${esc(String(n.src))}" alt="${esc(String(n.alt))}">`;
    case 'tufte-note':{
-    const id=`${prefix}-note-${n.noteId}`,kind=String(n.kind);
+    const id=`tufte-${prefix.length}-${prefix}-${n.noteId}`,kind=String(n.kind);
     return `<span data-tufte-note="${esc(String(n.noteId))}"><label for="${id}" class="margin-toggle${kind==='sidenote'?' sidenote-number':''}">${kind==='marginnote'?'⊕':''}</label><input id="${id}" type="checkbox" class="margin-toggle"><span class="${kind}"${attrs(n)}>${inner()}</span></span>`;
    }
    case 'tufte-figure':return `<figure${n.width==='fullwidth'?' class="fullwidth"':''}${attrs(n)}>${inner()}</figure>`;
