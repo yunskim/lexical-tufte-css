@@ -139,3 +139,23 @@ test('P2.2 F02-F09 headings, lists, definitions and quotations render semantical
  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
  for(const pattern of [/<h2>/,/<hr>/,/<ul>/,/<li>/,/<dl>/,/<dt>/,/<dd>/,/<div class="epigraph">/,/<blockquote>/,/<span class="sans">/])assert.match(result.html,pattern);
 });
+
+test('P2.2 ordered list numbering is retained; unordered list has no numeric attributes',()=>{
+ const d=fixture(),section=d.lexicalState.root.children[0];
+ const t=value=>({type:'text',version:1,text:value,format:0});
+ section.children.push(
+  {type:'list',version:1,tag:'ol',listType:'number',start:7,children:[
+   {type:'listitem',version:1,value:7,children:[t('seven')]},
+   {type:'listitem',version:1,value:12,children:[t('twelve')]}
+  ]},
+  {type:'list',version:1,tag:'ul',listType:'bullet',start:1,children:[
+   {type:'listitem',version:1,value:5,children:[t('bullet')]}
+  ]}
+ );
+ const result=renderArticle(d);
+ assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+ assert.match(result.html,/<ol start="7">/);
+ assert.match(result.html,/<li value="7">/);
+ assert.match(result.html,/<li value="12">/);
+ assert.match(result.html,/<ul><li>/);
+});
