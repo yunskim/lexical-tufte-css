@@ -28,3 +28,28 @@ test('durable backup writer replaces atomically and reader rejects corruption',a
   assert.equal(leftovers,'{bad-json');
  }finally{await rm(directory,{recursive:true,force:true});}
 });
+
+test('failed rename preserves previous backup and removes temporary file',async()=>{
+ const directory=await mkdtemp(join(tmpdir(),'lexical-tufte-failure-'));
+ try{
+  const path=join(directory,'post.json');
+  const document=JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document-v2.json',import.meta.url),'utf8'));
+  const metadata={slug:'failure-backup',summary:'original',tags:[],authors:['editor'],status:'draft',
+   createdAt:'2026-10-16T00:00:00Z',updatedAt:'2026-10-16T00:00:00Z',revision:1};
+  assert.equal((await writePostBackupFile(path,{document,metadata})).ok,true);
+  const before=await readFile(path,'utf8');
+  const filesystem={
+   mkdir:(...args)=>import('node:fs/promises').then(fs=>fs.mkdir(...args)),
+   open:(...args)=>import('node:fs/promises').then(fs=>fs.open(...args)),
+   rm:(...args)=>import('node:fs/promises').then(fs=>fs.rm(...args)),
+   async rename(){throw new Error('injected rename failure');},
+  };
+  await assert.rejects(
+   writePostBackupFile(path,{document,metadata:{...metadata,summary:'new'}},{filesystem}),
+   /injected rename failure/,
+  );
+  assert.equal(await readFile(path,'utf8'),before);
+  const {readdir}=await import('node:fs/promises');
+  assert.deepEqual(await readdir(directory),['post.json']);
+ }finally{await rm(directory,{recursive:true,force:true});}
+});
