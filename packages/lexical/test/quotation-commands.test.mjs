@@ -1,7 +1,8 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createHeadlessEditor} from '@lexical/headless';
-import {$getRoot,$createParagraphNode,$createTextNode} from 'lexical';
+import {$getRoot,$createParagraphNode,$createTextNode,UNDO_COMMAND,REDO_COMMAND} from 'lexical';
+import {registerHistory,createEmptyHistoryState} from '@lexical/history';
 import {TUFTE_NODES,$createSectionNode,registerQuotationCommands,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,INSERT_TUFTE_HORIZONTAL_RULE_COMMAND} from '../dist/index.js';
 
 function setup(){
@@ -82,4 +83,38 @@ test('F07 horizontal rule refuses selections outside a section without mutation'
  assert.deepEqual(editor.getEditorState().toJSON(),before);
  assert.equal(diagnostics.at(-1)?.code,'INVALID_QUOTATION_SELECTION');
  dispose();
+});
+
+test('F07 horizontal rule survives JSON restore and History undo/redo',async()=>{
+ const {editor,diagnostics,dispose}=setup();
+ const history=createEmptyHistoryState();
+ const unregisterHistory=registerHistory(editor,history,300);
+ const flush=()=>new Promise(resolve=>setImmediate(resolve));
+ const run=(command)=>editor.update(()=>editor.dispatchCommand(command,undefined),{discrete:true});
+ try{
+  editor.update(()=>{
+   const text=$createTextNode('persist');
+   $getRoot().append($createSectionNode().append($createParagraphNode().append(text)));
+   text.selectEnd();
+  },{discrete:true});
+  await flush();
+  const before=editor.getEditorState().toJSON();
+  run(INSERT_TUFTE_HORIZONTAL_RULE_COMMAND);
+  await flush();
+  const after=editor.getEditorState().toJSON();
+  assert.deepEqual(after.root.children[0].children.map(n=>n.type),['paragraph','horizontalrule']);
+  const restored=createHeadlessEditor({namespace:'quotation-rule-restore',nodes:TUFTE_NODES,onError(error){throw error;}});
+  restored.setEditorState(restored.parseEditorState(JSON.stringify(after)));
+  assert.deepEqual(restored.getEditorState().toJSON(),after);
+  run(UNDO_COMMAND);
+  await flush();
+  assert.deepEqual(editor.getEditorState().toJSON(),before);
+  run(REDO_COMMAND);
+  await flush();
+  assert.deepEqual(editor.getEditorState().toJSON(),after);
+  assert.equal(diagnostics.length,0);
+ }finally{
+  unregisterHistory();
+  dispose();
+ }
 });
