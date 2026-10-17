@@ -29,6 +29,7 @@ try{
  await page.keyboard.press('Home');assert.equal(await page.locator(':focus').innerText(),'본문 문단');
  await page.keyboard.press('ArrowDown');assert.equal(await page.locator(':focus').innerText(),'제목 h2');
  await page.keyboard.press('Enter');assert.equal(await editor.locator('h2').innerText(),'선택 영역 검사');
+ await page.waitForFunction(()=>Boolean(document.activeElement?.closest('.editor')));
  await page.waitForFunction(()=>document.querySelector('.block-context-menu > button')?.textContent?.includes('제목 h2'));
  await page.keyboard.press('Shift+F10');await group.waitFor();
  await page.waitForFunction(()=>document.activeElement?.textContent==='본문 문단');
@@ -42,9 +43,26 @@ try{
  assert.equal(await group.getByRole('menuitem',{name:'제목 h2',exact:true}).count(),0);
  assert.equal(await group.getByRole('menuitem',{name:'글머리표 목록 삽입',exact:true}).count(),1);
  await page.keyboard.press('Escape');await group.waitFor({state:'hidden'});
+ // Escape restores the actual right-click target, not the previously edited h2.
+ await page.waitForFunction(()=>{
+  const anchor=window.getSelection()?.anchorNode;
+  const element=anchor instanceof Element?anchor:anchor?.parentElement;
+  return Boolean(document.activeElement?.closest('.editor')&&element?.closest('p')?.textContent?.includes('이 본문 중간에'));
+ });
  // Refusing an unsupported conversion must leave the note and other block content intact.
  assert.equal(await editor.locator('[data-note-id="seed-note"]').count(),1);
  assert.equal(await editor.locator('h3').count(),0);
+ assert.equal(await editor.locator('h2').innerText(),'선택 영역 검사');
+ // A menu action selected on the seed paragraph must insert into its section, not the old h2.
+ await editor.locator('section').first().locator('p').first().click({button:'right',position:{x:20,y:10}});
+ await group.waitFor();
+ await group.getByRole('menuitem',{name:'글머리표 목록 삽입',exact:true}).click();
+ await page.waitForFunction(()=>Boolean(document.activeElement?.closest('.editor')));
+ assert.equal(await editor.locator('section').first().locator('ul > li').count(),1);
+ assert.equal(await editor.locator('[data-note-id="seed-note"]').count(),1);
+ assert.equal(await editor.locator('h2').innerText(),'선택 영역 검사');
+ await main.getByRole('button',{name:'실행 취소',exact:true}).click();
+ await page.waitForFunction(()=>document.querySelector('.editor section ul')===null);
  assert.equal(await editor.locator('h2').innerText(),'선택 영역 검사');
  await editor.locator('h2').click({button:'right'});await group.waitFor();
  await page.waitForFunction(()=>document.activeElement?.textContent==='본문 문단');
@@ -72,11 +90,13 @@ try{
  await editor.locator('h3').click({button:'right'});await group.waitFor();
  await page.waitForFunction(()=>document.activeElement?.textContent==='본문 문단');
  await page.keyboard.press('Tab');await group.waitFor({state:'hidden'});
+ assert.equal(await page.locator('.actions button').first().evaluate(element=>element===document.activeElement),true);
  assert.equal(await page.locator('.block-context-menu.is-floating').count(),0);
  assert.equal(await page.evaluate(()=>document.activeElement?.matches('#tufte-block-menu button')),false);
  await editor.locator('h3').click({button:'right'});await group.waitFor();
  await page.waitForFunction(()=>document.activeElement?.textContent==='본문 문단');
  await page.keyboard.press('Shift+Tab');await group.waitFor({state:'hidden'});
+ assert.equal(await page.locator('.block-context-menu > button').evaluate(element=>element===document.activeElement),true);
  assert.equal(await page.locator('.block-context-menu.is-floating').count(),0);
  assert.equal(await page.evaluate(()=>document.activeElement?.matches('#tufte-block-menu button')),false);
 
@@ -97,5 +117,5 @@ try{
  assert.equal(await group.getByRole('menuitem',{name:'구분선 삽입',exact:true}).count(),1);
  await page.keyboard.press('Escape');await group.waitFor({state:'hidden'});
  assert.deepEqual(errors,[]);
- console.log('Contextual UI: icon labels, six selected-text actions, format selection, keyboard entry/Escape, block arrows/heading, schema-filtered menu insertion and 375px bounds PASS.');
+ console.log('Contextual UI: formatting, selection snapshot restoration, Escape and Tab focus targets, schema-filtered inserts, undo and 375px bounds PASS.');
 }finally{await browser?.close();server.kill();}
