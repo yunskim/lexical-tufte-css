@@ -1075,3 +1075,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - FastAPI의 HTTPException/RequestValidationError를 공통 Result 오류 envelope로 매핑하는 코드를 추가하고 savedAt 시간대 유효성 검사를 추가했다.
 - `apps/recovery-server/tests/test_contract.py`에 CAS·checksum·목록 metadata·삭제·권한 거부·입력 오류 계약 테스트 코드를 작성했다.
 - 미완료: 실제 호스트 인증·CSRF, request body 상한, 오류 코드 전 범위 일치, Python↔TypeScript 공통 fixture, 테스트 실행. CI 생략.
+
+## 2026-10-17 Python 서버 계약 정합성 점검
+
+- 요청 본문 제한/Content-Type 조기 거부 응답에도 `Cache-Control: no-store`를 부여하도록 수정했다.
+- Python 계약 테스트의 DELETE+JSON 호출을 `TestClient.request('DELETE', ..., json=...)`로 변경해 HTTPX 호출 규약과 일치시켰다.
+- 테스트·CI는 실행하지 않았다. 인증/CSRF 운영 연결, Python–TypeScript 실행 상호운용 검증, 응답 코드 전 범위 점검은 미완료다.
