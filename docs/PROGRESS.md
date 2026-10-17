@@ -1,3 +1,8 @@
+## P3.1 아이콘 중심 툴바 1차 전환 (일괄 검증 대기)
+
+- `examples/editor/src/main.tsx`: 공통 SVG `ToolbarIcon`·`IconButton` 도입. 굵게·기울임·코드·구분선·실행 취소·다시 실행 및 인용문·Epigraph·섹션 출처를 아이콘 버튼으로 변경. 접근성 이름과 title 툴팁을 유지하여 기존 Playwright 버튼 이름 검색과 호환하도록 작성.
+- 전체 F01–F19 아이콘, 단축키 레지스트리, 메뉴 구조는 아직 미완료. 현재 아이콘은 로컬 SVG이며 Lucide 패키지 적용은 후속 결정 사항이다. 테스트 미실행, CI 생략.
+
 ## P2.2.c F08–F09 실제 편집기 통합 회귀 (일괄 검증 대기)
 
 - `tests/section-commands-browser.mjs`: 인용문 삽입 → 출처 추가 → quote/attribution/cite JSON 확인 → HTML blockquote/footer/cite 확인 → undo; epigraph 삽입 → epigraph/quote JSON 확인 → 발행 class 확인 → undo 회귀 추가.
