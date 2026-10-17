@@ -1,3 +1,8 @@
+## P2.2.c F08–F09 실제 편집기 통합 회귀 (일괄 검증 대기)
+
+- `tests/section-commands-browser.mjs`: 인용문 삽입 → 출처 추가 → quote/attribution/cite JSON 확인 → HTML blockquote/footer/cite 확인 → undo; epigraph 삽입 → epigraph/quote JSON 확인 → 발행 class 확인 → undo 회귀 추가.
+- 기존 섹션 불변성도 검사한다. 사용자 지시에 따라 Playwright 테스트는 아직 실행하지 않았으며 F08–F09 검증 완료로 표시하지 않는다. CI 생략.
+
 ## P2.2.c F07 섹션 문헌 실제 편집기 회귀 추가 (일괄 검증 대기)
 
 - `tests/section-commands-browser.mjs`: React 툴바에서 섹션 출처 → 섹션 문헌 삽입 후 Lexical JSON의 footer/cite 구조, 다른 섹션 불변성, 독립 렌더러의 HTML footer/cite 및 undo 복귀 검사 추가.
