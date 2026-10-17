@@ -19,6 +19,7 @@ import {
   COMMAND_PRIORITY_HIGH, type LexicalNode, type EditorState,
 } from 'lexical';
 import {registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,registerQuotationCommands,INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_SECTION_CITE_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND,registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_TUFTE_DEFINITION_PAIR_COMMAND,registerSectionCommands,WRAP_TUFTE_ROOT_COMMAND,INSERT_TUFTE_SECTION_COMMAND,SPLIT_TUFTE_SECTION_COMMAND,MERGE_TUFTE_SECTION_COMMAND,SET_TUFTE_BLOCK_COMMAND,inspectEditorStructure,focusStructureIssue,type StructureIssue,replaceEditorDocumentState,TUFTE_NODES,NoteNode, $createNoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, registerNoteEdgeTypingGuard, type NoteKind} from '@lexical-tufte/lexical';
+import {NODE_SCHEMA} from '@lexical-tufte/document';
 import './style.css';
 
 type ToolbarIconName='bold'|'italic'|'code'|'quote'|'epigraph'|'sidenote'|'marginnote'|'rule'|'undo'|'redo'|'list'|'numbered'|'definition'|'attribution'|'figure'|'underline'|'strike'|'highlight';
@@ -120,11 +121,36 @@ function canOpenBlockMenu(node:LexicalNode):boolean{
  }
  return hasEditableBlock;
 }
+type BlockMenuCapabilities={paragraph:boolean;heading:boolean;insert:boolean};
+const NO_BLOCK_MENU_ACTIONS:BlockMenuCapabilities={paragraph:false,heading:false,insert:false};
+/** Match the structural preconditions of section/list/quotation commands before showing actions. */
+function blockMenuCapabilities(node:LexicalNode):BlockMenuCapabilities{
+ if(!canOpenBlockMenu(node))return NO_BLOCK_MENU_ACTIONS;
+ let selected:LexicalNode|null=node;
+ while(selected&&!['paragraph','heading','quote'].includes(selected.getType()))selected=selected.getParent();
+ if(!selected)return NO_BLOCK_MENU_ACTIONS;
+ const parent=selected.getParent();
+ const children=selected.getChildren();
+ const canConvert=(target:'paragraph'|'heading')=>
+  (selected.getType()==='paragraph'||selected.getType()==='heading')&&
+  Boolean(parent&&NODE_SCHEMA[parent.getType()]?.children?.includes(target))&&
+  children.every(child=>NODE_SCHEMA[target]?.children?.includes(child.getType()));
+ let section:LexicalNode|null=node;
+ while(section&&section.getType()!=='tufte-section')section=section.getParent();
+ let direct:LexicalNode=node;
+ if(section){
+  while(direct.getParent()&&!direct.getParent()!.is(section))direct=direct.getParent()!;
+ }
+ const insert=Boolean(section&&section.getParent()?.getType()==='root'&&
+  direct.getParent()?.is(section)&&NODE_SCHEMA['tufte-section']?.children?.includes(direct.getType()));
+ return {paragraph:canConvert('paragraph'),heading:canConvert('heading'),insert};
+}
 function BlockContextMenu(){
  const [editor]=useLexicalComposerContext();
  const [open,setOpen]=useState(false);
  const [available,setAvailable]=useState(false);
  const [blockType,setBlockType]=useState('본문');
+ const [capabilities,setCapabilities]=useState<BlockMenuCapabilities>(NO_BLOCK_MENU_ACTIONS);
  const [point,setPoint]=useState<{x:number;y:number}|null>(null);
  const menuRef=useRef<HTMLDivElement|null>(null);
  useEffect(()=>editor.registerUpdateListener(({editorState})=>{
@@ -132,6 +158,7 @@ function BlockContextMenu(){
    const selection=$getSelection();
    const valid=$isRangeSelection(selection)&&selection.isCollapsed()&&canOpenBlockMenu(selection.anchor.getNode());
    setAvailable(valid);
+   setCapabilities(valid?blockMenuCapabilities(selection.anchor.getNode()):NO_BLOCK_MENU_ACTIONS);
    if(valid){
     let node=selection.anchor.getNode();
     while(node.getParent()&&node.getParent()?.getKey()!=='root'&&!['paragraph','heading','quote'].includes(node.getType()))node=node.getParent()!;
@@ -234,8 +261,15 @@ function BlockContextMenu(){
  return <div ref={menuRef} className={point&&open?'block-context-menu is-floating':'block-context-menu'} style={point&&open?{left:point.x,top:point.y}:undefined} onKeyDown={event=>{if(event.key==='Escape'){event.preventDefault();setOpen(false);setPoint(null);editor.focus();}else if(open&&event.key==='Tab'){setOpen(false);setPoint(null);}else if(open&&['ArrowDown','ArrowUp','Home','End'].includes(event.key)){const buttons=Array.from(menuRef.current?.querySelectorAll<HTMLButtonElement>('#tufte-block-menu button')??[]);const index=buttons.indexOf(document.activeElement as HTMLButtonElement);if(buttons.length){event.preventDefault();buttons[event.key==='Home'?0:event.key==='End'?buttons.length-1:(index+(event.key==='ArrowDown'?1:-1)+buttons.length)%buttons.length]?.focus();}}}}>
   <button type="button" aria-haspopup="menu" aria-expanded={open} aria-controls="tufte-block-menu" onMouseDown={event=>event.preventDefault()} onClick={()=>{setPoint(null);setOpen(value=>!value);}}>블록 유형: {blockType} ▾</button>
   {open&&<div id="tufte-block-menu" role="menu" aria-label="블록 유형" aria-orientation="vertical">
-   {([['paragraph','본문 문단'],['h2','제목 h2'],['h3','제목 h3']] as const).map(([type,label])=><button type="button" key={type} role="menuitem" onMouseDown={event=>event.preventDefault()} onClick={()=>{editor.dispatchCommand(SET_TUFTE_BLOCK_COMMAND,type);setOpen(false);setPoint(null);editor.focus();}}>{label}</button>)}
-   <button type="button" role="menuitem" onMouseDown={event=>event.preventDefault()} onClick={()=>{editor.dispatchCommand(INSERT_TUFTE_QUOTATION_COMMAND,'quote');setOpen(false);setPoint(null);editor.focus();}}>인용문 삽입</button>
+   {([['paragraph','본문 문단'],['h2','제목 h2'],['h3','제목 h3']] as const).filter(([type])=>type==='paragraph'?capabilities.paragraph:capabilities.heading).map(([type,label])=><button type="button" key={type} role="menuitem" onMouseDown={event=>event.preventDefault()} onClick={()=>{editor.dispatchCommand(SET_TUFTE_BLOCK_COMMAND,type);setOpen(false);setPoint(null);editor.focus();}}>{label}</button>)}
+   {capabilities.insert&&<>
+    {([['bullet','글머리표 목록 삽입'],['number','번호 목록 삽입']] as const).map(([kind,label])=><button type="button" key={kind} role="menuitem" onMouseDown={event=>event.preventDefault()} onClick={()=>{editor.dispatchCommand(INSERT_TUFTE_LIST_COMMAND,kind);setOpen(false);setPoint(null);editor.focus();}}>{label}</button>)}
+    <button type="button" role="menuitem" onMouseDown={event=>event.preventDefault()} onClick={()=>{editor.dispatchCommand(INSERT_TUFTE_DEFINITION_LIST_COMMAND,undefined);setOpen(false);setPoint(null);editor.focus();}}>정의목록 삽입</button>
+    <button type="button" role="menuitem" onMouseDown={event=>event.preventDefault()} onClick={()=>{editor.dispatchCommand(INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,undefined);setOpen(false);setPoint(null);editor.focus();}}>구분선 삽입</button>
+    <button type="button" role="menuitem" onMouseDown={event=>event.preventDefault()} onClick={()=>{editor.dispatchCommand(INSERT_TUFTE_QUOTATION_COMMAND,'epigraph');setOpen(false);setPoint(null);editor.focus();}}>Epigraph 삽입</button>
+    <button type="button" role="menuitem" onMouseDown={event=>event.preventDefault()} onClick={()=>{editor.dispatchCommand(INSERT_TUFTE_QUOTATION_COMMAND,'section-footer');setOpen(false);setPoint(null);editor.focus();}}>섹션 출처 삽입</button>
+    <button type="button" role="menuitem" onMouseDown={event=>event.preventDefault()} onClick={()=>{editor.dispatchCommand(INSERT_TUFTE_QUOTATION_COMMAND,'quote');setOpen(false);setPoint(null);editor.focus();}}>인용문 삽입</button>
+   </>}
   </div>}
  </div>;
 }
