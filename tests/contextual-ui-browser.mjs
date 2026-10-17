@@ -23,7 +23,7 @@ try{
  await page.keyboard.press('Escape');await floating.waitFor({state:'hidden'});
  await page.waitForTimeout(100);assert.equal(await floating.count(),0);
  await page.keyboard.press('ArrowRight');await page.keyboard.press('Shift+F10');
- const group=page.getByRole('group',{name:'블록 유형',exact:true});await group.waitFor();
+ const group=page.getByRole('menu',{name:'블록 유형',exact:true});await group.waitFor();
  await page.waitForFunction(()=>document.activeElement?.textContent==='본문 문단');
  await page.keyboard.press('End');assert.equal(await page.locator(':focus').innerText(),'인용문 삽입');
  await page.keyboard.press('Home');assert.equal(await page.locator(':focus').innerText(),'본문 문단');
@@ -34,7 +34,8 @@ try{
  await page.keyboard.press('Escape');await group.waitFor({state:'hidden'});
  // Right-click a different block, then act on that target rather than the prior caret.
  await editor.locator('section').first().locator('p').first().click({button:'right',position:{x:20,y:10}});
- await group.waitFor();await group.getByRole('button',{name:'제목 h3',exact:true}).click();
+ await group.waitFor();
+ assert.equal(await group.getByRole('menuitem').count(),4);await group.getByRole('menuitem',{name:'제목 h3',exact:true}).click();
  // The first paragraph contains a note and must be refused without altering its identity.
  assert.equal(await editor.locator('[data-note-id="seed-note"]').count(),1);
  assert.equal(await editor.locator('h3').count(),0);
@@ -46,7 +47,7 @@ try{
  await page.waitForFunction(()=>document.activeElement?.textContent==='본문 문단');
  await page.keyboard.press('End');assert.equal(await page.locator(':focus').innerText(),'인용문 삽입');
  await page.keyboard.press('Home');assert.equal(await page.locator(':focus').innerText(),'본문 문단');
- await group.getByRole('button',{name:'제목 h3',exact:true}).click();
+ await group.getByRole('menuitem',{name:'제목 h3',exact:true}).click();
  assert.equal(await editor.locator('h3').innerText(),'선택 영역 검사');
  await page.setViewportSize({width:375,height:812});
  await editor.locator('h3').click();await page.keyboard.press('Home');await page.keyboard.down('Shift');await page.keyboard.press('End');await page.keyboard.up('Shift');await floating.waitFor();
