@@ -144,7 +144,7 @@ try {
   const before=await page.locator('[data-note-id]').innerText();await selectNote(page);await page.keyboard.press('Control+c');
   await page.keyboard.press('Control+Home');await page.keyboard.press('Alt+ArrowDown');await page.keyboard.press('Control+v');
   assert.equal(await page.locator('[data-note-id]').count(),1);assert.equal(await page.locator('[data-note-id]').innerText(),before);
-  assert.match(await page.getByRole('status').innerText(),/붙여넣을 수 없습니다/);
+  assert.match(await page.getByRole('status',{name:'편집 작업 상태',exact:true}).innerText(),/붙여넣을 수 없습니다/);
  });
  await scenario('Backspace at note start exits without flattening note',async page=>{
   const before=await page.locator('[data-note-id]').innerText();await enter(page);await page.keyboard.press('Backspace');

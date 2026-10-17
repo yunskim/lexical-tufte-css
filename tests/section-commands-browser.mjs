@@ -17,7 +17,7 @@ try{
  const click=name=>page.getByRole('button',{name,exact:true}).click();
  await editor.click();await page.keyboard.press('Control+Home');const initial=await snapshot();
  await click('본문을 섹션으로 묶기');const wrapped=await snapshot();assert.equal(wrapped.root.children.length,1);assert.equal(wrapped.root.children[0].type,'tufte-section');assert.deepEqual(wrapped.root.children[0].children,initial.root.children);
- await click('본문 제목 h2');assert.match(await page.getByRole('status').innerText(),/주석/);assert.deepEqual(await snapshot(),wrapped);
+ await click('본문 제목 h2');assert.match(await page.getByRole('status',{name:'편집 작업 상태',exact:true}).innerText(),/주석/);assert.deepEqual(await snapshot(),wrapped);
  await click('다음 섹션 추가');await page.keyboard.insertText('제목 검증');assert.equal(await editor.locator(':scope > section').count(),2);
  const paragraph=await snapshot();await click('본문 제목 h2');const heading=await snapshot();assert.equal(await editor.locator('h2').innerText(),'제목 검증');
  await click('실행 취소');assert.deepEqual(await snapshot(),paragraph);await click('다시 실행');assert.deepEqual(await snapshot(),heading);

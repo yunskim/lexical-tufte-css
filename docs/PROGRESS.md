@@ -1,5 +1,12 @@
 # 진행 기록
 
+## 2026-10-17 최신 저장소 검증 작업 종료
+
+- main038e551의 새 clone에서 frozen 설치, check237개(실패/skip0), browser11개, package4개 소비 검사, diff 검사 통과. CI 없음.
+- 복구본 타입 술어, 복수 status selector, 최초 폰트 paint 대기를 수정. E072–E075/M066–M068/M058 기록·반영.
+- 추가 recovery browser로 조기 pagehide flush·탭 격리·손상 JSON 실제 다운로드·삭제 취소/확인 검증.
+- [최신 검증 보고서](VERIFICATION_2026-10-17.ko.md)의 체크리스트로 이번 검증 작업을 닫는다. P2–P7/figure UI 전체 gate·OS IME·한국어 fallback 등은 미완료로 유지한다.
+
 ## P0 — 완료 (2026-10-16)
 
 | ID | 결과 | 증거 |

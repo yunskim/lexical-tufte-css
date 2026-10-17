@@ -165,7 +165,7 @@ function EditorUI(){
             if(typeof value.savedAt!=='string'||!value.state)return null;
             return {key,savedAt:value.savedAt,state:value.state};
           }catch{return null;}
-        }).filter((item):item is {key:string;savedAt:string;state:unknown}=>item!==null)
+        }).filter((item):item is NonNullable<typeof item>=>item!==null)
         .sort((a,b)=>b.savedAt.localeCompare(a.savedAt));
       if(entries.length===0){setRecoveryAvailable(false);setStatus('읽을 수 있는 복구용 사본이 없습니다.');return;}
       const choice=entries.length===1?'0':window.prompt(
@@ -394,7 +394,7 @@ function EditorUI(){
       <RichTextPlugin contentEditable={<ContentEditable className="editor" aria-label="본문과 사이드노트 편집" aria-describedby="help"/>} ErrorBoundary={LexicalErrorBoundary}/>
       <HistoryPlugin/><TablePlugin/>
     </main>
-    <p role="status">{status}</p><p role="status" aria-label="자동 복구 저장 상태">{autoSaveState}</p>
+    <p role="status" aria-label="편집 작업 상태">{status}</p><p role="status" aria-label="자동 복구 저장 상태">{autoSaveState}</p>
     {structureIssues.length>0&&<aside role="alert" aria-label="문서 구조 복구"><p>문서 구조를 수정하세요. 내용은 자동 삭제하지 않으며 HTML 생성은 차단됩니다.</p><ul>{structureIssues.map((issue,i)=><li key={`${issue.key}-${i}`}><button onClick={()=>focusStructureIssue(editor,issue.key)}>{issue.message}</button> <code>{issue.path}</code></li>)}</ul><button onClick={()=>editor.dispatchCommand(UNDO_COMMAND,undefined)}>구조 변경 실행 취소</button><button onClick={recoverStructure} disabled={!checkpoint.current}>마지막 정상 구조로 복구</button></aside>}
     <div className="actions"><button onClick={save}>저장</button><button onClick={restore}>불러오기</button><button onClick={restoreRecovery} disabled={!recoveryAvailable}>복구용 사본 열기</button><button onClick={exportRecovery} disabled={!recoveryAvailable}>복구본 JSON 내보내기</button><button onClick={deleteRecovery} disabled={!recoveryAvailable}>복구본 정리</button><button onClick={exportDocument}>JSON·HTML 확인</button><button onClick={()=>{editor.update($loadLayoutFixture,{tag:HISTORY_PUSH_TAG});setStatus('레이아웃 예제를 불러왔습니다. 실행 취소할 수 있습니다.');}}>레이아웃 예제 불러오기</button></div>
     <details><summary>JSON과 발행 HTML 검사</summary><label>JSON<textarea ref={textarea} aria-label="문서 JSON" value={json} readOnly/></label><label>HTML<textarea aria-label="발행 HTML" value={html} readOnly/></label></details>

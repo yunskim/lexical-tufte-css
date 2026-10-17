@@ -1,5 +1,29 @@
 # 에러 기록
 
+## E075 — E065 paint 동기화 대책이 최초 폰트 검사에 누락
+
+- 2026-10-17 전체 browser의 font-proof 최초 검사에서 fonts.ready 직후 DejaVu를 관측해 custom glyph assertion 실패. 지연 swap 검사에만 두 frame 대기가 있고 최초 로드에는 없었다.
+- 최초 로드에도 같은 두 animation frame 대기를 적용했다. 고정 metrics/custom glyph/지연 swap/차단 검사가 통과했다. M058을 최초 로드에도 확장한다.
+- 상태: verified (고정 Chromium134 폰트 회귀). 기본 환경 한국어 시스템 fallback 부재 E064는 유지.
+
+## E072 — 복구본 필터 타입 술어 불일치
+
+- 2026-10-17 main 038e551 clean checkout의 check에서 TS2677/TS18047 발생. truthy 검사를 거친 state 추론 타입보다 넓은 unknown을 filter 술어에 지정했다.
+- NonNullable<typeof item>으로 원소 타입을 유지하면서 null만 제거. 수정 후 check237개(실패/skip0) 통과. M066 참조.
+- 상태: verified (현재 Node24 타입 검사).
+
+## E073 — 검증 환경의 캐시·브라우저 부재
+
+- offline frozen install은 @floating-ui/core 메타데이터 부재로 중단. 일반 frozen install 성공. 첫 browser 실행은 Chromium 부재로 중단.
+- Playwright 설치 중 첫 CDN의 손상 ZIP은 도구의 대체 다운로드로 정상 설치. 의존성/Chromium134 준비 완료와 제품 테스트 성공을 구분한다. M067 참조.
+- 상태: mitigated (환경 준비 완료).
+
+## E074 — 자동 저장 상태 추가 후 브라우저 status selector 충돌
+
+- note-editing-browser에서 getByRole('status')가 작업/자동 저장의 두 요소와 일치해 strict mode 실패. 주석 붙여넣기 거부 문구 자체는 정상 출력됐다.
+- 작업 상태에 접근 가능한 이름을 부여하고 note-editing/section 명령 테스트를 해당 이름으로 한정했다. M068 참조.
+- 상태: 수정 후 전체 브라우저 재검증 결과는 2026-10-17 보고서 참조.
+
 실제 발생한 실패를 기록한다. 재발 방지 대책은 [ERROR_PREVENTION.md](ERROR_PREVENTION.md)에 별도로 관리한다. 실패한 실행을 성공으로 덮어쓰지 않는다. 로그에 토큰·개인정보를 넣지 않는다.
 
 상태: open / investigating / mitigated / verified / reopened. `verified`는 명시한 검증 범위에 한정하며 모든 환경에서 해결됐다는 뜻이 아니다.
