@@ -105,6 +105,7 @@ test('F07 horizontal rule survives JSON restore and History undo/redo',async()=>
   assert.deepEqual(after.root.children[0].children.map(n=>n.type),['paragraph','horizontalrule']);
   const restored=createHeadlessEditor({namespace:'quotation-rule-restore',nodes:TUFTE_NODES,onError(error){throw error;}});
   restored.setEditorState(restored.parseEditorState(JSON.stringify(after)));
+  await flush();
   assert.deepEqual(restored.getEditorState().toJSON(),after);
   run(UNDO_COMMAND);
   await flush();
