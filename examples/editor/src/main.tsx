@@ -58,7 +58,6 @@ function EditorUI(){
   const recoverySession=useRef<string>(crypto.randomUUID());
   const sessionKey=recoveryKey+':'+recoverySession.current;
   const legacyRecoveryKey='lexical-tufte-recovery-v1';
-  const maxRecoverySessions=12;
   function recoveryKeys(){
     return Object.keys(localStorage).filter(key=>key.startsWith(recoveryKey+':'));
   }
@@ -74,18 +73,6 @@ function EditorUI(){
     // Only delete the legacy copy after the new slot is confirmed present.
     if(localStorage.getItem(migratedKey)!==null)localStorage.removeItem(legacyRecoveryKey);
   }
-  function pruneRecoverySessions(){
-    const entries=recoveryKeys().filter(key=>key!==sessionKey).map(key=>{
-      try{
-        const raw=localStorage.getItem(key);
-        const parsed=raw===null?null:JSON.parse(raw) as {savedAt?:unknown};
-        return {key,savedAt:typeof parsed?.savedAt==='string'?parsed.savedAt:''};
-      }catch{return {key,savedAt:''};}
-    }).sort((a,b)=>b.savedAt.localeCompare(a.savedAt));
-    // Never prune unreadable or legacy entries automatically; they may be the only recovery copy.
-    const eligible=entries.filter(entry=>entry.savedAt!==''&&!entry.key.endsWith(':legacy'));
-    for(const entry of eligible.slice(Math.max(0,maxRecoverySessions-1)))localStorage.removeItem(entry.key);
-  }
   useEffect(()=>{
     let pending:ReturnType<typeof setTimeout>|undefined;
     let latest:EditorState|null=null;
@@ -100,7 +87,7 @@ function EditorUI(){
       if(latest===null)return;
       try{
         localStorage.setItem(sessionKey,JSON.stringify({savedAt:new Date().toISOString(),state:latest.toJSON()}));
-        latest=null;pruneRecoverySessions();refresh();setAutoSaveState('이 탭의 편집 상태를 복구용으로 저장했습니다.');
+        latest=null;refresh();setAutoSaveState('이 탭의 편집 상태를 복구용으로 저장했습니다.');
       }catch{
         // Quota pressure must not silently delete older recovery copies.
         // The user can explicitly remove selected copies before retrying.
