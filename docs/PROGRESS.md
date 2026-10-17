@@ -1,3 +1,9 @@
+## P3.1.c 바깥 클릭 정리 및 375px 메뉴 회귀 (실행 대기)
+
+- 외부 pointerdown으로 블록 메뉴를 닫을 때 열린 상태와 화면 좌표를 함께 초기화한다.
+- `tests/contextual-ui-browser.mjs`: 375px viewport에서 우클릭 메뉴의 실제 bounding box와 Escape 닫기·편집기 포커스 복귀를 검사한다.
+- 이번 변경 이후 테스트 실행은 아직 하지 않았다. 기존 테스트 통과 기록과 구분하며 CI 생략.
+
 ## P3.1.c 블록 메뉴 ARIA 의미 구조 (검증 대기)
 
 - 블록 유형 트리거에 `aria-haspopup=menu`, 메뉴 컨테이너에 `role=menu`, 네 개 명령에 `role=menuitem`을 추가했다.
