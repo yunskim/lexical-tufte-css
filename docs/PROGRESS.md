@@ -1,3 +1,9 @@
+## P3.1.c 컨텍스트 메뉴 Tab 종료 (일괄 검증 대기)
+
+- 열린 블록 메뉴에서 Tab/Shift+Tab을 누르면 메뉴 상태와 floating 좌표를 닫되 기본 포커스 이동은 허용한다.
+- Escape의 편집기 포커스 복원, 화살표/Home/End 탐색과 동작을 구분했다.
+- 브라우저 포커스 순서와 접근성 회귀는 일괄 테스트 때 확인한다. CI 생략.
+
 ## P3.1.c visualViewport 크기 기반 메뉴 제한 (일괄 검증 대기)
 
 - 메뉴가 열린 상태에서 visualViewport의 너비/높이에 맞춰 floating 메뉴의 inline maxWidth/maxHeight를 지정하고, 실제 bounding rect를 다시 읽어 좌표를 보정한다.
