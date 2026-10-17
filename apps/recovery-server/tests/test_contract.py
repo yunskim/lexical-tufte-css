@@ -57,3 +57,14 @@ def test_contract_rejects_bad_inputs_and_denies_access(tmp_path):
     result = denied_client.get(BASE)
     assert result.status_code == 403
     assert result.json()["ok"] is False
+
+def test_contract_rejects_content_type_and_oversized_body(tmp_path):
+    client = setup(tmp_path)
+    wrong_type = client.put(BASE + "/session-1", content=b'{}',
+                            headers={"content-type": "text/plain"})
+    assert wrong_type.status_code == 415
+    assert wrong_type.json()["diagnostics"][0]["code"] == "RECOVERY_CONTENT_TYPE_UNSUPPORTED"
+    huge = client.put(BASE + "/session-1", content=b'x' * 2_100_001,
+                      headers={"content-type": "application/json"})
+    assert huge.status_code == 413
+    assert huge.json()["diagnostics"][0]["code"] == "RECOVERY_REQUEST_TOO_LARGE"
