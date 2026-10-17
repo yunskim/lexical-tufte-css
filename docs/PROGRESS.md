@@ -1,3 +1,12 @@
+## P3.1.c/d 이전 작업 마무리 — 선택 복원·포커스 흐름 (검증 대기)
+
+- 구현 (`examples/editor/src/main.tsx`): 우클릭·Shift+F10/ContextMenu·토글 버튼으로 메뉴를 열 때 Lexical `RangeSelection`을 복제해 명령 대상과 허용 항목을 보존한다. 메뉴의 DOM focus 이동 중에는 편집 선택 업데이트가 대상 기록을 덮어쓰지 않도록 한다.
+- 명령 실행·Escape: 기존 노드 key 존재를 확인해 저장한 선택을 `discrete` editor update 안에서 복원한 뒤 기존 구조 명령을 실행한다. 완료 후 편집기에 focus를 반환한다. `Tab`·`Shift+Tab`은 메뉴 바깥의 다음/이전 focus 가능한 요소로 직접 이동한다.
+- 회귀 (`tests/contextual-ui-browser.mjs`): 이전 h2 커서와 다른 섹션의 주석 포함 문단을 우클릭해 목록 삽입 위치를 검사하고 undo로 되돌린다. Escape의 실제 문단 커서 복원, Enter 명령 후 editor focus, 양방향 Tab의 실제 도착 요소를 확인한다. 기존 제목/노트 내용 보존도 계속 확인한다.
+- 검토에서 발견한 진입 경로 간 open guard 불일치는 E086/M080에 기록하고 수정했다.
+- 변경 커밋: `ad29937`, `dda34db`, `20418e9`, 회귀 `4513faf`, 오류·대책 `6e77276`/`c47b12d`.
+- 판정: **코드 작성 및 자체 점검 완료 / 실행 검증 미완료**. 사용자 지시대로 배치 실행 때 `pnpm check` 및 `tests/contextual-ui-browser.mjs`, 관련 브라우저 전체·undo·명령·IME를 확인한다. CI 생략. P3.1.c/d 체크박스는 실제 결과 확인 후 갱신한다. 이 작업을 선행하여 테스트 페이지 UI 재구성을 진행하지 않는다.
+
 ## P3.1.c 스키마 기반 블록 메뉴·삽입 명령 연결 (일괄 검증 대기)
 
 - 구현: `examples/editor/src/main.tsx` — 블록 메뉴에서 글머리표·번호 목록, 정의목록, 구분선, Epigraph, 섹션 출처, 인용문을 기존 `packages/lexical` 명령으로 연결했다. 최상위 섹션의 유효한 블록에서만 삽입 명령을 표시한다.
