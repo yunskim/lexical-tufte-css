@@ -72,7 +72,23 @@ def create_app(db_file: str, authorize: Callable[[Request, str], bool]):
             response = failure(code, status)
             response.headers['Cache-Control'] = 'no-store'
             return response
-        if request.method in ('PUT', 'DELETE') and request.url.path.startswith('/posts/'):
+        # Authenticate before reading/parsing a potentially large mutation body.
+        # Match only the recovery API's post-scoped routes.
+        parts = request.url.path.split('/')
+        recovery_route = (len(parts) in (4, 5) and parts[0] == ''
+                          and parts[1] == 'posts' and parts[3] == 'recoveries')
+        if recovery_route:
+            post_id = parts[2]
+            if not IDENTIFIER.fullmatch(post_id):
+                return reject('INVALID_RECOVERY_INPUT', 400)
+            try:
+                allowed = authorize(request, post_id)
+            except Exception:
+                allowed = False
+            if not allowed:
+                return reject('RECOVERY_ACCESS_DENIED', 403)
+            request.state.recovery_authorized_post = post_id
+        if request.method in ('PUT', 'DELETE') and recovery_route:
             length = request.headers.get('content-length')
             if length is not None and (not length.isdecimal() or int(length) > 2_100_000):
                 return reject('RECOVERY_REQUEST_TOO_LARGE', 413)
@@ -96,6 +112,8 @@ def create_app(db_file: str, authorize: Callable[[Request, str], bool]):
     def check(request: Request, post_id: str):
         if not IDENTIFIER.fullmatch(post_id):
             raise HTTPException(status_code=400, detail="INVALID_RECOVERY_INPUT")
+        if getattr(request.state, 'recovery_authorized_post', None) == post_id:
+            return
         try:
             if not authorize(request, post_id):
                 raise HTTPException(status_code=403, detail="RECOVERY_ACCESS_DENIED")
