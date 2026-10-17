@@ -2,7 +2,8 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createHeadlessEditor} from '@lexical/headless';
 import {$getRoot,$createParagraphNode,$createTextNode} from 'lexical';
-import {TUFTE_NODES,$createSectionNode,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND} from '../dist/index.js';
+import {$createListNode,$createListItemNode} from '@lexical/list';
+import {TUFTE_NODES,$createSectionNode,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,SET_TUFTE_LIST_KIND_COMMAND,$createNoteNode} from '../dist/index.js';
 
 function setup(){
  const diagnostics=[];
@@ -44,5 +45,84 @@ test('invalid list kind and missing selection leave editor state unchanged',()=>
  editor.update(()=>{},{discrete:true});
  assert.equal(JSON.stringify(editor.getEditorState().toJSON()),before);
  assert.equal(diagnostics.length,2);
+ dispose();
+});
+
+test('P2.2.b switch bullet/number keeps nested content, note ID and list item identity',()=>{
+ const {editor,diagnostics,dispose}=setup();
+ let itemKey;
+ editor.update(()=>{
+  const text=$createTextNode('One');
+  const note=$createNoteNode('list-note-1','marginnote').append($createTextNode('Note stays'));
+  const item=$createListItemNode().append(text,note);
+  const other=$createListItemNode().append($createTextNode('Two'));
+  const list=$createListNode('bullet').append(item,other);
+  $getRoot().append($createSectionNode().append(list));
+  itemKey=item.getKey();
+  text.select(1,1);
+ },{discrete:true});
+ const original=editor.getEditorState().toJSON();
+ assert.equal(editor.dispatchCommand(SET_TUFTE_LIST_KIND_COMMAND,'number'),true);
+ editor.update(()=>{},{discrete:true});
+ const changed=editor.getEditorState().toJSON();
+ editor.getEditorState().read(()=>{
+  const list=$getRoot().getFirstChild().getFirstChild();
+  assert.equal(list.getListType(),'number');
+  assert.equal(list.getTag(),'ol');
+  assert.equal(list.getFirstChild().getKey(),itemKey);
+  assert.equal(list.getFirstChild().getTextContent(),'OneNote stays');
+  assert.equal(list.getFirstChild().getLastChild().getNoteId(),'list-note-1');
+  assert.equal(list.getLastChild().getTextContent(),'Two');
+ });
+ assert.equal(changed.root.children[0].children[0].listType,'number');
+ assert.deepEqual(changed.root.children[0].children[0].children.map(i=>i.children.map(n=>n.type)),[['text','tufte-note'],['text']]);
+ assert.equal(editor.dispatchCommand(SET_TUFTE_LIST_KIND_COMMAND,'bullet'),true);
+ editor.update(()=>{},{discrete:true});
+ const reversed=editor.getEditorState().toJSON();
+ assert.equal(reversed.root.children[0].children[0].listType,'bullet');
+ assert.equal(reversed.root.children[0].children[0].tag,'ul');
+ assert.deepEqual(reversed.root.children[0].children[0].children.map(i=>i.children),original.root.children[0].children[0].children);
+ assert.deepEqual(diagnostics,[]);
+ dispose();
+});
+
+test('P2.2.b list kind command refuses missing selection and invalid kind atomically',()=>{
+ const {editor,diagnostics,dispose}=setup();
+ editor.update(()=>{
+  const text=$createTextNode('Ordinary block');
+  $getRoot().append($createSectionNode().append($createParagraphNode().append(text)));
+  text.select(2,2);
+ },{discrete:true});
+ const initial=JSON.stringify(editor.getEditorState().toJSON());
+ editor.dispatchCommand(SET_TUFTE_LIST_KIND_COMMAND,'number');
+ editor.update(()=>{},{discrete:true});
+ assert.equal(JSON.stringify(editor.getEditorState().toJSON()),initial);
+ editor.dispatchCommand(SET_TUFTE_LIST_KIND_COMMAND,'invalid');
+ editor.update(()=>{},{discrete:true});
+ assert.equal(JSON.stringify(editor.getEditorState().toJSON()),initial);
+ assert.equal(diagnostics.length,2);
+ dispose();
+});
+
+test('P2.2.b list kind converts only the nearest nested list, not the enclosing list',()=>{
+ const {editor,diagnostics,dispose}=setup();
+ editor.update(()=>{
+  const selectedText=$createTextNode('Inner');
+  const nested=$createListNode('bullet').append($createListItemNode().append(selectedText));
+  const outer=$createListNode('number').append($createListItemNode().append($createTextNode('Outer'),nested));
+  $getRoot().append($createSectionNode().append(outer));
+  selectedText.select(1,1);
+ },{discrete:true});
+ editor.dispatchCommand(SET_TUFTE_LIST_KIND_COMMAND,'number');
+ editor.update(()=>{},{discrete:true});
+ editor.getEditorState().read(()=>{
+  const outer=$getRoot().getFirstChild().getFirstChild();
+  assert.equal(outer.getListType(),'number');
+  const nested=outer.getFirstChild().getChildren().find(n=>n.getType()==='list');
+  assert.ok(nested);
+  assert.equal(nested.getListType(),'number');
+  assert.equal(nested.getFirstChild().getTextContent(),'Inner');
+ });
+ assert.deepEqual(diagnostics,[]);
  dispose();
 });
