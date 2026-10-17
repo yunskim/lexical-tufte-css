@@ -1,3 +1,8 @@
+## P2.2.c F08 중복 출처 방지 회귀 (일괄 검증 대기)
+
+- `quotation-commands.test.mjs`: quote에 attribution/cite를 추가한 후 같은 quote에서 재삽입을 시도하면 진단을 반환하고 JSON이 바뀌지 않는지 검사.
+- 사용자의 일괄 테스트 방침에 따라 이 테스트는 실행하지 않았다. P2.2.c/F08 체크는 검증 전까지 미완료, CI는 생략.
+
 ## P2.2.c F09 복수 Epigraph 보존 회귀 (일괄 테스트 대기)
 
 - `packages/lexical/test/quotation-commands.test.mjs`: 한 섹션에 epigraph 두 개를 순차 삽입해 원래 본문과 첫 번째 인용 묶음이 보존되고 두 묶음이 각각 `tufte-epigraph > quote`로 직렬화되는지 확인하는 회귀 추가.
