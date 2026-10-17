@@ -9,7 +9,11 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./sql/001_publications_v1.sql": "./sql/001_publications_v1.sql"
+    "./sql/001_publications_v1.sql": "./sql/001_publications_v1.sql",
+    "./recovery-client": {
+      "types": "./dist/recoveryClient.d.ts",
+      "import": "./dist/recoveryClient.js"
+    }
   },
   "files": [
     "dist",
