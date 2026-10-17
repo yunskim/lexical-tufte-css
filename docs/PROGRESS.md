@@ -1,3 +1,9 @@
+## P3.1.c 블록 메뉴 키보드 진입·이동 (검증 대기)
+
+- 본문 커서 위치에서 ContextMenu 키 또는 Shift+F10으로 블록 메뉴를 열고 첫 번째 항목으로 포커스를 이동한다.
+- 열린 메뉴에서 위/아래 화살표로 항목을 순환하며 Escape로 닫는다.
+- 브라우저별 키 이벤트·스크린리더·Lexical selection 동기화 검증 미실행. 테스트는 마지막에 일괄 수행하고 CI는 생략한다.
+
 ## P3.1.c 우클릭 위치 caret 연결 (검증 대기)
 
 - 우클릭 좌표에서 `caretPositionFromPoint` 또는 `caretRangeFromPoint`를 이용해 DOM caret 위치를 얻고 접힌 DOM 선택 영역으로 이동하는 코드를 추가했다.
