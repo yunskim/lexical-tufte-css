@@ -1,3 +1,9 @@
+## 2026-10-18 P2.2.b.2-K2/K3 일반 목록 항목의 기본 키 처리 수락 테스트 (미실행)
+
+- `tests/list-kind-browser.mjs`에 일반 항목 `AlphaBeta` 중간 Enter 분할 → `Alpha`/`Beta`, 두 번째 항목 시작 Backspace 병합 → `AlphaBeta`를 검증하는 브라우저 회귀를 추가했다. DOM과 JSON을 함께 확인한다. [커밋 `20918d2`](https://github.com/yunskim/lexical-tufte-css/commit/20918d299610524737fa6f7bcff923385ede2f0e).
+- [명령 계약](LIST_COMMANDS_P22B.ko.md)에 Lexical 기본 처리 위임과 통과 조건을 명시했다. 키 명령 자체는 이번에 수정하지 않았다.
+- **실제 실행하지 않았으므로** 일반 항목 분할/병합이 정상이라고 주장하지 않는다. 실패 시 명령 등록/selection/DOM 차이와 원인을 점검한다. CI 생략, P2.2.b.2 체크 미완료.
+
 ## 2026-10-18 P2.2.b.2 키보드 브라우저 회귀 확대 (실행 대기)
 
 - 기존 `tests/list-kind-browser.mjs`의 목록 유형 변환·저장·발행·undo 회귀에 **Tab/Shift+Tab 구조적 들여쓰기·내어쓰기, 마지막 빈 항목 Enter 종료, 첫 빈 항목 Backspace 삭제** 브라우저 시나리오를 추가했다. [커밋 `2c5ce25`](https://github.com/yunskim/lexical-tufte-css/commit/2c5ce2557bb5f6eb4d50a26b1f477441a47b524f).
