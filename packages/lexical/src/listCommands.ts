@@ -9,6 +9,8 @@ export const INSERT_TUFTE_LIST_COMMAND:LexicalCommand<TufteListKind>=createComma
 export const APPEND_TUFTE_LIST_ITEM_COMMAND:LexicalCommand<void>=createCommand('APPEND_TUFTE_LIST_ITEM');
 /** Switch an existing list between ul and ol without replacing its items or moving any note anchors. */
 export const SET_TUFTE_LIST_KIND_COMMAND:LexicalCommand<TufteListKind>=createCommand('SET_TUFTE_LIST_KIND');
+/** Adjust nesting by one level using Lexical's structural ListItemNode indent operation. */
+export const CHANGE_TUFTE_LIST_INDENT_COMMAND:LexicalCommand<'indent'|'outdent'>=createCommand('CHANGE_TUFTE_LIST_INDENT');
 
 /** Conservative list commands: preserve existing content and reject unsupported selections. */
 export function registerListCommands(editor:LexicalEditor,onDiagnostic?:(diagnostic:Diagnostic)=>void):()=>void{
@@ -54,6 +56,26 @@ export function registerListCommands(editor:LexicalEditor,onDiagnostic?:(diagnos
    if(list.getListType()===kind)return true;
    $addUpdateTag(HISTORY_PUSH_TAG);
    list.setListType(kind);
+   return true;
+  },COMMAND_PRIORITY_EDITOR),
+  editor.registerCommand(CHANGE_TUFTE_LIST_INDENT_COMMAND,direction=>{
+   if(direction!=='indent'&&direction!=='outdent')return reject('지원하지 않는 목록 들여쓰기 명령입니다.');
+   const s=selected();
+   if(!s)return reject('목록 항목의 한 위치를 선택하세요.');
+   const item=ancestor(s.anchor.getNode(),'listitem');
+   if(!(item instanceof ListItemNode))return reject('목록 항목 안에서만 들여쓰기를 변경할 수 있습니다.');
+   const list=item.getParent();
+   if(!(list instanceof ListNode)||list.getListType()==='check'||!list.getParent()||
+      !NODE_SCHEMA[list.getParent()!.getType()]?.children?.includes('list'))
+    return reject('지원하지 않는 목록 구조에서는 들여쓰기를 변경할 수 없습니다.');
+   // Lexical's setIndent performs structural nesting; never set CSS-only indentation on a list.
+   const depth=item.getIndent();
+   if(direction==='indent'&&(!item.getPreviousSibling()||depth>=20))
+    return reject('첫 목록 항목은 들여쓸 수 없으며 최대 중첩 깊이는 20입니다.');
+   if(direction==='outdent'&&depth===0)
+    return reject('최상위 목록에서는 내어쓰기를 할 수 없습니다.');
+   $addUpdateTag(HISTORY_PUSH_TAG);
+   item.setIndent(depth+(direction==='indent'?1:-1));
    return true;
   },COMMAND_PRIORITY_EDITOR)
  ];
