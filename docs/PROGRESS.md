@@ -1,3 +1,9 @@
+## P3.1.c 텍스트 블록 적격성 강화 (검증 대기)
+
+- `canOpenBlockMenu`는 note/table/figure/image 조상을 배제하는 것에 더해 paragraph/heading/quote 조상이 있는 경우에만 메뉴를 허용한다.
+- 직전 main85ac2c3 검증 통과 기록은 유지하되, 이후의 Escape 회귀 보강 및 본 구현 변경은 아직 재검증하지 않았다.
+- 다음: 실제 비텍스트/표/주석 대상의 브라우저 회귀와 전체 contextual 테스트 실행. CI 생략.
+
 ## 2026-10-17 main 85ac2c3 일괄 테스트 결과 반영
 
 - `docs/ERROR_PREVENTION.md`의 실행 기록에 따르면 main 85ac2c3에서 check 266개, Python 16개, browser 12개, package 4개, 실제 HTTP 왕복이 모두 통과했고 신규 실패는 없었다.
