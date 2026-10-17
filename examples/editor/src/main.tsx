@@ -205,8 +205,13 @@ function BlockContextMenu(){
    const menu=menuRef.current;
    if(!menu)return;
    const rect=menu.getBoundingClientRect();
-   const x=Math.max(8,Math.min(window.innerWidth-rect.width-8,point.x));
-   const y=Math.max(8,Math.min(window.innerHeight-rect.height-8,point.y));
+   const viewport=window.visualViewport;
+   const left=viewport?.offsetLeft??0;
+   const top=viewport?.offsetTop??0;
+   const right=left+(viewport?.width??window.innerWidth);
+   const bottom=top+(viewport?.height??window.innerHeight);
+   const x=Math.max(left+8,Math.min(right-rect.width-8,point.x));
+   const y=Math.max(top+8,Math.min(bottom-rect.height-8,point.y));
    if(x!==point.x||y!==point.y)setPoint({x,y});
   };
   reposition();
