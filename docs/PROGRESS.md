@@ -1,3 +1,9 @@
+## P2.2.c F07 실제 편집기 통합 회귀 추가
+
+- `tests/section-commands-browser.mjs`: 실제 툴바 `구분선 삽입` → React DOM `<hr>` → JSON `horizontalrule` → 독립 발행 HTML `<hr>` → undo/redo → 기존 문서 복귀를 기존 P2.2.a 흐름에 연결.
+- 구분선 이후 기존 노트·저장/불러오기 회귀를 계속 수행하도록 원상 복귀한다.
+- **이번 변경의 브라우저 테스트는 실행하지 않았다.** 성공 여부·F07 완료 판정은 보류한다. 다음: `pnpm build`, `node tests/section-commands-browser.mjs`, 전체 관련 회귀 및 실패 시 ERROR_LOG/ERROR_PREVENTION 갱신.
+
 ## P2.2.c F07 JSON 복원·History 회귀 추가
 
 - `quotation-commands.test.mjs`에 공식 History 등록 후 구분선 삽입/undo/redo 및 새 headless editor의 JSON 복원 동등성 검사 추가.
