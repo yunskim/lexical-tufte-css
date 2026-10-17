@@ -125,3 +125,11 @@ def test_request_body_replay_allows_save_then_read(tmp_path):
     fetched = client.get(BASE + "/session-1")
     assert fetched.status_code == 200
     assert fetched.json()["value"]["payload"] == PAYLOAD
+
+def test_unknown_collection_mutation_keeps_method_error(tmp_path):
+    client = setup(tmp_path)
+    response = client.put(BASE, content=b'not-json',
+                          headers={"content-type": "text/plain"})
+    assert response.status_code == 405
+    assert response.json()["diagnostics"][0]["code"] == "RECOVERY_METHOD_NOT_ALLOWED"
+    assert response.headers["cache-control"] == "no-store"
