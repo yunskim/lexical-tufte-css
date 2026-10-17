@@ -143,16 +143,16 @@ function BlockContextMenu(){
    if(!domSelection)return;
    const range=document.createRange();
    try{range.setStart(node,offset);range.collapse(true);}catch{return;}
-   editor.focus();
    let valid=false;
    editor.update(()=>{
     const selection=$createRangeSelection();
     selection.applyDOMRange(range);
-    valid=!containingNote(selection.anchor.getNode());
+    valid=selection.isCollapsed()&&!containingNote(selection.anchor.getNode());
     if(valid)$setSelection(selection);
    },{discrete:true});
    if(!valid)return;
    event.preventDefault();
+   editor.focus();
    setPoint({x:Math.max(8,Math.min(window.innerWidth-260,event.clientX)),y:Math.max(8,Math.min(window.innerHeight-160,event.clientY))});
    setOpen(true);
   };
@@ -183,8 +183,8 @@ function BlockContextMenu(){
   document.addEventListener('pointerdown',close);
   return()=>document.removeEventListener('pointerdown',close);
  },[open]);
- useEffect(()=>{if(!available)setOpen(false);},[available]);
- if(!available)return null;
+ useEffect(()=>{if(!available&&!open)setPoint(null);},[available]);
+ if(!available&&!open)return null;
  return <div ref={menuRef} className={point&&open?'block-context-menu is-floating':'block-context-menu'} style={point&&open?{left:point.x,top:point.y}:undefined} onKeyDown={event=>{if(event.key==='Escape'){event.preventDefault();setOpen(false);setPoint(null);editor.focus();}else if(open&&(event.key==='ArrowDown'||event.key==='ArrowUp')){const buttons=Array.from(menuRef.current?.querySelectorAll<HTMLButtonElement>('#tufte-block-menu button')??[]);const index=buttons.indexOf(document.activeElement as HTMLButtonElement);if(buttons.length){event.preventDefault();buttons[(index+(event.key==='ArrowDown'?1:-1)+buttons.length)%buttons.length]?.focus();}}}}>
   <button type="button" aria-expanded={open} aria-controls="tufte-block-menu" onMouseDown={event=>event.preventDefault()} onClick={()=>{setPoint(null);setOpen(value=>!value);}}>블록 유형: {blockType} ▾</button>
   {open&&<div id="tufte-block-menu" role="group" aria-label="블록 유형">
