@@ -1,3 +1,11 @@
+## 2026-10-17 P2.2.b.2 목록 유형 전환·들여쓰기 구현 (일괄 검증 대기)
+
+- [이슈 #9](https://github.com/yunskim/lexical-tufte-css/issues/9) 및 [명령 계약](LIST_COMMANDS_P22B.ko.md)에 따라 `SET_TUFTE_LIST_KIND_COMMAND`(bullet↔number)와 `CHANGE_TUFTE_LIST_INDENT_COMMAND`(indent/outdent)을 추가했다. 각각 기존 ListNode/ListItemNode를 유지하면서 유형 또는 구조적 깊이를 바꾸며, 명령 공개 export 및 기존 editor prototype 버튼에 연결했다.
+- 변경 코드: `packages/lexical/src/listCommands.ts` (`2fe151c`, `62b0511`), `packages/lexical/src/index.ts` (`5edc1c4`, `6bb47e5`), `examples/editor/src/main.tsx` (`57d6438`, `21dc819`).
+- 회귀 **코드 작성**: `packages/lexical/test/list-commands.test.mjs`에 목록 종류 전환·노트 ID와 항목 보존·중첩 범위·무효 선택의 원자적 거부·한 단계 들여쓰기/내어쓰기와 첫 항목/최상위 경계 추가 (`8b9fe83`, `46dcfaa`). `tests/list-kind-browser.mjs`에서 React UI→목록 편집→undo/redo→JSON 저장·재열기→순수 발행 렌더 및 중첩 편집을 다룸 (`913ff78`, `5b57675`, `015aa77`). `package.json`의 직렬 browser 배치에 새 테스트를 추가했다 (`5eeb5be`).
+- 기존 `P2.2.b.0/.1`·P3.1.c/d 변경과 함께 최종 배치 검증 필요. **현재 실행한 테스트는 없음**. CI 생략. `P2.2.b.2` 및 `F06` 완료 표시 보류.
+- 다음 구현 범위: 리스트 해제·복합/중첩 리스트 항목 구조·키보드 정책 및 정의목록의 편집/삭제. 오류/예방 기록 E085–E087/M078–M081 재조회; 실제 실패 발견 시 새 에러 ID와 대응 기록.
+
 ## 2026-10-17 반복 계획 검증 최종 종료 (설계 점검만 완료)
 
 - 결과: [PLAN 정본](PLAN.ko.md)과 [최종 독립 재점검 보고서](PLAN_AUDIT_2026-10-17.ko.md)에 설계 검토를 종결했다. F01–F22 전체(22개), P0–P7 단계(8개), 89개 체크리스트 ID(중복 0개), P2→P3→P4→P5→P6 의존성, Notion-like 블록 UX의 Tufte 문서 정본 보존, P6.8 검증 게이트를 서로 독립적으로 교차 확인했다.
