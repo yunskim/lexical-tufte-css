@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createHeadlessEditor} from '@lexical/headless';
 import {$getRoot,$createParagraphNode,$createTextNode} from 'lexical';
-import {TUFTE_NODES,$createSectionNode,registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_PAIR_COMMAND,MOVE_TUFTE_DEFINITION_PAIR_COMMAND,$createDefinitionListNode,$createDefinitionTermNode,$createDefinitionDescriptionNode,$createNoteNode} from '../dist/index.js';
+import {TUFTE_NODES,$createSectionNode,registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_PAIR_COMMAND,MOVE_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_LIST_COMMAND,$createDefinitionListNode,$createDefinitionTermNode,$createDefinitionDescriptionNode,$createNoteNode} from '../dist/index.js';
 
 function setup(){
  const diagnostics=[];
@@ -179,5 +179,71 @@ test('P2.2.b first/last definition pair move and missing selection reject withou
  editor.update(()=>{},{discrete:true});
  assert.equal(JSON.stringify(editor.getEditorState().toJSON()),before);
  assert.equal(diagnostics.length,2);
+ unregister();
+});
+
+test('P2.2.b whole definition list deletion preserves adjacent blocks and caret target',()=>{
+ const {editor,diagnostics,unregister}=setup();
+ editor.update(()=>{
+  const term=$createTextNode('Glossary');
+  $getRoot().append($createSectionNode().append(
+   $createParagraphNode().append($createTextNode('Before')),
+   $createDefinitionListNode().append(
+    $createDefinitionTermNode().append(term),
+    $createDefinitionDescriptionNode().append($createParagraphNode().append($createTextNode('Definition')))
+   ),
+   $createParagraphNode().append($createTextNode('After'))
+  ));term.selectEnd();
+ },{discrete:true});
+ editor.dispatchCommand(REMOVE_TUFTE_DEFINITION_LIST_COMMAND,undefined);
+ editor.update(()=>{},{discrete:true});
+ editor.getEditorState().read(()=>{
+  const section=$getRoot().getFirstChild();
+  assert.deepEqual(section.getChildren().map(n=>n.getType()),['paragraph','paragraph']);
+  assert.deepEqual(section.getChildren().map(n=>n.getTextContent()),['Before','After']);
+ });
+ assert.deepEqual(diagnostics,[]);
+ unregister();
+});
+
+test('P2.2.b deleting the sole definition list leaves an editable paragraph',()=>{
+ const {editor,diagnostics,unregister}=setup();
+ editor.update(()=>{
+  const term=$createTextNode('Only term');
+  $getRoot().append($createSectionNode().append($createDefinitionListNode().append(
+   $createDefinitionTermNode().append(term),
+   $createDefinitionDescriptionNode().append($createParagraphNode().append($createTextNode('Only description')))
+  )));
+  term.selectEnd();
+ },{discrete:true});
+ editor.dispatchCommand(REMOVE_TUFTE_DEFINITION_LIST_COMMAND,undefined);
+ editor.update(()=>{},{discrete:true});
+ editor.getEditorState().read(()=>{
+  const blocks=$getRoot().getFirstChild().getChildren();
+  assert.deepEqual(blocks.map(n=>n.getType()),['paragraph']);
+  assert.equal(blocks[0].getTextContent(),'');
+ });
+ assert.deepEqual(diagnostics,[]);
+ unregister();
+});
+
+test('P2.2.b whole-list delete rejects selection outside dl without mutation',()=>{
+ const {editor,diagnostics,unregister}=setup();
+ editor.update(()=>{
+  const outside=$createTextNode('Outside');
+  $getRoot().append($createSectionNode().append(
+   $createParagraphNode().append(outside),
+   $createDefinitionListNode().append(
+    $createDefinitionTermNode().append($createTextNode('Term')),
+    $createDefinitionDescriptionNode().append($createParagraphNode().append($createTextNode('Definition')))
+   )
+  ));
+  outside.select(2,2);
+ },{discrete:true});
+ const before=JSON.stringify(editor.getEditorState().toJSON());
+ editor.dispatchCommand(REMOVE_TUFTE_DEFINITION_LIST_COMMAND,undefined);
+ editor.update(()=>{},{discrete:true});
+ assert.equal(JSON.stringify(editor.getEditorState().toJSON()),before);
+ assert.equal(diagnostics.length,1);
  unregister();
 });
