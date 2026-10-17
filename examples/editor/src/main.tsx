@@ -236,7 +236,6 @@ function BlockContextMenu(){
    editor.focus();
    setPoint({x:Math.max(8,Math.min(window.innerWidth-260,event.clientX)),y:Math.max(8,Math.min(window.innerHeight-160,event.clientY))});
    menuOpenRef.current=true;
-   menuOpenRef.current=true;
    setOpen(true);
    requestAnimationFrame(()=>menuRef.current?.querySelector<HTMLButtonElement>('#tufte-block-menu button')?.focus());
   };
@@ -256,6 +255,7 @@ function BlockContextMenu(){
    const selection=window.getSelection();
    const rect=selection?.rangeCount?selection.getRangeAt(0).getBoundingClientRect():root.getBoundingClientRect();
    setPoint({x:Math.max(8,Math.min(window.innerWidth-260,rect.left)),y:Math.max(8,Math.min(window.innerHeight-160,rect.bottom+8))});
+   menuOpenRef.current=true;
    setOpen(true);
    requestAnimationFrame(()=>menuRef.current?.querySelector<HTMLButtonElement>('#tufte-block-menu button')?.focus());
   };
