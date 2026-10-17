@@ -1,3 +1,9 @@
+## 2026-10-18 P2.2.b.2-K4 Tab/Shift+Tab 목록 단축키 구현 (검증 대기)
+
+- 선택적 `registerListKeyboardCommands`를 추가했다. `KEY_TAB_COMMAND`에서 접힌 선택·비조합 입력·노트 밖·유효한 ul/ol `listitem`과 구조적 indent/outdent 가능 경계를 먼저 확인한다. 허용될 때만 `preventDefault` 후 기존 `CHANGE_TUFTE_LIST_INDENT_COMMAND`를 재사용한다. 일반 문단·첫 항목 들여쓰기·최상위 내어쓰기·IME는 기본 Tab 포커스 이동을 유지한다. [구현](https://github.com/yunskim/lexical-tufte-css/commit/ad71b16a6be61174384b33ab64d8ebe0c7f736d8).
+- [공개 API](https://github.com/yunskim/lexical-tufte-css/commit/aa4df340d6435cd35cb0d0643e86c488aa9c92e4)와 [예제 편집기](https://github.com/yunskim/lexical-tufte-css/commit/3bafed9bc61d5dbeac757dc9b19bdfa96de60beb) 연결. [headless 회귀 코드](https://github.com/yunskim/lexical-tufte-css/commit/1d20c78fcd47f9e1195fe964070a3bd64b6e56e7)에는 정상 Tab/Shift+Tab, 문단·첫 항목·최상위·조합 입력의 무개입을 추가했다.
+- Enter/Backspace(K2/K3)는 아직 미구현. **테스트는 실행하지 않았고 CI도 생략했다.** 현재 HEAD의 성공을 주장하지 않으며 P2.2.b.2 완료 체크는 유지하지 않는다.
+
 ## 2026-10-18 P2.2.b.2 목록 키보드 정책 분해
 
 - Enter/Backspace/Tab의 기존 Lexical 키 명령·note guard·메뉴 포커스 처리와 목록 구조 편집 간 소유권 충돌을 확인하고, [PLAN.ko.md](PLAN.ko.md)에 K1–K5의 명시적 수락 조건을 추가했다. 이번 변경은 **계획 정교화**이며 키 명령 구현 또는 테스트 통과가 아니다.
