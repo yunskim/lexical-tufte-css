@@ -182,3 +182,26 @@ test('F07 inserts into the selected section without modifying adjacent sections'
  assert.equal(diagnostics.length,0);
  dispose();
 });
+
+test('F09 repeated epigraph insertion preserves earlier quotation groups',()=>{
+ const {editor,diagnostics,dispose}=setup();
+ editor.update(()=>{
+  const text=$createTextNode('introduction');
+  $getRoot().append($createSectionNode().append($createParagraphNode().append(text)));
+  text.selectEnd();
+ },{discrete:true});
+ editor.update(()=>editor.dispatchCommand(INSERT_TUFTE_QUOTATION_COMMAND,'epigraph'),{discrete:true});
+ const first=editor.getEditorState().toJSON().root.children[0].children[1];
+ assert.equal(first.type,'tufte-epigraph');
+ editor.update(()=>{
+  const section=$getRoot().getFirstChild();
+  section.getFirstChild().selectEnd();
+ },{discrete:true});
+ editor.update(()=>editor.dispatchCommand(INSERT_TUFTE_QUOTATION_COMMAND,'epigraph'),{discrete:true});
+ const children=editor.getEditorState().toJSON().root.children[0].children;
+ assert.deepEqual(children.map(n=>n.type),['paragraph','tufte-epigraph','tufte-epigraph']);
+ assert.deepEqual(children[2],first);
+ assert.equal(children[1].children[0].type,'quote');
+ assert.equal(diagnostics.length,0);
+ dispose();
+});
