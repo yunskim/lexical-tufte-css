@@ -75,16 +75,18 @@ function SelectionToolbar(){
    if(!selected){setPosition(null);return;}
    const rect=selection.getRangeAt(0).getBoundingClientRect();
    if(rect.width===0&&rect.height===0){setPosition(null);return;}
-   setPosition({top:Math.max(8,rect.top-54),left:Math.min(window.innerWidth-12,Math.max(12,rect.left+rect.width/2))});
+   setPosition({top:rect.top>=56?rect.top-52:Math.min(window.innerHeight-52,rect.bottom+8),left:Math.min(window.innerWidth-170,Math.max(170,rect.left+rect.width/2))});
   };
   const unregister=editor.registerUpdateListener(()=>requestAnimationFrame(update));
   document.addEventListener('selectionchange',update);
   window.addEventListener('resize',update);
   window.addEventListener('scroll',update,true);
-  return ()=>{unregister();document.removeEventListener('selectionchange',update);window.removeEventListener('resize',update);window.removeEventListener('scroll',update,true);};
+  document.addEventListener('compositionstart',update,true);
+  document.addEventListener('compositionend',update,true);
+  return ()=>{unregister();document.removeEventListener('selectionchange',update);window.removeEventListener('resize',update);window.removeEventListener('scroll',update,true);document.removeEventListener('compositionstart',update,true);document.removeEventListener('compositionend',update,true);};
  },[editor]);
  if(!position)return null;
- return <div className="selection-toolbar" role="toolbar" aria-label="선택 영역 서식" style={{top:position.top,left:position.left}} onMouseDown={e=>e.preventDefault()}>
+ return <div className="selection-toolbar" role="toolbar" aria-label="선택 영역 서식" style={{top:position.top,left:position.left}} onMouseDown={e=>e.preventDefault()} onKeyDown={e=>{if(e.key==='Escape'){e.preventDefault();setPosition(null);editor.focus();}}}>
   {INLINE_ACTIONS.map(action=><IconButton key={action.id} name={action.icon} label={action.label} onMouseDown={e=>e.preventDefault()} onClick={()=>editor.dispatchCommand(FORMAT_TEXT_COMMAND,action.id)}/>)}
  </div>;
 }
