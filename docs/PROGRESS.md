@@ -1,3 +1,10 @@
+## F07 다중 섹션 회귀 및 검증 순서
+
+- 다중 섹션에서 선택된 섹션에만 구분선이 삽입되고 앞 섹션의 JSON은 불변인지 검사하는 테스트 추가.
+- 실제 로컬 확인: `git ls-remote`는 `Could not resolve host: github.com`으로 실패했고 작업 컨테이너에 checkout 및 pnpm이 없다. 이 환경에서 새 코드를 실행하지 못했다.
+- 실행 가능 환경에서 저장소 루트 기준 `pnpm install --frozen-lockfile` → `pnpm build` → `pnpm --filter @lexical-tufte/lexical test` → `pnpm --filter @lexical-tufte/render test` → `node tests/section-commands-browser.mjs` → `pnpm check` → `pnpm test:browser` 순서로 검증. 실패하면 ERROR_LOG/ERROR_PREVENTION에 원인과 재발 대책 기록.
+- CI는 생략한다. 새 테스트의 실행 성공 및 F07 완료 판정은 아직 보류.
+
 ## F07 JSON 복원 테스트의 commit 경계 보완
 
 - `quotation-commands.test.mjs`: `setEditorState(parseEditorState(...))` 뒤 `await flush()`를 추가해 비동기 상태 반영 이전에 JSON을 비교하지 않도록 수정했다. 이전 상태를 검증하는 가짜 성공/실패를 피하기 위한 테스트 수정이다.
