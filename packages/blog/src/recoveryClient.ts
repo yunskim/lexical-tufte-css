@@ -36,8 +36,10 @@ export class RecoveryHttpClient{
     method,headers,credentials:'same-origin',cache:'no-store',
     ...(method==='GET'?{}:{body:JSON.stringify(body)})
    });
-   const parsed:unknown=await response.json();
+   let parsed:unknown;
+   try{parsed=await response.json();}catch{return failure('RECOVERY_PROTOCOL_ERROR','Invalid recovery JSON response');}
    if(!validResult(parsed))return failure('RECOVERY_PROTOCOL_ERROR','Invalid recovery response');
+   if(response.ok!==(parsed as Result<unknown>).ok)return failure('RECOVERY_PROTOCOL_ERROR','HTTP status and recovery result disagree');
    return parsed as Result<T>;
   }catch{return failure('RECOVERY_NETWORK_ERROR','Recovery request failed');}
  }
