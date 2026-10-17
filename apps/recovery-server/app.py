@@ -103,12 +103,13 @@ def create_app(db_file: str, authorize: Callable[[Request, str], bool]):
                 chunks.append(chunk)
             body = b''.join(chunks)
             delivered = False
+            original_receive = request._receive
             async def replay():
                 nonlocal delivered
                 if not delivered:
                     delivered = True
                     return {'type': 'http.request', 'body': body, 'more_body': False}
-                return {'type': 'http.disconnect'}
+                return await original_receive()
             request._receive = replay
         response = await call_next(request)
         response.headers["Cache-Control"] = "no-store"
