@@ -59,6 +59,36 @@ const INLINE_ACTIONS:ReadonlyArray<{id:InlineAction;label:string;icon:ToolbarIco
  {id:'highlight',label:'마크',icon:'highlight'}
 ];
 
+function SelectionToolbar(){
+ const [editor]=useLexicalComposerContext();
+ const [position,setPosition]=useState<{top:number;left:number}|null>(null);
+ useEffect(()=>{
+  const update=()=>{
+   if(editor.isComposing()){setPosition(null);return;}
+   const root=editor.getRootElement();
+   const selection=window.getSelection();
+   if(!root||!selection||selection.isCollapsed||selection.rangeCount===0||!root.contains(selection.anchorNode)||!root.contains(selection.focusNode)){
+    setPosition(null);return;
+   }
+   let selected=false;
+   editor.getEditorState().read(()=>{const s=$getSelection();selected=$isRangeSelection(s)&&!s.isCollapsed();});
+   if(!selected){setPosition(null);return;}
+   const rect=selection.getRangeAt(0).getBoundingClientRect();
+   if(rect.width===0&&rect.height===0){setPosition(null);return;}
+   setPosition({top:Math.max(8,rect.top-54),left:Math.min(window.innerWidth-12,Math.max(12,rect.left+rect.width/2))});
+  };
+  const unregister=editor.registerUpdateListener(()=>requestAnimationFrame(update));
+  document.addEventListener('selectionchange',update);
+  window.addEventListener('resize',update);
+  window.addEventListener('scroll',update,true);
+  return ()=>{unregister();document.removeEventListener('selectionchange',update);window.removeEventListener('resize',update);window.removeEventListener('scroll',update,true);};
+ },[editor]);
+ if(!position)return null;
+ return <div className="selection-toolbar" role="toolbar" aria-label="선택 영역 서식" style={{top:position.top,left:position.left}} onMouseDown={e=>e.preventDefault()}>
+  {INLINE_ACTIONS.map(action=><IconButton key={action.id} name={action.icon} label={action.label} onMouseDown={e=>e.preventDefault()} onClick={()=>editor.dispatchCommand(FORMAT_TEXT_COMMAND,action.id)}/>)}
+ </div>;
+}
+
 function containingNote(node: LexicalNode | null): NoteNode | null {
   for(let n=node;n;n=n.getParent()) if(n instanceof NoteNode)return n;
   return null;
@@ -430,7 +460,7 @@ function EditorUI(){
     <p id="help">본문에서 Alt+↓: 다음 노트로 이동 · 노트에서 Escape: 본문으로 이동</p>
     <main>
       <RichTextPlugin contentEditable={<ContentEditable className="editor" aria-label="본문과 사이드노트 편집" aria-describedby="help"/>} ErrorBoundary={LexicalErrorBoundary}/>
-      <HistoryPlugin/><TablePlugin/>
+      <HistoryPlugin/><TablePlugin/><SelectionToolbar/>
     </main>
     <p role="status" aria-label="편집 작업 상태">{status}</p><p role="status" aria-label="자동 복구 저장 상태">{autoSaveState}</p>
     {structureIssues.length>0&&<aside role="alert" aria-label="문서 구조 복구"><p>문서 구조를 수정하세요. 내용은 자동 삭제하지 않으며 HTML 생성은 차단됩니다.</p><ul>{structureIssues.map((issue,i)=><li key={`${issue.key}-${i}`}><button onClick={()=>focusStructureIssue(editor,issue.key)}>{issue.message}</button> <code>{issue.path}</code></li>)}</ul><button onClick={()=>editor.dispatchCommand(UNDO_COMMAND,undefined)}>구조 변경 실행 취소</button><button onClick={recoverStructure} disabled={!checkpoint.current}>마지막 정상 구조로 복구</button></aside>}
