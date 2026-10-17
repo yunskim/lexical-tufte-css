@@ -180,7 +180,7 @@ function BlockContextMenu(){
     if(!anchor||!focus||editor.isComposing())return;
     $setSelection(target.clone());
     action?.();
-   },action?{tag:HISTORY_PUSH_TAG}:undefined);
+   },action?{tag:HISTORY_PUSH_TAG,discrete:true}:{discrete:true});
   }
   editor.focus();
  };
