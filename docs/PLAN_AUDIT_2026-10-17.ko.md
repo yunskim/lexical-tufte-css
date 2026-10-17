@@ -4,6 +4,8 @@
 
 기준: `docs/PLAN.ko.md`, `AGENTS.md`, `docs/DOCUMENT_SCHEMA_V1.ko.md`, 기존 렌더러/명령 구현, `examples/editor`, `package.json`·`pnpm-lock.yaml`, 2026-10-17 실제 검증 보고서. 저장소의 마지막 기존 성공 증거는 `85ac2c3` 범위이며 그 이후 변경에는 적용하지 않는다.
 
+추적: [P2.2.b 이슈 #9](https://github.com/yunskim/lexical-tufte-css/issues/9). 독립 점검에서 추가한 링크 내부 span 해제 시 URL·인접 note ID 보존 회귀는 `0746f88`에 기록했다. 아래 원칙과 결과의 **실행 검증은 여전히 대기**다.
+
 ## 1차 독립 검토: 사용자가 작성·발행하는 문서의 전체 수명주기
 
 검토 질문: **기능이 JSON에 표현된다는 사실과 사람이 GUI로 생성/수정/재열기/발행 가능하다는 사실을 구분하는가?** P0–P7 설명이나 초기 구현의 성공률을 근거로 사용하지 않고, 예제 글을 새로 작성해 저장·재열기·발행하는 흐름을 처음부터 따라갔다.
