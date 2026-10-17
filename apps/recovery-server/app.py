@@ -4,16 +4,16 @@ import json
 import re
 import sqlite3
 from contextlib import contextmanager
-from pathlib import Path
 from typing import Callable
 
-from fastapi import Depends, FastAPI, HTTPException, Request
+from datetime import datetime
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
 
 IDENTIFIER = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]*$")
 MAX_SAFE = 9007199254740991
-DB_PATH = Path(__file__).resolve().parents[2] / "packages/blog/sql/002_editor_recovery_v1.sql"
 
 
 def success(value):
@@ -46,6 +46,15 @@ def create_app(db_file: str, authorize: Callable[[Request, str], bool]):
     """authorize must validate authenticated caller, post access and mutation CSRF/Origin."""
     app = FastAPI()
     app.state.db_file = db_file
+
+    @app.exception_handler(HTTPException)
+    async def http_error(request, exc):
+        code = exc.detail if isinstance(exc.detail, str) and exc.detail.startswith('RECOVERY_') or exc.detail == 'INVALID_RECOVERY_INPUT' else 'RECOVERY_REQUEST_DENIED'
+        return failure(code, exc.status_code)
+
+    @app.exception_handler(RequestValidationError)
+    async def validation_error(request, exc):
+        return failure('INVALID_RECOVERY_INPUT', 400)
 
     @app.middleware("http")
     async def no_store(request, call_next):
@@ -104,6 +113,12 @@ def create_app(db_file: str, authorize: Callable[[Request, str], bool]):
         check(request, post_id)
         if not IDENTIFIER.fullmatch(session_id) or body.postId != post_id or body.sessionId != session_id or body.sequence != body.expectedSequence + 1:
             return failure("INVALID_RECOVERY_INPUT", 400)
+        try:
+            timestamp = datetime.fromisoformat(body.savedAt.replace('Z', '+00:00'))
+            if timestamp.tzinfo is None:
+                return failure('INVALID_RECOVERY_INPUT', 400)
+        except ValueError:
+            return failure('INVALID_RECOVERY_INPUT', 400)
         if len(body.payload.encode()) > 2_000_000:
             return failure("INVALID_RECOVERY_INPUT", 400)
         try:
