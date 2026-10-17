@@ -41,8 +41,9 @@ const toolbarPaths:Record<ToolbarIconName,string>={
 function ToolbarIcon({name}:{name:ToolbarIconName}){
  return <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d={toolbarPaths[name]}/></svg>;
 }
+const EDITOR_SHORTCUTS:Record<string,string>={굵게:'Ctrl/Cmd+B',기울임:'Ctrl/Cmd+I','실행 취소':'Ctrl/Cmd+Z','다시 실행':'Ctrl/Cmd+Shift+Z'};
 function IconButton({name,label,onClick,onMouseDown}:{name:ToolbarIconName;label:string;onClick:()=>void;onMouseDown:(event:MouseEvent<HTMLButtonElement>)=>void}){
- return <button type="button" aria-label={label} title={label} onMouseDown={onMouseDown} onClick={onClick}><ToolbarIcon name={name}/></button>;
+ return <button type="button" aria-label={label} title={EDITOR_SHORTCUTS[label]?`${label} (${EDITOR_SHORTCUTS[label]})`:label} onMouseDown={onMouseDown} onClick={onClick}><ToolbarIcon name={name}/></button>;
 }
 
 function containingNote(node: LexicalNode | null): NoteNode | null {
@@ -353,7 +354,7 @@ function EditorUI(){
       replaceEditorDocumentState(editor,editor.parseEditorState(raw));setStatus('저장한 문서를 불러왔습니다.');
     }catch{setStatus('문서를 불러오지 못했습니다.');}
   }
-  const preserve=(e:React.MouseEvent)=>e.preventDefault();
+  const preserve=(e:MouseEvent<HTMLButtonElement>)=>e.preventDefault();
   return <>
     <header><h1>사이드노트 편집 프로토타입</h1><p>P1.2 · 본문과 노트를 한 편집 상태에서 작성합니다.</p></header>
     <div className="toolbar" role="toolbar" aria-label="노트 편집">
