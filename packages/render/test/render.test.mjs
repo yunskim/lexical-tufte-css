@@ -312,3 +312,18 @@ test('F07 horizontal rule is published between paragraphs without losing their c
  const before=result.html.indexOf('before-rule'),rule=result.html.indexOf('<hr>',before),after=result.html.indexOf('after-rule',rule);
  assert.ok(before>=0&&rule>before&&after>rule,'the rule must publish between both preserved paragraphs');
 });
+
+test('F07 section footer citation publishes semantic footer and cite in order',()=>{
+ const d=fixture(),section=d.lexicalState.root.children[0];
+ const text=value=>({type:'text',version:1,text:value,format:0});
+ section.children.push({
+  type:'tufte-section-footer',version:1,children:[
+   text('References: '),
+   {type:'tufte-cite',version:1,children:[text('A published source')]}
+  ]
+ });
+ const original=JSON.stringify(d),result=renderArticle(d);
+ assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+ assert.match(result.html,/<footer>References: <cite>A published source<\/cite><\/footer>/);
+ assert.equal(JSON.stringify(d),original);
+});
