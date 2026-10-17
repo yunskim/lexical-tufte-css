@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {createHeadlessEditor} from '@lexical/headless';
 import {$getRoot,$createParagraphNode,$createTextNode,UNDO_COMMAND,REDO_COMMAND} from 'lexical';
 import {registerHistory,createEmptyHistoryState} from '@lexical/history';
-import {TUFTE_NODES,$createSectionNode,registerQuotationCommands,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,INSERT_TUFTE_HORIZONTAL_RULE_COMMAND} from '../dist/index.js';
+import {TUFTE_NODES,$createSectionNode,registerQuotationCommands,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,$createNoteNode} from '../dist/index.js';
 
 function setup(){
  const diagnostics=[];
@@ -117,4 +117,32 @@ test('F07 horizontal rule survives JSON restore and History undo/redo',async()=>
   unregisterHistory();
   dispose();
  }
+});
+
+test('F07 rejects insertion inside a note without altering note identity or payload',()=>{
+ const {editor,diagnostics,dispose}=setup();
+ editor.update(()=>{
+  const inside=$createTextNode('protected');
+  const note=$createNoteNode('f07-note').append(inside);
+  $getRoot().append($createSectionNode().append($createParagraphNode().append($createTextNode('body'),note)));
+  inside.select(3,3);
+ },{discrete:true});
+ const before=editor.getEditorState().toJSON();
+ editor.update(()=>editor.dispatchCommand(INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,undefined),{discrete:true});
+ assert.deepEqual(editor.getEditorState().toJSON(),before);
+ assert.equal(diagnostics.at(-1)?.code,'INVALID_QUOTATION_SELECTION');
+ dispose();
+});
+test('F07 unregister removes command handler',()=>{
+ const {editor,dispose}=setup();
+ editor.update(()=>{
+  const text=$createTextNode('body');
+  $getRoot().append($createSectionNode().append($createParagraphNode().append(text)));
+  text.selectEnd();
+ },{discrete:true});
+ dispose();
+ let handled;
+ editor.update(()=>{handled=editor.dispatchCommand(INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,undefined);},{discrete:true});
+ assert.equal(handled,false);
+ assert.equal(editor.getEditorState().toJSON().root.children[0].children.length,1);
 });
