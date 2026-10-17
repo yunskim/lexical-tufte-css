@@ -1,3 +1,8 @@
+## P3.1.c 스크롤 시 컨텍스트 메뉴 화면 경계 보정 (일괄 검증 대기)
+
+- 열린 블록 메뉴가 window 및 중첩 스크롤 이벤트에서 실제 크기를 기준으로 viewport 경계를 다시 확인하도록 capture scroll listener를 추가했다. 종료 시 listener를 해제한다.
+- 사용자가 요청한 일괄 검증 정책에 따라 이번 변경은 실행 테스트하지 않았다. 추후 nested scroll·375px viewport·포커스 유지 회귀와 함께 검증한다. CI 생략.
+
 ## P3.1.c 제목 수준 레이블 구분 (일괄 검증 대기)
 
 - 블록 컨텍스트 메뉴가 HeadingNode의 h2/h3 태그를 읽어 현재 제목 수준을 구분한다. `$isHeadingNode` 타입 판별을 사용한다.
