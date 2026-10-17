@@ -204,8 +204,12 @@ function BlockContextMenu(){
   const reposition=()=>{
    const menu=menuRef.current;
    if(!menu)return;
-   const rect=menu.getBoundingClientRect();
    const viewport=window.visualViewport;
+   const visibleWidth=viewport?.width??window.innerWidth;
+   const visibleHeight=viewport?.height??window.innerHeight;
+   menu.style.maxWidth=`${Math.max(1,visibleWidth-16)}px`;
+   menu.style.maxHeight=`${Math.max(1,visibleHeight-16)}px`;
+   const rect=menu.getBoundingClientRect();
    const left=viewport?.offsetLeft??0;
    const top=viewport?.offsetTop??0;
    const right=left+(viewport?.width??window.innerWidth);
@@ -220,7 +224,7 @@ function BlockContextMenu(){
   const visualViewport=window.visualViewport;
   visualViewport?.addEventListener('resize',reposition);
   visualViewport?.addEventListener('scroll',reposition);
-  return()=>{window.removeEventListener('resize',reposition);window.removeEventListener('scroll',reposition,true);visualViewport?.removeEventListener('resize',reposition);visualViewport?.removeEventListener('scroll',reposition);};
+  return()=>{window.removeEventListener('resize',reposition);window.removeEventListener('scroll',reposition,true);visualViewport?.removeEventListener('resize',reposition);visualViewport?.removeEventListener('scroll',reposition);if(menuRef.current){menuRef.current.style.maxWidth='';menuRef.current.style.maxHeight='';}};
  },[open,point]);
  useEffect(()=>{if(!available&&!open)setPoint(null);},[available]);
  if(!available&&!open)return null;
