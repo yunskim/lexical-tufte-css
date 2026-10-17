@@ -1,3 +1,9 @@
+## P2.2.c F07 섹션 문헌 저장·복원·발행 회귀 (일괄 검증 대기)
+
+- `packages/lexical/test/quotation-commands.test.mjs`: 문헌 인용 추가 후 Lexical JSON 직렬화, 새 headless editor에서 복원, 원래 본문·footer/cite 구조 보존 확인.
+- `packages/render/test/render.test.mjs`: section footer 안 cite가 `<footer>…<cite>…</cite></footer>`로 발행되고 입력 문서가 변경되지 않는지 확인.
+- 두 테스트 모두 코드만 추가했다. 사용자 방침에 따라 테스트 실행 및 완료 판정은 마지막 통합 검증으로 보류하며 CI는 생략한다.
+
 ## P2.2.c F07 섹션 문헌 UI 연결 (일괄 테스트 대기)
 
 - `examples/editor/src/main.tsx`: `APPEND_TUFTE_SECTION_CITE_COMMAND`를 import하고 `섹션 문헌 추가` 툴바 버튼 연결. 기존 `인용문 출처 추가` 버튼과 별도로 제공한다.
