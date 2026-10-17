@@ -1,6 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createHeadlessEditor} from '@lexical/headless';
+import {$createLinkNode} from '@lexical/link';
 import {$getRoot,$createParagraphNode,$createTextNode,$createRangeSelection,$setSelection} from 'lexical';
 import {TufteSpanNode,$createTufteSpanNode,$createNoteNode,TUFTE_NODES,registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND,WRAP_TUFTE_SPAN_COMMAND,UNWRAP_TUFTE_SPAN_COMMAND} from '../dist/index.js';
 
@@ -129,5 +130,46 @@ test('P2.2.b unwrapping rejects a caret outside a Tufte span without mutation',(
  editor.update(()=>{},{discrete:true});
  assert.equal(JSON.stringify(editor.getEditorState().toJSON()),before);
  assert.ok(diagnostics.some(d=>d.code==='INVALID_SPAN_SELECTION'));
+ dispose();
+});
+
+test('P2.2.b wrapping text inside a link preserves its URL and an adjacent note ID',()=>{
+ const editor=createHeadlessEditor({namespace:'inline-link-test',nodes:TUFTE_NODES,onError(error){throw error;}});
+ const diagnostics=[];
+ const dispose=registerInlineCommands(editor,d=>diagnostics.push(d));
+ editor.update(()=>{
+  const text=$createTextNode('linked term');
+  const link=$createLinkNode('https://lexical.dev').append(text);
+  const note=$createNoteNode('stable-note','sidenote').append($createTextNode('Keep me'));
+  $getRoot().append($createParagraphNode().append(link,$createTextNode(' '),note));
+  text.select(0,6);
+ },{discrete:true});
+ editor.dispatchCommand(WRAP_TUFTE_SPAN_COMMAND,'sans');
+ editor.update(()=>{},{discrete:true});
+ editor.getEditorState().read(()=>{
+  const paragraph=$getRoot().getFirstChild();
+  const link=paragraph.getFirstChild();
+  assert.equal(link.getURL(),'https://lexical.dev');
+  assert.equal(link.getTextContent(),'linked term');
+  assert.equal(link.getFirstChild().getType(),'tufte-span');
+  assert.equal(link.getFirstChild().getKind(),'sans');
+  assert.equal(paragraph.getLastChild().getNoteId(),'stable-note');
+ });
+ assert.deepEqual(diagnostics,[]);
+ dispose();
+});
+
+test('P2.2.b invalid wrap kind returns a diagnostic and preserves the source selection content',()=>{
+ const editor=make(),diagnostics=[];
+ const dispose=registerInlineCommands(editor,d=>diagnostics.push(d));
+ editor.update(()=>{
+  const text=$createTextNode('unchanged');
+  $getRoot().append($createParagraphNode().append(text));text.select(1,4);
+ },{discrete:true});
+ const before=JSON.stringify(editor.getEditorState().toJSON());
+ editor.dispatchCommand(WRAP_TUFTE_SPAN_COMMAND,'not-a-kind');
+ editor.update(()=>{},{discrete:true});
+ assert.equal(JSON.stringify(editor.getEditorState().toJSON()),before);
+ assert.ok(diagnostics.some(d=>d.code==='INVALID_SPAN_KIND'));
  dispose();
 });
