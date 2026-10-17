@@ -1081,3 +1081,10 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - 요청 본문 제한/Content-Type 조기 거부 응답에도 `Cache-Control: no-store`를 부여하도록 수정했다.
 - Python 계약 테스트의 DELETE+JSON 호출을 `TestClient.request('DELETE', ..., json=...)`로 변경해 HTTPX 호출 규약과 일치시켰다.
 - 테스트·CI는 실행하지 않았다. 인증/CSRF 운영 연결, Python–TypeScript 실행 상호운용 검증, 응답 코드 전 범위 점검은 미완료다.
+
+## 2026-10-17 인증 우선 처리
+
+- 복구 API 경로에서 본문 파싱 및 크기 검사 이전에 호스트 인증·게시글 접근권·변경 요청 CSRF 정책을 호출한다.
+- 인증 거부 시 403 오류 envelope 및 no-store를 즉시 반환한다. 승인 결과는 요청 상태에 보존해 엔드포인트에서 중복 호출하지 않는다.
+- 미인증 요청의 잘못된 Content-Type 우선순위 및 인증 콜백 1회 실행 회귀 테스트를 작성했다.
+- 테스트/CI 미실행. 실제 호스트 제공자 연결과 실행 검증은 여전히 필요하다.
