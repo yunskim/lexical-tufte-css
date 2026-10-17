@@ -1,3 +1,8 @@
+## P2.2.c F08–F09 삽입 대상 스키마 검증 강화 (일괄 테스트 대기)
+
+- `packages/lexical/src/quotationCommands.ts`: 삽입 기준 블록의 허용 여부뿐 아니라 요청한 `quote`/`tufte-epigraph`/`tufte-section-footer`가 `tufte-section`의 허용 자식인지 확인한 후 삽입하도록 변경.
+- 기존 F07 구분선과 같은 사전 검증 원칙 적용. 사용자 요청에 따라 빌드·단위·브라우저 테스트는 후속 통합 검증에서 일괄 실행하며 현재 통과를 주장하지 않는다. CI 생략.
+
 ## P2.2.c F08 중복 출처 방지 회귀 (일괄 검증 대기)
 
 - `quotation-commands.test.mjs`: quote에 attribution/cite를 추가한 후 같은 quote에서 재삽입을 시도하면 진단을 반환하고 JSON이 바뀌지 않는지 검사.
