@@ -1,5 +1,11 @@
 # 에러 기록
 
+## E079 — F07 검증 환경에서 GitHub DNS 해석 실패 및 checkout 부재
+
+- 2026-10-17 실행 컨테이너에서 `git ls-remote https://github.com/yunskim/lexical-tufte-css.git HEAD`가 `Could not resolve host: github.com`으로 실패했다. `/mnt/data`에 checkout이 없고 pnpm 실행 파일도 없다. Node v22.16.0은 확인했다.
+- GitHub 커넥터로 원격 파일 읽기/커밋은 가능하나, 이는 로컬 빌드·실행 검증을 대체하지 못한다. F07 테스트는 미실행이며 제품 결함으로 분류하지 않는다.
+- 상태: **open / environment-blocked**. 네트워크와 checkout을 제공하는 실행 환경에서 M072 순서대로 검증한 뒤에만 닫는다. 동일한 DNS 실패를 반복 호출해 해결됐다고 추정하지 않는다.
+
 ## E076 — 복구 목록 SQL 인터페이스에 all 누락
 
 - 2026-10-17 main5fb4d20 clean build에서 TS2339. list 구현은 all()을 호출하지만 기존 PublicationDatabase는 get/run만 선언했다.
