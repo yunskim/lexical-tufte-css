@@ -1,3 +1,8 @@
+## P3.1.a 단축키 안내 및 타입 정리 (검증 대기)
+
+- `examples/editor/src/main.tsx`: `MouseEvent` 타입을 직접 import하여 React namespace 참조를 제거하고, 일반 서식/이력 명령의 툴팁 단축키 안내를 추가했다.
+- 단축키 안내는 명령 등록이나 플랫폼별 실제 키 매핑을 보장하지 않는다. P3.1.a 명령 레지스트리와 P3.1.b–d 컨텍스트 UI는 미완료. 테스트 미실행, CI 생략.
+
 ## P3.1 아이콘 중심 툴바 2차 전환 (일괄 검증 대기)
 
 - `examples/editor/src/main.tsx`: 목록(글머리표/번호), 정의목록, sidenote/marginnote, 인용문 attribution 및 섹션 cite 버튼을 `IconButton`으로 전환. 기존 명령·접근성 이름을 유지했다.
