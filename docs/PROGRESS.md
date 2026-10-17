@@ -1,3 +1,8 @@
+## F07 JSON 복원 테스트의 commit 경계 보완
+
+- `quotation-commands.test.mjs`: `setEditorState(parseEditorState(...))` 뒤 `await flush()`를 추가해 비동기 상태 반영 이전에 JSON을 비교하지 않도록 수정했다. 이전 상태를 검증하는 가짜 성공/실패를 피하기 위한 테스트 수정이다.
+- 실제 실행 환경 재점검: Node v22.16.0, pnpm 없음, GitHub DNS 해석 실패. 새 변경의 `pnpm check` 및 Playwright 테스트는 미실행이다. CI 생략. F07 완료 gate는 여전히 보류.
+
 ## F07 스키마 경계 강화 및 실행 환경 재확인
 
 - `quotationCommands.ts`: 구분선 삽입 기준 블록이 `tufte-section`의 허용 child type인지도 검사하도록 강화. 기존 구현의 누락된 사전 조건을 수정했다.
