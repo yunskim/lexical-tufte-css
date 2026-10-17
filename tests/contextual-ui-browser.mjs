@@ -62,6 +62,15 @@ try{
  await page.locator('header').first().click({position:{x:5,y:5}});
  await group.waitFor({state:'hidden'});
  assert.equal(await page.locator('.block-context-menu.is-floating').count(),0);
+ // Tab and Shift+Tab must dismiss the popup rather than leave an invisible active menu.
+ await editor.locator('h3').click({button:'right'});await group.waitFor();
+ await page.waitForFunction(()=>document.activeElement?.textContent==='본문 문단');
+ await page.keyboard.press('Tab');await group.waitFor({state:'hidden'});
+ assert.equal(await page.locator('.block-context-menu.is-floating').count(),0);
+ await editor.locator('h3').click({button:'right'});await group.waitFor();
+ await page.waitForFunction(()=>document.activeElement?.textContent==='본문 문단');
+ await page.keyboard.press('Shift+Tab');await group.waitFor({state:'hidden'});
+ assert.equal(await page.locator('.block-context-menu.is-floating').count(),0);
 
  await editor.locator('h3').click();await page.keyboard.press('Home');await page.keyboard.down('Shift');await page.keyboard.press('End');await page.keyboard.up('Shift');await floating.waitFor();
  const box=await floating.boundingBox();assert.ok(box.x>=0&&box.x+box.width<=375,JSON.stringify(box));
