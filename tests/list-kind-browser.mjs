@@ -58,6 +58,22 @@ try{
  const beforeReject=await snapshot();
  await action('현재 목록 글머리표로').click();
  assert.deepEqual(await snapshot(),beforeReject,'Plain paragraph must not change a list elsewhere');
+ // Structural nested lists are an editor operation, not a CSS-only indent.
+ await editor.locator('section ol > li').first().click();
+ await action('목록 항목 추가').click();
+ await page.keyboard.insertText('Second list item');
+ assert.equal(await editor.locator('section ol > li').count(),2);
+ await action('목록 들여쓰기').click();
+ await page.waitForFunction(()=>document.querySelector('.editor section ol ol li')?.textContent?.includes('Second list item'));
+ const nested=await snapshot();
+ assert.equal(extractList(nested).listType,'number');
+ assert.match(JSON.stringify(nested),/Second list item/);
+ await editor.locator('section ol ol li').first().click();
+ await action('목록 내어쓰기').click();
+ await page.waitForFunction(()=>[...document.querySelectorAll('.editor section ol > li')].some(li=>li.textContent?.includes('Second list item')));
+ const flattened=await snapshot();
+ assert.equal(extractList(flattened).children.length,2);
+ assert.equal(await editor.locator('section ol ol li').count(),0);
  assert.deepEqual(errors,[]);
- console.log('P2.2.b list kind browser: ul/ol conversion, history, save/reopen, canonical renderer and reject PASS.');
+ console.log('P2.2.b list browser: ul/ol conversion, structural indent/outdent, history, save/reopen, renderer, reject PASS.');
 }finally{await browser?.close();server.kill();}
