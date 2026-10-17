@@ -42,3 +42,11 @@
 - 권한 콜백은 호스트의 인증 결과와 사용자별 글 소유권을 확인해야 한다. 서비스 자체는 HTTP 인증, CSRF 토큰, 사용자 세션을 제공하지 않는다.
 - 실패한 권한 검사에서는 저장소 접근을 진행하지 않는다. 이 동작과 타입 검사는 일괄 테스트 대기다.
 - 다음: 권한 거부·예외·세션 간 접근 제어 테스트 코드 및 실제 HTTP 호스트 연결. CI 생략.
+
+## HTTP 경계 구현 (검증 대기)
+
+- `packages/blog/src/recoveryHttp.ts`: 프레임워크 중립 `handleRecoveryRequest` 구현. GET 목록/단일 읽기, PUT CAS 저장, DELETE CAS 삭제를 `AuthorizedRecoveryService`에 위임한다.
+- 결과 코드를 200/400/403/405/409/422/503으로 변환한다. 실제 HTTP listener나 인증/CSRF 미들웨어는 포함하지 않는다.
+- 호스트는 반드시 요청을 인증하고 CSRF를 검사한 뒤 호출해야 한다. `postId`와 `sessionId`는 경로와 본문 일치를 검사한다.
+- `packages/blog/test/recovery-host.test.mjs` 권한 성공·거부·예외·세션 격리 회귀 코드를 추가했다.
+- 테스트 및 타입 검사는 사용자의 일괄 검증 지시로 미실행. HTTP 요청 dispatch의 추가 회귀 코드, 실제 서버 연결 및 브라우저 연결은 후속이다. CI 생략.
