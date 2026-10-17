@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createHeadlessEditor} from '@lexical/headless';
 import {$getRoot,$createParagraphNode,$createTextNode} from 'lexical';
-import {TUFTE_NODES,$createSectionNode,registerQuotationCommands,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND} from '../dist/index.js';
+import {TUFTE_NODES,$createSectionNode,registerQuotationCommands,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,INSERT_TUFTE_HORIZONTAL_RULE_COMMAND} from '../dist/index.js';
 
 function setup(){
  const diagnostics=[];
@@ -53,4 +53,33 @@ test('epigraph and section footer use schema-defined nesting',()=>{
   });
   dispose();
  }
+});
+
+test('F07 horizontal rule insertion preserves existing paragraph and serializes semantically',()=>{
+ const {editor,diagnostics,dispose}=setup();
+ editor.update(()=>{
+  const text=$createTextNode('before');
+  $getRoot().append($createSectionNode().append($createParagraphNode().append(text)));
+  text.selectEnd();
+ },{discrete:true});
+ editor.update(()=>editor.dispatchCommand(INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,undefined),{discrete:true});
+ const serialized=editor.getEditorState().toJSON();
+ const children=serialized.root.children[0].children;
+ assert.deepEqual(children.map(n=>n.type),['paragraph','horizontalrule']);
+ assert.equal(children[0].children[0].text,'before');
+ assert.equal(diagnostics.length,0);
+ dispose();
+});
+test('F07 horizontal rule refuses selections outside a section without mutation',()=>{
+ const {editor,diagnostics,dispose}=setup();
+ editor.update(()=>{
+  const text=$createTextNode('root');
+  $getRoot().append($createParagraphNode().append(text));
+  text.selectEnd();
+ },{discrete:true});
+ const before=editor.getEditorState().toJSON();
+ editor.update(()=>editor.dispatchCommand(INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,undefined),{discrete:true});
+ assert.deepEqual(editor.getEditorState().toJSON(),before);
+ assert.equal(diagnostics.at(-1)?.code,'INVALID_QUOTATION_SELECTION');
+ dispose();
 });
