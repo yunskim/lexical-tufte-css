@@ -63,3 +63,10 @@
 - `/posts/:postId/recoveries[/:sessionId]`에 대해 GET/PUT/DELETE를 매핑한다. JSON Content-Type, 2.1MB 본문 상한, `Cache-Control: no-store`를 적용한다.
 - 별도 `AuthorizedRecoveryService`에서 게시글/세션별 권한 검사를 계속 수행해야 한다. `authorizeRequest:()=>true`는 테스트용으로만 사용하고 운영에 사용하지 않는다.
 - `packages/blog/test/recovery-fetch.test.mjs` 회귀 코드 추가. 테스트/타입 검사/CI 미실행. 실제 호스트 인증 미들웨어, 서버 listener, 브라우저 네트워크 연결은 미구현.
+
+## 브라우저 네트워크 클라이언트 (검증 대기)
+
+- `packages/blog/src/recoveryClient.ts`에 `RecoveryHttpClient`를 추가했다. `@lexical-tufte/blog/recovery-client` 별도 엔트리로 배포하며 서버 SQLite barrel을 참조하지 않는다.
+- GET 목록/읽기, PUT CAS 저장, DELETE CAS 삭제, `credentials: same-origin`, `cache: no-store`, 호스트 CSRF 헤더 공급자를 지원한다.
+- 실제 편집기 UI에는 아직 연결하지 않았다. 원격 저장 성공 전 로컬 복구본을 삭제하지 않으며 복구 적용은 반드시 사용자의 확인을 받도록 후속 연결해야 한다.
+- 타입 검사/테스트/CI는 사용자 요청대로 미실행. 브라우저 클라이언트 회귀 및 실제 호스트 인증 연결 대기.
