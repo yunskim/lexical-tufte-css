@@ -198,6 +198,20 @@ function BlockContextMenu(){
   document.addEventListener('pointerdown',close);
   return()=>document.removeEventListener('pointerdown',close);
  },[open]);
+ useEffect(()=>{
+  if(!open||!point)return;
+  const reposition=()=>{
+   const menu=menuRef.current;
+   if(!menu)return;
+   const rect=menu.getBoundingClientRect();
+   const x=Math.max(8,Math.min(window.innerWidth-rect.width-8,point.x));
+   const y=Math.max(8,Math.min(window.innerHeight-rect.height-8,point.y));
+   if(x!==point.x||y!==point.y)setPoint({x,y});
+  };
+  reposition();
+  window.addEventListener('resize',reposition);
+  return()=>window.removeEventListener('resize',reposition);
+ },[open,point]);
  useEffect(()=>{if(!available&&!open)setPoint(null);},[available]);
  if(!available&&!open)return null;
  return <div ref={menuRef} className={point&&open?'block-context-menu is-floating':'block-context-menu'} style={point&&open?{left:point.x,top:point.y}:undefined} onKeyDown={event=>{if(event.key==='Escape'){event.preventDefault();setOpen(false);setPoint(null);editor.focus();}else if(open&&['ArrowDown','ArrowUp','Home','End'].includes(event.key)){const buttons=Array.from(menuRef.current?.querySelectorAll<HTMLButtonElement>('#tufte-block-menu button')??[]);const index=buttons.indexOf(document.activeElement as HTMLButtonElement);if(buttons.length){event.preventDefault();buttons[event.key==='Home'?0:event.key==='End'?buttons.length-1:(index+(event.key==='ArrowDown'?1:-1)+buttons.length)%buttons.length]?.focus();}}}}>
