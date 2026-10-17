@@ -1,5 +1,15 @@
 # 재발 방지 대책 및 정기 점검
 
+
+## M082 — 구조 편집은 부모 스키마와 그룹 경계를 먼저 확인
+
+- 목록 `UNWRAP_TUFTE_LIST_COMMAND`: 삭제/해제 전에 **선택이 속한 최상위 섹션 직계 목록**, 모든 자식 `listitem`, 각 항목의 깊이 0 및 `paragraph` 허용 자식 타입을 전체 검사한다. 하나라도 불허하면 리스트를 분할·보정하지 말고 기존 문서 전체를 유지한다.
+- 성공한 목록 해제는 새 문단 컨테이너로 **기존 inline 자식 노드를 직접 이동**한다. 텍스트·링크·노트 payload/ID를 재생성해 누락·중복시키지 않으며 `HISTORY_PUSH_TAG`로 단일 undo 경계를 둔다.
+- 정의목록 `dt/dd`의 그룹 경계를 눈에 보이는 인접 항목만 보고 추정하지 않는다. schema validator가 허용하는 `dt dt dd`는 '하나의 정의에 용어 둘'일 수 있으므로, 쌍 단위 이동/삭제는 오직 전체가 `dt dd`로 교대하는 경우만 허용한다. 마지막 쌍 삭제를 거부해 `EMPTY_NODE`/정의목록 위반을 예방한다.
+- 단위 회귀에서 노트 ID·텍스트·노드 식별자, 우회되지 않은 부모 구조, 첫/끝 경계, 비정형 그룹의 **변경 없는 거부**를 각각 검사한다. 브라우저 회귀는 canonical JSON→HTML 발행 및 저장/재열기와 undo/redo를 포함한다.
+- E086/E087 및 M080/M081을 재검토했다. 현재 구현과 회귀는 **작성 완료, 실행되지 않음**. 실행 중 실제 오류가 발견되면 새로운 E 기록과 수정/검증 결과를 별도로 남긴다.
+
+
 ## M081 — 패키지 직접 import·lockfile과 신규 인라인 명령의 원자성
 
 - E087: 신규 import를 추가할 때 해당 패키지의 `dependencies`/peer dependency, `pnpm-lock.yaml`의 importer, public package export, consumer smoke를 모두 대조한다. 현재 workspace에서 import가 된다는 이유로 clean frozen install을 생략하지 않는다.
