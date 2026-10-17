@@ -1,3 +1,8 @@
+## P2.2.c F09 복수 Epigraph 보존 회귀 (일괄 테스트 대기)
+
+- `packages/lexical/test/quotation-commands.test.mjs`: 한 섹션에 epigraph 두 개를 순차 삽입해 원래 본문과 첫 번째 인용 묶음이 보존되고 두 묶음이 각각 `tufte-epigraph > quote`로 직렬화되는지 확인하는 회귀 추가.
+- 사용자 결정: **테스트는 기능 구현 후 한 번에 실행**. 개별 작업마다 DNS·pnpm 환경 점검을 반복하지 않고 구현/회귀 코드를 계속 작성한다. 테스트 코드는 작성했으나 실행하지 않았고, F07–F09 및 P2.2.c 완료 체크는 일괄 검증 전까지 유지한다. CI는 생략한다.
+
 ## F07 브라우저 데이터 보존 검증 강화
 
 - `tests/section-commands-browser.mjs`: 실제 React 편집기에서 구분선 삽입 후 이전 섹션 JSON과 기존 본문 블록 JSON이 변경되지 않았는지 검증하는 단언 추가. 삽입·발행·undo/redo 경로는 유지.
