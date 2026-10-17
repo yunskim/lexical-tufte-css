@@ -189,6 +189,14 @@ P2 gate: F01–F19의 데이터 보존 및 구조 검증 통과. 편집·시각 
 - [ ] P3.1.d 선택 영역 보존, 포커스 복귀, 키보드 열기/닫기(Escape), 스크린리더, 툴바 위치·화면 가장자리, 모바일 터치·IME 및 undo/redo를 회귀 검증한다. 우클릭 메뉴와 선택 영역 툴바의 동작을 구분한다.
 - [ ] P3.1.e `examples/editor`에 집중된 액션/선택/노트 도구·상태를 `packages/editor-react` 재사용 가능한 컴포넌트와 hook/API로 이동한다. 호스트 props(`value/onChange/onError/assetAdapter/readonly`), lifecycle/unmount·초안 교체·여러 편집기 독립성, accessibility contract를 공개 예제로 검증한다. 예제는 소비자여야 하며 역의존 금지.
 - [ ] P3.1.f 편집 툴바는 핵심 서식만 기본 노출, 삽입 메뉴·문맥 메뉴·figure/note 속성 패널로 작업을 분산한다. 섹션·목록·주석·그림·인용·코드를 발견/생성/수정하는 작업 경로를 1개 문서 showcase에서 모두 실연한다. 기존 테스트의 역할·이름 변경은 접근성 계약과 함께 명시적으로 이관한다.
+- [ ] P3.1.g **Notion-like 블록 편집 UX**: 블록 단위 조작을 기존 Lexical/Tufte 문서 스키마 위의 UI·command 계층으로 구현한다. 특정 제품 UI를 그대로 복제하지 않으며 새 범용 block AST를 문서 정본으로 추가하지 않는다.
+  - [ ] P3.1.g.1 블록 의미·액션 수락 조건 정의: `root → tufte-section → 허용 block`을 유지하고 paragraph/heading/quote/list/definition-list/figure/table/code/embed/fullwidth/footer/hr의 지원 명령 매트릭스를 작성한다. **노트는 독립 이동 블록이 아니라 본문 inline anchor와 payload의 단위**다. figure의 caption/여백 주석, 목록의 listitem/dt/dd는 부모와 함께 관리한다.
+  - [ ] P3.1.g.2 커서가 있는 블록 옆에 더하기(+) 삽입·드래그 핸들을 노출하고, `/` 슬래시 메뉴(검색/유형별 삽입: 문단·h2/h3·목록·정의목록·인용·구분선·그림·코드 등)를 제공한다. IME 조합·노트 입력·코드 입력에서는 슬래시 진입/단축키를 가로채지 않는다. 기존 `INSERT_*/SET_*` 명령과 action registry를 재사용한다.
+  - [ ] P3.1.g.3 블록 선택·위/아래 이동·복제·삭제·유형 전환을 command로 분리한다. 마우스 드래그와 키보드 동등 경로(블록 선택, 위/아래 이동, 메뉴 호출)를 모두 제공한다. section 경계의 이동은 명시적 목적지/스키마 검사 뒤 허용하거나 진단하며, root·section 자체의 재정렬과 자식 블록 이동을 구분한다.
+  - [ ] P3.1.g.4 목록·정의목록·표·figure·epigraph·fullwidth 같은 **복합 블록**의 내부 항목 선택/이동과 상위 블록 이동을 구분한다. 구조를 임의 div로 감싸거나 section 밖으로 노드를 빼내지 않는다. 미지원 drag/drop·다중 블록 변환/중첩은 원문을 유지하고 이유를 알린다.
+  - [ ] P3.1.g.5 블록 복제/붙여넣기에서 note ID·내부 참조를 필요 시 재발급/재연결하고 자산 참조는 보존한다. drag/drop 전후 caret/selection·focus·history(한 번에 undo/redo)·자동저장 상태를 일치시킨다. 블록 외부 drop, 조합 중 drop, 스키마 불허 대상, 취소(Escape)는 무변경.
+  - [ ] P3.1.g.6 모바일 터치에서 핸들·삽입 메뉴·블록 이동을 키보드/마우스와 기능적으로 동등하게 제공하고 screen reader용 블록 종류/위치·이동 결과를 알린다. 손잡이 hover에만 의존하지 않고 touch/assistive 기술로 발견 가능해야 한다.
+  - [ ] P3.1.g.7 적용 순서: **1차** 핸들·슬래시 삽입/블록 유형 전환 → **2차** 키보드 이동·삭제·복제/undo → **3차** 드래그·섹션 간 이동 → **4차** 복합 블록/모바일·접근성 확대. 각 차수마다 최소 반례와 JSON 저장→재열기→발행 HTML 동등성 증거를 남긴다. P2 명령·스키마 gate 및 P3.1.e 재사용 컴포넌트 경계를 먼저 확보한다.
 - [ ] P3.2 키보드·focus·selection·clipboard·undo/redo·한국어 IME·모바일 터치.
 - [ ] P3.3 동일 렌더러로 preview, draft 복구·dirty state·오류 표시.
   - [ ] P3.3.a `renderArticle` 정본 결과를 독립 sandbox/격리 스타일의 preview로 보여 주고 발행 실패 진단을 위치·원인과 연결한다. JSON/HTML 텍스트 표시를 실제 미리보기로 오인하지 않는다.
@@ -198,7 +206,7 @@ P2 gate: F01–F19의 데이터 보존 및 구조 검증 통과. 편집·시각 
   - [ ] P3.4.b 파일 MIME 매직바이트·크기 제한·SVG 정책·alt 필수/장식 이미지·캡션 수정/삭제를 테스트하고 외부 URL과 호스트 인증 경계를 유지한다.
 - [ ] P3.5 노트의 모바일 작성 UI는 항상 접근 가능하게 제공; 독자용 접힘 상태와 구분.
 
-P3 gate: 예제 글의 모든 F기능을 HTML 직접 편집 없이 생성·수정·재열기 가능.
+P3 gate: 예제 글의 모든 F기능을 HTML 직접 편집 없이 생성·수정·재열기 가능. **P3.1.g 블록 편집은 별도 단계별 gate로 판정**하며, Tufte section/inline note의 무손실 보존·명령/스크린리더·모바일 등 누락된 입력 경로가 있으면 'Notion-like 전체 지원'이라고 표시하지 않는다.
 
 ### P4 — 발행 렌더러와 전체 호환성 (P2/P3 이후)
 
@@ -234,6 +242,7 @@ P5 gate: 실제 예제 블로그에서 작성→발행→수정→비공개→�
 - [ ] P6.4 5만 자·노트 200개 장문 fixture에서 입력/저장/렌더 baseline 측정 후 성능 예산 확정, 회귀 기준 적용.
 - [ ] P6.5 package export/ESM/types/SSR·consumer 설치 smoke test, 브라우저에 Node 전용 모듈이 새지 않는지 검증.
 - [ ] P6.6 문서·기능별 evidence matrix를 유지하며 검증 게이트를 분리한다: 정적 타입/빌드, 명령·JSON·렌더, Playwright UI, 실제 OS IME/터치/스크린리더, SSR/정적 빌드, end-to-end 블로그·복원. 메뉴 단독 통과로 전체 기능 완료를 선언하지 않는다.
+- [ ] P6.8 Notion-like 블록 조작 E2E 매트릭스: 슬래시 메뉴·핸들·키보드·드래그·터치에서 삽입/이동/복제/삭제·취소를 검증한다. section 시작/끝 및 다른 section으로 이동, 노트/그림/복합 블록의 ID·참조 보존, 불허 drop의 무변경, undo/redo·IME·focus, 접근성 발표, JSON 저장→재열기→순수 renderer 출력 비교를 포함한다. 블록 이동 결과에 편집기 전용 wrapper가 HTML에 새지 않는지 확인한다.
 - [ ] P6.7 host 안전성: CSP/Trusted Types 가능 범위, URL/iframe/자산 응답 헤더, 비인가 관리 라우트·CSRF·세션 만료·rate limit, 글과 자산의 백업/복구/삭제 권한을 실제 호스트로 검증한다.
 
 P6 gate: 로컬 빌드·타입 검사·관련 테스트 통과, 남은 결함과 지원 브라우저 범위 명시. 검증 미완료 기능은 지원 완료로 홍보하지 않음.
@@ -277,6 +286,8 @@ P6 gate: 로컬 빌드·타입 검사·관련 테스트 통과, 남은 결함과
 | Lexical API 변화/JSON 호환성 | 버전 고정·migration·지원 버전 matrix |
 | Markdown 변환 시 Tufte 정보 유실 | 정본 JSON 유지, Markdown은 손실 진단을 가진 선택적 출력 |
 | 초안 유출/자산 삭제로 공개 글 손상 | immutable published snapshot, asset 참조 추적·삭제 보호 |
+| 드래그/블록 복제 과정에서 section 구조 위반·노트 ID 충돌·자산 참조 유실 | 기존 `NODE_SCHEMA` 기반 command preflight, atomic history, 실패 시 무변경 및 JSON/HTML 왕복 fixture; P3.1.g/P6.8 |
+| 슬래시 메뉴와 IME/노트·코드 입력, 키보드/스크린리더·터치 제스처 충돌 | 입력 영역 및 조합 상태에 따른 동작 분기, 키보드 동등 명령·focus/발표 테스트; P3.1.g/P6.8 |
 
 ## 공식 출처
 
