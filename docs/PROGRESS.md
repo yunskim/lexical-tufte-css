@@ -1,3 +1,9 @@
+## F07 스키마 경계 강화 및 실행 환경 재확인
+
+- `quotationCommands.ts`: 구분선 삽입 기준 블록이 `tufte-section`의 허용 child type인지도 검사하도록 강화. 기존 구현의 누락된 사전 조건을 수정했다.
+- 2026-10-17 실행 컨테이너에서 `git ls-remote https://github.com/yunskim/lexical-tufte-css.git HEAD`를 실제 재시도했으나 `Could not resolve host: github.com` 발생. Node 22.16.0 및 npm 10.9.2는 있으나 pnpm/checkout 부재. 따라서 `pnpm check`/브라우저 검증 미실행.
+- GitHub 커넥터로 코드만 반영. CI는 생략하며, 검증 성공·F07 완료 판정은 보류한다.
+
 ## F07 노트 경계·명령 생명주기 회귀 추가
 
 - `quotation-commands.test.mjs`: 노트 내부 삽입 거부 시 원본 JSON·노트 ID 보존, unregister 후 명령이 처리되지 않는지 검증하는 테스트 추가.
