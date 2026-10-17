@@ -1,3 +1,9 @@
+## P3.1.c 블록 메뉴 ARIA 의미 구조 (검증 대기)
+
+- 블록 유형 트리거에 `aria-haspopup=menu`, 메뉴 컨테이너에 `role=menu`, 네 개 명령에 `role=menuitem`을 추가했다.
+- `tests/contextual-ui-browser.mjs`의 role 기반 locator를 수정하고 네 개 menuitem 존재 검사를 추가했다.
+- 이 변경 이후 실제 브라우저·스크린리더 검증은 아직 실행하지 않았다. CI 생략.
+
 ## P3.1.c 실제 메뉴 크기 기반 화면 경계 보정 (검증 대기)
 
 - `examples/editor/src/main.tsx`: 열려 있는 블록 메뉴의 실제 DOM 크기를 측정하여 viewport 안으로 보정하고 resize 때 재계산한다.
