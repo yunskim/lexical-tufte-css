@@ -1063,3 +1063,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - `packages/blog/src/recoveryHttp.ts`: 요청 본문의 `checksum` 필드 제공을 명시적으로 거부하고 서버 저장소가 계산하도록 강제. 위조 checksum 입력 회귀 추가.
 - 실행 테스트·타입 검사·브라우저 검증은 사용자 요청에 따라 보류. CI 생략. 완료 체크 보류.
 - 다음: 실제 인증·CSRF를 포함하는 호스트 연결 및 브라우저 어댑터. 프레임워크 중립 dispatcher만으로 인증된 HTTP 서버가 만들어진 것은 아니다.
+
+## 2026-10-17 브라우저 복구 클라이언트 회귀 코드
+
+- `packages/blog/test/recovery-client.test.mjs` 추가: 경로·쿠키·CSRF 헤더·캐시 정책·CAS 요청 및 오류 응답 검사 코드.
+- `packages/blog/src/recoveryClient.ts`: JSON 파싱 실패를 네트워크 오류와 구분하고 HTTP 성공 여부와 Result.ok의 불일치를 프로토콜 오류로 처리.
+- 테스트·타입 검사·CI 실행은 사용자 지시로 보류. 브라우저 편집기 UI 연결과 실제 호스트 보안 구현 미완료.
