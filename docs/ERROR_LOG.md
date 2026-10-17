@@ -1,5 +1,13 @@
 # 에러 기록
 
+## E087 — editor example의 직접 import가 manifest·lockfile importer에 누락됨
+
+- `examples/editor/src/main.tsx`가 `@lexical-tufte/document`와 `@lexical/rich-text`를 직접 import했으나 `examples/editor/package.json`에 둘 다 없었다. lockfile의 `examples/editor` importer에도 직접 선언되지 않았다.
+- 기존 workspace의 전이 의존성/hoisting 때문에 우연히 해석될 가능성과 clean consumer에서 실패할 위험을 구분했다. 이번 점검에서 **직접 의존성 정합성 결함**을 발견했으며 설치 오류가 실제 발생했다고 주장하지 않는다.
+- `c2a8e4a`, `e36382f`에서 두 manifest/lockfile을 동시에 수정했다. `pnpm install --frozen-lockfile`·`pnpm check` 성공 전에는 해결 완료로 처리하지 않는다.
+- 상태: 코드·메타데이터 수정 완료, **검증 대기**. M081 참조.
+
+
 ## E086 — 메뉴 진입 경로별 open guard 누락 (코드 점검에서 발견)
 
 - 선택 위치 보존 리팩터링 직후 우클릭 경로에 `menuOpenRef.current=true`가 중복 삽입되고, `Shift+F10/ContextMenu` 경로에는 삽입되지 않은 것을 소스 재조회에서 발견했다. 같은 문자열 치환의 반복 적용이 원인이었다.
