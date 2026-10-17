@@ -30,6 +30,8 @@ try{
  await click('구분선 삽입');
  const withRule=await snapshot();
  assert.equal(withRule.root.children[1].children.filter(n=>n.type==='horizontalrule').length,1);
+ assert.deepEqual(withRule.root.children[0],merged.root.children[0],'F07 must not mutate the preceding section');
+ assert.deepEqual(withRule.root.children[1].children.filter(n=>n.type!=='horizontalrule'),merged.root.children[1].children,'F07 must preserve every existing block');
  assert.equal(await editor.locator('hr').count(),1);
  const publishedRule=renderArticle({schemaVersion:1,id:'section-rule',locale:'ko-KR',title:'구분선 검증',assets:[],lexicalState:withRule});
  assert.equal(publishedRule.ok,true,JSON.stringify(publishedRule.diagnostics));
