@@ -156,11 +156,27 @@ P1 gate: 완료. 노트 편집 회귀와 SSR 출력의 실제 브라우저 비�
 - [ ] P2.2 F01–F09 노드/속성/commands와 JSON serialization 구현.
   - [x] P2.2.a section 묶기/추가/블록 경계 분할/병합 및 paragraph·h2·h3 명령, 내용 보존·거부 원자성·실제 UI 왕복. [명령 계약](SECTION_COMMANDS_P22A.ko.md), check214개·browser10개·package4개 통과.
   - [ ] P2.2.b F03/F05 인라인 속성 및 F06 목록/정의목록 명령과 회귀.
+    - [ ] P2.2.b.0 editor prototype의 직접 import가 package.json과 pnpm-lock에 명시되는지 확인하고 workspace frozen install/package 경계를 검증한다.
+    - [ ] P2.2.b.1 기존 span kind 변경에 더해 선택 텍스트를 Tufte span으로 **생성·해제**한다. 부분 선택·같은/다른 인라인 부모·link·note·IME의 보존/거부 기준을 명시하고 atomic undo/redo와 HTML roundtrip을 검증한다.
+    - [ ] P2.2.b.2 ul/ol 항목 생성·추가·형태 변경·중첩·들여쓰기·내어쓰기/해제·키보드 Enter/Backspace/Tab 경계(필요한 정책 포함)를 설계·구현한다. 빈 목록/최초·최종 항목, 혼합/중첩 목록, 선택 범위, note payload/ID 보존을 검사한다.
+    - [ ] P2.2.b.3 dl/dt/dd의 추가·수정·삭제·항목 순서 보존을 검증하고 기존 문서·editor·renderer 3경로의 JSON/HTML 왕복을 연결한다.
   - [ ] P2.2.c F07–F09 구분선/section footer/quote·출처/epigraph 명령과 회귀.
+    - [ ] P2.2.c.1 이미 구현된 생성·출처 추가 명령을 기준으로 기존 노드의 속성/내용 수정, 출처·인용 삭제, 복수 epigraph 항목 관리의 지원/거부 경계를 정한다.
+    - [ ] P2.2.c.2 선택 위치·동일 블록 원자성·undo/redo·JSON→발행 HTML·재열기·스크린리더 읽기 순서를 회귀 검증한다.
   - [ ] P2.2.d F01–F09 직렬화·발행 지원 경계 통합 검증. F04 전체 폰트/시각 증거는 P4와 연결.
+    - [ ] P2.2.d.1 `NODE_SCHEMA`에서 허용되는 타입/속성과 editor import/export 및 순수 renderer capability를 기능별 매트릭스로 대조한다. 구현하지 않은 속성은 침묵 변환 대신 진단·발행 차단.
+    - [ ] P2.2.d.2 F01–F09 대표/거부 fixture에 대해 편집→JSON 저장→재열기→HTML 발행→semantic DOM 비교를 실행하고 명령별 history/IME/접근성 증거를 남긴다.
 - [ ] P2.3 F10–F19 노트·그림·표·코드·embed 구현.
+  - [ ] P2.3.a 노트 F10–F12: note 종류 전환/텍스트·이미지 편집/삭제/이동, anchor/ID 일체성, copy/paste/undo/redo, 복수 article 번호와 모바일 fallback.
+  - [ ] P2.3.b 그림·ImageQuilts F13/F14/F19: src/alt/caption/asset ID 수정 및 body/fullwidth/여백 변환, 자산 유실·삭제 시 진단, schema 유효성 보존.
+  - [ ] P2.3.c 표/전체 폭 F15/F16: 셀·헤더·행/열 편집, 스크롤/폭 전환, 병합 거부와 접근 가능한 설명, 좁은 화면 overflow.
+  - [ ] P2.3.d 코드/embed F17/F18: code block·language·fullwidth·공백/탭 및 embed의 provider allowlist/title/aspect ratio/서식 편집. 외부 HTML/sanitization 정책과 통합.
 - [ ] P2.4 JSON 및 HTML import/export, 지원 subset 명시, 손실 진단과 unknown-node 발행 차단.
+  - [ ] P2.4.a 문서 정본(JSON)을 유지하고 외부 Tufte HTML importer의 허용 태그/속성/URL·노트 인접 DOM 계약을 고정한다. 비지원 요소는 삭제하지 않고 위치 있는 진단과 중단/명시적 손실 선택을 제공한다.
+  - [ ] P2.4.b renderer(순수 JSON→HTML), Lexical exportDOM(편집 보조), preview(발행 출력) 간 의미 차이를 fixture로 검사한다. 발행 정본으로 exportDOM을 사용하지 않는다.
 - [ ] P2.5 schema migration fixture, malformed 입력·ID 충돌·참조 오류 검증.
+  - [ ] P2.5.a schemaVersion·stored format·Lexical 노드 버전을 분리해 지원 버전별 명시적 migration과 실패 시 원본 복원/백업을 검증한다.
+  - [ ] P2.5.b duplicate note/asset ID·깨진 참조·URL·unknown fields·깊이/크기 상한·취소/부분 저장 입력을 검증한다.
 
 P2 gate: F01–F19의 데이터 보존 및 구조 검증 통과. 편집·시각 증거 전에는 F표를 완료 처리하지 않는다.
 
@@ -171,9 +187,15 @@ P2 gate: F01–F19의 데이터 보존 및 구조 검증 통과. 편집·시각 
 - [ ] P3.1.b 텍스트 선택 영역에 Floating Toolbar를 제공한다. 굵게·기울임·밑줄·링크·코드·강조·Sidenote/Marginnote 삽입을 문맥에 맞게 노출한다. 비어 있거나 접힌 선택, 주석 내부, IME 조합 중에는 적절히 숨기거나 제한한다.
 - [ ] P3.1.c 블록 컨텍스트 메뉴를 제공한다. 문단·제목·인용문·목록·그림·주석의 종류와 스키마에 따라 가능한 변환·편집 명령만 표시한다. 지원하지 않는 변환은 숨기거나 사유를 알리고 원본 내용을 보존한다.
 - [ ] P3.1.d 선택 영역 보존, 포커스 복귀, 키보드 열기/닫기(Escape), 스크린리더, 툴바 위치·화면 가장자리, 모바일 터치·IME 및 undo/redo를 회귀 검증한다. 우클릭 메뉴와 선택 영역 툴바의 동작을 구분한다.
+- [ ] P3.1.e `examples/editor`에 집중된 액션/선택/노트 도구·상태를 `packages/editor-react` 재사용 가능한 컴포넌트와 hook/API로 이동한다. 호스트 props(`value/onChange/onError/assetAdapter/readonly`), lifecycle/unmount·초안 교체·여러 편집기 독립성, accessibility contract를 공개 예제로 검증한다. 예제는 소비자여야 하며 역의존 금지.
+- [ ] P3.1.f 편집 툴바는 핵심 서식만 기본 노출, 삽입 메뉴·문맥 메뉴·figure/note 속성 패널로 작업을 분산한다. 섹션·목록·주석·그림·인용·코드를 발견/생성/수정하는 작업 경로를 1개 문서 showcase에서 모두 실연한다. 기존 테스트의 역할·이름 변경은 접근성 계약과 함께 명시적으로 이관한다.
 - [ ] P3.2 키보드·focus·selection·clipboard·undo/redo·한국어 IME·모바일 터치.
 - [ ] P3.3 동일 렌더러로 preview, draft 복구·dirty state·오류 표시.
+  - [ ] P3.3.a `renderArticle` 정본 결과를 독립 sandbox/격리 스타일의 preview로 보여 주고 발행 실패 진단을 위치·원인과 연결한다. JSON/HTML 텍스트 표시를 실제 미리보기로 오인하지 않는다.
+  - [ ] P3.3.b 로컬 복구본 목록·선택적 복원·복원 전 diff/확인, dirty/saving/saved/error/conflict 표시와 navigate-away 보호, 비공개 draft 및 최종 공개 snapshot 분리를 검증한다.
 - [ ] P3.4 assets 업로드/진행/취소/실패 재시도, alt/caption, 본문/여백/전체 폭 전환.
+  - [ ] P3.4.a `AssetStore` 어댑터와 브라우저 임시 blob/외부 URL/저장 asset ID의 소유권·중복 제거·미참조 회수 기준을 명시한다. 업로드 실패 시 공개본 참조 보호, 취소 후 복구·재시도를 검증한다.
+  - [ ] P3.4.b 파일 MIME 매직바이트·크기 제한·SVG 정책·alt 필수/장식 이미지·캡션 수정/삭제를 테스트하고 외부 URL과 호스트 인증 경계를 유지한다.
 - [ ] P3.5 노트의 모바일 작성 UI는 항상 접근 가능하게 제공; 독자용 접힘 상태와 구분.
 
 P3 gate: 예제 글의 모든 F기능을 HTML 직접 편집 없이 생성·수정·재열기 가능.
@@ -185,18 +207,22 @@ P3 gate: 예제 글의 모든 F기능을 HTML 직접 편집 없이 생성·수�
 - [ ] P4.3 F01–F22 fixture와 공식 baseline 비교, 의도적 차이는 ADR에 명시.
 - [ ] P4.4 CSS 기본 토글 외에 키보드/스크린리더 가능한 progressive enhancement 결정; JS 없어도 내용 접근 fallback 제공.
 - [ ] P4.5 dark/한글 본명조·본고딕 및 fallback/장문·연속 노트/여러 article/좁은 화면 overflow 검증.
+- [ ] P4.6 `packages/theme`를 편집기 DOM·출판 scoped/full-page 2모드에서 재사용할 수 있게 분리한다. 폰트 subset coverage·ET Book 우선순위·font-display·license·패키지 자산 base URL·CSP/no-JS 및 CSS 충돌을 확인한다.
 
 P4 gate: F01–F22 완료 증거 확보, 공개 페이지에 editor dependency가 포함되지 않음.
 
 ### P5 — 블로그 운영 라이브러리 (P4 이후)
 
 - [ ] P5.1 filesystem repository와 asset adapter, 원자적 저장·revision 충돌·초안 복구.
+  - [ ] P5.1.a `packages/adapter-fs` 구현: fsync/원자 rename·expectedRevision CAS·경로/slug 중복·삭제/정리 오류·동시 프로세스 쓰기·복구/백업·Windows 파일명 경계를 테스트한다.
+  - [ ] P5.1.b `packages/blog`의 현 SQLite publication/recovery proof를 실제 호스트 저장소 어댑터와 연결하되 공개 snapshot·초안·편집 세션·복구본 데이터 소유권 및 retention/삭제 규칙을 분리한다.
 - [ ] P5.2 create/edit/preview/publish/update/unpublish/delete; 공개 snapshot과 초안 분리.
 - [ ] P5.3 slug 중복/변경 redirect, 날짜·timezone, 목록·pagination·tag·archive.
 - [ ] P5.4 SEO title/description/canonical/Open Graph, RSS/Atom·sitemap·robots, HTML escape.
 - [ ] P5.5 정적 build, 콘텐츠/자산 누락 검출, 백업·복원 및 포맷 내보내기.
 - [ ] P5.6 호스트가 인증/권한/CSRF/배포를 책임지는 경계 문서화; 예제 관리 API는 인증 또는 로컬 전용으로 제한.
 - [ ] P5.7 업로드 MIME/크기 제한·path traversal 방지·URL protocol allowlist·embed provider 정책·SVG 처리·XSS 회귀 검증.
+- [ ] P5.8 `examples/blog` 소비자 예제로 문서 생성→편집→preview→publish→update→unpublish→restore→delete·검색/목록을 실제 경로로 연결한다. 공개 라우트는 편집 의존성, 초안·복구본·인증 비밀 누출 금지. 호스트의 인증·ACL·Origin/CSRF와 recovery 서비스 연결 책임을 문서화한다.
 
 P5 gate: 실제 예제 블로그에서 작성→발행→수정→비공개→복원 및 revision 충돌 시나리오 통과.
 
@@ -207,6 +233,8 @@ P5 gate: 실제 예제 블로그에서 작성→발행→수정→비공개→�
 - [ ] P6.3 HTML conformance 검사, JSON/HTML roundtrip, 자산 유실·저장 실패·악성 입력 테스트.
 - [ ] P6.4 5만 자·노트 200개 장문 fixture에서 입력/저장/렌더 baseline 측정 후 성능 예산 확정, 회귀 기준 적용.
 - [ ] P6.5 package export/ESM/types/SSR·consumer 설치 smoke test, 브라우저에 Node 전용 모듈이 새지 않는지 검증.
+- [ ] P6.6 문서·기능별 evidence matrix를 유지하며 검증 게이트를 분리한다: 정적 타입/빌드, 명령·JSON·렌더, Playwright UI, 실제 OS IME/터치/스크린리더, SSR/정적 빌드, end-to-end 블로그·복원. 메뉴 단독 통과로 전체 기능 완료를 선언하지 않는다.
+- [ ] P6.7 host 안전성: CSP/Trusted Types 가능 범위, URL/iframe/자산 응답 헤더, 비인가 관리 라우트·CSRF·세션 만료·rate limit, 글과 자산의 백업/복구/삭제 권한을 실제 호스트로 검증한다.
 
 P6 gate: 로컬 빌드·타입 검사·관련 테스트 통과, 남은 결함과 지원 브라우저 범위 명시. 검증 미완료 기능은 지원 완료로 홍보하지 않음.
 
@@ -222,13 +250,20 @@ P6 gate: 로컬 빌드·타입 검사·관련 테스트 통과, 남은 결함과
 
 각 작업 시작·완료 때 [에러 기록](ERROR_LOG.md)과 [재발 방지 대책](ERROR_PREVENTION.md)을 점검한다. 단계 전환과 동일 오류 재발 때는 전체 기록을 점검하고 개선 내역을 남긴다. 오류 기록 → 원인 확인 → 대책 적용 → 관련 검증 → 기록 갱신을 작업 완료 조건에 포함한다.
 
-단계 의존성: P0 → P1 → P2 → P3 → P4 → P5 → P6 → P7. P2 이후 노드 단위로 편집/변환/렌더를 함께 검증해 조기 피드백을 받는다.
+단계 의존성: P0 → P1 → **P2 기능별 닫힘** → P3 재사용 editor UI → P4 독립 발행/테마 → P5 블로그/어댑터 → P6 운영 검증 → P7 출시. 기존 P3 프로토타입은 폐기하지 않고 P2 기능 검증 하네스로 활용하되, 새로운 UI 미관/메뉴 확장은 P2의 데이터/렌더/명령 게이트보다 우선하지 않는다. P2 이후 노드 단위로 editor↔JSON↔render를 함께 검증해 조기 피드백을 받는다.
 
 각 작업은 같은 ID의 이슈로 만들고 수락 조건을 본문에 복사한다. PLAN을 범위·완료 상태의 기준으로 유지하고 이슈는 실행 증거를 연결한다. 이슈 종료와 체크 갱신을 같은 작업 단위로 처리한다. 단계별 추적 이슈를 생성하고 아래 이슈 목록에서 관리한다.
 
 진행 기록 형식: `작업 ID | 상태(todo/in-progress/blocked/done) | 변경 경로/PR | 검증 명령·결과 | 차단 원인 | 다음 작업`. 증거 없이 체크하지 않는다. 문서 수정만으로 구현 작업을 완료하지 않는다.
 
-현재 다음 작업: P2.2.a 완료 후 P2.2.b 인라인·목록 명령, P2.2.c 인용 명령, P2.2.d 통합 검증. P2.1의 33개 노드 계약을 순서대로 편집/발행 구현에 연결한다. 구조 검증 통과와 제품 기능 완료는 구분한다.
+현재 다음 작업(2026-10-17 재점검): **P2.2.b.0 직접 의존성/lockfile 정합성 → P2.2.b.1 span 생성·해제 → P2.2.b.2 목록 중첩/전환 → P2.2.b.3 정의목록**, 이어서 P2.2.c/d. 기존 구현·과거 성공 증거는 재사용하지만 마지막 성공 커밋 이후의 변경은 일괄 검증 전까지 미완료로 둔다. 테스트 작성과 실행을 구분하며 사용자가 보류한 실행은 한 번에 수행한다. P2.1의 33개 노드 계약을 편집/발행에 연결하고 구조 검증 통과와 제품 기능 완료를 구분한다.
+
+## 재점검 통제와 완료 증거
+
+- 설계 재점검은 최소 3가지 독립 관점(기능별 편집/저장/발행 수명주기, 패키지·데이터 소유권, 보안·접근성·운영 실패 모드)에서 **다시 수행**한다. 최초 확인 목록에 없는 반례를 각 관점마다 작성하고 결함/누락·완료 증거를 [계획 재점검 보고서](PLAN_AUDIT_2026-10-17.ko.md)에 남긴다.
+- 한 항목의 완료는 **실제 변경 코드 + 독립 fixture/회귀 + 타입·단위·브라우저 실행 결과 + 검증한 commit SHA + 미지원·환경 제약**을 함께 기록한 후 체크한다. 실행 보류 중에는 구현 상태만 진행 기록으로 보고하고 [ ]를 유지한다.
+- 기본 배치 검증: frozen workspace 설치 → `pnpm check` → `pnpm package:check` → 각 targeted browser → `pnpm test:browser`(직렬) → Python recovery/HTTP(해당 시); 실제 OS IME·터치·스크린리더 수동 검증. 빌드 중 browser 병렬 실행 금지, 서로 다른 Vite port 사용, 성공을 다른 commit으로 전이하지 않는다.
+- P2–P5 모두 성공/거부 예제를 최소 1개씩 둔다. 값이 잘못된 입력에서 저장·발행 상태가 변하지 않는지 및 undo/history를 검사한다. 기능/보안/접근성의 미지원 경계를 명시한다.
 
 ## 주요 위험과 처리
 
