@@ -41,6 +41,9 @@ try{
  assert.equal(await editor.locator('h2').innerText(),'선택 영역 검사');
  await editor.locator('h2').click({button:'right'});await group.waitFor();
  await page.waitForFunction(()=>document.activeElement?.textContent==='본문 문단');
+ const menuBounds=await page.locator('.block-context-menu.is-floating').boundingBox();
+ assert.ok(menuBounds&&menuBounds.x>=0&&menuBounds.y>=0&&menuBounds.x+menuBounds.width<=await page.evaluate(()=>innerWidth)&&menuBounds.y+menuBounds.height<=await page.evaluate(()=>innerHeight),JSON.stringify(menuBounds));
+ await page.waitForFunction(()=>document.activeElement?.textContent==='본문 문단');
  await page.keyboard.press('End');assert.equal(await page.locator(':focus').innerText(),'인용문 삽입');
  await page.keyboard.press('Home');assert.equal(await page.locator(':focus').innerText(),'본문 문단');
  await group.getByRole('button',{name:'제목 h3',exact:true}).click();
