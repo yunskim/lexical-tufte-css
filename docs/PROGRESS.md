@@ -1,3 +1,8 @@
+## P3.1 아이콘 중심 툴바 2차 전환 (일괄 검증 대기)
+
+- `examples/editor/src/main.tsx`: 목록(글머리표/번호), 정의목록, sidenote/marginnote, 인용문 attribution 및 섹션 cite 버튼을 `IconButton`으로 전환. 기존 명령·접근성 이름을 유지했다.
+- SVG 아이콘은 임시 내부 경로를 사용한다. Lucide 일괄 도입, 단축키 레지스트리, 툴바 그룹 및 테스트 실행은 후속 작업이다. CI 생략.
+
 ## P3.1 아이콘 중심 툴바 1차 전환 (일괄 검증 대기)
 
 - `examples/editor/src/main.tsx`: 공통 SVG `ToolbarIcon`·`IconButton` 도입. 굵게·기울임·코드·구분선·실행 취소·다시 실행 및 인용문·Epigraph·섹션 출처를 아이콘 버튼으로 변경. 접근성 이름과 title 툴팁을 유지하여 기존 Playwright 버튼 이름 검색과 호환하도록 작성.
