@@ -25,3 +25,9 @@ app = create_app('recovery.sqlite', policy.authorize)
 ```
 
 위 `host_*` 함수는 예시 이름이며 실제 운영 호스트가 구현해야 한다. `RecoverySecurity` 자체가 로그인 세션이나 CSRF 토큰을 발급하지 않는다. 인증/인가 콜백 예외는 거부 처리한다. 운영용 호스트 구현과 통합 테스트는 아직 미완료다.
+
+## 운영 호스트 조립
+
+`host.py`의 `RecoveryHostConfig`와 `build_recovery_app(config)`를 사용해 세 가지 보안 콜백과 SQLite 경로를 명시적으로 제공한다. 콜백이나 DB 경로가 빠지면 앱 생성을 거부한다. 실제 호스트의 세션/ACL/Origin·CSRF 제공자가 준비되기 전에는 운영 서버 진입점을 만들지 않는다.
+
+`tests/test_host.py`는 누락된 보안 설정 거부 및 명시적 구성 경로를 검사하는 회귀 테스트 코드다. 테스트와 CI는 실행하지 않았다.
