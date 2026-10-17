@@ -1,3 +1,8 @@
+## F07 브라우저 데이터 보존 검증 강화
+
+- `tests/section-commands-browser.mjs`: 실제 React 편집기에서 구분선 삽입 후 이전 섹션 JSON과 기존 본문 블록 JSON이 변경되지 않았는지 검증하는 단언 추가. 삽입·발행·undo/redo 경로는 유지.
+- 현재 컨테이너 재확인: Node 22.16.0, checkout/pnpm 없음, `git ls-remote`는 GitHub DNS 조회 실패. 테스트를 실행하지 않았으며 F07 gate 미완료. CI는 생략.
+
 ## F07 다중 섹션 회귀 및 검증 순서
 
 - 다중 섹션에서 선택된 섹션에만 구분선이 삽입되고 앞 섹션의 JSON은 불변인지 검사하는 테스트 추가.
