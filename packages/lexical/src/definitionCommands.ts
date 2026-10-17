@@ -31,21 +31,25 @@ export function registerDefinitionCommands(editor:LexicalEditor,onDiagnostic?:(d
   const description=$createDefinitionDescriptionNode().append($createParagraphNode().append($createTextNode('설명')));
   return {term,description};
  };
- const strictSelectedPair=()=>{
+ const selectedGroup=()=>{
   const s=selection();if(!s)return null;
   const node=s.anchor.getNode(),list=nearest(node,'tufte-definition-list');
   if(!(list instanceof DefinitionListNode)||!(list.getParent() instanceof SectionNode)||
      list.getParent()?.getParent()?.getType()!=='root')return null;
   const children=list.getChildren();
-  // A dl may legally group multiple dt per dd; do not silently reinterpret those groups as pairs.
-  if(children.length===0||children.length%2!==0||
-     children.some((child,i)=>i%2===0?!(child instanceof DefinitionTermNode):!(child instanceof DefinitionDescriptionNode)))return null;
+  const groups:{terms:DefinitionTermNode[];description:DefinitionDescriptionNode}[]=[];
+  let terms:DefinitionTermNode[]=[];
+  // A group consists of one or more terms followed by exactly one description.
+  for(const child of children){
+   if(child instanceof DefinitionTermNode){terms.push(child);continue;}
+   if(!(child instanceof DefinitionDescriptionNode)||terms.length===0)return null;
+   groups.push({terms,description:child});terms=[];
+  }
+  if(terms.length||groups.length===0)return null;
   const subject=nearest(node,'tufte-term')??nearest(node,'tufte-definition');
   if(!subject||!subject.getParent()?.is(list))return null;
-  const index=children.findIndex(child=>child.is(subject));
-  if(index<0)return null;
-  const start=index-(index%2);
-  return {list,children,term:children[start] as DefinitionTermNode,description:children[start+1] as DefinitionDescriptionNode,pairIndex:start/2,pairCount:children.length/2};
+  const groupIndex=groups.findIndex(group=>group.description.is(subject)||group.terms.some(term=>term.is(subject)));
+  return groupIndex<0?null:{list,groups,group:groups[groupIndex]!,groupIndex};
  };
  const registrations=[
   editor.registerCommand(INSERT_TUFTE_DEFINITION_LIST_COMMAND,()=>{
@@ -68,34 +72,37 @@ export function registerDefinitionCommands(editor:LexicalEditor,onDiagnostic?:(d
    const {term,description}=pair();list.append(term,description);term.selectStart();return true;
   },COMMAND_PRIORITY_EDITOR),
   editor.registerCommand(REMOVE_TUFTE_DEFINITION_PAIR_COMMAND,()=>{
-   const group=strictSelectedPair();
-   if(!group)return reject('정의목록의 연속된 용어·설명 쌍 안에서만 삭제할 수 있습니다.');
-   if(group.pairCount===1)return reject('마지막 정의 쌍은 남겨두어 빈 정의목록을 만들지 않습니다.');
-   // Select a surviving term before removing the active nodes, avoiding a dangling caret.
-   const survivor=group.children[(group.pairIndex===group.pairCount-1?group.pairIndex-1:group.pairIndex+1)*2] as DefinitionTermNode;
+   const selected=selectedGroup();
+   if(!selected)return reject('유효한 용어 그룹과 설명을 선택하세요.');
+   if(selected.groups.length===1)return reject('마지막 정의 그룹은 남겨두어 빈 정의목록을 만들지 않습니다.');
+   const {group,groups,groupIndex}=selected;
+   const survivor=groups[groupIndex===groups.length-1?groupIndex-1:groupIndex+1]!.terms[0]!;
    $addUpdateTag(HISTORY_PUSH_TAG);
    group.description.remove();
-   group.term.remove();
+   for(const term of group.terms)term.remove();
    survivor.selectStart();
    return true;
   },COMMAND_PRIORITY_EDITOR),
   editor.registerCommand(MOVE_TUFTE_DEFINITION_PAIR_COMMAND,direction=>{
    if(direction!=='up'&&direction!=='down')return reject('지원하지 않는 정의목록 이동 방향입니다.');
-   const group=strictSelectedPair();
-   if(!group)return reject('정의목록의 연속된 용어·설명 쌍 안에서만 이동할 수 있습니다.');
-   if(direction==='up'&&group.pairIndex===0||direction==='down'&&group.pairIndex===group.pairCount-1)
+   const selected=selectedGroup();
+   if(!selected)return reject('유효한 용어 그룹과 설명을 선택하세요.');
+   const {group,groups,groupIndex}=selected;
+   if(direction==='up'&&groupIndex===0||direction==='down'&&groupIndex===groups.length-1)
     return reject('정의목록의 처음/끝을 넘어서는 이동은 지원하지 않습니다.');
    $addUpdateTag(HISTORY_PUSH_TAG);
    if(direction==='up'){
-    const previous=group.children[(group.pairIndex-1)*2] as DefinitionTermNode;
-    group.term.insertBefore(previous);
-    group.description.insertAfter(group.term);
+    const previousFirst=groups[groupIndex-1]!.terms[0]!;
+    for(const term of group.terms)term.insertBefore(previousFirst);
+    group.description.insertBefore(previousFirst);
    }else{
-    const nextDescription=group.children[(group.pairIndex+1)*2+1] as DefinitionDescriptionNode;
-    group.term.insertAfter(nextDescription);
-    group.description.insertAfter(group.term);
+    const nextDescription=groups[groupIndex+1]!.description;
+    // Repeated insertAfter reverses order; advance the insertion anchor instead.
+    let after:LexicalNode=nextDescription;
+    for(const node of [...group.terms,group.description]){
+     after.insertAfter(node);after=node;
+    }
    }
-   // The content nodes retain their keys, so a caret within either child stays valid.
    return true;
   },COMMAND_PRIORITY_EDITOR)
  ];
