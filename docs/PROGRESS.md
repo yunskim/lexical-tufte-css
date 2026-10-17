@@ -1,3 +1,9 @@
+## 2026-10-17 P2.2.c 구분선 명령 추가 (검증 대기)
+
+- `packages/lexical/src/quotationCommands.ts`: `INSERT_TUFTE_HORIZONTAL_RULE_COMMAND` 추가. 선택·조합·섹션 경계 검증 후 공식 Lexical HorizontalRuleNode 삽입, history 경계 표시.
+- `packages/lexical/src/index.ts`: 공개 명령 export 추가.
+- 이번 변경은 아직 타입 검사·빌드·단위/브라우저 테스트를 실행하지 않았다. F07 완료 판정 보류. 다음 단계: 명령 회귀·UI 연결·F07–F09 통합 검증.
+
 # 진행 기록
 
 ## 2026-10-17 Recovery HTTP 추가 검증 종료
