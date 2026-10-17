@@ -1,4 +1,4 @@
-import {$addUpdateTag,$getSelection,$isRangeSelection,createCommand,COMMAND_PRIORITY_EDITOR,HISTORY_PUSH_TAG,type LexicalCommand,type LexicalEditor,type LexicalNode} from 'lexical';
+import {$addUpdateTag,$createParagraphNode,$getSelection,$isRangeSelection,createCommand,COMMAND_PRIORITY_EDITOR,HISTORY_PUSH_TAG,type LexicalCommand,type LexicalEditor,type LexicalNode} from 'lexical';
 import {$createListNode,$createListItemNode,ListNode,ListItemNode} from '@lexical/list';
 import {SectionNode} from './LayoutNodes.js';
 import {$getContainingNote} from './noteOperations.js';
@@ -11,6 +11,8 @@ export const APPEND_TUFTE_LIST_ITEM_COMMAND:LexicalCommand<void>=createCommand('
 export const SET_TUFTE_LIST_KIND_COMMAND:LexicalCommand<TufteListKind>=createCommand('SET_TUFTE_LIST_KIND');
 /** Adjust nesting by one level using Lexical's structural ListItemNode indent operation. */
 export const CHANGE_TUFTE_LIST_INDENT_COMMAND:LexicalCommand<'indent'|'outdent'>=createCommand('CHANGE_TUFTE_LIST_INDENT');
+/** Turn a flat section-level list into paragraphs, retaining inline children and note identities. */
+export const UNWRAP_TUFTE_LIST_COMMAND:LexicalCommand<void>=createCommand('UNWRAP_TUFTE_LIST');
 
 /** Conservative list commands: preserve existing content and reject unsupported selections. */
 export function registerListCommands(editor:LexicalEditor,onDiagnostic?:(diagnostic:Diagnostic)=>void):()=>void{
@@ -76,6 +78,30 @@ export function registerListCommands(editor:LexicalEditor,onDiagnostic?:(diagnos
     return reject('최상위 목록에서는 내어쓰기를 할 수 없습니다.');
    $addUpdateTag(HISTORY_PUSH_TAG);
    item.setIndent(depth+(direction==='indent'?1:-1));
+   return true;
+  },COMMAND_PRIORITY_EDITOR),
+  editor.registerCommand(UNWRAP_TUFTE_LIST_COMMAND,()=>{
+   const s=selected();if(!s)return reject('해제할 목록 안의 한 위치를 선택하세요.');
+   const list=ancestor(s.anchor.getNode(),'list');
+   if(!(list instanceof ListNode)||list.getListType()==='check'||!(list.getParent() instanceof SectionNode)||
+      list.getParent()?.getParent()?.getType()!=='root')
+    return reject('최상위 섹션에 직접 속한 목록만 문단으로 해제할 수 있습니다.');
+   const items=list.getChildren();
+   const allowed=NODE_SCHEMA.paragraph?.children;
+   if(items.length===0||items.some(item=>!(item instanceof ListItemNode)||
+       item.getIndent()!==0||item.getChildren().some(child=>!allowed?.includes(child.getType()))))
+    return reject('중첩 목록·지원하지 않는 자식이 있는 항목은 내용 보존을 위해 해제하지 않습니다.');
+   const selectedItem=ancestor(s.anchor.getNode(),'listitem');
+   const selectedIndex=items.findIndex(item=>item.is(selectedItem));
+   $addUpdateTag(HISTORY_PUSH_TAG);
+   const paragraphs=items.map(item=>{
+    const paragraph=$createParagraphNode();
+    list.insertBefore(paragraph);
+    paragraph.append(...item.getChildren());
+    return paragraph;
+   });
+   list.remove();
+   paragraphs[Math.max(0,selectedIndex)]?.selectStart();
    return true;
   },COMMAND_PRIORITY_EDITOR)
  ];
