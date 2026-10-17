@@ -1,3 +1,9 @@
+## P3.1.c 실제 메뉴 크기 기반 화면 경계 보정 (검증 대기)
+
+- `examples/editor/src/main.tsx`: 열려 있는 블록 메뉴의 실제 DOM 크기를 측정하여 viewport 안으로 보정하고 resize 때 재계산한다.
+- `tests/contextual-ui-browser.mjs`: 우클릭 메뉴 첫 버튼 포커스와 bounding box의 viewport 내 위치를 검사한다.
+- 새 테스트는 아직 실행하지 않았다. 기존 통과 결과와 구분하며 CI는 생략한다.
+
 ## P3.1.c 블록 메뉴 Home/End 및 우클릭 포커스 회귀 추가 (실행 대기)
 
 - `tests/contextual-ui-browser.mjs`: 키보드 메뉴의 End→Home→ArrowDown 이동, 우클릭 메뉴의 첫 버튼 포커스와 End→Home 이동 검사를 추가했다.
