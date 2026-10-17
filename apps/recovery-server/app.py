@@ -88,7 +88,8 @@ def create_app(db_file: str, authorize: Callable[[Request, str], bool]):
             if not allowed:
                 return reject('RECOVERY_ACCESS_DENIED', 403)
             request.state.recovery_authorized_post = post_id
-        if request.method in ('PUT', 'DELETE') and recovery_route:
+        mutation_route = recovery_route and len(parts) == 5
+        if request.method in ('PUT', 'DELETE') and mutation_route:
             length = request.headers.get('content-length')
             if length is not None and (not length.isdecimal() or int(length) > 2_100_000):
                 return reject('RECOVERY_REQUEST_TOO_LARGE', 413)
