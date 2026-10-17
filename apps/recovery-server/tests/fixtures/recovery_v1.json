@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "postId": "post-1",
+  "sessionId": "session-1",
+  "save": {
+    "postId": "post-1",
+    "sessionId": "session-1",
+    "sequence": 1,
+    "expectedSequence": 0,
+    "baseRevision": 0,
+    "savedAt": "2026-10-17T09:00:00Z",
+    "payload": "{\"draft\":true}"
+  },
+  "delete": {
+    "expectedSequence": 1
+  },
+  "errors": {
+    "conflict": {
+      "status": 409,
+      "code": "RECOVERY_CONFLICT"
+    },
+    "invalid": {
+      "status": 400,
+      "code": "INVALID_RECOVERY_INPUT"
+    },
+    "denied": {
+      "status": 403,
+      "code": "RECOVERY_ACCESS_DENIED"
+    },
+    "integrity": {
+      "status": 422,
+      "code": "RECOVERY_INTEGRITY_ERROR"
+    }
+  }
+}
