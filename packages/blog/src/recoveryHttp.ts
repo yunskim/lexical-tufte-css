@@ -36,7 +36,7 @@ export async function handleRecoveryRequest(service:AuthorizedRecoveryService,re
    typeof request.body.expectedSequence!=='number')
    return failure('INVALID_RECOVERY_INPUT','Recovery identity or expected sequence mismatch',400);
   const {expectedSequence,...slot}=request.body;
-  result=await service.save(slot as Omit<RecoverySlot,'checksum'>,expectedSequence);
+  result=await service.save(slot as unknown as Omit<RecoverySlot,'checksum'>,expectedSequence);
  }else{
   if(request.sessionId===undefined||!object(request.body)||typeof request.body.expectedSequence!=='number')
    return failure('INVALID_RECOVERY_INPUT','Expected deletion sequence',400);
