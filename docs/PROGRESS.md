@@ -1,3 +1,9 @@
+## P2.2.c F07 JSON 복원·History 회귀 추가
+
+- `quotation-commands.test.mjs`에 공식 History 등록 후 구분선 삽입/undo/redo 및 새 headless editor의 JSON 복원 동등성 검사 추가.
+- 기존 정상 삽입·거부 회귀와 함께 F07 구조 보존 검증 범위를 확장했다.
+- **테스트 코드는 작성했으나 이번 턴에 실행하지 않았다.** 타입/빌드/HTML 발행/React UI 연결 및 브라우저 검증은 미완료. F07 전체 체크 유지.
+
 ## P2.2.c F07 구분선 명령 회귀 추가
 
 - `packages/lexical/test/quotation-commands.test.mjs`: 섹션 안 구분선 삽입 후 기존 문단 보존 및 JSON `horizontalrule` 노드 검증, 섹션 밖 선택에서 원자적 거부·진단 검증.
