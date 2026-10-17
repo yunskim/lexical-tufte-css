@@ -1,3 +1,9 @@
+## P3.1.b 선택 영역 Floating Toolbar 초안 (구현·검증 대기)
+
+- `examples/editor/src/main.tsx`: 선택 영역이 비어 있지 않고 편집기 내부이며 IME 조합 중이 아닐 때 `SelectionToolbar`를 렌더링한다. 공통 `INLINE_ACTIONS`를 재사용해 여섯 가지 인라인 서식을 제공한다. selectionchange, editor update, scroll, resize에서 위치를 갱신한다.
+- `examples/editor/src/style.css`: 화면 고정 위치, 다크 모드, 수평 스크롤 및 버튼 최소 크기를 추가했다.
+- 아직 실제 브라우저 테스트 미실행. 키보드만으로 접근, 화면 경계, 포커스 보존, note 문맥, 모바일 터치, 블록 컨텍스트 메뉴는 후속 검증·구현 대상. CI 생략.
+
 ## P3.1.a 인라인 명령 목록 통합 (검증 대기)
 
 - `examples/editor/src/main.tsx`: underline/strikethrough/highlight 아이콘 전환 및 6개 인라인 서식의 `INLINE_ACTIONS` 공통 목록 도입. 공통 목록은 향후 Floating Toolbar가 재사용할 기준이다.
