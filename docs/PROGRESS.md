@@ -1,3 +1,9 @@
+## 2026-10-18 P2.2.b.2-K3 Backspace 첫 빈 목록 항목 경계 (검증 대기)
+
+- 최상위 섹션 직계 ul/ol의 **첫 빈 항목**에 한해 Backspace를 소비한다. 다음 항목이 있으면 빈 첫 항목만 삭제하고 다음 항목으로 커서를 이동하며, 유일한 빈 항목이면 목록을 빈 문단으로 교체한다. 그 외 일반 텍스트/중간 항목/중첩/노트/IME는 Lexical에 위임한다. [구현 `f1f2fd5`](https://github.com/yunskim/lexical-tufte-css/commit/f1f2fd5ad03d78f1e23dbc8211a9301b51886316).
+- [회귀 코드 `abb2622`](https://github.com/yunskim/lexical-tufte-css/commit/abb2622d06b7f701ecc2eeaf96d671f021864ca6): 다음 항목과 note ID 보존, 유일한 빈 목록 전환, 비어 있지 않은/중간/IME/목록 밖 무개입. [계약](LIST_COMMANDS_P22B.ko.md) 갱신.
+- **실제 테스트 미실행, CI 생략**. 일반 항목 시작 병합, 중첩 목록 경계, 키보드 browser E2E는 미완료로 유지한다.
+
 ## 2026-10-18 P2.2.b.2-K2 Enter 마지막 빈 목록 항목 종료 (검증 대기)
 
 - `registerListKeyboardCommands`에 보수적 Enter 분기를 구현했다. 최상위 섹션 직계 ul/ol의 **마지막 빈 항목**에서만 목록을 종료하고 목록 뒤에 문단을 만든다. 유일한 항목이었다면 빈 목록을 제거한다. 텍스트 분할·중간 항목·중첩 목록·IME·노트·수정키는 Lexical 기본 처리에 위임한다. [구현 `ce17ca0`](https://github.com/yunskim/lexical-tufte-css/commit/ce17ca0de076c1c3e49b9ffa84cca2c0201b23a6).
