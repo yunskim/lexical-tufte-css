@@ -96,6 +96,8 @@ export function registerListCommands(editor:LexicalEditor,onDiagnostic?:(diagnos
    $addUpdateTag(HISTORY_PUSH_TAG);
    const paragraphs=items.map(item=>{
     const paragraph=$createParagraphNode();
+    paragraph.setDirection(item.getDirection()).setFormat(item.getFormatType()).setIndent(item.getIndent())
+      .setTextFormat(item.getTextFormat()).setTextStyle(item.getTextStyle());
     list.insertBefore(paragraph);
     paragraph.append(...item.getChildren());
     return paragraph;
