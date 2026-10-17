@@ -134,6 +134,9 @@ function BlockContextMenu(){
    if(editor.isComposing())return;
    const target=event.target;
    if(!(target instanceof Node)||!root.contains(target))return;
+   const element=target instanceof Element?target:target.parentElement;
+   // Do not steal the native menu from atomic media, table cells or note editors.
+   if(element?.closest('figure, img, table, [data-tufte-editor="table-layout"], .tufte-note-editor, [contenteditable="false"]'))return;
    const caret=document.caretPositionFromPoint?.(event.clientX,event.clientY);
    const legacy=document.caretRangeFromPoint?.(event.clientX,event.clientY);
    const node=caret?.offsetNode??legacy?.startContainer;
@@ -147,7 +150,7 @@ function BlockContextMenu(){
    editor.update(()=>{
     const selection=$createRangeSelection();
     selection.applyDOMRange(range);
-    valid=selection.isCollapsed()&&!containingNote(selection.anchor.getNode());
+    valid=selection.isCollapsed()&&!containingNote(selection.anchor.getNode())&&selection.anchor.getNode().getType()!=='root';
     if(valid)$setSelection(selection);
    },{discrete:true});
    if(!valid)return;
