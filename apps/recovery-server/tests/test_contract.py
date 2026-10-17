@@ -69,3 +69,16 @@ def test_contract_rejects_content_type_and_oversized_body(tmp_path):
     assert huge.status_code == 413
     assert huge.headers["cache-control"] == "no-store"
     assert huge.json()["diagnostics"][0]["code"] == "RECOVERY_REQUEST_TOO_LARGE"
+
+def test_strict_integer_and_route_error_envelopes(tmp_path):
+    client = setup(tmp_path)
+    for invalid in ("1", True, 1.0):
+        response = client.put(BASE + "/session-1", json=draft(sequence=invalid))
+        assert response.status_code == 400
+        assert response.json()["diagnostics"][0]["code"] == "INVALID_RECOVERY_INPUT"
+    missing = client.get("/unknown-route")
+    assert missing.status_code == 404
+    assert missing.json()["diagnostics"][0]["code"] == "RECOVERY_ROUTE_NOT_FOUND"
+    method = client.post(BASE)
+    assert method.status_code == 405
+    assert method.json()["diagnostics"][0]["code"] == "RECOVERY_METHOD_NOT_ALLOWED"
