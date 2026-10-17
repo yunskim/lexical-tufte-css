@@ -87,6 +87,36 @@ try{
  assert.match(publishedUnwrapped.html,/Second list item/);
  await page.getByRole('button',{name:'실행 취소',exact:true}).click();
  assert.deepEqual(await snapshot(),flattened,'Undo restores the flat list after unwrap');
+ // Keyboard boundary regression: keep the published list roundtrip above intact.
+ // Start from a normal paragraph so the list shortcut never steals toolbar focus.
+ await editor.locator('section').last().locator('p').last().click();
+ await action('글머리표 목록 삽입').click();
+ await page.keyboard.insertText('Keyboard first');
+ await action('목록 항목 추가').click();
+ await page.keyboard.insertText('Keyboard second');
+ const keyboardList=editor.locator('section ul').last();
+ await keyboardList.locator('li').last().click();
+ await page.keyboard.press('Tab');
+ await page.waitForFunction(()=>[...document.querySelectorAll('.editor section ul ul li')].some(li=>li.textContent?.includes('Keyboard second')));
+ await page.keyboard.press('Shift+Tab');
+ await page.waitForFunction(()=>[...document.querySelectorAll('.editor section ul > li')].some(li=>li.textContent?.includes('Keyboard second')));
+ await keyboardList.locator('li').last().click();
+ await action('목록 항목 추가').click();
+ await page.keyboard.press('Enter');
+ await page.waitForFunction(()=>[...document.querySelectorAll('.editor section p')].some(p=>p.previousElementSibling?.tagName==='UL'));
+ const afterEnter=await snapshot();
+ assert.ok(extractList(afterEnter),'Other lists remain after keyboard exit');
+ assert.match(JSON.stringify(afterEnter),/Keyboard first/);
+ assert.match(JSON.stringify(afterEnter),/Keyboard second/);
+ // Browser Backspace: empty first item must be removed without touching the next.
+ await editor.locator('section').last().locator('p').last().click();
+ await action('글머리표 목록 삽입').click();
+ await action('목록 항목 추가').click();
+ await page.keyboard.insertText('Keep after Backspace');
+ const backspaceList=editor.locator('section ul').last();
+ await backspaceList.locator('li').first().click();
+ await page.keyboard.press('Backspace');
+ await page.waitForFunction(()=>[...document.querySelectorAll('.editor section ul')].some(ul=>ul.querySelectorAll(':scope > li').length===1&&ul.textContent?.includes('Keep after Backspace')));
  assert.deepEqual(errors,[]);
  console.log('P2.2.b list browser: ul/ol conversion, structural indent/outdent, safe unwrap, history, save/reopen, renderer, reject PASS.');
 }finally{await browser?.close();server.kill();}
