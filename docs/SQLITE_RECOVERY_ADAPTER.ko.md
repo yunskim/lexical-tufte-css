@@ -56,3 +56,10 @@
 - `handleRecoveryRequest(service,request,guard)`의 선택적 `RecoveryRequestGuard`를 추가했다. guard는 실제 호스트가 사용자 인증·Origin/CSRF를 확인하는 함수이며, false/예외는 403으로 거부한다.
 - **guard 생략은 기존 API 호환용이며 안전한 배포 설정이 아니다.** 공개 HTTP 라우트는 반드시 guard를 제공하고, 그 외에도 `AuthorizedRecoveryService`의 글·세션 권한 검사를 유지해야 한다.
 - `packages/blog/test/recovery-http.test.mjs`에 거부/예외/허용 분기 회귀 코드를 작성했다. 실행 검증 대기, CI 생략.
+
+## Fetch 라우트 어댑터 (실행 검증 대기)
+
+- `packages/blog/src/recoveryFetch.ts`의 `handleRecoveryFetch(service, request, {authorizeRequest})`는 호스트 Fetch API Request/Response 경계다. 호스트는 실제 인증·Origin/CSRF를 수행하는 콜백을 반드시 제공한다.
+- `/posts/:postId/recoveries[/:sessionId]`에 대해 GET/PUT/DELETE를 매핑한다. JSON Content-Type, 2.1MB 본문 상한, `Cache-Control: no-store`를 적용한다.
+- 별도 `AuthorizedRecoveryService`에서 게시글/세션별 권한 검사를 계속 수행해야 한다. `authorizeRequest:()=>true`는 테스트용으로만 사용하고 운영에 사용하지 않는다.
+- `packages/blog/test/recovery-fetch.test.mjs` 회귀 코드 추가. 테스트/타입 검사/CI 미실행. 실제 호스트 인증 미들웨어, 서버 listener, 브라우저 네트워크 연결은 미구현.
