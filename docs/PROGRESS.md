@@ -1,3 +1,9 @@
+## P2.2.c F07 구분선 명령 회귀 추가
+
+- `packages/lexical/test/quotation-commands.test.mjs`: 섹션 안 구분선 삽입 후 기존 문단 보존 및 JSON `horizontalrule` 노드 검증, 섹션 밖 선택에서 원자적 거부·진단 검증.
+- 명령은 공개 API에 연결되어 있다. **이번 추가 코드의 테스트/타입 검사/브라우저 검증은 실행하지 않았으며 F07 완료 판정은 보류**한다.
+- 다음: 실제 HistoryPlugin undo/redo 및 발행 HTML 통합, React 툴바 명령 연결 검증.
+
 ## 2026-10-17 P2.2.c 구분선 명령 추가 (검증 대기)
 
 - `packages/lexical/src/quotationCommands.ts`: `INSERT_TUFTE_HORIZONTAL_RULE_COMMAND` 추가. 선택·조합·섹션 경계 검증 후 공식 Lexical HorizontalRuleNode 삽입, history 경계 표시.
