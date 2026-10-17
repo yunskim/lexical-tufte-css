@@ -155,7 +155,7 @@ P1 gate: 완료. 노트 편집 회귀와 SSR 출력의 실제 브라우저 비�
 - [x] P2.1 envelope·metadata·asset·노드 schema 및 validator 구현. 증거: packages/document, DOCUMENT_SCHEMA_V1.ko.md, document-contract.test.mjs, PROGRESS.md.
 - [ ] P2.2 F01–F09 노드/속성/commands와 JSON serialization 구현.
   - [x] P2.2.a section 묶기/추가/블록 경계 분할/병합 및 paragraph·h2·h3 명령, 내용 보존·거부 원자성·실제 UI 왕복. [명령 계약](SECTION_COMMANDS_P22A.ko.md), check214개·browser10개·package4개 통과.
-  - [ ] P2.2.b F03/F05 인라인 속성 및 F06 목록/정의목록 명령과 회귀.
+  - [ ] P2.2.b F03/F05 인라인 속성 및 F06 목록/정의목록 명령과 회귀. [추적 이슈 #9](https://github.com/yunskim/lexical-tufte-css/issues/9).
     - [ ] P2.2.b.0 editor prototype의 직접 import가 package.json과 pnpm-lock에 명시되는지 확인하고 workspace frozen install/package 경계를 검증한다.
     - [ ] P2.2.b.1 기존 span kind 변경에 더해 선택 텍스트를 Tufte span으로 **생성·해제**한다. 부분 선택·같은/다른 인라인 부모·link·note·IME의 보존/거부 기준을 명시하고 atomic undo/redo와 HTML roundtrip을 검증한다.
     - [ ] P2.2.b.2 ul/ol 항목 생성·추가·형태 변경·중첩·들여쓰기·내어쓰기/해제·키보드 Enter/Backspace/Tab 경계(필요한 정책 포함)를 설계·구현한다. 빈 목록/최초·최종 항목, 혼합/중첩 목록, 선택 범위, note payload/ID 보존을 검사한다.
