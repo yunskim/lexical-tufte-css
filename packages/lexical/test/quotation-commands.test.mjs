@@ -244,3 +244,25 @@ test('F07 section footer cite insertion is semantic and duplicate-safe',()=>{
  assert.equal(diagnostics.at(-1)?.code,'INVALID_QUOTATION_SELECTION');
  dispose();
 });
+
+test('F07 section cite survives JSON save and reload without changing adjacent content',async()=>{
+ const {editor,diagnostics,dispose}=setup();
+ editor.update(()=>{
+  const text=$createTextNode('unchanged body');
+  $getRoot().append($createSectionNode().append($createParagraphNode().append(text)));
+  text.selectEnd();
+ },{discrete:true});
+ editor.update(()=>editor.dispatchCommand(INSERT_TUFTE_QUOTATION_COMMAND,'section-footer'),{discrete:true});
+ editor.update(()=>editor.dispatchCommand(APPEND_TUFTE_SECTION_CITE_COMMAND,undefined),{discrete:true});
+ const saved=editor.getEditorState().toJSON();
+ const children=saved.root.children[0].children;
+ assert.equal(children[0].children[0].text,'unchanged body');
+ assert.equal(children[1].type,'tufte-section-footer');
+ assert.equal(children[1].children.at(-1).type,'tufte-cite');
+ const restored=createHeadlessEditor({namespace:'section-cite-restore',nodes:TUFTE_NODES,onError(error){throw error;}});
+ restored.setEditorState(restored.parseEditorState(JSON.stringify(saved)));
+ await new Promise(resolve=>setImmediate(resolve));
+ assert.deepEqual(restored.getEditorState().toJSON(),saved);
+ assert.equal(diagnostics.length,0);
+ dispose();
+});
