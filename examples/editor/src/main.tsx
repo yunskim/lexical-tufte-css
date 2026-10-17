@@ -113,6 +113,26 @@ function EditorUI(){
       window.removeEventListener('storage',onStorage);
     };
   },[editor,sessionKey]);
+  function exportRecovery(){
+    try{
+      const entries=recoveryKeys().map(key=>({key,raw:localStorage.getItem(key)}))
+        .filter((item):item is {key:string;raw:string}=>item.raw!==null);
+      if(entries.length===0){setStatus('내보낼 복구본이 없습니다.');return;}
+      const choice=window.prompt('내보낼 복구본 번호 (취소하면 유지):\\n'+
+        entries.map((entry,index)=>index+': '+entry.key.slice(-12)).join('\\n'),'0');
+      if(choice===null)return;
+      const selected=/^(0|[1-9][0-9]*)$/.test(choice)?entries[Number(choice)]:undefined;
+      if(!selected){setStatus('올바른 복구본 번호를 입력하세요.');return;}
+      // Export the exact stored bytes without attempting to parse a possibly damaged draft.
+      const blob=new Blob([selected.raw],{type:'application/json'});
+      const url=URL.createObjectURL(blob);
+      const link=document.createElement('a');
+      link.href=url;link.download='lexical-tufte-recovery-'+selected.key.slice(-12)+'.json';
+      document.body.appendChild(link);
+      try{link.click();setStatus('선택한 복구본의 다운로드를 요청했습니다.');}
+      finally{link.remove();setTimeout(()=>URL.revokeObjectURL(url),60_000);}
+    }catch{setStatus('복구본 내보내기에 실패했습니다.');}
+  }
   function deleteRecovery(){
     try{
       const entries=recoveryKeys().map(key=>{
@@ -376,7 +396,7 @@ function EditorUI(){
     </main>
     <p role="status">{status}</p><p role="status" aria-label="자동 복구 저장 상태">{autoSaveState}</p>
     {structureIssues.length>0&&<aside role="alert" aria-label="문서 구조 복구"><p>문서 구조를 수정하세요. 내용은 자동 삭제하지 않으며 HTML 생성은 차단됩니다.</p><ul>{structureIssues.map((issue,i)=><li key={`${issue.key}-${i}`}><button onClick={()=>focusStructureIssue(editor,issue.key)}>{issue.message}</button> <code>{issue.path}</code></li>)}</ul><button onClick={()=>editor.dispatchCommand(UNDO_COMMAND,undefined)}>구조 변경 실행 취소</button><button onClick={recoverStructure} disabled={!checkpoint.current}>마지막 정상 구조로 복구</button></aside>}
-    <div className="actions"><button onClick={save}>저장</button><button onClick={restore}>불러오기</button><button onClick={restoreRecovery} disabled={!recoveryAvailable}>복구용 사본 열기</button><button onClick={deleteRecovery} disabled={!recoveryAvailable}>복구본 정리</button><button onClick={exportDocument}>JSON·HTML 확인</button><button onClick={()=>{editor.update($loadLayoutFixture,{tag:HISTORY_PUSH_TAG});setStatus('레이아웃 예제를 불러왔습니다. 실행 취소할 수 있습니다.');}}>레이아웃 예제 불러오기</button></div>
+    <div className="actions"><button onClick={save}>저장</button><button onClick={restore}>불러오기</button><button onClick={restoreRecovery} disabled={!recoveryAvailable}>복구용 사본 열기</button><button onClick={exportRecovery} disabled={!recoveryAvailable}>복구본 JSON 내보내기</button><button onClick={deleteRecovery} disabled={!recoveryAvailable}>복구본 정리</button><button onClick={exportDocument}>JSON·HTML 확인</button><button onClick={()=>{editor.update($loadLayoutFixture,{tag:HISTORY_PUSH_TAG});setStatus('레이아웃 예제를 불러왔습니다. 실행 취소할 수 있습니다.');}}>레이아웃 예제 불러오기</button></div>
     <details><summary>JSON과 발행 HTML 검사</summary><label>JSON<textarea ref={textarea} aria-label="문서 JSON" value={json} readOnly/></label><label>HTML<textarea aria-label="발행 HTML" value={html} readOnly/></label></details>
     <p className="notice">프로토타입: 공개 발행·모바일 여백 배치·OS별 실제 IME와 다른 브라우저 검증은 후속 단계에서 진행합니다. 한글 웹폰트 자산 연결은 P4 대상입니다.</p>
   </>;
