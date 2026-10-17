@@ -22,7 +22,7 @@
 ## 목록 해제: flat ul/ol → 문단 (추가 구현)
 
 - `UNWRAP_TUFTE_LIST_COMMAND`는 **최상위 `tufte-section`의 직계 목록**에서만 작동한다. 자식이 모두 `ListItemNode`, 모든 항목의 구조적 깊이가 0, 각 항목의 직계 자식 타입이 `NODE_SCHEMA.paragraph.children`에 허용되는지 **변경 전에** 검사한다.
-- 성공 시 원래 목록의 위치에 항목 순서대로 `paragraph`를 만들고, 항목 내부의 기존 Lexical 자식 노드를 이동하여 텍스트·링크·주석 `noteId`를 유지한다. 선택은 해제된 항목의 새 문단 시작으로 옮긴다. 구분선·다른 섹션·앞뒤 문단은 바꾸지 않는다.
+- 성공 시 원래 목록의 위치에 항목 순서대로 `paragraph`를 만들고, 항목의 문단 호환 속성(direction/format/textFormat/textStyle/indent)과 내부의 기존 Lexical 자식 노드를 보존하여 텍스트·링크·주석 `noteId`를 유지한다. 선택은 해제된 항목의 새 문단 시작으로 옮긴다. 구분선·다른 섹션·앞뒤 문단은 바꾸지 않는다.
 - 중첩 목록, 지원되지 않는 원소, 주석 내부 선택, 목록 밖 커서, IME 조합 중 작업은 **무변경 진단·거부**한다. 명령 수행 전 조건을 모두 검사하고 단일 history step으로 되돌릴 수 있어야 한다.
 - `packages/lexical/test/list-commands.test.mjs`에 note ID를 포함한 여러 항목 해제와 중첩·목록 밖 선택 거부 사례를 추가했다. `tests/list-kind-browser.mjs`에 해제 후 문단 텍스트·순서, 순수 JSON→HTML 출판, undo 복구 회귀를 추가했다.
 - 검증은 여전히 미실행. 중첩/복합 리스트의 선택적 해제, 구조가 다른 다중 선택, 스크린리더 경로 및 실기기 IME는 추후 수락 게이트로 남긴다.
