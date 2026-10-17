@@ -112,19 +112,56 @@ function BlockContextMenu(){
  const [editor]=useLexicalComposerContext();
  const [open,setOpen]=useState(false);
  const [available,setAvailable]=useState(false);
+ const [blockType,setBlockType]=useState('본문');
+ const [point,setPoint]=useState<{x:number;y:number}|null>(null);
+ const menuRef=useRef<HTMLDivElement|null>(null);
  useEffect(()=>editor.registerUpdateListener(({editorState})=>{
   editorState.read(()=>{
    const selection=$getSelection();
-   setAvailable($isRangeSelection(selection)&&selection.isCollapsed()&&!containingNote(selection.anchor.getNode()));
+   const valid=$isRangeSelection(selection)&&selection.isCollapsed()&&!containingNote(selection.anchor.getNode());
+   setAvailable(valid);
+   if(valid){
+    let node=selection.anchor.getNode();
+    while(node.getParent()&&node.getParent()?.getKey()!=='root'&&!['paragraph','heading','quote'].includes(node.getType()))node=node.getParent()!;
+    setBlockType(node.getType()==='heading'?'제목':node.getType()==='quote'?'인용문':'본문');
+   }
   });
  }),[editor]);
+ useEffect(()=>{
+  const root=editor.getRootElement();
+  if(!root)return;
+  const onContext=(event:globalThis.MouseEvent)=>{
+   if(editor.isComposing())return;
+   const target=event.target;
+   if(!(target instanceof Node)||!root.contains(target))return;
+   let valid=false;
+   editor.getEditorState().read(()=>{
+    const selection=$getSelection();
+    valid=$isRangeSelection(selection)&&selection.isCollapsed()&&!containingNote(selection.anchor.getNode());
+   });
+   if(!valid)return;
+   event.preventDefault();
+   setPoint({x:Math.max(8,Math.min(window.innerWidth-260,event.clientX)),y:Math.max(8,Math.min(window.innerHeight-160,event.clientY))});
+   setOpen(true);
+  };
+  root.addEventListener('contextmenu',onContext);
+  return()=>root.removeEventListener('contextmenu',onContext);
+ },[editor]);
+ useEffect(()=>{
+  if(!open)return;
+  const close=(event:PointerEvent)=>{
+   if(!menuRef.current?.contains(event.target as Node))setOpen(false);
+  };
+  document.addEventListener('pointerdown',close);
+  return()=>document.removeEventListener('pointerdown',close);
+ },[open]);
  useEffect(()=>{if(!available)setOpen(false);},[available]);
  if(!available)return null;
- return <div className="block-context-menu">
-  <button type="button" aria-expanded={open} aria-controls="tufte-block-menu" onMouseDown={event=>event.preventDefault()} onClick={()=>setOpen(value=>!value)}>블록 유형 변경 ▾</button>
+ return <div ref={menuRef} className={point&&open?'block-context-menu is-floating':'block-context-menu'} style={point&&open?{left:point.x,top:point.y}:undefined} onKeyDown={event=>{if(event.key==='Escape'){event.preventDefault();setOpen(false);setPoint(null);editor.focus();}}}>
+  <button type="button" aria-expanded={open} aria-controls="tufte-block-menu" onMouseDown={event=>event.preventDefault()} onClick={()=>{setPoint(null);setOpen(value=>!value);}}>블록 유형: {blockType} ▾</button>
   {open&&<div id="tufte-block-menu" role="group" aria-label="블록 유형">
-   {([['paragraph','본문 문단'],['h2','제목 h2'],['h3','제목 h3']] as const).map(([type,label])=><button type="button" key={type} onMouseDown={event=>event.preventDefault()} onClick={()=>{editor.dispatchCommand(SET_TUFTE_BLOCK_COMMAND,type);setOpen(false);editor.focus();}}>{label}</button>)}
-   <button type="button" onMouseDown={event=>event.preventDefault()} onClick={()=>{editor.dispatchCommand(INSERT_TUFTE_QUOTATION_COMMAND,'quote');setOpen(false);editor.focus();}}>인용문 삽입</button>
+   {([['paragraph','본문 문단'],['h2','제목 h2'],['h3','제목 h3']] as const).map(([type,label])=><button type="button" key={type} onMouseDown={event=>event.preventDefault()} onClick={()=>{editor.dispatchCommand(SET_TUFTE_BLOCK_COMMAND,type);setOpen(false);setPoint(null);editor.focus();}}>{label}</button>)}
+   <button type="button" onMouseDown={event=>event.preventDefault()} onClick={()=>{editor.dispatchCommand(INSERT_TUFTE_QUOTATION_COMMAND,'quote');setOpen(false);setPoint(null);editor.focus();}}>인용문 삽입</button>
   </div>}
  </div>;
 }
