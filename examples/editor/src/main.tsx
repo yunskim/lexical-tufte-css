@@ -108,6 +108,27 @@ function SelectionToolbar(){
  </div>;
 }
 
+function BlockContextMenu(){
+ const [editor]=useLexicalComposerContext();
+ const [open,setOpen]=useState(false);
+ const [available,setAvailable]=useState(false);
+ useEffect(()=>editor.registerUpdateListener(({editorState})=>{
+  editorState.read(()=>{
+   const selection=$getSelection();
+   setAvailable($isRangeSelection(selection)&&selection.isCollapsed()&&!containingNote(selection.anchor.getNode()));
+  });
+ }),[editor]);
+ useEffect(()=>{if(!available)setOpen(false);},[available]);
+ if(!available)return null;
+ return <div className="block-context-menu">
+  <button type="button" aria-expanded={open} aria-controls="tufte-block-menu" onMouseDown={event=>event.preventDefault()} onClick={()=>setOpen(value=>!value)}>블록 유형 변경 ▾</button>
+  {open&&<div id="tufte-block-menu" role="group" aria-label="블록 유형">
+   {([['paragraph','본문 문단'],['h2','제목 h2'],['h3','제목 h3']] as const).map(([type,label])=><button type="button" key={type} onMouseDown={event=>event.preventDefault()} onClick={()=>{editor.dispatchCommand(SET_TUFTE_BLOCK_COMMAND,type);setOpen(false);editor.focus();}}>{label}</button>)}
+   <button type="button" onMouseDown={event=>event.preventDefault()} onClick={()=>{editor.dispatchCommand(INSERT_TUFTE_QUOTATION_COMMAND,'quote');setOpen(false);editor.focus();}}>인용문 삽입</button>
+  </div>}
+ </div>;
+}
+
 function containingNote(node: LexicalNode | null): NoteNode | null {
   for(let n=node;n;n=n.getParent()) if(n instanceof NoteNode)return n;
   return null;
@@ -479,7 +500,7 @@ function EditorUI(){
     <p id="help">본문에서 Alt+↓: 다음 노트로 이동 · 노트에서 Escape: 본문으로 이동</p>
     <main>
       <RichTextPlugin contentEditable={<ContentEditable className="editor" aria-label="본문과 사이드노트 편집" aria-describedby="help"/>} ErrorBoundary={LexicalErrorBoundary}/>
-      <HistoryPlugin/><TablePlugin/><SelectionToolbar/>
+      <HistoryPlugin/><TablePlugin/><SelectionToolbar/><BlockContextMenu/>
     </main>
     <p role="status" aria-label="편집 작업 상태">{status}</p><p role="status" aria-label="자동 복구 저장 상태">{autoSaveState}</p>
     {structureIssues.length>0&&<aside role="alert" aria-label="문서 구조 복구"><p>문서 구조를 수정하세요. 내용은 자동 삭제하지 않으며 HTML 생성은 차단됩니다.</p><ul>{structureIssues.map((issue,i)=><li key={`${issue.key}-${i}`}><button onClick={()=>focusStructureIssue(editor,issue.key)}>{issue.message}</button> <code>{issue.path}</code></li>)}</ul><button onClick={()=>editor.dispatchCommand(UNDO_COMMAND,undefined)}>구조 변경 실행 취소</button><button onClick={recoverStructure} disabled={!checkpoint.current}>마지막 정상 구조로 복구</button></aside>}
