@@ -117,6 +117,33 @@ try{
  await backspaceList.locator('li').first().click();
  await page.keyboard.press('Backspace');
  await page.waitForFunction(()=>[...document.querySelectorAll('.editor section ul')].some(ul=>ul.querySelectorAll(':scope > li').length===1&&ul.textContent?.includes('Keep after Backspace')));
+ // Characterize Lexical's native Enter split and Backspace merge on nonempty list items.
+ // No custom handler should consume these keys; text and list structure must remain intact.
+ await editor.locator('section').last().locator('p').last().click();
+ await action('글머리표 목록 삽입').click();
+ await page.keyboard.insertText('AlphaBeta');
+ const splitList=editor.locator('section ul').last();
+ await splitList.locator('li').first().click();
+ await page.keyboard.press('End');
+ await page.keyboard.press('ArrowLeft');
+ await page.keyboard.press('ArrowLeft');
+ await page.keyboard.press('ArrowLeft');
+ await page.keyboard.press('ArrowLeft');
+ await page.keyboard.press('Enter');
+ await page.waitForFunction(()=>[...document.querySelectorAll('.editor section ul')].some(ul=>
+   [...ul.querySelectorAll(':scope > li')].map(li=>li.textContent).join('|')==='Alpha|Beta'));
+ const splitState=await snapshot();
+ assert.match(JSON.stringify(splitState),/Alpha/);
+ assert.match(JSON.stringify(splitState),/Beta/);
+ await splitList.locator('li').last().click();
+ await page.keyboard.press('Home');
+ await page.keyboard.press('Backspace');
+ await page.waitForFunction(()=>[...document.querySelectorAll('.editor section ul')].some(ul=>
+   [...ul.querySelectorAll(':scope > li')].some(li=>li.textContent==='AlphaBeta')));
+ const mergedState=await snapshot();
+ assert.match(JSON.stringify(mergedState),/AlphaBeta/);
+ const mergedLists=mergedState.root.children.flatMap(n=>n.children).filter(n=>n.type==='list');
+ assert.ok(mergedLists.some(list=>list.children.some(item=>item.children?.some(child=>child.text==='AlphaBeta'))));
  assert.deepEqual(errors,[]);
  console.log('P2.2.b list browser: ul/ol conversion, structural indent/outdent, safe unwrap, history, save/reopen, renderer, reject PASS.');
 }finally{await browser?.close();server.kill();}
