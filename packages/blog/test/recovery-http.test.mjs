@@ -31,6 +31,7 @@ test('HTTP dispatcher rejects mismatched identities, malformed body and unsuppor
  const {db,service}=setup();try{
   assert.equal((await call(service,'PUT','session-1',{...draft,postId:'post-2',expectedSequence:0})).status,400);
   assert.equal((await call(service,'PUT','session-2',{...draft,expectedSequence:0})).status,400);
+  assert.equal((await call(service,'PUT','session-1',{...draft,checksum:'0'.repeat(64),expectedSequence:0})).status,400);
   assert.equal((await call(service,'DELETE','session-1',{})).status,400);
   assert.equal((await call(service,'PATCH','session-1',{})).status,405);
   assert.equal((await call(service,'GET')).body.value.length,0);
