@@ -25,6 +25,8 @@ try{
  await page.keyboard.press('ArrowRight');await page.keyboard.press('Shift+F10');
  const group=page.getByRole('group',{name:'블록 유형',exact:true});await group.waitFor();
  await page.waitForFunction(()=>document.activeElement?.textContent==='본문 문단');
+ await page.keyboard.press('End');assert.equal(await page.locator(':focus').innerText(),'인용문 삽입');
+ await page.keyboard.press('Home');assert.equal(await page.locator(':focus').innerText(),'본문 문단');
  await page.keyboard.press('ArrowDown');assert.equal(await page.locator(':focus').innerText(),'제목 h2');
  await page.keyboard.press('Enter');assert.equal(await editor.locator('h2').innerText(),'선택 영역 검사');
  await page.keyboard.press('Shift+F10');await group.waitFor();
