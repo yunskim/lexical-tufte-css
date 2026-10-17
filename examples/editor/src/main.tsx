@@ -129,10 +129,11 @@ function blockMenuCapabilities(node:LexicalNode):BlockMenuCapabilities{
  let selected:LexicalNode|null=node;
  while(selected&&!['paragraph','heading','quote'].includes(selected.getType()))selected=selected.getParent();
  if(!selected)return NO_BLOCK_MENU_ACTIONS;
- const parent=selected.getParent();
- const children=selected.getChildren();
+ const selectedBlock=selected;
+ const parent=selectedBlock.getParent();
+ const children=$isElementNode(selectedBlock)?selectedBlock.getChildren():[];
  const canConvert=(target:'paragraph'|'heading')=>
-  (selected.getType()==='paragraph'||selected.getType()==='heading')&&
+  (selectedBlock.getType()==='paragraph'||selectedBlock.getType()==='heading')&&
   Boolean(parent&&NODE_SCHEMA[parent.getType()]?.children?.includes(target))&&
   children.every(child=>NODE_SCHEMA[target]?.children?.includes(child.getType()));
  let section:LexicalNode|null=node;
