@@ -116,3 +116,12 @@ def test_streamed_oversize_without_content_length(tmp_path):
     assert response.status_code == 413
     assert response.headers["cache-control"] == "no-store"
     assert response.json()["diagnostics"][0]["code"] == "RECOVERY_REQUEST_TOO_LARGE"
+
+def test_request_body_replay_allows_save_then_read(tmp_path):
+    client = setup(tmp_path)
+    response = client.put(BASE + "/session-1", json=draft())
+    assert response.status_code == 200
+    assert response.json()["value"]["payload"] == PAYLOAD
+    fetched = client.get(BASE + "/session-1")
+    assert fetched.status_code == 200
+    assert fetched.json()["value"]["payload"] == PAYLOAD
