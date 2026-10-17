@@ -49,6 +49,16 @@ function IconButton({name,label,onClick,onMouseDown}:{name:ToolbarIconName;label
  return <button type="button" aria-label={label} title={EDITOR_SHORTCUTS[label]?`${label} (${EDITOR_SHORTCUTS[label]})`:label} onMouseDown={onMouseDown} onClick={onClick}><ToolbarIcon name={name}/></button>;
 }
 
+type InlineAction='bold'|'italic'|'underline'|'strikethrough'|'code'|'highlight';
+const INLINE_ACTIONS:ReadonlyArray<{id:InlineAction;label:string;icon:ToolbarIconName}>=[
+ {id:'bold',label:'굵게',icon:'bold'},
+ {id:'italic',label:'기울임',icon:'italic'},
+ {id:'underline',label:'밑줄',icon:'underline'},
+ {id:'strikethrough',label:'취소선',icon:'strike'},
+ {id:'code',label:'코드',icon:'code'},
+ {id:'highlight',label:'마크',icon:'highlight'}
+];
+
 function containingNote(node: LexicalNode | null): NoteNode | null {
   for(let n=node;n;n=n.getParent()) if(n instanceof NoteNode)return n;
   return null;
@@ -407,10 +417,7 @@ function EditorUI(){
       <IconButton name="marginnote" label="여백 주석 삽입" onMouseDown={preserve} onClick={()=>insertNote('marginnote')}/>
       <button onMouseDown={preserve} onClick={()=>editor.update(()=>{if(!enterNote())setStatus('뒤에 있는 노트를 찾지 못했습니다.');})}>다음 노트로</button>
       <button onMouseDown={preserve} onClick={()=>editor.update(leaveNote)}>본문으로</button>
-      <IconButton name="bold" label="굵게" onMouseDown={preserve} onClick={()=>editor.dispatchCommand(FORMAT_TEXT_COMMAND,'bold')}/>
-      <IconButton name="italic" label="기울임" onMouseDown={preserve} onClick={()=>editor.dispatchCommand(FORMAT_TEXT_COMMAND,'italic')}/>
-      <IconButton name="code" label="코드" onMouseDown={preserve} onClick={()=>editor.dispatchCommand(FORMAT_TEXT_COMMAND,'code')}/>
-      {([['underline','밑줄','underline'],['strikethrough','취소선','strike'],['highlight','마크','highlight']] as const).map(([format,label,name])=><IconButton key={format} name={name} label={label} onMouseDown={preserve} onClick={()=>editor.update(()=>{editor.dispatchCommand(FORMAT_TEXT_COMMAND,format);},{tag:HISTORY_PUSH_TAG})}/>)}
+      {INLINE_ACTIONS.map(action=><IconButton key={action.id} name={action.icon} label={action.label} onMouseDown={preserve} onClick={()=>editor.update(()=>{editor.dispatchCommand(FORMAT_TEXT_COMMAND,action.id);},{tag:HISTORY_PUSH_TAG})}/>)}
       <button onMouseDown={preserve} onClick={()=>insertPayload('link')}>노트 링크 삽입</button>
       <button onMouseDown={preserve} onClick={()=>insertPayload('image')}>노트 이미지 삽입</button>
       <button onMouseDown={preserve} onClick={()=>noteOperation('split')}>노트 나누기</button>
