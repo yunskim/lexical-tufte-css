@@ -13,10 +13,10 @@ import {$isHeadingNode} from '@lexical/rich-text';
 import {$generateHtmlFromNodes} from '@lexical/html';
 import {
   $getRoot, $getSelection, $isRangeSelection, $isNodeSelection, $isElementNode, $isTextNode, $createRangeSelection, $setSelection,
-  $createParagraphNode, $createTextNode, $createLineBreakNode, $isParagraphNode,
+  $createParagraphNode, $createTextNode, $createLineBreakNode, $isParagraphNode, $getNodeByKey,
   FORMAT_TEXT_COMMAND, KEY_ESCAPE_COMMAND, KEY_ARROW_DOWN_COMMAND, KEY_ENTER_COMMAND,
   SELECTION_INSERT_CLIPBOARD_NODES_COMMAND, COPY_COMMAND, CUT_COMMAND, PASTE_COMMAND, KEY_BACKSPACE_COMMAND, KEY_DELETE_COMMAND, HISTORY_PUSH_TAG, UNDO_COMMAND, REDO_COMMAND,
-  COMMAND_PRIORITY_HIGH, type LexicalNode, type EditorState,
+  COMMAND_PRIORITY_HIGH, type LexicalNode, type EditorState, type RangeSelection,
 } from 'lexical';
 import {registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,registerQuotationCommands,INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_SECTION_CITE_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND,registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_TUFTE_DEFINITION_PAIR_COMMAND,registerSectionCommands,WRAP_TUFTE_ROOT_COMMAND,INSERT_TUFTE_SECTION_COMMAND,SPLIT_TUFTE_SECTION_COMMAND,MERGE_TUFTE_SECTION_COMMAND,SET_TUFTE_BLOCK_COMMAND,inspectEditorStructure,focusStructureIssue,type StructureIssue,replaceEditorDocumentState,TUFTE_NODES,NoteNode, $createNoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, registerNoteEdgeTypingGuard, type NoteKind} from '@lexical-tufte/lexical';
 import {NODE_SCHEMA} from '@lexical-tufte/document';
@@ -154,17 +154,55 @@ function BlockContextMenu(){
  const [capabilities,setCapabilities]=useState<BlockMenuCapabilities>(NO_BLOCK_MENU_ACTIONS);
  const [point,setPoint]=useState<{x:number;y:number}|null>(null);
  const menuRef=useRef<HTMLDivElement|null>(null);
+ const menuOpenRef=useRef(false);
+ const targetSelectionRef=useRef<RangeSelection|null>(null);
+ const captureTarget=(selection:RangeSelection)=>{
+  targetSelectionRef.current=selection.clone();
+  setCapabilities(blockMenuCapabilities(selection.anchor.getNode()));
+  let node:LexicalNode=selection.anchor.getNode();
+  while(node.getParent()&&node.getParent()?.getKey()!=='root'&&!['paragraph','heading','quote'].includes(node.getType()))node=node.getParent()!;
+  setBlockType($isHeadingNode(node)?(node.getTag()==='h3'?'제목 h3':'제목 h2'):node.getType()==='quote'?'인용문':'본문');
+  setAvailable(true);
+ };
+ const closeMenu=()=>{
+  menuOpenRef.current=false;
+  targetSelectionRef.current=null;
+  setOpen(false);
+  setPoint(null);
+ };
+ /** Restore the caret captured when opening; focus moving into the menu must not change the command target. */
+ const restoreTarget=(action?:()=>void)=>{
+  const target=targetSelectionRef.current;
+  closeMenu();
+  if(target){
+   editor.update(()=>{
+    const anchor=$getNodeByKey(target.anchor.key),focus=$getNodeByKey(target.focus.key);
+    if(!anchor||!focus||editor.isComposing())return;
+    $setSelection(target.clone());
+    action?.();
+   },action?{tag:HISTORY_PUSH_TAG}:undefined);
+  }
+  editor.focus();
+ };
+ const moveFocusPastMenu=(backward:boolean)=>{
+  const container=menuRef.current;
+  const focusable=Array.from(document.querySelectorAll<HTMLElement>('button:not([disabled]), a[href], input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [contenteditable="true"], [tabindex]:not([tabindex="-1"])'))
+   .filter(element=>element.getClientRects().length>0);
+  const index=focusable.indexOf(document.activeElement as HTMLElement);
+  const candidates=backward?focusable.slice(0,index).reverse():focusable.slice(index+1);
+  const next=candidates.find(element=>!container?.contains(element));
+  closeMenu();
+  if(next)next.focus();else editor.focus();
+ };
  useEffect(()=>editor.registerUpdateListener(({editorState})=>{
   editorState.read(()=>{
+   // Menu items intentionally own DOM focus; do not erase the captured selection on editor blur.
+   if(menuOpenRef.current)return;
    const selection=$getSelection();
    const valid=$isRangeSelection(selection)&&selection.isCollapsed()&&canOpenBlockMenu(selection.anchor.getNode());
    setAvailable(valid);
-   setCapabilities(valid?blockMenuCapabilities(selection.anchor.getNode()):NO_BLOCK_MENU_ACTIONS);
-   if(valid){
-    let node=selection.anchor.getNode();
-    while(node.getParent()&&node.getParent()?.getKey()!=='root'&&!['paragraph','heading','quote'].includes(node.getType()))node=node.getParent()!;
-    setBlockType($isHeadingNode(node)?(node.getTag()==='h3'?'제목 h3':'제목 h2'):node.getType()==='quote'?'인용문':'본문');
-   }
+   if(valid)captureTarget(selection);
+   else {setCapabilities(NO_BLOCK_MENU_ACTIONS);targetSelectionRef.current=null;}
   });
  }),[editor]);
  useEffect(()=>{
@@ -191,12 +229,14 @@ function BlockContextMenu(){
     const selection=$createRangeSelection();
     selection.applyDOMRange(range);
     valid=selection.isCollapsed()&&canOpenBlockMenu(selection.anchor.getNode())&&selection.anchor.getNode().getType()!=='root';
-    if(valid)$setSelection(selection);
+    if(valid){$setSelection(selection);captureTarget(selection);}
    },{discrete:true});
    if(!valid)return;
    event.preventDefault();
    editor.focus();
    setPoint({x:Math.max(8,Math.min(window.innerWidth-260,event.clientX)),y:Math.max(8,Math.min(window.innerHeight-160,event.clientY))});
+   menuOpenRef.current=true;
+   menuOpenRef.current=true;
    setOpen(true);
    requestAnimationFrame(()=>menuRef.current?.querySelector<HTMLButtonElement>('#tufte-block-menu button')?.focus());
   };
@@ -209,6 +249,7 @@ function BlockContextMenu(){
    editor.getEditorState().read(()=>{
     const selection=$getSelection();
     valid=$isRangeSelection(selection)&&selection.isCollapsed()&&canOpenBlockMenu(selection.anchor.getNode());
+    if(valid)captureTarget(selection);
    });
    if(!valid)return;
    event.preventDefault();
@@ -225,7 +266,7 @@ function BlockContextMenu(){
  useEffect(()=>{
   if(!open)return;
   const close=(event:PointerEvent)=>{
-   if(!menuRef.current?.contains(event.target as Node)){setOpen(false);setPoint(null);}
+   if(!menuRef.current?.contains(event.target as Node))closeMenu();
   };
   document.addEventListener('pointerdown',close);
   return()=>document.removeEventListener('pointerdown',close);
@@ -259,17 +300,17 @@ function BlockContextMenu(){
  },[open,point]);
  useEffect(()=>{if(!available&&!open)setPoint(null);},[available]);
  if(!available&&!open)return null;
- return <div ref={menuRef} className={point&&open?'block-context-menu is-floating':'block-context-menu'} style={point&&open?{left:point.x,top:point.y}:undefined} onKeyDown={event=>{if(event.key==='Escape'){event.preventDefault();setOpen(false);setPoint(null);editor.focus();}else if(open&&event.key==='Tab'){setOpen(false);setPoint(null);}else if(open&&['ArrowDown','ArrowUp','Home','End'].includes(event.key)){const buttons=Array.from(menuRef.current?.querySelectorAll<HTMLButtonElement>('#tufte-block-menu button')??[]);const index=buttons.indexOf(document.activeElement as HTMLButtonElement);if(buttons.length){event.preventDefault();buttons[event.key==='Home'?0:event.key==='End'?buttons.length-1:(index+(event.key==='ArrowDown'?1:-1)+buttons.length)%buttons.length]?.focus();}}}}>
-  <button type="button" aria-haspopup="menu" aria-expanded={open} aria-controls="tufte-block-menu" onMouseDown={event=>event.preventDefault()} onClick={()=>{setPoint(null);setOpen(value=>!value);}}>블록 유형: {blockType} ▾</button>
+ return <div ref={menuRef} className={point&&open?'block-context-menu is-floating':'block-context-menu'} style={point&&open?{left:point.x,top:point.y}:undefined} onKeyDown={event=>{if(event.key==='Escape'){event.preventDefault();restoreTarget();}else if(open&&event.key==='Tab'){event.preventDefault();moveFocusPastMenu(event.shiftKey);}else if(open&&['ArrowDown','ArrowUp','Home','End'].includes(event.key)){const buttons=Array.from(menuRef.current?.querySelectorAll<HTMLButtonElement>('#tufte-block-menu button')??[]);const index=buttons.indexOf(document.activeElement as HTMLButtonElement);if(buttons.length){event.preventDefault();buttons[event.key==='Home'?0:event.key==='End'?buttons.length-1:(index+(event.key==='ArrowDown'?1:-1)+buttons.length)%buttons.length]?.focus();}}}}>
+  <button type="button" aria-haspopup="menu" aria-expanded={open} aria-controls="tufte-block-menu" onMouseDown={event=>event.preventDefault()} onClick={()=>{if(open){closeMenu();return;}let valid=false;editor.getEditorState().read(()=>{const selection=$getSelection();if($isRangeSelection(selection)&&selection.isCollapsed()&&canOpenBlockMenu(selection.anchor.getNode())){captureTarget(selection);valid=true;}});if(!valid)return;menuOpenRef.current=true;setPoint(null);setOpen(true);requestAnimationFrame(()=>menuRef.current?.querySelector<HTMLButtonElement>('#tufte-block-menu button')?.focus());}}>블록 유형: {blockType} ▾</button>
   {open&&<div id="tufte-block-menu" role="menu" aria-label="블록 유형" aria-orientation="vertical">
-   {([['paragraph','본문 문단'],['h2','제목 h2'],['h3','제목 h3']] as const).filter(([type])=>type==='paragraph'?capabilities.paragraph:capabilities.heading).map(([type,label])=><button type="button" key={type} role="menuitem" onMouseDown={event=>event.preventDefault()} onClick={()=>{editor.dispatchCommand(SET_TUFTE_BLOCK_COMMAND,type);setOpen(false);setPoint(null);editor.focus();}}>{label}</button>)}
+   {([['paragraph','본문 문단'],['h2','제목 h2'],['h3','제목 h3']] as const).filter(([type])=>type==='paragraph'?capabilities.paragraph:capabilities.heading).map(([type,label])=><button type="button" key={type} role="menuitem" onMouseDown={event=>event.preventDefault()} onClick={()=>restoreTarget(()=>editor.dispatchCommand(SET_TUFTE_BLOCK_COMMAND,type))}>{label}</button>)}
    {capabilities.insert&&<>
-    {([['bullet','글머리표 목록 삽입'],['number','번호 목록 삽입']] as const).map(([kind,label])=><button type="button" key={kind} role="menuitem" onMouseDown={event=>event.preventDefault()} onClick={()=>{editor.dispatchCommand(INSERT_TUFTE_LIST_COMMAND,kind);setOpen(false);setPoint(null);editor.focus();}}>{label}</button>)}
-    <button type="button" role="menuitem" onMouseDown={event=>event.preventDefault()} onClick={()=>{editor.dispatchCommand(INSERT_TUFTE_DEFINITION_LIST_COMMAND,undefined);setOpen(false);setPoint(null);editor.focus();}}>정의목록 삽입</button>
-    <button type="button" role="menuitem" onMouseDown={event=>event.preventDefault()} onClick={()=>{editor.dispatchCommand(INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,undefined);setOpen(false);setPoint(null);editor.focus();}}>구분선 삽입</button>
-    <button type="button" role="menuitem" onMouseDown={event=>event.preventDefault()} onClick={()=>{editor.dispatchCommand(INSERT_TUFTE_QUOTATION_COMMAND,'epigraph');setOpen(false);setPoint(null);editor.focus();}}>Epigraph 삽입</button>
-    <button type="button" role="menuitem" onMouseDown={event=>event.preventDefault()} onClick={()=>{editor.dispatchCommand(INSERT_TUFTE_QUOTATION_COMMAND,'section-footer');setOpen(false);setPoint(null);editor.focus();}}>섹션 출처 삽입</button>
-    <button type="button" role="menuitem" onMouseDown={event=>event.preventDefault()} onClick={()=>{editor.dispatchCommand(INSERT_TUFTE_QUOTATION_COMMAND,'quote');setOpen(false);setPoint(null);editor.focus();}}>인용문 삽입</button>
+    {([['bullet','글머리표 목록 삽입'],['number','번호 목록 삽입']] as const).map(([kind,label])=><button type="button" key={kind} role="menuitem" onMouseDown={event=>event.preventDefault()} onClick={()=>restoreTarget(()=>editor.dispatchCommand(INSERT_TUFTE_LIST_COMMAND,kind))}>{label}</button>)}
+    <button type="button" role="menuitem" onMouseDown={event=>event.preventDefault()} onClick={()=>restoreTarget(()=>editor.dispatchCommand(INSERT_TUFTE_DEFINITION_LIST_COMMAND,undefined))}>정의목록 삽입</button>
+    <button type="button" role="menuitem" onMouseDown={event=>event.preventDefault()} onClick={()=>restoreTarget(()=>editor.dispatchCommand(INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,undefined))}>구분선 삽입</button>
+    <button type="button" role="menuitem" onMouseDown={event=>event.preventDefault()} onClick={()=>restoreTarget(()=>editor.dispatchCommand(INSERT_TUFTE_QUOTATION_COMMAND,'epigraph'))}>Epigraph 삽입</button>
+    <button type="button" role="menuitem" onMouseDown={event=>event.preventDefault()} onClick={()=>restoreTarget(()=>editor.dispatchCommand(INSERT_TUFTE_QUOTATION_COMMAND,'section-footer'))}>섹션 출처 삽입</button>
+    <button type="button" role="menuitem" onMouseDown={event=>event.preventDefault()} onClick={()=>restoreTarget(()=>editor.dispatchCommand(INSERT_TUFTE_QUOTATION_COMMAND,'quote'))}>인용문 삽입</button>
    </>}
   </div>}
  </div>;
