@@ -1,3 +1,9 @@
+## P3.1.c visualViewport 가시 영역 좌표 보정 (일괄 검증 대기)
+
+- 열린 블록 메뉴의 경계 보정에 visualViewport offsetLeft/offsetTop/width/height를 적용했다. API 미지원 환경에서는 기존 window 크기로 대체한다.
+- 좁은 visualViewport가 메뉴 자체보다 작을 때 완전한 내부 배치는 불가능하므로 메뉴 크기/스크롤 전략은 후속 검토한다.
+- 실제 모바일 키보드, 확대·이동 및 브라우저 회귀는 미실행이다. 사용자 요청대로 최종 일괄 검증하고 CI는 생략한다.
+
 ## P3.1.c 모바일 visualViewport 이벤트 대응 (일괄 검증 대기)
 
 - 메뉴가 열린 동안 visualViewport resize/scroll을 수신해 위치 재계산을 요청하며 언마운트 시 리스너를 해제한다.
