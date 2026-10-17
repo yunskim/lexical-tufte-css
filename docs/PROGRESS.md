@@ -1,3 +1,9 @@
+## P3.1.c 블록 메뉴 공통 적격성 검사 (신규 변경 검증 대기)
+
+- `canOpenBlockMenu`로 note/table/tablecell/tablerow/figure/image 노드 및 조상 노드 제한을 공통화했다. 선택 변경 감시·마우스 우클릭·키보드 ContextMenu/Shift+F10 진입이 동일한 Lexical 검사 경로를 사용한다.
+- 기존 실제 브라우저 테스트 통과 기록은 앞선 리비전의 결과다. 이번 변경 후 테스트는 실행하지 않았다. CSS 선택자에 의존하는 미디어 영역 예외도 유지한다.
+- 다음: 해당 노드 타입과 실제 사용자 상호작용을 대상으로 회귀 테스트 추가, 키보드 메뉴 포커스·ARIA 점검. CI 생략.
+
 ## 2026-10-17 테스트 결과 인계 확인 및 P3.1.c 명령 범위 제한
 
 - `docs/ERROR_LOG.md`와 `docs/ERROR_PREVENTION.md`에 기록된 다른 작업 세션의 일괄 검증 결과를 확인했다: check 266, Python 16, package 4, 기존 browser 11 + contextual 1, HTTP 왕복 통과. 이는 해당 기록 시점의 결과이며 이번 커밋 이후 재실행 결과는 아니다.
