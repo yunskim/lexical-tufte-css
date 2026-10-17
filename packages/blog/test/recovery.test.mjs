@@ -63,3 +63,21 @@ test('recovery sessions are independent and cannot overwrite each other',async()
   assert.equal((await store.read('post-1','session-2')).value.payload,'{"different":true}');
  }finally{db.close();}
 });
+
+test('recovery list returns newest sessions first without leaking payloads or other posts',async()=>{
+ const {db,store}=setup();try{
+  assert.equal((await store.save(input(),0)).ok,true);
+  assert.equal((await store.save({...input(),sessionId:'session-2',savedAt:'2026-10-17T09:00:00Z',payload:'{"secret":"private"}'},0)).ok,true);
+  assert.equal((await store.save({...input(),postId:'post-2',sessionId:'session-3'},0)).ok,true);
+  const listed=store.list('post-1');
+  assert.equal(listed.ok,true,JSON.stringify(listed.diagnostics));
+  assert.deepEqual(listed.value.map(x=>x.sessionId),['session-2','session-1']);
+  assert.equal(listed.value.every(x=>!('payload' in x)),true);
+  assert.equal(listed.value[0].sequence,1);
+  assert.equal(listed.value[0].baseRevision,1);
+  assert.equal(store.list('bad id').diagnostics[0].code,'INVALID_RECOVERY_INPUT');
+  assert.deepEqual(store.list('missing-post').value,[]);
+  assert.equal(store.remove('post-1','session-2',1).ok,true);
+  assert.deepEqual(store.list('post-1').value.map(x=>x.sessionId),['session-1']);
+ }finally{db.close();}
+});
