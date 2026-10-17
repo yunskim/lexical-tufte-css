@@ -24,7 +24,7 @@ export {$inspectEditorStructure,inspectEditorStructure,focusStructureIssue,type 
 
 export {registerSectionCommands,WRAP_TUFTE_ROOT_COMMAND,INSERT_TUFTE_SECTION_COMMAND,SPLIT_TUFTE_SECTION_COMMAND,MERGE_TUFTE_SECTION_COMMAND,SET_TUFTE_BLOCK_COMMAND,type TufteBlockType} from './sectionCommands.js';
 
-export {registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND} from './inlineCommands.js';
+export {registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND,WRAP_TUFTE_SPAN_COMMAND,UNWRAP_TUFTE_SPAN_COMMAND} from './inlineCommands.js';
 
 export {registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_TUFTE_DEFINITION_PAIR_COMMAND} from './definitionCommands.js';
 
