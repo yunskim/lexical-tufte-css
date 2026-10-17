@@ -82,3 +82,24 @@ def test_strict_integer_and_route_error_envelopes(tmp_path):
     method = client.post(BASE)
     assert method.status_code == 405
     assert method.json()["diagnostics"][0]["code"] == "RECOVERY_METHOD_NOT_ALLOWED"
+
+def test_unauthorized_mutation_rejected_before_body_validation(tmp_path):
+    denied = TestClient(create_app(str(tmp_path / "missing.sqlite"), lambda request, post_id: False))
+    response = denied.put(BASE + "/session-1", content=b'not-json',
+                          headers={"content-type": "text/plain"})
+    assert response.status_code == 403
+    assert response.json()["diagnostics"][0]["code"] == "RECOVERY_ACCESS_DENIED"
+    assert response.headers["cache-control"] == "no-store"
+
+
+def test_authorization_callback_called_once(tmp_path):
+    db_path = tmp_path / "recovery.sqlite"
+    with sqlite3.connect(db_path) as db:
+        db.executescript(SCHEMA.read_text())
+    calls = []
+    def authorize(request, post_id):
+        calls.append((request.method, post_id))
+        return True
+    client = TestClient(create_app(str(db_path), authorize))
+    assert client.get(BASE).status_code == 200
+    assert calls == [("GET", "post-1")]
