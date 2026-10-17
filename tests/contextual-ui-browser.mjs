@@ -56,6 +56,7 @@ try{
  assert.ok(narrowMenu&&narrowMenu.x>=0&&narrowMenu.y>=0&&narrowMenu.x+narrowMenu.width<=375&&narrowMenu.y+narrowMenu.height<=812,JSON.stringify(narrowMenu));
  await page.keyboard.press('Escape');await group.waitFor({state:'hidden'});
  await page.waitForFunction(()=>document.activeElement?.closest('.editor'));
+ assert.equal(await page.locator('.block-context-menu.is-floating').count(),0);
  await editor.locator('h3').click({button:'right'});await group.waitFor();
  await page.locator('header').first().click({position:{x:5,y:5}});
  await group.waitFor({state:'hidden'});
