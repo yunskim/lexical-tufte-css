@@ -50,6 +50,13 @@ try{
  await group.getByRole('menuitem',{name:'제목 h3',exact:true}).click();
  assert.equal(await editor.locator('h3').innerText(),'선택 영역 검사');
  await page.setViewportSize({width:375,height:812});
+ await editor.locator('h3').click({button:'right'});await group.waitFor();
+ await page.waitForFunction(()=>document.activeElement?.textContent==='본문 문단');
+ const narrowMenu=await page.locator('.block-context-menu.is-floating').boundingBox();
+ assert.ok(narrowMenu&&narrowMenu.x>=0&&narrowMenu.y>=0&&narrowMenu.x+narrowMenu.width<=375&&narrowMenu.y+narrowMenu.height<=812,JSON.stringify(narrowMenu));
+ await page.keyboard.press('Escape');await group.waitFor({state:'hidden'});
+ await page.waitForFunction(()=>document.activeElement?.closest('.editor'));
+
  await editor.locator('h3').click();await page.keyboard.press('Home');await page.keyboard.down('Shift');await page.keyboard.press('End');await page.keyboard.up('Shift');await floating.waitFor();
  const box=await floating.boundingBox();assert.ok(box.x>=0&&box.x+box.width<=375,JSON.stringify(box));
  assert.deepEqual(errors,[]);
