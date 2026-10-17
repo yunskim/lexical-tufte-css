@@ -193,7 +193,7 @@ function BlockContextMenu(){
  useEffect(()=>{
   if(!open)return;
   const close=(event:PointerEvent)=>{
-   if(!menuRef.current?.contains(event.target as Node))setOpen(false);
+   if(!menuRef.current?.contains(event.target as Node)){setOpen(false);setPoint(null);}
   };
   document.addEventListener('pointerdown',close);
   return()=>document.removeEventListener('pointerdown',close);
