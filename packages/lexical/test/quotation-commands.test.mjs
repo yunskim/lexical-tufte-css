@@ -205,3 +205,23 @@ test('F09 repeated epigraph insertion preserves earlier quotation groups',()=>{
  assert.equal(diagnostics.length,0);
  dispose();
 });
+
+test('F08 attribution command refuses duplicate cite footer without changing quotation',()=>{
+ const {editor,diagnostics,dispose}=setup();
+ editor.update(()=>{
+  const text=$createTextNode('source');
+  $getRoot().append($createSectionNode().append($createParagraphNode().append(text)));
+  text.selectEnd();
+ },{discrete:true});
+ editor.update(()=>editor.dispatchCommand(INSERT_TUFTE_QUOTATION_COMMAND,'quote'),{discrete:true});
+ editor.update(()=>editor.dispatchCommand(APPEND_TUFTE_ATTRIBUTION_COMMAND,undefined),{discrete:true});
+ const before=editor.getEditorState().toJSON();
+ editor.update(()=>{
+  const quote=$getRoot().getFirstChild().getLastChild();
+  quote.getFirstChild().selectEnd();
+ },{discrete:true});
+ editor.update(()=>editor.dispatchCommand(APPEND_TUFTE_ATTRIBUTION_COMMAND,undefined),{discrete:true});
+ assert.deepEqual(editor.getEditorState().toJSON(),before);
+ assert.equal(diagnostics.at(-1)?.code,'INVALID_QUOTATION_SELECTION');
+ dispose();
+});
