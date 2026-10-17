@@ -9,6 +9,7 @@ import {LexicalErrorBoundary} from '@lexical/react/LexicalErrorBoundary';
 import {TablePlugin} from '@lexical/react/LexicalTablePlugin';
 import {$loadLayoutFixture} from './layoutFixture.js';
 import {$createLinkNode} from '@lexical/link';
+import {$isHeadingNode} from '@lexical/rich-text';
 import {$generateHtmlFromNodes} from '@lexical/html';
 import {
   $getRoot, $getSelection, $isRangeSelection, $isNodeSelection, $isElementNode, $isTextNode, $createRangeSelection, $setSelection,
@@ -134,7 +135,7 @@ function BlockContextMenu(){
    if(valid){
     let node=selection.anchor.getNode();
     while(node.getParent()&&node.getParent()?.getKey()!=='root'&&!['paragraph','heading','quote'].includes(node.getType()))node=node.getParent()!;
-    setBlockType(node.getType()==='heading'?(node.getTag?.()==='h3'?'제목 h3':'제목 h2'):node.getType()==='quote'?'인용문':'본문');
+    setBlockType($isHeadingNode(node)?(node.getTag()==='h3'?'제목 h3':'제목 h2'):node.getType()==='quote'?'인용문':'본문');
    }
   });
  }),[editor]);
