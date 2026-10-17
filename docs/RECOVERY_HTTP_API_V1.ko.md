@@ -42,3 +42,7 @@ v1의 필드명·경로·CAS·체크섬·진단 코드 변경은 breaking change
 ## 구현 참고: Python 요청 본문 제한
 
 Python FastAPI 어댑터는 PUT/DELETE에서 `application/json`을 요구하며, 전체 HTTP 요청 본문을 2,100,000바이트로 제한한다. `payload` 자체의 UTF-8 한도는 별도 2,000,000바이트다. 한도 초과는 `RECOVERY_REQUEST_TOO_LARGE` (413), Content-Type 오류는 `RECOVERY_CONTENT_TYPE_UNSUPPORTED` (415)로 반환한다. 현재 코드는 작성 단계로 테스트 실행 전이다.
+
+## 언어 간 계약 fixture
+
+공통 테스트 데이터: `apps/recovery-server/tests/fixtures/recovery_v1.json`. Python `apps/recovery-server/tests/test_shared_contract.py`와 TypeScript `packages/blog/test/recovery-shared-contract.test.mjs`가 같은 파일을 읽는다. 저장/삭제 본문, CAS 충돌, 체크섬·진단 코드 기대값을 비교한다. **코드만 작성했으며 아직 실행하지 않았다.** 다음 단계에서 실제 인증/CSRF 호스트 연결 및 계약 테스트 실행 후 v1 호환성 판정이 필요하다.
