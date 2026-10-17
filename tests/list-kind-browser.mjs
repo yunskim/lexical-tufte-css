@@ -33,6 +33,8 @@ try{
  assert.equal(await editor.locator('section ul > li').count(),1);
  const initial=await snapshot();
  assert.equal(extractList(initial).listType,'bullet');
+ // Snapshot opens external inspection UI: explicitly restore the caret inside this list.
+ await editor.locator('section ul > li').click();
  await action('현재 목록 번호로').click();
  const changed=await snapshot();
  assert.equal(extractList(changed).listType,'number');
