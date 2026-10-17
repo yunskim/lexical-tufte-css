@@ -15,10 +15,11 @@
     "test": "pnpm -r --if-present test",
     "test:recovery-python": "node tests/recovery-python-http.mjs",
     "test:contextual-ui": "pnpm build && node tests/contextual-ui-browser.mjs",
-    "test:browser": "pnpm build && node tests/note-browser.mjs && node tests/note-editing-browser.mjs && node tests/note-dom-browser.mjs && node tests/layout-browser.mjs && node tests/server-browser.mjs && node tests/publication-browser.mjs && node tests/all-nodes-browser.mjs && node tests/text-format-browser.mjs && node tests/font-proof-browser.mjs && node tests/section-commands-browser.mjs && node tests/recovery-browser.mjs",
+    "test:browser": "pnpm build && node tests/note-browser.mjs && node tests/note-editing-browser.mjs && node tests/note-dom-browser.mjs && node tests/layout-browser.mjs && node tests/server-browser.mjs && node tests/publication-browser.mjs && node tests/all-nodes-browser.mjs && node tests/text-format-browser.mjs && node tests/font-proof-browser.mjs && node tests/section-commands-browser.mjs && node tests/recovery-browser.mjs && node tests/contextual-ui-browser.mjs && node tests/inline-span-browser.mjs",
     "dev:editor": "pnpm --filter @lexical-tufte/lexical build && pnpm --filter @lexical-tufte/editor-prototype dev",
     "font:check": "node scripts/check-font-proof.mjs",
-    "package:check": "pnpm build && node scripts/pack-and-check.mjs"
+    "package:check": "pnpm build && node scripts/pack-and-check.mjs",
+    "test:inline-span": "pnpm build && node tests/inline-span-browser.mjs"
   },
   "devDependencies": {
     "playwright": "1.51.1"
