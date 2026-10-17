@@ -1,4 +1,4 @@
-import {$addUpdateTag,$createParagraphNode,$createTextNode,$getSelection,$isRangeSelection,createCommand,COMMAND_PRIORITY_EDITOR,HISTORY_PUSH_TAG,type LexicalCommand,type LexicalEditor,type LexicalNode} from 'lexical';
+import {$addUpdateTag,$createParagraphNode,$createTextNode,$getSelection,$isElementNode,$isRangeSelection,createCommand,COMMAND_PRIORITY_EDITOR,HISTORY_PUSH_TAG,type LexicalCommand,type LexicalEditor,type LexicalNode} from 'lexical';
 import {NODE_SCHEMA,type Diagnostic} from '@lexical-tufte/document';
 import {DefinitionListNode,DefinitionTermNode,DefinitionDescriptionNode,$createDefinitionListNode,$createDefinitionTermNode,$createDefinitionDescriptionNode} from './DefinitionListNodes.js';
 import {SectionNode} from './LayoutNodes.js';
@@ -78,11 +78,10 @@ export function registerDefinitionCommands(editor:LexicalEditor,onDiagnostic?:(d
    const list=nearest(s.anchor.getNode(),'tufte-definition-list');
    if(!(list instanceof DefinitionListNode)||!(list.getParent() instanceof SectionNode)||
       list.getParent()?.getParent()?.getType()!=='root')return reject('최상위 섹션의 정의목록만 삭제할 수 있습니다.');
-   const section=list.getParent();
    const previous=list.getPreviousSibling(),next=list.getNextSibling();
    $addUpdateTag(HISTORY_PUSH_TAG);
-   if(previous){list.remove();previous.selectEnd();}
-   else if(next){list.remove();next.selectStart();}
+   if(previous&&$isElementNode(previous)){list.remove();previous.selectEnd();}
+   else if(next&&$isElementNode(next)){list.remove();next.selectStart();}
    else{
     const placeholder=$createParagraphNode();
     list.insertBefore(placeholder);list.remove();placeholder.selectStart();
