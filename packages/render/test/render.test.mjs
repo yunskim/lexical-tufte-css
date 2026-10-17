@@ -298,3 +298,16 @@ test('R05 invalid section/figure/table wrapper blocks all publication without mu
   const before=JSON.stringify(d),result=renderArticle(d);assert.equal(result.ok,false);assert.equal(result.html,null);assert.ok(result.diagnostics.some(d=>d.code===code));assert.equal(JSON.stringify(d),before);
  }
 });
+
+test('F07 horizontal rule is published between paragraphs without losing their content',()=>{
+ const d=fixture(),section=d.lexicalState.root.children[0];
+ const text=value=>({type:'text',version:1,text:value,format:0});
+ section.children.push(
+  {type:'paragraph',version:1,children:[text('before-rule')]},
+  {type:'horizontalrule',version:1},
+  {type:'paragraph',version:1,children:[text('after-rule')]}
+ );
+ const result=renderArticle(d);
+ assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+ assert.match(result.html,/<p>before-rule<\/p><hr><p>after-rule<\/p>/);
+});
