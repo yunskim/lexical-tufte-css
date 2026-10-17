@@ -169,6 +169,7 @@ function BlockContextMenu(){
    editor.focus();
    setPoint({x:Math.max(8,Math.min(window.innerWidth-260,event.clientX)),y:Math.max(8,Math.min(window.innerHeight-160,event.clientY))});
    setOpen(true);
+   requestAnimationFrame(()=>menuRef.current?.querySelector<HTMLButtonElement>('#tufte-block-menu button')?.focus());
   };
   const onKeyboardMenu=(event:KeyboardEvent)=>{
    if(editor.isComposing()||!(event.key==='ContextMenu'||(event.shiftKey&&event.key==='F10')))return;
@@ -199,7 +200,7 @@ function BlockContextMenu(){
  },[open]);
  useEffect(()=>{if(!available&&!open)setPoint(null);},[available]);
  if(!available&&!open)return null;
- return <div ref={menuRef} className={point&&open?'block-context-menu is-floating':'block-context-menu'} style={point&&open?{left:point.x,top:point.y}:undefined} onKeyDown={event=>{if(event.key==='Escape'){event.preventDefault();setOpen(false);setPoint(null);editor.focus();}else if(open&&(event.key==='ArrowDown'||event.key==='ArrowUp')){const buttons=Array.from(menuRef.current?.querySelectorAll<HTMLButtonElement>('#tufte-block-menu button')??[]);const index=buttons.indexOf(document.activeElement as HTMLButtonElement);if(buttons.length){event.preventDefault();buttons[(index+(event.key==='ArrowDown'?1:-1)+buttons.length)%buttons.length]?.focus();}}}}>
+ return <div ref={menuRef} className={point&&open?'block-context-menu is-floating':'block-context-menu'} style={point&&open?{left:point.x,top:point.y}:undefined} onKeyDown={event=>{if(event.key==='Escape'){event.preventDefault();setOpen(false);setPoint(null);editor.focus();}else if(open&&['ArrowDown','ArrowUp','Home','End'].includes(event.key)){const buttons=Array.from(menuRef.current?.querySelectorAll<HTMLButtonElement>('#tufte-block-menu button')??[]);const index=buttons.indexOf(document.activeElement as HTMLButtonElement);if(buttons.length){event.preventDefault();buttons[event.key==='Home'?0:event.key==='End'?buttons.length-1:(index+(event.key==='ArrowDown'?1:-1)+buttons.length)%buttons.length]?.focus();}}}}>
   <button type="button" aria-expanded={open} aria-controls="tufte-block-menu" onMouseDown={event=>event.preventDefault()} onClick={()=>{setPoint(null);setOpen(value=>!value);}}>블록 유형: {blockType} ▾</button>
   {open&&<div id="tufte-block-menu" role="group" aria-label="블록 유형">
    {([['paragraph','본문 문단'],['h2','제목 h2'],['h3','제목 h3']] as const).map(([type,label])=><button type="button" key={type} onMouseDown={event=>event.preventDefault()} onClick={()=>{editor.dispatchCommand(SET_TUFTE_BLOCK_COMMAND,type);setOpen(false);setPoint(null);editor.focus();}}>{label}</button>)}
