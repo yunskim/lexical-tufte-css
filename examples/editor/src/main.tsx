@@ -211,7 +211,8 @@ function BlockContextMenu(){
   };
   reposition();
   window.addEventListener('resize',reposition);
-  return()=>window.removeEventListener('resize',reposition);
+  window.addEventListener('scroll',reposition,true);
+  return()=>{window.removeEventListener('resize',reposition);window.removeEventListener('scroll',reposition,true);};
  },[open,point]);
  useEffect(()=>{if(!available&&!open)setPoint(null);},[available]);
  if(!available&&!open)return null;
