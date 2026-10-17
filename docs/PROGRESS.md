@@ -1,3 +1,9 @@
+## P2.2.c F07 섹션 출처 cite 명령 (일괄 검증 대기)
+
+- `quotationCommands.ts`: `APPEND_TUFTE_SECTION_CITE_COMMAND` 추가. 최상위 섹션의 `tufte-section-footer` 내부 선택만 허용하며, 기존 `tufte-cite`가 있으면 거부하고 스키마를 확인한 뒤 인용 출처를 추가한다.
+- `index.ts`: 공개 명령 export. `quotation-commands.test.mjs`: 정상 삽입·직렬화·중복 거부 원자성 회귀 추가.
+- 사용자 요청에 따라 단위·브라우저 테스트 실행은 마지막 통합 검증까지 보류한다. 구현 완료와 검증 완료를 구분하고 F07/P2.2.c 체크는 아직 열어 둔다. CI 생략.
+
 ## P2.2.c F08–F09 삽입 대상 스키마 검증 강화 (일괄 테스트 대기)
 
 - `packages/lexical/src/quotationCommands.ts`: 삽입 기준 블록의 허용 여부뿐 아니라 요청한 `quote`/`tufte-epigraph`/`tufte-section-footer`가 `tufte-section`의 허용 자식인지 확인한 후 삽입하도록 변경.
