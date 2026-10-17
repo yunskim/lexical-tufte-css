@@ -1,3 +1,9 @@
+## P3.1.d Tab 포커스 잔류 회귀 보강 (일괄 검증 대기)
+
+- `tests/contextual-ui-browser.mjs`에서 Tab/Shift+Tab으로 메뉴를 닫은 뒤 비표시 메뉴 항목이 활성 요소로 남지 않는지 추가 확인한다.
+- 정확한 다음 포커스 대상과 스크린리더 수동 검증은 별도로 남긴다.
+- 실행 테스트는 사용자 지시에 따라 누적 후 일괄 수행한다. CI 생략. P3.1.d 완료 체크는 하지 않는다.
+
 ## P3.1.c Tab/Shift+Tab 종료 브라우저 회귀 추가 (일괄 검증 대기)
 
 - `tests/contextual-ui-browser.mjs`에 우클릭 메뉴의 Tab/Shift+Tab 종료와 floating 상태 제거를 확인하는 시나리오를 추가했다.
