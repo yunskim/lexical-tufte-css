@@ -212,7 +212,10 @@ function BlockContextMenu(){
   reposition();
   window.addEventListener('resize',reposition);
   window.addEventListener('scroll',reposition,true);
-  return()=>{window.removeEventListener('resize',reposition);window.removeEventListener('scroll',reposition,true);};
+  const visualViewport=window.visualViewport;
+  visualViewport?.addEventListener('resize',reposition);
+  visualViewport?.addEventListener('scroll',reposition);
+  return()=>{window.removeEventListener('resize',reposition);window.removeEventListener('scroll',reposition,true);visualViewport?.removeEventListener('resize',reposition);visualViewport?.removeEventListener('scroll',reposition);};
  },[open,point]);
  useEffect(()=>{if(!available&&!open)setPoint(null);},[available]);
  if(!available&&!open)return null;
