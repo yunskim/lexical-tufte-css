@@ -34,3 +34,7 @@ details {margin-top:2rem;} .notice {color:#555;font-size:.9rem;}
 @media(prefers-color-scheme:dark){.selection-toolbar{background:#222;}}
 
 @media(max-width:400px){.selection-toolbar{width:calc(100vw - 24px);box-sizing:border-box;justify-content:flex-start;}.selection-toolbar button{min-width:2.5rem;min-height:2.5rem;}}
+
+.block-context-menu{margin:.75rem 0;display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;}
+.block-context-menu [role=group]{display:flex;flex-wrap:wrap;gap:.3rem;border:1px solid #999;border-radius:.4rem;padding:.3rem;}
+.block-context-menu button{font-size:.85rem;padding:.4rem .6rem;}
