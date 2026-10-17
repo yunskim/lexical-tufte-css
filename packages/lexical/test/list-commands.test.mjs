@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createHeadlessEditor} from '@lexical/headless';
-import {$getRoot,$createParagraphNode,$createTextNode,$getNodeByKey,KEY_ENTER_COMMAND,KEY_TAB_COMMAND} from 'lexical';
+import {$getRoot,$createParagraphNode,$createTextNode,$getNodeByKey,KEY_ENTER_COMMAND,KEY_BACKSPACE_COMMAND,KEY_TAB_COMMAND} from 'lexical';
 import {$createListNode,$createListItemNode} from '@lexical/list';
 import {TUFTE_NODES,$createSectionNode,registerListKeyboardCommands,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,SET_TUFTE_LIST_KIND_COMMAND,CHANGE_TUFTE_LIST_INDENT_COMMAND,UNWRAP_TUFTE_LIST_COMMAND,$createNoteNode} from '../dist/index.js';
 
@@ -342,5 +342,61 @@ test('P2.2.b Enter defers nonempty, nonfinal, nested and composing list items to
  const nonfinal=event();assert.equal(editor.dispatchCommand(KEY_ENTER_COMMAND,nonfinal),false);assert.equal(nonfinal.prevented,false);
  editor.update(()=>{$getRoot().getFirstChild().getFirstChild().getLastChild().selectStart();},{discrete:true});
  const composing=event(true);assert.equal(editor.dispatchCommand(KEY_ENTER_COMMAND,composing),false);assert.equal(composing.prevented,false);
+ stop();dispose();
+});
+
+test('P2.2.b Backspace removes empty first item without changing later note payload',()=>{
+ const {editor,dispose}=setup();const stop=registerListKeyboardCommands(editor);
+ editor.update(()=>{
+  const empty=$createListItemNode();
+  const other=$createListItemNode().append($createTextNode('Kept'),$createNoteNode('backspace-note','marginnote').append($createTextNode('Annotation')));
+  $getRoot().append($createSectionNode().append($createListNode('bullet').append(empty,other)));
+  empty.selectStart();
+ },{discrete:true});
+ const event={isComposing:false,shiftKey:false,ctrlKey:false,metaKey:false,altKey:false,prevented:false,preventDefault(){this.prevented=true;}};
+ assert.equal(editor.dispatchCommand(KEY_BACKSPACE_COMMAND,event),true);
+ editor.update(()=>{},{discrete:true});
+ assert.equal(event.prevented,true);
+ editor.getEditorState().read(()=>{
+  const list=$getRoot().getFirstChild().getFirstChild();
+  assert.equal(list.getChildrenSize(),1);
+  assert.equal(list.getFirstChild().getTextContent(),'KeptAnnotation');
+  assert.equal(list.getFirstChild().getLastChild().getNoteId(),'backspace-note');
+ });
+ stop();dispose();
+});
+
+test('P2.2.b Backspace on sole empty first list item replaces list with paragraph',()=>{
+ const {editor,dispose}=setup();const stop=registerListKeyboardCommands(editor);
+ editor.update(()=>{
+  const item=$createListItemNode();
+  $getRoot().append($createSectionNode().append($createListNode('number').append(item)));
+  item.selectStart();
+ },{discrete:true});
+ const event={isComposing:false,shiftKey:false,ctrlKey:false,metaKey:false,altKey:false,preventDefault(){}};
+ assert.equal(editor.dispatchCommand(KEY_BACKSPACE_COMMAND,event),true);
+ editor.update(()=>{},{discrete:true});
+ editor.getEditorState().read(()=>assert.deepEqual($getRoot().getFirstChild().getChildren().map(n=>n.getType()),['paragraph']));
+ stop();dispose();
+});
+
+test('P2.2.b Backspace leaves nonempty and nonfirst items, IME and outside paragraph to Lexical',()=>{
+ const {editor,dispose}=setup();const stop=registerListKeyboardCommands(editor);
+ editor.update(()=>{
+  const outside=$createTextNode('Outside');
+  const first=$createTextNode('First');
+  $getRoot().append($createSectionNode().append(
+   $createParagraphNode().append(outside),
+   $createListNode('bullet').append($createListItemNode().append(first),$createListItemNode())
+  ));
+  first.select(0,0);
+ },{discrete:true});
+ const event=(isComposing=false)=>({isComposing,shiftKey:false,ctrlKey:false,metaKey:false,altKey:false,prevented:false,preventDefault(){this.prevented=true;}});
+ const nonempty=event();assert.equal(editor.dispatchCommand(KEY_BACKSPACE_COMMAND,nonempty),false);assert.equal(nonempty.prevented,false);
+ editor.update(()=>{$getRoot().getFirstChild().getLastChild().getLastChild().selectStart();},{discrete:true});
+ const nonfirst=event();assert.equal(editor.dispatchCommand(KEY_BACKSPACE_COMMAND,nonfirst),false);assert.equal(nonfirst.prevented,false);
+ const composing=event(true);assert.equal(editor.dispatchCommand(KEY_BACKSPACE_COMMAND,composing),false);
+ editor.update(()=>{$getRoot().getFirstChild().getFirstChild().selectStart();},{discrete:true});
+ const outside=event();assert.equal(editor.dispatchCommand(KEY_BACKSPACE_COMMAND,outside),false);assert.equal(outside.prevented,false);
  stop();dispose();
 });
