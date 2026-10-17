@@ -223,6 +223,12 @@
 
 # 진행 기록
 
+## 2026-10-17 20:36 요청 — 메뉴 후속 검증 완료
+
+- main85ac2c3 별도 worktree frozen/check266개/pytest16개/package4개/기존browser11개+contextual1개/실제TS→Python HTTP 왕복 모두 통과. CI 없음.
+- 초점 이동·Home/End·ARIA role·실제 viewport 경계·외부 클릭 닫힘 회귀 확인. 코드/테스트 수정이나 새 실패 없이 검증 완료.
+- [최신 보고서](VERIFICATION_MENU_2026-10-17.ko.md)의 증거 범위에 한정. 전체 F표/P2–P7 및 운영/접근성 미완료는 유지.
+
 ## 2026-10-17 구분선·출처·컨텍스트 UI 검증
 
 - 최종 기존browser11개 및 추가contextual1개 통과로 이번 검증 작업 종료. E085 focus readiness와 M078을 추가하고 미검증 race 범위를 보고서에 남김.

@@ -62,6 +62,8 @@ pnpm test:browser
 
 ## 최신 통합 실행 검증
 
+2026-10-17 메뉴 후속(main85ac2c3): **266개 단위·통합 / Python16개 / browser12개 실행 파일 / package4개 / 실제 TS→Python HTTP 왕복** 모두 통과. 코드 수정·새 테스트 실패 없음, CI 생략. [최신 메뉴 검증 보고서](docs/VERIFICATION_MENU_2026-10-17.ko.md).
+
 2026-10-17 컨텍스트 UI 후속 검증: 단위·통합266개, Python16개, 패키지4개 및 실제 우클릭/키보드/선택 toolbar 회귀를 실행했습니다. 우클릭 명령이 이전 선택에 적용되는 오류를 수정했습니다. 최종 결과와 범위는 [UI 검증 보고서](docs/VERIFICATION_CONTEXT_UI_2026-10-17.ko.md)를 따릅니다. CI 생략.
 
 2026-10-17 Recovery HTTP 후속 검증 완료: **단위·통합253개 + Python16개 + 브라우저11개 + 패키지4개** 통과. 실제 TypeScript 클라이언트→Python HTTP→SQLite 왕복도 통과했습니다. CI 생략. [최신 후속 보고서](docs/VERIFICATION_RECOVERY_HTTP_2026-10-17.ko.md)에 수정 사항과 미완료 운영 연결을 기록했습니다.

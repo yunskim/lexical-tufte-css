@@ -1,5 +1,7 @@
 # 재발 방지 대책 및 정기 점검
 
+2026-10-17 20:36 검증 시작/완료 점검: E080–E085/M073–M078을 확인했다. 별도 worktree·구문 검사·명시적 focus readiness·빌드 종료 후 browser 직렬 실행·constraints venv 절차를 적용했다. main85ac2c3의 check266개/Python16개/browser12개/package4개/실제HTTP 모두 통과했고 새 실패는 없었다. Chromium 부재는 E073/M067에 따라 설치 준비로 구분했다. 다음 구현 시작/완료에 재점검한다.
+
 2026-10-17 UI 완료 점검: check266개/Python16개/package4개/기존browser11개+contextual1개/실제HTTP 왕복 통과. E080–E085 대책을 테스트·코드·실행 순서에 반영했다. 우클릭 실제 선택 오류는 반례와 정상 경로로 확인했다. 빠른 Escape/실제 IME/다른 브라우저·접근성 전체는 유지한다. 다음 구현 시작/완료 때 다시 점검한다.
 
 ## M078 — 키보드 UI는 표시와 focus readiness를 별도 관찰
