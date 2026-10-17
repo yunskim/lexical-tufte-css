@@ -1,3 +1,9 @@
+## P3.1.c 블록 메뉴 Home/End 및 우클릭 포커스 회귀 추가 (실행 대기)
+
+- `tests/contextual-ui-browser.mjs`: 키보드 메뉴의 End→Home→ArrowDown 이동, 우클릭 메뉴의 첫 버튼 포커스와 End→Home 이동 검사를 추가했다.
+- 앞선 도구 차단 이후 작은 독립 커밋 두 건으로 재시도하여 반영했다. 테스트 실행 결과를 주장하지 않는다.
+- 이전 검증 통과 결과는 해당 커밋 이전 기준이며 이번 테스트는 실행 대기. CI 생략.
+
 ## P3.1.c 블록 메뉴 공통 적격성 검사 (신규 변경 검증 대기)
 
 - `canOpenBlockMenu`로 note/table/tablecell/tablerow/figure/image 노드 및 조상 노드 제한을 공통화했다. 선택 변경 감시·마우스 우클릭·키보드 ContextMenu/Shift+F10 진입이 동일한 Lexical 검사 경로를 사용한다.
