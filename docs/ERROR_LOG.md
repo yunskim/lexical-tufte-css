@@ -1,5 +1,13 @@
 # 에러 기록
 
+## E086 — 메뉴 진입 경로별 open guard 누락 (코드 점검에서 발견)
+
+- 선택 위치 보존 리팩터링 직후 우클릭 경로에 `menuOpenRef.current=true`가 중복 삽입되고, `Shift+F10/ContextMenu` 경로에는 삽입되지 않은 것을 소스 재조회에서 발견했다. 같은 문자열 치환의 반복 적용이 원인이었다.
+- 우클릭 경로의 중복을 제거하고 키보드 경로에도 동일한 open guard를 지정했다 (`20418e9`). 세 진입 경로(우클릭·키보드·버튼)에서 열림 guard 설정을 정적 재점검했다.
+- `tests/contextual-ui-browser.mjs`의 키보드 진입/첫 항목 focus 검증 및 실제 명령 실행은 사용자 요청에 따라 **일괄 테스트 대기**다. 정적 수정 사실과 실행 검증 완료를 구분한다.
+- 상태: 코드 수정, **검증 대기**. M080 참조.
+
+
 ## E085 — 메뉴 표시와 키보드 focus 도착 시점 혼동
 
 - contextual 검사에서 Shift+F10 후 group 표시만 기다리고 Escape를 보내, requestAnimationFrame의 첫 버튼 focus 이전에 키가 editor로 전달되어 닫힘 검사가 timeout했다.
