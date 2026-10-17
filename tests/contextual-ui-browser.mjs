@@ -49,6 +49,7 @@ try{
  await page.keyboard.press('Home');assert.equal(await page.locator(':focus').innerText(),'본문 문단');
  await group.getByRole('menuitem',{name:'제목 h3',exact:true}).click();
  assert.equal(await editor.locator('h3').innerText(),'선택 영역 검사');
+ await page.waitForFunction(()=>document.querySelector('.block-context-menu > button')?.textContent?.includes('제목 h3'));
  await page.setViewportSize({width:375,height:812});
  await editor.locator('h3').click({button:'right'});await group.waitFor();
  await page.waitForFunction(()=>document.activeElement?.textContent==='본문 문단');
