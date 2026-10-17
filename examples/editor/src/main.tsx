@@ -677,6 +677,7 @@ function EditorUI(){
       <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(MOVE_TUFTE_DEFINITION_PAIR_COMMAND,'up')}>정의 쌍 위로 이동</button>
       <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(MOVE_TUFTE_DEFINITION_PAIR_COMMAND,'down')}>정의 쌍 아래로 이동</button>
       <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(REMOVE_TUFTE_DEFINITION_PAIR_COMMAND,undefined)}>정의 쌍 삭제</button>
+      <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(REMOVE_TUFTE_DEFINITION_LIST_COMMAND,undefined)}>정의목록 전체 삭제</button>
       {(['sans','newthought','numeral','danger'] as const).map(kind=><button key={kind} onMouseDown={preserve} onClick={()=>editor.dispatchCommand(SET_TUFTE_SPAN_KIND_COMMAND,kind)}>인라인 {kind}</button>)}
       {(['sans','newthought','numeral','danger'] as const).map(kind=><button key={'wrap-'+kind} onMouseDown={preserve} onClick={()=>editor.dispatchCommand(WRAP_TUFTE_SPAN_COMMAND,kind)}>선택 텍스트 {kind}</button>)}
       <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(UNWRAP_TUFTE_SPAN_COMMAND,undefined)}>인라인 속성 해제</button>
