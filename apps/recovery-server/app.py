@@ -49,7 +49,9 @@ def create_app(db_file: str, authorize: Callable[[Request, str], bool]):
 
     @app.exception_handler(HTTPException)
     async def http_error(request, exc):
-        code = exc.detail if isinstance(exc.detail, str) and exc.detail.startswith('RECOVERY_') or exc.detail == 'INVALID_RECOVERY_INPUT' else 'RECOVERY_REQUEST_DENIED'
+        code = (exc.detail if isinstance(exc.detail, str) and
+                (exc.detail.startswith('RECOVERY_') or exc.detail == 'INVALID_RECOVERY_INPUT')
+                else 'RECOVERY_REQUEST_DENIED')
         return failure(code, exc.status_code)
 
     @app.exception_handler(RequestValidationError)
@@ -58,12 +60,16 @@ def create_app(db_file: str, authorize: Callable[[Request, str], bool]):
 
     @app.middleware("http")
     async def no_store(request, call_next):
+        def reject(code, status):
+            response = failure(code, status)
+            response.headers['Cache-Control'] = 'no-store'
+            return response
         if request.method in ('PUT', 'DELETE') and request.url.path.startswith('/posts/'):
             length = request.headers.get('content-length')
             if length is not None and (not length.isdecimal() or int(length) > 2_100_000):
-                return failure('RECOVERY_REQUEST_TOO_LARGE', 413)
+                return reject('RECOVERY_REQUEST_TOO_LARGE', 413)
             if request.headers.get('content-type', '').split(';', 1)[0].strip().lower() != 'application/json':
-                return failure('RECOVERY_CONTENT_TYPE_UNSUPPORTED', 415)
+                return reject('RECOVERY_CONTENT_TYPE_UNSUPPORTED', 415)
             received = 0
             chunks = []
             async for chunk in request.stream():
