@@ -51,6 +51,14 @@ export class SqliteEditorRecoveryStore{
    return fail('RECOVERY_STORAGE_ERROR','Recovery removal failed');
   }
  }
+ /** Enumerate recovery metadata without returning raw drafts; each payload is integrity checked on read. */
+ list(postId:string):Result<Array<Pick<RecoverySlot,'postId'|'sessionId'|'sequence'|'baseRevision'|'savedAt'|'checksum'>>>{
+  if(!isIdentifier(postId))return fail('INVALID_RECOVERY_INPUT','Invalid recovery identity');
+  try{
+   const rows=this.db.prepare('SELECT post_id,session_id,sequence,base_revision,saved_at,checksum FROM editor_recovery_v1 WHERE post_id=? ORDER BY saved_at DESC,session_id ASC').all(postId) as Array<Record<string,unknown>>;
+   return {ok:true,value:rows.map(row=>({postId:String(row.post_id),sessionId:String(row.session_id),sequence:Number(row.sequence),baseRevision:Number(row.base_revision),savedAt:String(row.saved_at),checksum:String(row.checksum)})),diagnostics:[]};
+  }catch{return fail('RECOVERY_STORAGE_ERROR','Recovery list failed');}
+ }
  async read(postId:string,sessionId:string):Promise<Result<RecoverySlot|null>>{
   if(!isIdentifier(postId)||!isIdentifier(sessionId))return fail('INVALID_RECOVERY_INPUT','Invalid recovery identity');
   try{
