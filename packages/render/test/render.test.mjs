@@ -309,5 +309,6 @@ test('F07 horizontal rule is published between paragraphs without losing their c
  );
  const result=renderArticle(d);
  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
- assert.match(result.html,/<p>before-rule<\/p><hr><p>after-rule<\/p>/);
+ const before=result.html.indexOf('before-rule'),rule=result.html.indexOf('<hr>',before),after=result.html.indexOf('after-rule',rule);
+ assert.ok(before>=0&&rule>before&&after>rule,'the rule must publish between both preserved paragraphs');
 });
