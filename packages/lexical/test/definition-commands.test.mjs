@@ -105,14 +105,47 @@ test('P2.2.b deleting selected definition pair removes only dt/dd and refuses re
  unregister();
 });
 
-test('P2.2.b grouped dt dt dd is valid structure but refuses pair move/delete without mutation',()=>{
+test('P2.2.b multi-term definition groups move together and remove together without splitting shared description',()=>{
  const {editor,diagnostics,unregister}=setup();
  editor.update(()=>{
   const first=$createTextNode('Variant term');
   $getRoot().append($createSectionNode().append($createDefinitionListNode().append(
    $createDefinitionTermNode().append(first),
    $createDefinitionTermNode().append($createTextNode('Alias')),
-   $createDefinitionDescriptionNode().append($createParagraphNode().append($createTextNode('Shared definition')))
+   $createDefinitionDescriptionNode().append($createParagraphNode().append($createTextNode('Shared definition'))),
+   $createDefinitionTermNode().append($createTextNode('Second group')),
+   $createDefinitionDescriptionNode().append($createParagraphNode().append($createTextNode('Second definition')))
+  )));
+  first.select(1,1);
+ },{discrete:true});
+ const before=editor.getEditorState().toJSON();
+ editor.dispatchCommand(MOVE_TUFTE_DEFINITION_PAIR_COMMAND,'down');
+ editor.update(()=>{},{discrete:true});
+ editor.getEditorState().read(()=>{
+  const children=$getRoot().getFirstChild().getFirstChild().getChildren();
+  assert.deepEqual(children.map(n=>n.getTextContent()),['Second group','Second definition','Variant term','Alias','Shared definition']);
+ });
+ editor.dispatchCommand(MOVE_TUFTE_DEFINITION_PAIR_COMMAND,'up');
+ editor.update(()=>{},{discrete:true});
+ assert.deepEqual(editor.getEditorState().toJSON(),before);
+ editor.dispatchCommand(REMOVE_TUFTE_DEFINITION_PAIR_COMMAND,undefined);
+ editor.update(()=>{},{discrete:true});
+ editor.getEditorState().read(()=>{
+  const children=$getRoot().getFirstChild().getFirstChild().getChildren();
+  assert.deepEqual(children.map(n=>n.getTextContent()),['Second group','Second definition']);
+ });
+ assert.deepEqual(diagnostics,[]);
+ unregister();
+});
+
+test('P2.2.b invalid definition group ordering refuses edits atomically',()=>{
+ const {editor,diagnostics,unregister}=setup();
+ editor.update(()=>{
+  const first=$createTextNode('Term');
+  $getRoot().append($createSectionNode().append($createDefinitionListNode().append(
+   $createDefinitionTermNode().append(first),
+   $createDefinitionDescriptionNode().append($createParagraphNode().append($createTextNode('Definition'))),
+   $createDefinitionDescriptionNode().append($createParagraphNode().append($createTextNode('Orphan description')))
   )));
   first.select(1,1);
  },{discrete:true});
