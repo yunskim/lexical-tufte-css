@@ -5,6 +5,7 @@ Lexical 기반 Tufte CSS 편집기와 블로그 운영용 TypeScript 라이브�
 현재 단계: P0·P1·P2.1 완료. 노트 편집 prototype을 실행할 수 있습니다. 전체 편집기 및 npm 배포 패키지는 아직 완성되지 않았습니다.
 
 - [구현 계획 및 실행 체크리스트](docs/PLAN.ko.md)
+- [2026-10-17 구현 계획 독립 재점검과 남은 게이트](docs/PLAN_AUDIT_2026-10-17.ko.md)
 - [작업 규약](AGENTS.md)
 
 저장소: https://github.com/yunskim/lexical-tufte-css
@@ -61,6 +62,9 @@ pnpm test:browser
 `packages/document`는 문서·메타데이터·자산·33개 노드 계약과 validator를 제공합니다. `packages/render`는 공유 검증 뒤 현재 `p1-v1` 출력 지원 범위를 검사합니다. 두 패키지는 DOM/React/Lexical runtime 없이 실행됩니다. 노드별 편집·발행 구현은 P2.2부터 확장합니다.
 
 ## 최신 통합 실행 검증
+
+**주의:** 아래의 통과 결과는 각각 명시된 검증 커밋만을 대상으로 한다. 이후의 블록 메뉴·인라인 span 명령·직접 의존성 수정은 회귀 테스트 코드를 작성했지만 아직 일괄 실행하지 않았다. [진행 기록](docs/PROGRESS.md)의 미검증 상태를 우선 확인한다.
+
 
 2026-10-17 메뉴 후속(main85ac2c3): **266개 단위·통합 / Python16개 / browser12개 실행 파일 / package4개 / 실제 TS→Python HTTP 왕복** 모두 통과. 코드 수정·새 테스트 실패 없음, CI 생략. [최신 메뉴 검증 보고서](docs/VERIFICATION_MENU_2026-10-17.ko.md).
 
