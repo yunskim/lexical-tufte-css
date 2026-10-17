@@ -1,3 +1,8 @@
+## P3.1.a 인라인 명령 목록 통합 (검증 대기)
+
+- `examples/editor/src/main.tsx`: underline/strikethrough/highlight 아이콘 전환 및 6개 인라인 서식의 `INLINE_ACTIONS` 공통 목록 도입. 공통 목록은 향후 Floating Toolbar가 재사용할 기준이다.
+- Floating Toolbar, 블록 메뉴, 플랫폼별 키 바인딩은 미구현. 실행 검증은 최종 일괄 수행하며 CI는 생략한다.
+
 ## P3.1.a 단축키 안내 및 타입 정리 (검증 대기)
 
 - `examples/editor/src/main.tsx`: `MouseEvent` 타입을 직접 import하여 React namespace 참조를 제거하고, 일반 서식/이력 명령의 툴팁 단축키 안내를 추가했다.
