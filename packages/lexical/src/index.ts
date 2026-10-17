@@ -30,7 +30,7 @@ export {registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_T
 
 export {registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,type TufteListKind} from './listCommands.js';
 
-export {registerQuotationCommands,INSERT_TUFTE_QUOTATION_COMMAND,INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,type TufteQuotationKind} from './quotationCommands.js';
+export {registerQuotationCommands,INSERT_TUFTE_QUOTATION_COMMAND,INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,APPEND_TUFTE_SECTION_CITE_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,type TufteQuotationKind} from './quotationCommands.js';
 
 export {registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,type UpdateFigureMarginNote,type InsertTufteFigure,type InsertFigureMarginNote} from './figureCommands.js';
 
