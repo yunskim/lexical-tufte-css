@@ -50,3 +50,9 @@
 - 호스트는 반드시 요청을 인증하고 CSRF를 검사한 뒤 호출해야 한다. `postId`와 `sessionId`는 경로와 본문 일치를 검사한다.
 - `packages/blog/test/recovery-host.test.mjs` 권한 성공·거부·예외·세션 격리 회귀 코드를 추가했다.
 - 테스트 및 타입 검사는 사용자의 일괄 검증 지시로 미실행. HTTP 요청 dispatch의 추가 회귀 코드, 실제 서버 연결 및 브라우저 연결은 후속이다. CI 생략.
+
+## 요청 가드 (검증 대기)
+
+- `handleRecoveryRequest(service,request,guard)`의 선택적 `RecoveryRequestGuard`를 추가했다. guard는 실제 호스트가 사용자 인증·Origin/CSRF를 확인하는 함수이며, false/예외는 403으로 거부한다.
+- **guard 생략은 기존 API 호환용이며 안전한 배포 설정이 아니다.** 공개 HTTP 라우트는 반드시 guard를 제공하고, 그 외에도 `AuthorizedRecoveryService`의 글·세션 권한 검사를 유지해야 한다.
+- `packages/blog/test/recovery-http.test.mjs`에 거부/예외/허용 분기 회귀 코드를 작성했다. 실행 검증 대기, CI 생략.
