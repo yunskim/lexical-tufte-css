@@ -143,15 +143,11 @@ function BlockContextMenu(){
    if(!domSelection)return;
    const range=document.createRange();
    try{range.setStart(node,offset);range.collapse(true);}catch{return;}
+   // Keep the browser's native menu if the click is outside an editable text position.
+   // Lexical reconciles the DOM caret after focus; the menu must not assume a stale selection.
    domSelection.removeAllRanges();
    domSelection.addRange(range);
    editor.focus();
-   let valid=false;
-   editor.getEditorState().read(()=>{
-    const selection=$getSelection();
-    valid=$isRangeSelection(selection)&&selection.isCollapsed()&&!containingNote(selection.anchor.getNode());
-   });
-   if(!valid)return;
    event.preventDefault();
    setPoint({x:Math.max(8,Math.min(window.innerWidth-260,event.clientX)),y:Math.max(8,Math.min(window.innerHeight-160,event.clientY))});
    setOpen(true);
