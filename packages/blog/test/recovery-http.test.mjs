@@ -45,3 +45,17 @@ test('HTTP dispatcher denies unauthorized requests before data access',async()=>
   assert.equal((await call(service,'DELETE','session-1',{expectedSequence:1})).status,403);
  }finally{db.close();}
 });
+
+test('host request guard denies mutations before SQLite access and fails closed',async()=>{
+ const {db,service}=setup();try{
+  const request={method:'PUT',postId:'post-1',sessionId:'session-1',body:{...draft,expectedSequence:0}};
+  const denied=await handleRecoveryRequest(service,request,()=>false);
+  assert.equal(denied.status,403);
+  assert.equal(denied.body.diagnostics[0].code,'RECOVERY_REQUEST_DENIED');
+  assert.equal((await call(service,'GET')).body.value.length,0);
+  const errored=await handleRecoveryRequest(service,request,()=>{throw Error('CSRF unavailable');});
+  assert.equal(errored.status,403);
+  assert.equal((await call(service,'GET')).body.value.length,0);
+  assert.equal((await handleRecoveryRequest(service,request,()=>true)).status,200);
+ }finally{db.close();}
+});
