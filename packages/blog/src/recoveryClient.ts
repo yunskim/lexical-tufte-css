@@ -1,6 +1,7 @@
 import type {Result} from '@lexical-tufte/document';
-import type {RecoverySlot} from './recovery.js';
-import type {RecoveryMetadata} from './recoveryHost.js';
+/** Browser-only structural DTOs; do not import server modules here. */
+export type RecoveryClientSlot={postId:string;sessionId:string;sequence:number;baseRevision:number;savedAt:string;payload:string;checksum:string};
+export type RecoveryClientMetadata=Omit<RecoveryClientSlot,'payload'>;
 
 export type RecoveryClientFetch=(input:string,init?:RequestInit)=>Promise<Response>;
 export type RecoveryClientOptions={
@@ -40,9 +41,9 @@ export class RecoveryHttpClient{
    return parsed as Result<T>;
   }catch{return failure('RECOVERY_NETWORK_ERROR','Recovery request failed');}
  }
- list(postId:string):Promise<Result<RecoveryMetadata[]>>{return this.send('GET',postId);}
- read(postId:string,sessionId:string):Promise<Result<RecoverySlot|null>>{return this.send('GET',postId,sessionId);}
- save(input:Omit<RecoverySlot,'checksum'>,expectedSequence:number):Promise<Result<RecoverySlot>>{
+ list(postId:string):Promise<Result<RecoveryClientMetadata[]>>{return this.send('GET',postId);}
+ read(postId:string,sessionId:string):Promise<Result<RecoveryClientSlot|null>>{return this.send('GET',postId,sessionId);}
+ save(input:Omit<RecoveryClientSlot,'checksum'>,expectedSequence:number):Promise<Result<RecoveryClientSlot>>{
   return this.send('PUT',input.postId,input.sessionId,{...input,expectedSequence});
  }
  remove(postId:string,sessionId:string,expectedSequence:number):Promise<Result<boolean>>{
