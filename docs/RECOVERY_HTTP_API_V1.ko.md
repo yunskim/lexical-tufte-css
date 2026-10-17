@@ -46,3 +46,7 @@ Python FastAPI 어댑터는 PUT/DELETE에서 `application/json`을 요구하며,
 ## 언어 간 계약 fixture
 
 공통 테스트 데이터: `apps/recovery-server/tests/fixtures/recovery_v1.json`. Python `apps/recovery-server/tests/test_shared_contract.py`와 TypeScript `packages/blog/test/recovery-shared-contract.test.mjs`가 같은 파일을 읽는다. 저장/삭제 본문, CAS 충돌, 체크섬·진단 코드 기대값을 비교한다. **코드만 작성했으며 아직 실행하지 않았다.** 다음 단계에서 실제 인증/CSRF 호스트 연결 및 계약 테스트 실행 후 v1 호환성 판정이 필요하다.
+
+## 엄격한 숫자·경로 오류 규칙
+
+`sequence`, `expectedSequence`, `baseRevision`은 JSON 정수여야 하며 문자열, 불리언, 소수 형태를 자동 변환하지 않는다. 범위는 JavaScript 안전 정수 범위 안이다. 미등록 경로는 404 `RECOVERY_ROUTE_NOT_FOUND`, 허용되지 않은 메서드는 405 `RECOVERY_METHOD_NOT_ALLOWED`로 공통 `{ok:false,diagnostics:[...]}` 형식을 사용한다. 테스트 코드는 작성했지만 아직 실행하지 않았다.
