@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {createHeadlessEditor} from '@lexical/headless';
 import {$getRoot,$createParagraphNode,$createTextNode,UNDO_COMMAND,REDO_COMMAND} from 'lexical';
 import {registerHistory,createEmptyHistoryState} from '@lexical/history';
-import {TUFTE_NODES,$createSectionNode,registerQuotationCommands,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,$createNoteNode} from '../dist/index.js';
+import {TUFTE_NODES,$createSectionNode,registerQuotationCommands,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,APPEND_TUFTE_SECTION_CITE_COMMAND,INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,$createNoteNode} from '../dist/index.js';
 
 function setup(){
  const diagnostics=[];
@@ -222,6 +222,25 @@ test('F08 attribution command refuses duplicate cite footer without changing quo
  },{discrete:true});
  editor.update(()=>editor.dispatchCommand(APPEND_TUFTE_ATTRIBUTION_COMMAND,undefined),{discrete:true});
  assert.deepEqual(editor.getEditorState().toJSON(),before);
+ assert.equal(diagnostics.at(-1)?.code,'INVALID_QUOTATION_SELECTION');
+ dispose();
+});
+
+test('F07 section footer cite insertion is semantic and duplicate-safe',()=>{
+ const {editor,diagnostics,dispose}=setup();
+ editor.update(()=>{
+  const text=$createTextNode('body');
+  $getRoot().append($createSectionNode().append($createParagraphNode().append(text)));
+  text.selectEnd();
+ },{discrete:true});
+ editor.update(()=>editor.dispatchCommand(INSERT_TUFTE_QUOTATION_COMMAND,'section-footer'),{discrete:true});
+ editor.update(()=>editor.dispatchCommand(APPEND_TUFTE_SECTION_CITE_COMMAND,undefined),{discrete:true});
+ const after=editor.getEditorState().toJSON();
+ const footer=after.root.children[0].children.at(-1);
+ assert.equal(footer.type,'tufte-section-footer');
+ assert.equal(footer.children.at(-1).type,'tufte-cite');
+ editor.update(()=>editor.dispatchCommand(APPEND_TUFTE_SECTION_CITE_COMMAND,undefined),{discrete:true});
+ assert.deepEqual(editor.getEditorState().toJSON(),after);
  assert.equal(diagnostics.at(-1)?.code,'INVALID_QUOTATION_SELECTION');
  dispose();
 });
