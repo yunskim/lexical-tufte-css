@@ -33,7 +33,7 @@ export function registerQuotationCommands(editor:LexicalEditor,onDiagnostic?:(di
    if(!(section instanceof SectionNode)||section.getParent()?.getType()!=='root')return reject('최상위 섹션에서만 구분선을 삽입할 수 있습니다.');
    let block:LexicalNode=s.anchor.getNode();
    while(block.getParent()&&!block.getParent()!.is(section))block=block.getParent()!;
-   if(!block.getParent()?.is(section)||!NODE_SCHEMA['tufte-section']!.children!.includes('horizontalrule'))return reject('유효한 섹션 블록을 선택하세요.');
+   if(!block.getParent()?.is(section)||!NODE_SCHEMA['tufte-section']!.children!.includes(block.getType())||!NODE_SCHEMA['tufte-section']!.children!.includes('horizontalrule'))return reject('유효한 섹션 블록을 선택하세요.');
    $addUpdateTag(HISTORY_PUSH_TAG);
    const rule=$createHorizontalRuleNode();block.insertAfter(rule);rule.selectNext();return true;
   },COMMAND_PRIORITY_EDITOR),
