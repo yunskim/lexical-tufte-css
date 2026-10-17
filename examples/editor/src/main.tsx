@@ -134,6 +134,18 @@ function BlockContextMenu(){
    if(editor.isComposing())return;
    const target=event.target;
    if(!(target instanceof Node)||!root.contains(target))return;
+   const caret=document.caretPositionFromPoint?.(event.clientX,event.clientY);
+   const legacy=document.caretRangeFromPoint?.(event.clientX,event.clientY);
+   const node=caret?.offsetNode??legacy?.startContainer;
+   const offset=caret?.offset??legacy?.startOffset;
+   if(!node||offset===undefined||!root.contains(node))return;
+   const domSelection=window.getSelection();
+   if(!domSelection)return;
+   const range=document.createRange();
+   try{range.setStart(node,offset);range.collapse(true);}catch{return;}
+   domSelection.removeAllRanges();
+   domSelection.addRange(range);
+   editor.focus();
    let valid=false;
    editor.getEditorState().read(()=>{
     const selection=$getSelection();
