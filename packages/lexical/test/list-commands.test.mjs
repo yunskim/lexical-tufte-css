@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {createHeadlessEditor} from '@lexical/headless';
 import {$getRoot,$createParagraphNode,$createTextNode,$getNodeByKey} from 'lexical';
 import {$createListNode,$createListItemNode} from '@lexical/list';
-import {TUFTE_NODES,$createSectionNode,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,SET_TUFTE_LIST_KIND_COMMAND,CHANGE_TUFTE_LIST_INDENT_COMMAND,$createNoteNode} from '../dist/index.js';
+import {TUFTE_NODES,$createSectionNode,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,SET_TUFTE_LIST_KIND_COMMAND,CHANGE_TUFTE_LIST_INDENT_COMMAND,UNWRAP_TUFTE_LIST_COMMAND,$createNoteNode} from '../dist/index.js';
 
 function setup(){
  const diagnostics=[];
@@ -181,5 +181,62 @@ test('P2.2.b indent first item and outdent top-level item are atomic rejections'
  editor.update(()=>{},{discrete:true});
  assert.equal(JSON.stringify(editor.getEditorState().toJSON()),before);
  assert.equal(diagnostics.length,3);
+ dispose();
+});
+
+test('P2.2.b flat list unwrap creates paragraphs at the same position without losing inline note identity',()=>{
+ const {editor,diagnostics,dispose}=setup();
+ editor.update(()=>{
+  const itemText=$createTextNode('First');
+  const withNote=$createListItemNode().append(itemText,$createNoteNode('unwrap-note','sidenote').append($createTextNode('Note text')));
+  const second=$createListItemNode().append($createTextNode('Second'));
+  $getRoot().append($createSectionNode().append(
+   $createParagraphNode().append($createTextNode('Before')),
+   $createListNode('bullet').append(withNote,second),
+   $createParagraphNode().append($createTextNode('After'))
+  ));
+  itemText.select(2,2);
+ },{discrete:true});
+ editor.dispatchCommand(UNWRAP_TUFTE_LIST_COMMAND,undefined);
+ editor.update(()=>{},{discrete:true});
+ editor.getEditorState().read(()=>{
+  const blocks=$getRoot().getFirstChild().getChildren();
+  assert.deepEqual(blocks.map(n=>n.getType()),['paragraph','paragraph','paragraph','paragraph']);
+  assert.deepEqual(blocks.map(n=>n.getTextContent()),['Before','FirstNote text','Second','After']);
+  assert.equal(blocks[1].getLastChild().getNoteId(),'unwrap-note');
+ });
+ assert.deepEqual(diagnostics,[]);
+ dispose();
+});
+
+test('P2.2.b nested list unwrap rejects without changing parent list or nested content',()=>{
+ const {editor,diagnostics,dispose}=setup();
+ editor.update(()=>{
+  const text=$createTextNode('Main');
+  const nested=$createListNode('number').append($createListItemNode().append($createTextNode('Nested')));
+  const list=$createListNode('bullet').append($createListItemNode().append(text,nested));
+  $getRoot().append($createSectionNode().append(list));
+  text.select(1,1);
+ },{discrete:true});
+ const before=JSON.stringify(editor.getEditorState().toJSON());
+ editor.dispatchCommand(UNWRAP_TUFTE_LIST_COMMAND,undefined);
+ editor.update(()=>{},{discrete:true});
+ assert.equal(JSON.stringify(editor.getEditorState().toJSON()),before);
+ assert.ok(diagnostics.some(d=>d.code==='INVALID_LIST_SELECTION'));
+ dispose();
+});
+
+test('P2.2.b list unwrap rejects an ordinary paragraph without modifying a nearby list',()=>{
+ const {editor,diagnostics,dispose}=setup();
+ editor.update(()=>{
+  const text=$createTextNode('Outside');
+  $getRoot().append($createSectionNode().append($createParagraphNode().append(text),$createListNode('bullet').append($createListItemNode().append($createTextNode('Inside')))));
+  text.select(1,1);
+ },{discrete:true});
+ const before=JSON.stringify(editor.getEditorState().toJSON());
+ editor.dispatchCommand(UNWRAP_TUFTE_LIST_COMMAND,undefined);
+ editor.update(()=>{},{discrete:true});
+ assert.equal(JSON.stringify(editor.getEditorState().toJSON()),before);
+ assert.ok(diagnostics.some(d=>d.code==='INVALID_LIST_SELECTION'));
  dispose();
 });
