@@ -1,3 +1,8 @@
+## P2.2.c F07 섹션 문헌 실제 편집기 회귀 추가 (일괄 검증 대기)
+
+- `tests/section-commands-browser.mjs`: React 툴바에서 섹션 출처 → 섹션 문헌 삽입 후 Lexical JSON의 footer/cite 구조, 다른 섹션 불변성, 독립 렌더러의 HTML footer/cite 및 undo 복귀 검사 추가.
+- 사용자 방침에 따라 Playwright 실행은 아직 하지 않았고, 테스트 통과·F07 완료 판정은 보류한다. CI는 생략한다.
+
 ## P2.2.c F07 섹션 문헌 저장·복원·발행 회귀 (일괄 검증 대기)
 
 - `packages/lexical/test/quotation-commands.test.mjs`: 문헌 인용 추가 후 Lexical JSON 직렬화, 새 headless editor에서 복원, 원래 본문·footer/cite 구조 보존 확인.
