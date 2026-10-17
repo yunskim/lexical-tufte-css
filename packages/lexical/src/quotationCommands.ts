@@ -45,6 +45,8 @@ export function registerQuotationCommands(editor:LexicalEditor,onDiagnostic?:(di
    let block:LexicalNode=s.anchor.getNode();
    while(block.getParent()&&!block.getParent()!.is(section))block=block.getParent()!;
    if(!block.getParent()?.is(section)||!NODE_SCHEMA['tufte-section']!.children!.includes(block.getType()))return reject('유효한 섹션 블록을 선택하세요.');
+   const insertedType=kind==='quote'?'quote':kind==='epigraph'?'tufte-epigraph':'tufte-section-footer';
+   if(!NODE_SCHEMA['tufte-section']!.children!.includes(insertedType))return reject('섹션에 허용되지 않는 인용 구조입니다.');
    $addUpdateTag(HISTORY_PUSH_TAG);
    const node=kind==='quote'?quote():kind==='epigraph'?$createEpigraphNode().append(quote()):$createSectionFooterNode().append($createTextNode('섹션 출처'));
    block.insertAfter(node);node.selectStart();return true;
