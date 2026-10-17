@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef, useState, type MouseEvent} from 'react';
 import {createRoot} from 'react-dom/client';
 import {LexicalComposer} from '@lexical/react/LexicalComposer';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
@@ -36,7 +36,7 @@ const toolbarPaths:Record<ToolbarIconName,string>={
 function ToolbarIcon({name}:{name:ToolbarIconName}){
  return <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d={toolbarPaths[name]}/></svg>;
 }
-function IconButton({name,label,onClick,onMouseDown}:{name:ToolbarIconName;label:string;onClick:()=>void;onMouseDown:(event:React.MouseEvent<HTMLButtonElement>)=>void}){
+function IconButton({name,label,onClick,onMouseDown}:{name:ToolbarIconName;label:string;onClick:()=>void;onMouseDown:(event:MouseEvent<HTMLButtonElement>)=>void}){
  return <button type="button" aria-label={label} title={label} onMouseDown={onMouseDown} onClick={onClick}><ToolbarIcon name={name}/></button>;
 }
 
@@ -387,7 +387,7 @@ function EditorUI(){
       <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(INSERT_TUFTE_LIST_COMMAND,'bullet')}>글머리표 목록 삽입</button>
       <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(INSERT_TUFTE_LIST_COMMAND,'number')}>번호 목록 삽입</button>
       <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(APPEND_TUFTE_LIST_ITEM_COMMAND,undefined)}>목록 항목 추가</button>
-      {([['quote','인용문 삽입'],['epigraph','Epigraph 삽입'],['section-footer','섹션 출처 삽입']] as const).map(([kind,label])=><button key={kind} onMouseDown={preserve} onClick={()=>editor.dispatchCommand(INSERT_TUFTE_QUOTATION_COMMAND,kind)}>{label}</button>)}
+      {([['quote','인용문 삽입'],['epigraph','Epigraph 삽입'],['section-footer','섹션 출처 삽입']] as const).map(([kind,label])=><IconButton key={kind} name={kind==='epigraph'?'epigraph':'quote'} label={label} onMouseDown={preserve} onClick={()=>editor.dispatchCommand(INSERT_TUFTE_QUOTATION_COMMAND,kind)}/>)}
       <IconButton name="rule" label="구분선 삽입" onMouseDown={preserve} onClick={()=>editor.dispatchCommand(INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,undefined)}/>
       <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(APPEND_TUFTE_ATTRIBUTION_COMMAND,undefined)}>인용문 출처 추가</button>
       <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(APPEND_TUFTE_SECTION_CITE_COMMAND,undefined)}>섹션 문헌 추가</button>
