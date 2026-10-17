@@ -38,10 +38,10 @@ def test_contract_roundtrip_and_cas(tmp_path):
     assert len(listed.json()["value"]) == 1
     assert "payload" not in listed.json()["value"][0]
     assert client.get(BASE + "/session-1").json()["value"]["payload"] == PAYLOAD
-    conflict = client.delete(BASE + "/session-1", json={"expectedSequence": 2})
+    conflict = client.request("DELETE", BASE + "/session-1", json={"expectedSequence": 2})
     assert conflict.status_code == 409
     assert conflict.json()["diagnostics"][0]["code"] == "RECOVERY_CONFLICT"
-    assert client.delete(BASE + "/session-1", json={"expectedSequence": 1}).json()["value"] is True
+    assert client.request("DELETE", BASE + "/session-1", json={"expectedSequence": 1}).json()["value"] is True
     assert client.get(BASE + "/session-1").json()["value"] is None
 
 
@@ -67,4 +67,5 @@ def test_contract_rejects_content_type_and_oversized_body(tmp_path):
     huge = client.put(BASE + "/session-1", content=b'x' * 2_100_001,
                       headers={"content-type": "application/json"})
     assert huge.status_code == 413
+    assert huge.headers["cache-control"] == "no-store"
     assert huge.json()["diagnostics"][0]["code"] == "RECOVERY_REQUEST_TOO_LARGE"
