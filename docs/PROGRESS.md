@@ -1,3 +1,9 @@
+## P3.1.c 제목 수준 레이블 구분 (일괄 검증 대기)
+
+- 블록 컨텍스트 메뉴가 HeadingNode의 h2/h3 태그를 읽어 현재 제목 수준을 구분한다. `$isHeadingNode` 타입 판별을 사용한다.
+- contextual 브라우저 회귀에 h3 변환 후 레이블 표시 검사를 추가했다.
+- 사용자 요청에 따라 테스트 실행은 기능 구현 이후 일괄 수행한다. 이번 변경은 실행하지 않았으며 CI도 생략한다.
+
 ## P3.1.c 텍스트 블록 적격성 강화 (검증 대기)
 
 - `canOpenBlockMenu`는 note/table/figure/image 조상을 배제하는 것에 더해 paragraph/heading/quote 조상이 있는 경우에만 메뉴를 허용한다.
