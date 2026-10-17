@@ -1,3 +1,9 @@
+## F07 검증 준비 점검 — 실행 환경 제한
+
+- `packages/render/test/render.test.mjs`: 발행 HTML의 문단 내부 래퍼를 고정하지 않고 `before-rule → <hr> → after-rule` 순서로 검사하도록 수정. 렌더러가 인라인 텍스트를 감싸는 기존 계약을 고려했다.
+- 실행 환경에서 `git ls-remote https://github.com/yunskim/lexical-tufte-css.git HEAD`는 DNS 해석 실패(`Could not resolve host: github.com`). 로컬 checkout과 pnpm 설치도 없어 이번 턴 `pnpm check`/Playwright를 실행할 수 없었다. **검증 통과로 기록하지 않는다.** GitHub 커넥터로 소스 변경·커밋만 수행했다.
+- 다음: 네트워크/checkout 및 Node/pnpm/Chromium이 준비된 실행 환경에서 `pnpm check`, `pnpm test:browser` 실행 후 F07 gate 판단. CI는 사용자 지시에 따라 생략.
+
 ## P2.2.c F07 실제 편집기 통합 회귀 추가
 
 - `tests/section-commands-browser.mjs`: 실제 툴바 `구분선 삽입` → React DOM `<hr>` → JSON `horizontalrule` → 독립 발행 HTML `<hr>` → undo/redo → 기존 문서 복귀를 기존 P2.2.a 흐름에 연결.
