@@ -147,3 +147,17 @@ test('F07 unregister removes command handler',()=>{
  assert.equal(handled,false);
  assert.equal(editor.getEditorState().toJSON().root.children[0].children.length,1);
 });
+
+test('F07 refuses a non-collapsed text selection without mutating the document',()=>{
+ const {editor,diagnostics,dispose}=setup();
+ editor.update(()=>{
+  const text=$createTextNode('keep all text');
+  $getRoot().append($createSectionNode().append($createParagraphNode().append(text)));
+  text.select(0,4);
+ },{discrete:true});
+ const before=editor.getEditorState().toJSON();
+ editor.update(()=>editor.dispatchCommand(INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,undefined),{discrete:true});
+ assert.deepEqual(editor.getEditorState().toJSON(),before);
+ assert.equal(diagnostics.at(-1)?.code,'INVALID_QUOTATION_SELECTION');
+ dispose();
+});
