@@ -85,7 +85,9 @@ function SelectionToolbar(){
   };
   const onKeyDown=(event:KeyboardEvent)=>{
    if(event.altKey&&event.shiftKey&&event.key.toLowerCase()==='f'&&!event.ctrlKey&&!event.metaKey){
-    if(!editor.getRootElement()?.contains(document.activeElement))return;
+    if(!editor.getRootElement()?.contains(document.activeElement)||editor.isComposing())return;
+    const selection=window.getSelection();
+    if(!selection||selection.isCollapsed||selection.rangeCount===0||dismissed.current)return;
     update();
     requestAnimationFrame(()=>toolbarRef.current?.querySelector<HTMLButtonElement>('button')?.focus());
     event.preventDefault();
