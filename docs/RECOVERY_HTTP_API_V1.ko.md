@@ -37,16 +37,16 @@
 
 ## 버전 관리와 이관
 
-v1의 필드명·경로·CAS·체크섬·진단 코드 변경은 breaking change로 간주하고 v2에서만 수행한다. TypeScript 클라이언트와 Python 구현은 동일한 계약 fixture 및 상호운용 테스트로 검증한다. 현재는 **계약 문서 고정** 단계이며 Python 구현 및 교차 언어 테스트는 아직 검증되지 않았다. CI는 사용자 지시에 따라 생략한다.
+v1의 필드명·경로·CAS·체크섬·진단 코드 변경은 breaking change로 간주하고 v2에서만 수행한다. TypeScript 클라이언트와 Python 구현은 동일한 계약 fixture 및 상호운용 테스트로 검증한다. 2026-10-17 Python16개 테스트 및 실제 TypeScript→Python HTTP→SQLite 왕복을 통과했다. 운영 인증 제공자와 편집기 UI 통합은 미완료다. CI는 사용자 지시에 따라 생략한다.
 
 ## 구현 참고: Python 요청 본문 제한
 
-Python FastAPI 어댑터는 PUT/DELETE에서 `application/json`을 요구하며, 전체 HTTP 요청 본문을 2,100,000바이트로 제한한다. `payload` 자체의 UTF-8 한도는 별도 2,000,000바이트다. 한도 초과는 `RECOVERY_REQUEST_TOO_LARGE` (413), Content-Type 오류는 `RECOVERY_CONTENT_TYPE_UNSUPPORTED` (415)로 반환한다. 현재 코드는 작성 단계로 테스트 실행 전이다.
+Python FastAPI 어댑터는 PUT/DELETE 슬롯 경로에서 `application/json`을 요구하며, 전체 HTTP 요청 본문을 2,100,000바이트로 제한한다. `payload` 자체의 UTF-8 한도는 별도 2,000,000바이트다. 한도 초과는 `RECOVERY_REQUEST_TOO_LARGE` (413), Content-Type 오류는 `RECOVERY_CONTENT_TYPE_UNSUPPORTED` (415)로 반환한다. content-length 없는 스트리밍 초과와 정상 본문 전달을 pytest에서 검증했다.
 
 ## 언어 간 계약 fixture
 
-공통 테스트 데이터: `apps/recovery-server/tests/fixtures/recovery_v1.json`. Python `apps/recovery-server/tests/test_shared_contract.py`와 TypeScript `packages/blog/test/recovery-shared-contract.test.mjs`가 같은 파일을 읽는다. 저장/삭제 본문, CAS 충돌, 체크섬·진단 코드 기대값을 비교한다. **코드만 작성했으며 아직 실행하지 않았다.** 다음 단계에서 실제 인증/CSRF 호스트 연결 및 계약 테스트 실행 후 v1 호환성 판정이 필요하다.
+공통 테스트 데이터: `apps/recovery-server/tests/fixtures/recovery_v1.json`. Python `apps/recovery-server/tests/test_shared_contract.py`와 TypeScript `packages/blog/test/recovery-shared-contract.test.mjs`가 같은 파일을 읽는다. 저장/삭제 본문, CAS 충돌, 체크섬·진단 코드 기대값을 비교하며 양쪽 실행이 모두 통과했다.`tests/recovery-python-http.mjs`는 실제 localhost HTTP로 같은 fixture를 확인한다. 실제 운영 인증/CSRF 호스트 연결은 후속이다.
 
 ## 엄격한 숫자·경로 오류 규칙
 
-`sequence`, `expectedSequence`, `baseRevision`은 JSON 정수여야 하며 문자열, 불리언, 소수 형태를 자동 변환하지 않는다. 범위는 JavaScript 안전 정수 범위 안이다. 미등록 경로는 404 `RECOVERY_ROUTE_NOT_FOUND`, 허용되지 않은 메서드는 405 `RECOVERY_METHOD_NOT_ALLOWED`로 공통 `{ok:false,diagnostics:[...]}` 형식을 사용한다. 테스트 코드는 작성했지만 아직 실행하지 않았다.
+`sequence`, `expectedSequence`, `baseRevision`은 JSON 정수여야 하며 문자열, 불리언, 소수 형태를 자동 변환하지 않는다. 범위는 JavaScript 안전 정수 범위 안이다. 미등록 경로는 404 `RECOVERY_ROUTE_NOT_FOUND`, 허용되지 않은 메서드는 405 `RECOVERY_METHOD_NOT_ALLOWED`로 공통 `{ok:false,diagnostics:[...]}` 형식을 사용한다. 관련 Python 계약 테스트는 통과했다.

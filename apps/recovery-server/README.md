@@ -6,7 +6,21 @@
 
 SQLite 마이그레이션은 `../../packages/blog/sql/002_editor_recovery_v1.sql`을 기존 DB에 적용한다. 공개 글 정본과 복구본은 분리한다.
 
-현재 단계는 초기 구현이며 서버 구동 엔트리, 실제 인증·CSRF 통합, Pydantic 오류 envelope 통일, 타임스탬프 검증, 요청 크기 제한, Python/TypeScript 계약 회귀 검증이 남았다. 사용자 지시로 테스트/CI는 실행하지 않았다.
+오류 envelope·타임스탬프·본문 상한·엄격한 숫자·인증 우선순위·ASGI 본문 전달은 Python16개 테스트로 검증했다. TypeScript 클라이언트→실제 Python HTTP→SQLite 왕복도 통과했다. 운영 서버 구동 엔트리, 실제 인증·CSRF 제공자와 편집기 UI 연결은 미완료다. CI는 생략했다.
+
+## 로컬 검증
+
+저장소 루트에서 다음과 같이 실행한다. `test-constraints.txt`는 이번 Python3.12 환경에서 검증한 의존성 버전이며 모든 OS 지원을 보장하지 않는다.
+
+```sh
+python -m venv .venv
+.venv/bin/pip install -c apps/recovery-server/test-constraints.txt -e './apps/recovery-server[test]'
+(cd apps/recovery-server && ../../.venv/bin/python -m pytest -q)
+pnpm build
+RECOVERY_PYTHON="$PWD/.venv/bin/python" pnpm test:recovery-python
+```
+
+HTTP 왕복 검사는 localhost 임시 서버/임시 SQLite/테스트 전용 헤더를 사용하고 종료 시 제거한다. 운영 인증 구현을 제공하지 않는다. [후속 검증 보고서](../../docs/VERIFICATION_RECOVERY_HTTP_2026-10-17.ko.md) 참조.
 
 ## 인증 정책 연결
 
@@ -30,4 +44,4 @@ app = create_app('recovery.sqlite', policy.authorize)
 
 `host.py`의 `RecoveryHostConfig`와 `build_recovery_app(config)`를 사용해 세 가지 보안 콜백과 SQLite 경로를 명시적으로 제공한다. 콜백이나 DB 경로가 빠지면 앱 생성을 거부한다. 실제 호스트의 세션/ACL/Origin·CSRF 제공자가 준비되기 전에는 운영 서버 진입점을 만들지 않는다.
 
-`tests/test_host.py`는 누락된 보안 설정 거부 및 명시적 구성 경로를 검사하는 회귀 테스트 코드다. 테스트와 CI는 실행하지 않았다.
+`tests/test_host.py`의 누락된 보안 설정 거부 및 명시적 구성 경로는 이번 pytest 실행에 포함해 통과했다. 실제 호스트 세션/ACL/Origin·CSRF 제공자 연결은 후속이다.

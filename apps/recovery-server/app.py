@@ -102,16 +102,10 @@ def create_app(db_file: str, authorize: Callable[[Request, str], bool]):
                 if received > 2_100_000:
                     return reject('RECOVERY_REQUEST_TOO_LARGE', 413)
                 chunks.append(chunk)
-            body = b''.join(chunks)
-            delivered = False
-            original_receive = request._receive
-            async def replay():
-                nonlocal delivered
-                if not delivered:
-                    delivered = True
-                    return {'type': 'http.request', 'body': body, 'more_body': False}
-                return await original_receive()
-            request._receive = replay
+            # BaseHTTPMiddleware forwards the cached body to downstream once.
+            # Replacing _receive after consuming stream() leaves its wrapper in
+            # the consumed-stream state and can forward an empty body instead.
+            request._body = b''.join(chunks)
         response = await call_next(request)
         response.headers["Cache-Control"] = "no-store"
         return response

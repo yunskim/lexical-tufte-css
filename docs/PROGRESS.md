@@ -1,5 +1,11 @@
 # 진행 기록
 
+## 2026-10-17 Recovery HTTP 추가 검증 종료
+
+- main5fb4d20에서 frozen/check253개/browser11개/package4개, Python 격리 설치/pytest16개 및 실제 TS→Python HTTP→SQLite 왕복 통과. CI 생략.
+- E076 SQL all 타입/E077 Python 모듈 설치/E078 middleware 본문 유실을 수정하고 M069–M071 반영. 실행 버전 constraints와 재현 명령 기록.
+- [후속 검증 보고서](VERIFICATION_RECOVERY_HTTP_2026-10-17.ko.md)의 체크리스트로 이번 검증 작업 종료. 운영 인증 제공자·배포·원격 복구 UI 및 P2–P7 전체 gate는 계속 미완료.
+
 ## 2026-10-17 최신 저장소 검증 작업 종료
 
 - main038e551의 새 clone에서 frozen 설치, check237개(실패/skip0), browser11개, package4개 소비 검사, diff 검사 통과. CI 없음.

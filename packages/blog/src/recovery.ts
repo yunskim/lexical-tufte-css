@@ -1,6 +1,10 @@
 import {isIdentifier,isTimestamp,type Result} from '@lexical-tufte/document';
 import type {PublicationDatabase} from './publication.js';
 
+export interface RecoveryDatabase extends PublicationDatabase{
+ prepare(sql:string):ReturnType<PublicationDatabase['prepare']>&{all(...values:(string|number|null)[]):unknown[]};
+}
+
 export type RecoverySlot={postId:string;sessionId:string;sequence:number;baseRevision:number;savedAt:string;payload:string;checksum:string};
 const fail=(code:string,message:string):Result<never>=>({ok:false,diagnostics:[{code,path:'$.recovery',message}]});
 const integer=(n:number,min:number)=>Number.isSafeInteger(n)&&n>=min;
@@ -8,7 +12,7 @@ const digest=async(s:string)=>Array.from(new Uint8Array(await crypto.subtle.dige
 const MAX_BYTES=2_000_000;
 /** Raw Lexical JSON recovery is not a validated or publishable Tufte document. */
 export class SqliteEditorRecoveryStore{
- constructor(private readonly db:PublicationDatabase){}
+ constructor(private readonly db:RecoveryDatabase){}
  async save(input:Omit<RecoverySlot,'checksum'>,expectedSequence:number):Promise<Result<RecoverySlot>>{
   if(!input||!isIdentifier(input.postId)||!isIdentifier(input.sessionId)||!integer(input.sequence,1)||
    !integer(input.baseRevision,0)||!integer(expectedSequence,0)||input.sequence!==expectedSequence+1||

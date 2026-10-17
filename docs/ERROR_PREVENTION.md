@@ -1,5 +1,24 @@
 # 재발 방지 대책 및 정기 점검
 
+2026-10-17 HTTP 후속 완료 점검: E076–E078/M069–M071의 타입·설치·본문 전달 대책을 실제 코드와 실행 절차에 반영했다. check253개/pytest16개/browser11개/package4개/실제 localhost 교차 언어 왕복 통과. E073 브라우저 부재는 공식 설치로 준비했으며 제품 결함 해결과 구분한다. 다음 구현 시작/완료와 framework 업그레이드 때 전체 관련 기록을 다시 점검한다.
+
+## 2026-10-17 Python/HTTP 검증 시작 점검
+
+M058/M065–M068 및 기존 비동기 commit·검증 의존 순서·환경 준비 분리 규칙을 다시 확인했다. main5fb4d20을 별도 worktree로 검사해 과거237개 통과와 새 구현의 결과를 구분한다. Chromium 부재는 E073의 환경 제한 재발로 기록하며 공식 실행 파일 설치 후 회귀를 수행한다.
+
+## M069 — SQL 연산 확장 시 어댑터 타입 동시 변경
+
+- E076: 단일 행/여러 행 조회의 요구를 명시한다. 기존 공개 어댑터의 요구를 무작정 확대하지 않고 recovery 전용 타입을 export하고 clean build로 검사한다.
+
+## M070 — Python 앱의 설치·검증 절차 명시
+
+- E077: flat layout 모듈은 패키지 메타데이터에 명시한다. 격리 venv editable 설치와 pytest를 함께 실행하고 검증 당시 constraints를 기록한다.
+
+## M071 — ASGI 본문 검사 후 실제 downstream 파싱 검증
+
+- E078: stream을 읽은 후 _receive 교체만으로 downstream에 본문이 전달된다고 추정하지 않는다. middleware의 body cache/consumption 상태를 함께 확인한다.
+- 정상 PUT→GET, DELETE, content-length 없는 스트리밍 초과, 인증 우선순위, 공통 fixture와 실제 HTTP client 왕복을 실행한다. FastAPI/Starlette 업그레이드는 test-constraints 환경과 비교하고 이 회귀를 다시 실행한다.
+
 2026-10-17 완료 점검: check237개·browser11개·package4개 소비 검사가 모두 통과했다. E072/E074/E075는 현재 실행 범위에서 검증했고 E073은 환경 준비 완료로 구분한다. E069/E070의 단위 회귀는 통과했으나 P23 실제 UI 전체 gate와 E071 provenance 제한은 유지한다. 다음 구현 작업 시작/완료 및 단계 전환 때 다시 점검한다.
 
 2026-10-17 완료 전 추가 점검: E075에서 M058의 최초 로드 누락을 확인해 지연 swap뿐 아니라 최초 custom glyph 조회 전에도 paint 동기화를 적용했다. 성공한 폰트 요청/ready만으로 실제 glyph 교체를 추정하지 않는다.

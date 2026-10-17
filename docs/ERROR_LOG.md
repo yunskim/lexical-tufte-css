@@ -1,5 +1,23 @@
 # 에러 기록
 
+## E076 — 복구 목록 SQL 인터페이스에 all 누락
+
+- 2026-10-17 main5fb4d20 clean build에서 TS2339. list 구현은 all()을 호출하지만 기존 PublicationDatabase는 get/run만 선언했다.
+- RecoveryDatabase를 별도 정의해 all을 요구하고 공개 타입으로 export했다. publication 소비자의 기존 계약은 유지한다.
+- 상태: verified (수정 후 check253개 통과). M069 참조.
+
+## E077 — Python editable 설치의 모듈 자동 탐색 실패
+
+- pip install -e apps/recovery-server[test]에서 app/host/security의 여러 최상위 모듈 자동 탐색을 setuptools가 거부했다.
+- build backend 및 py-modules를 명시하고 격리 venv에서 설치 성공. 테스트 당시 의존성을 test-constraints.txt로 남겼다.
+- 상태: verified (editable 설치 및 pytest16개 통과). M070 참조.
+
+## E078 — stream 소비 후 요청 본문 replay가 빈 본문 전달
+
+- Python 계약 테스트 4건 실패. 정상 PUT도 400이며 RequestValidationError는 body missing을 보고했다. 기존 middleware는 request.stream 소비 뒤 _receive만 교체했다.
+- BaseHTTPMiddleware의 소비 상태와 일치하도록 크기 검사 후 _body cache를 채워 downstream 전달을 사용한다. 수동 replay/가짜 disconnect를 제거했다.
+- 상태: verified (pytest16개 및 실제 TS client→Python HTTP→SQLite 저장/조회/목록/CAS/권한/CSRF/삭제). FastAPI/Starlette 내부 cache 계약은 고정 실행 환경 범위이며 업그레이드 때 재검증한다. M071 참조.
+
 ## E075 — E065 paint 동기화 대책이 최초 폰트 검사에 누락
 
 - 2026-10-17 전체 browser의 font-proof 최초 검사에서 fonts.ready 직후 DejaVu를 관측해 custom glyph assertion 실패. 지연 swap 검사에만 두 frame 대기가 있고 최초 로드에는 없었다.
