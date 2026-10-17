@@ -1,3 +1,9 @@
+## P3.1.c 모바일 visualViewport 이벤트 대응 (일괄 검증 대기)
+
+- 메뉴가 열린 동안 visualViewport resize/scroll을 수신해 위치 재계산을 요청하며 언마운트 시 리스너를 해제한다.
+- 현재 좌표 보정은 여전히 window.innerWidth/innerHeight를 기준으로 한다. visualViewport.offsetLeft/offsetTop/width/height를 반영한 실제 모바일 키보드·확대 배치는 아직 보장하지 않는다.
+- 사용자 지시에 따라 테스트 실행은 최종 일괄 검증 때 수행하고 CI는 생략한다.
+
 ## P3.1.c 스크롤 시 컨텍스트 메뉴 화면 경계 보정 (일괄 검증 대기)
 
 - 열린 블록 메뉴가 window 및 중첩 스크롤 이벤트에서 실제 크기를 기준으로 viewport 경계를 다시 확인하도록 capture scroll listener를 추가했다. 종료 시 listener를 해제한다.
