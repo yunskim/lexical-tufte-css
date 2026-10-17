@@ -1,3 +1,9 @@
+## F07 노트 경계·명령 생명주기 회귀 추가
+
+- `quotation-commands.test.mjs`: 노트 내부 삽입 거부 시 원본 JSON·노트 ID 보존, unregister 후 명령이 처리되지 않는지 검증하는 테스트 추가.
+- 현재 실행 환경에서 GitHub DNS 해석 실패를 다시 확인했으며 pnpm 및 checkout이 없어 테스트를 실행하지 못했다. 이전 검증 성공을 새 변경의 통과로 재사용하지 않는다. CI 생략 유지.
+- 다음 실행 가능 환경에서 `pnpm check`, `pnpm test:browser` 및 신규 F07 테스트를 실행하고 실패 기록·대책을 갱신한다. F07 gate 미완료.
+
 ## F07 검증 준비 점검 — 실행 환경 제한
 
 - `packages/render/test/render.test.mjs`: 발행 HTML의 문단 내부 래퍼를 고정하지 않고 `before-rule → <hr> → after-rule` 순서로 검사하도록 수정. 렌더러가 인라인 텍스트를 감싸는 기존 계약을 고려했다.
