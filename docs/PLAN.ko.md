@@ -189,7 +189,7 @@ P2 gate: F01–F19의 데이터 보존 및 구조 검증 통과. 편집·시각 
 - [ ] P3.1.d 선택 영역 보존, 포커스 복귀, 키보드 열기/닫기(Escape), 스크린리더, 툴바 위치·화면 가장자리, 모바일 터치·IME 및 undo/redo를 회귀 검증한다. 우클릭 메뉴와 선택 영역 툴바의 동작을 구분한다.
 - [ ] P3.1.e `examples/editor`에 집중된 액션/선택/노트 도구·상태를 `packages/editor-react` 재사용 가능한 컴포넌트와 hook/API로 이동한다. 호스트 props(`value/onChange/onError/assetAdapter/readonly`), lifecycle/unmount·초안 교체·여러 편집기 독립성, accessibility contract를 공개 예제로 검증한다. 예제는 소비자여야 하며 역의존 금지.
 - [ ] P3.1.f 편집 툴바는 핵심 서식만 기본 노출, 삽입 메뉴·문맥 메뉴·figure/note 속성 패널로 작업을 분산한다. 섹션·목록·주석·그림·인용·코드를 발견/생성/수정하는 작업 경로를 1개 문서 showcase에서 모두 실연한다. 기존 테스트의 역할·이름 변경은 접근성 계약과 함께 명시적으로 이관한다.
-- [ ] P3.1.g **Notion-like 블록 편집 UX**: 블록 단위 조작을 기존 Lexical/Tufte 문서 스키마 위의 UI·command 계층으로 구현한다. 특정 제품 UI를 그대로 복제하지 않으며 새 범용 block AST를 문서 정본으로 추가하지 않는다.
+- [ ] P3.1.g **Notion-like 블록 편집 UX** ([추적 이슈 #10](https://github.com/yunskim/lexical-tufte-css/issues/10)): 블록 단위 조작을 기존 Lexical/Tufte 문서 스키마 위의 UI·command 계층으로 구현한다. 특정 제품 UI를 그대로 복제하지 않으며 새 범용 block AST를 문서 정본으로 추가하지 않는다.
   - [ ] P3.1.g.1 블록 의미·액션 수락 조건 정의: `root → tufte-section → 허용 block`을 유지하고 paragraph/heading/quote/list/definition-list/figure/table/code/embed/fullwidth/footer/hr의 지원 명령 매트릭스를 작성한다. **노트는 독립 이동 블록이 아니라 본문 inline anchor와 payload의 단위**다. figure의 caption/여백 주석, 목록의 listitem/dt/dd는 부모와 함께 관리한다.
   - [ ] P3.1.g.2 커서가 있는 블록 옆에 더하기(+) 삽입·드래그 핸들을 노출하고, `/` 슬래시 메뉴(검색/유형별 삽입: 문단·h2/h3·목록·정의목록·인용·구분선·그림·코드 등)를 제공한다. IME 조합·노트 입력·코드 입력에서는 슬래시 진입/단축키를 가로채지 않는다. 명령 실행 시 입력한 트리거의 처리와 Escape 취소 시 리터럴 `/` 보존·커서 복구를 명시하며, 기존 `INSERT_*/SET_*` 명령과 action registry를 재사용한다.
   - [ ] P3.1.g.3 블록 선택·위/아래 이동·복제·삭제·유형 전환을 command로 분리한다. 마우스 드래그와 키보드 동등 경로(블록 선택, 위/아래 이동, 메뉴 호출)를 모두 제공한다. section 경계의 이동은 명시적 목적지/스키마 검사 뒤 허용하거나 진단하며, root·section 자체의 재정렬과 자식 블록 이동을 구분한다.
