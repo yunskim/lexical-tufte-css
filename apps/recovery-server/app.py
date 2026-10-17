@@ -30,16 +30,16 @@ class RecoverySave(BaseModel):
     model_config = ConfigDict(extra="forbid")
     postId: str
     sessionId: str
-    sequence: int = Field(ge=1, le=MAX_SAFE)
-    expectedSequence: int = Field(ge=0, le=MAX_SAFE)
-    baseRevision: int = Field(ge=0, le=MAX_SAFE)
+    sequence: int = Field(strict=True, ge=1, le=MAX_SAFE)
+    expectedSequence: int = Field(strict=True, ge=0, le=MAX_SAFE)
+    baseRevision: int = Field(strict=True, ge=0, le=MAX_SAFE)
     savedAt: str
     payload: str
 
 
 class RecoveryDelete(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    expectedSequence: int = Field(ge=1, le=MAX_SAFE)
+    expectedSequence: int = Field(strict=True, ge=1, le=MAX_SAFE)
 
 
 def create_app(db_file: str, authorize: Callable[[Request, str], bool]):
@@ -53,6 +53,14 @@ def create_app(db_file: str, authorize: Callable[[Request, str], bool]):
                 (exc.detail.startswith('RECOVERY_') or exc.detail == 'INVALID_RECOVERY_INPUT')
                 else 'RECOVERY_REQUEST_DENIED')
         return failure(code, exc.status_code)
+
+    @app.exception_handler(404)
+    async def not_found(request, exc):
+        return failure('RECOVERY_ROUTE_NOT_FOUND', 404)
+
+    @app.exception_handler(405)
+    async def method_not_allowed(request, exc):
+        return failure('RECOVERY_METHOD_NOT_ALLOWED', 405)
 
     @app.exception_handler(RequestValidationError)
     async def validation_error(request, exc):
