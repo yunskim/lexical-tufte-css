@@ -1,3 +1,9 @@
+## 2026-10-18 P2.2.b.2 키보드 브라우저 회귀 확대 (실행 대기)
+
+- 기존 `tests/list-kind-browser.mjs`의 목록 유형 변환·저장·발행·undo 회귀에 **Tab/Shift+Tab 구조적 들여쓰기·내어쓰기, 마지막 빈 항목 Enter 종료, 첫 빈 항목 Backspace 삭제** 브라우저 시나리오를 추가했다. [커밋 `2c5ce25`](https://github.com/yunskim/lexical-tufte-css/commit/2c5ce2557bb5f6eb4d50a26b1f477441a47b524f).
+- 실행하지 않았으므로 브라우저의 실제 선택·포커스 및 DOM 구조에 맞는지는 미확인이다. 실패 시 원인·재발방지 문서에 기록하고 수정할 것. CI는 생략하며 P2.2.b.2 및 K1–K5 완료 체크는 열어둔다.
+- 다음: 일반 항목 Enter 분할과 Backspace 병합의 Lexical 기본 동작을 브라우저에서 확인하고, 필요할 때만 별도 처리 추가. 일괄 검증 전에는 결과를 성공으로 표기하지 않는다.
+
 ## 2026-10-18 P2.2.b.2-K3 Backspace 첫 빈 목록 항목 경계 (검증 대기)
 
 - 최상위 섹션 직계 ul/ol의 **첫 빈 항목**에 한해 Backspace를 소비한다. 다음 항목이 있으면 빈 첫 항목만 삭제하고 다음 항목으로 커서를 이동하며, 유일한 빈 항목이면 목록을 빈 문단으로 교체한다. 그 외 일반 텍스트/중간 항목/중첩/노트/IME는 Lexical에 위임한다. [구현 `f1f2fd5`](https://github.com/yunskim/lexical-tufte-css/commit/f1f2fd5ad03d78f1e23dbc8211a9301b51886316).
