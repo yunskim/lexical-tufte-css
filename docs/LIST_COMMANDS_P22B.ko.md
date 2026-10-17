@@ -33,3 +33,9 @@
 - `tests/list-kind-browser.mjs`: 실제 React 툴바, ul/ol DOM, 저장·재열기, undo/redo, 순수 JSON→HTML 렌더, 문단에서 호출 시 원본 불변.
 - 일괄 실행: `pnpm install --frozen-lockfile` → `pnpm check` → `pnpm package:check` → `pnpm test:browser` 직렬. 사용자 지시에 따라 지금은 실행하지 않았으며 위 검사들의 성공을 주장하지 않는다.
 - 후속: 동일/복합 목록 항목 다중 선택, 중첩 ul/ol 혼합 유형·내어쓰기 경계, 키보드 Enter/Backspace/Tab 정책, 전체 목록 해제, 실제 OS IME·포커스·스크린리더 검증. 따라서 P2.2.b.2/F06 완료로 표시하지 않는다.
+
+## 키보드 Enter — 최소 안전 경계 (2026-10-18)
+
+- `registerListKeyboardCommands`가 `KEY_ENTER_COMMAND`를 **최상위 섹션 직계 ul/ol의 마지막 빈 항목**에서만 소비한다. 이때 빈 항목을 제거하고 목록 뒤에 문단을 생성한다. 목록에 다른 항목이 남아 있으면 기존 항목과 inline note ID는 변경하지 않는다. 유일한 빈 항목이면 빈 목록도 제거한다.
+- 일반/중간 텍스트의 Enter 분할, 중첩 목록, 빈 중간 항목, Shift+Enter, IME 조합, 노트 내부, 수정키 조합은 모두 `false`를 반환해 Lexical 기본 동작에 맡긴다. 이 범위를 넘어 임의로 키 이벤트를 선점하지 않는다.
+- `packages/lexical/test/list-commands.test.mjs`에 마지막 빈 항목 종료, 유일한 빈 목록 종료, 비어 있지 않은 항목/중간 빈 항목/IME 무개입을 추가했다. 실제 단위/브라우저 테스트는 아직 실행하지 않았다.
