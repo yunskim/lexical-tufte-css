@@ -74,6 +74,19 @@ try{
  const flattened=await snapshot();
  assert.equal(extractList(flattened).children.length,2);
  assert.equal(await editor.locator('section ol ol li').count(),0);
+ // A flat list converts back to paragraphs while retaining each item's text.
+ await editor.locator('section ol > li').first().click();
+ await action('목록을 문단으로 해제').click();
+ const unwrapped=await snapshot();
+ assert.equal(extractList(unwrapped),undefined);
+ assert.deepEqual(await editor.locator('section').last().locator('p').allInnerTexts(),['List introduction','First list item','Second list item']);
+ const publishedUnwrapped=renderArticle({schemaVersion:1,id:'list-unwrap-scenario',locale:'ko-KR',title:'목록 해제',assets:[],lexicalState:unwrapped});
+ assert.equal(publishedUnwrapped.ok,true,JSON.stringify(publishedUnwrapped.diagnostics));
+ assert.doesNotMatch(publishedUnwrapped.html,/<ol>|<ul>/);
+ assert.match(publishedUnwrapped.html,/First list item/);
+ assert.match(publishedUnwrapped.html,/Second list item/);
+ await page.getByRole('button',{name:'실행 취소',exact:true}).click();
+ assert.deepEqual(await snapshot(),flattened,'Undo restores the flat list after unwrap');
  assert.deepEqual(errors,[]);
- console.log('P2.2.b list browser: ul/ol conversion, structural indent/outdent, history, save/reopen, renderer, reject PASS.');
+ console.log('P2.2.b list browser: ul/ol conversion, structural indent/outdent, safe unwrap, history, save/reopen, renderer, reject PASS.');
 }finally{await browser?.close();server.kill();}
