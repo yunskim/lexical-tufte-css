@@ -1,3 +1,9 @@
+## P3.1.b Floating Toolbar 경계·키보드 보완 (검증 대기)
+
+- 화면 상단 선택 시 하단 배치, 수평 위치 제한, Escape 닫기 및 편집기 포커스 복귀를 구현했다.
+- IME composition 이벤트 감지와 툴바 내부 키보드 포커스 중 선택 영역 갱신 억제를 추가했다.
+- 실제 브라우저/접근성 테스트는 실행하지 않았다. 선택 보존·IME 이벤트 순서·좁은 화면·키보드 열기 경로·블록 메뉴는 여전히 검증/구현 대상이다. CI 생략.
+
 ## P3.1.b 선택 영역 Floating Toolbar 초안 (구현·검증 대기)
 
 - `examples/editor/src/main.tsx`: 선택 영역이 비어 있지 않고 편집기 내부이며 IME 조합 중이 아닐 때 `SelectionToolbar`를 렌더링한다. 공통 `INLINE_ACTIONS`를 재사용해 여섯 가지 인라인 서식을 제공한다. selectionchange, editor update, scroll, resize에서 위치를 갱신한다.
