@@ -38,3 +38,7 @@
 ## 버전 관리와 이관
 
 v1의 필드명·경로·CAS·체크섬·진단 코드 변경은 breaking change로 간주하고 v2에서만 수행한다. TypeScript 클라이언트와 Python 구현은 동일한 계약 fixture 및 상호운용 테스트로 검증한다. 현재는 **계약 문서 고정** 단계이며 Python 구현 및 교차 언어 테스트는 아직 검증되지 않았다. CI는 사용자 지시에 따라 생략한다.
+
+## 구현 참고: Python 요청 본문 제한
+
+Python FastAPI 어댑터는 PUT/DELETE에서 `application/json`을 요구하며, 전체 HTTP 요청 본문을 2,100,000바이트로 제한한다. `payload` 자체의 UTF-8 한도는 별도 2,000,000바이트다. 한도 초과는 `RECOVERY_REQUEST_TOO_LARGE` (413), Content-Type 오류는 `RECOVERY_CONTENT_TYPE_UNSUPPORTED` (415)로 반환한다. 현재 코드는 작성 단계로 테스트 실행 전이다.
