@@ -12,6 +12,8 @@ export const APPEND_TUFTE_DEFINITION_PAIR_COMMAND:LexicalCommand<void>=createCom
 export const REMOVE_TUFTE_DEFINITION_PAIR_COMMAND:LexicalCommand<void>=createCommand('REMOVE_TUFTE_DEFINITION_PAIR');
 /** Reorder complete dt/dd pairs while retaining their node keys and all existing content. */
 export const MOVE_TUFTE_DEFINITION_PAIR_COMMAND:LexicalCommand<'up'|'down'>=createCommand('MOVE_TUFTE_DEFINITION_PAIR');
+/** Remove the whole definition list, including its contents, after explicit user action. */
+export const REMOVE_TUFTE_DEFINITION_LIST_COMMAND:LexicalCommand<void>=createCommand('REMOVE_TUFTE_DEFINITION_LIST');
 
 export function registerDefinitionCommands(editor:LexicalEditor,onDiagnostic?:(diagnostic:Diagnostic)=>void):()=>void{
  if(!editor.hasNodes([DefinitionListNode,DefinitionTermNode,DefinitionDescriptionNode,SectionNode]))
@@ -70,6 +72,22 @@ export function registerDefinitionCommands(editor:LexicalEditor,onDiagnostic?:(d
    if(!(list instanceof DefinitionListNode))return reject('정의목록 안에서만 항목을 추가할 수 있습니다.');
    $addUpdateTag(HISTORY_PUSH_TAG);
    const {term,description}=pair();list.append(term,description);term.selectStart();return true;
+  },COMMAND_PRIORITY_EDITOR),
+  editor.registerCommand(REMOVE_TUFTE_DEFINITION_LIST_COMMAND,()=>{
+   const s=selection();if(!s)return reject('삭제할 정의목록 안에 커서를 두세요.');
+   const list=nearest(s.anchor.getNode(),'tufte-definition-list');
+   if(!(list instanceof DefinitionListNode)||!(list.getParent() instanceof SectionNode)||
+      list.getParent()?.getParent()?.getType()!=='root')return reject('최상위 섹션의 정의목록만 삭제할 수 있습니다.');
+   const section=list.getParent();
+   const previous=list.getPreviousSibling(),next=list.getNextSibling();
+   $addUpdateTag(HISTORY_PUSH_TAG);
+   if(previous){list.remove();previous.selectEnd();}
+   else if(next){list.remove();next.selectStart();}
+   else{
+    const placeholder=$createParagraphNode();
+    list.insertBefore(placeholder);list.remove();placeholder.selectStart();
+   }
+   return true;
   },COMMAND_PRIORITY_EDITOR),
   editor.registerCommand(REMOVE_TUFTE_DEFINITION_PAIR_COMMAND,()=>{
    const selected=selectedGroup();
