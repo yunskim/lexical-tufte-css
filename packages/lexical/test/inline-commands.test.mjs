@@ -155,6 +155,19 @@ test('P2.2.b wrapping text inside a link preserves its URL and an adjacent note 
   assert.equal(link.getFirstChild().getKind(),'sans');
   assert.equal(paragraph.getLastChild().getNoteId(),'stable-note');
  });
+ editor.update(()=>{
+  const text=$getRoot().getFirstChild().getFirstChild().getFirstChild().getFirstChild();
+  text.select(2,2);
+ },{discrete:true});
+ editor.dispatchCommand(UNWRAP_TUFTE_SPAN_COMMAND,undefined);
+ editor.update(()=>{},{discrete:true});
+ editor.getEditorState().read(()=>{
+  const paragraph=$getRoot().getFirstChild(),link=paragraph.getFirstChild();
+  assert.equal(link.getURL(),'https://lexical.dev');
+  assert.equal(link.getTextContent(),'linked term');
+  assert.equal(link.getChildren().some(n=>n.getType()==='tufte-span'),false);
+  assert.equal(paragraph.getLastChild().getNoteId(),'stable-note');
+ });
  assert.deepEqual(diagnostics,[]);
  dispose();
 });
