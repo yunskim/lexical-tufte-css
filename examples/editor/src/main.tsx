@@ -20,6 +20,26 @@ import {
 import {registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,registerQuotationCommands,INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_SECTION_CITE_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND,registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_TUFTE_DEFINITION_PAIR_COMMAND,registerSectionCommands,WRAP_TUFTE_ROOT_COMMAND,INSERT_TUFTE_SECTION_COMMAND,SPLIT_TUFTE_SECTION_COMMAND,MERGE_TUFTE_SECTION_COMMAND,SET_TUFTE_BLOCK_COMMAND,inspectEditorStructure,focusStructureIssue,type StructureIssue,replaceEditorDocumentState,TUFTE_NODES,NoteNode, $createNoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, registerNoteEdgeTypingGuard, type NoteKind} from '@lexical-tufte/lexical';
 import './style.css';
 
+type ToolbarIconName='bold'|'italic'|'code'|'quote'|'epigraph'|'sidenote'|'marginnote'|'rule'|'undo'|'redo';
+const toolbarPaths:Record<ToolbarIconName,string>={
+ bold:'M7 4h6a4 4 0 0 1 0 8H7zm0 8h7a4 4 0 0 1 0 8H7z',
+ italic:'M10 4h10M4 20h10M14 4 10 20',
+ code:'m8 8-4 4 4 4m8-8 4 4-4 4m-3-12-2 16',
+ quote:'M4 11h7v8H4v-8zm0 0V9a5 5 0 0 1 5-5m4 7h7v8h-7v-8zm0 0V9a5 5 0 0 1 5-5',
+ epigraph:'M4 5h16M4 10h11M4 15h16M4 20h11',
+ sidenote:'M4 5h10M4 10h10M4 15h10m6-8h4v10h-4',
+ marginnote:'M4 5h16M4 10h11M4 15h11m5-3h4v8h-4',
+ rule:'M3 12h18',
+ undo:'M9 14 4 9l5-5M4 9h10a6 6 0 0 1 0 12',
+ redo:'m15 14 5-5-5-5m5 5H10a6 6 0 0 0 0 12'
+};
+function ToolbarIcon({name}:{name:ToolbarIconName}){
+ return <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d={toolbarPaths[name]}/></svg>;
+}
+function IconButton({name,label,onClick,onMouseDown}:{name:ToolbarIconName;label:string;onClick:()=>void;onMouseDown:(event:React.MouseEvent<HTMLButtonElement>)=>void}){
+ return <button type="button" aria-label={label} title={label} onMouseDown={onMouseDown} onClick={onClick}><ToolbarIcon name={name}/></button>;
+}
+
 function containingNote(node: LexicalNode | null): NoteNode | null {
   for(let n=node;n;n=n.getParent()) if(n instanceof NoteNode)return n;
   return null;
