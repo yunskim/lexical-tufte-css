@@ -103,3 +103,16 @@ def test_authorization_callback_called_once(tmp_path):
     client = TestClient(create_app(str(db_path), authorize))
     assert client.get(BASE).status_code == 200
     assert calls == [("GET", "post-1")]
+
+def test_streamed_oversize_without_content_length(tmp_path):
+    client = setup(tmp_path)
+    def chunks():
+        yield b'{' + b' ' * 1_100_000
+        yield b' ' * 1_100_001 + b'}'
+    response = client.put(
+        BASE + "/session-1", content=chunks(),
+        headers={"content-type": "application/json"},
+    )
+    assert response.status_code == 413
+    assert response.headers["cache-control"] == "no-store"
+    assert response.json()["diagnostics"][0]["code"] == "RECOVERY_REQUEST_TOO_LARGE"
