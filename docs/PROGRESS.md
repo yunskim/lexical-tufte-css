@@ -1069,3 +1069,9 @@ P1.2 브라우저 범위: rich copy/paste의 ID·링크·이미지, note 전체 
 - `packages/blog/test/recovery-client.test.mjs` 추가: 경로·쿠키·CSRF 헤더·캐시 정책·CAS 요청 및 오류 응답 검사 코드.
 - `packages/blog/src/recoveryClient.ts`: JSON 파싱 실패를 네트워크 오류와 구분하고 HTTP 성공 여부와 Result.ok의 불일치를 프로토콜 오류로 처리.
 - 테스트·타입 검사·CI 실행은 사용자 지시로 보류. 브라우저 편집기 UI 연결과 실제 호스트 보안 구현 미완료.
+
+## 2026-10-17 Python Recovery HTTP v1 계약 검증 준비
+
+- FastAPI의 HTTPException/RequestValidationError를 공통 Result 오류 envelope로 매핑하는 코드를 추가하고 savedAt 시간대 유효성 검사를 추가했다.
+- `apps/recovery-server/tests/test_contract.py`에 CAS·checksum·목록 metadata·삭제·권한 거부·입력 오류 계약 테스트 코드를 작성했다.
+- 미완료: 실제 호스트 인증·CSRF, request body 상한, 오류 코드 전 범위 일치, Python↔TypeScript 공통 fixture, 테스트 실행. CI 생략.
