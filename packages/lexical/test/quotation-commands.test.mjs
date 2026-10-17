@@ -161,3 +161,24 @@ test('F07 refuses a non-collapsed text selection without mutating the document',
  assert.equal(diagnostics.at(-1)?.code,'INVALID_QUOTATION_SELECTION');
  dispose();
 });
+
+test('F07 inserts into the selected section without modifying adjacent sections',()=>{
+ const {editor,diagnostics,dispose}=setup();
+ editor.update(()=>{
+  const first=$createTextNode('first');
+  const second=$createTextNode('second');
+  $getRoot().append(
+   $createSectionNode().append($createParagraphNode().append(first)),
+   $createSectionNode().append($createParagraphNode().append(second))
+  );
+  second.selectEnd();
+ },{discrete:true});
+ const before=editor.getEditorState().toJSON();
+ editor.update(()=>editor.dispatchCommand(INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,undefined),{discrete:true});
+ const after=editor.getEditorState().toJSON();
+ assert.deepEqual(after.root.children[0],before.root.children[0]);
+ assert.deepEqual(after.root.children[1].children.map(n=>n.type),['paragraph','horizontalrule']);
+ assert.equal(after.root.children[1].children[0].children[0].text,'second');
+ assert.equal(diagnostics.length,0);
+ dispose();
+});
