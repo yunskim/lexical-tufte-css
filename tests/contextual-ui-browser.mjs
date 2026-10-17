@@ -36,8 +36,13 @@ try{
  // Right-click a different block, then act on that target rather than the prior caret.
  await editor.locator('section').first().locator('p').first().click({button:'right',position:{x:20,y:10}});
  await group.waitFor();
- assert.equal(await group.getByRole('menuitem').count(),4);await group.getByRole('menuitem',{name:'제목 h3',exact:true}).click();
- // The first paragraph contains a note and must be refused without altering its identity.
+ // Heading conversion is hidden when the paragraph contains a note that heading schema disallows.
+ await page.waitForFunction(()=>document.querySelector('#tufte-block-menu')?.querySelectorAll('[role=menuitem]').length===8);
+ assert.equal(await group.getByRole('menuitem',{name:'제목 h3',exact:true}).count(),0);
+ assert.equal(await group.getByRole('menuitem',{name:'제목 h2',exact:true}).count(),0);
+ assert.equal(await group.getByRole('menuitem',{name:'글머리표 목록 삽입',exact:true}).count(),1);
+ await page.keyboard.press('Escape');await group.waitFor({state:'hidden'});
+ // Refusing an unsupported conversion must leave the note and other block content intact.
  assert.equal(await editor.locator('[data-note-id="seed-note"]').count(),1);
  assert.equal(await editor.locator('h3').count(),0);
  assert.equal(await editor.locator('h2').innerText(),'선택 영역 검사');
@@ -77,6 +82,20 @@ try{
 
  await editor.locator('h3').click();await page.keyboard.press('Home');await page.keyboard.down('Shift');await page.keyboard.press('End');await page.keyboard.up('Shift');await floating.waitFor();
  const box=await floating.boundingBox();assert.ok(box.x>=0&&box.x+box.width<=375,JSON.stringify(box));
+ // Section-level insertion actions reuse existing schema-checked commands.
+ await editor.locator('h3').click({button:'right'});await group.waitFor();
+ await group.getByRole('menuitem',{name:'글머리표 목록 삽입',exact:true}).click();
+ assert.equal(await editor.locator('section ul > li').count(),1);
+ assert.equal(await editor.locator('h3').innerText(),'선택 영역 검사');
+ await editor.locator('h3').click({button:'right'});await group.waitFor();
+ await group.getByRole('menuitem',{name:'인용문 삽입',exact:true}).click();
+ assert.equal(await editor.locator('section blockquote').count(),1);
+ await editor.locator('section blockquote').first().click({button:'right'});await group.waitFor();
+ await page.waitForFunction(()=>document.querySelector('.block-context-menu > button')?.textContent?.includes('인용문'));
+ assert.equal(await group.getByRole('menuitem',{name:'제목 h2',exact:true}).count(),0);
+ assert.equal(await group.getByRole('menuitem',{name:'본문 문단',exact:true}).count(),0);
+ assert.equal(await group.getByRole('menuitem',{name:'구분선 삽입',exact:true}).count(),1);
+ await page.keyboard.press('Escape');await group.waitFor({state:'hidden'});
  assert.deepEqual(errors,[]);
- console.log('Contextual UI: icon labels, six selected-text actions, format selection, keyboard entry/Escape, block arrows/heading, right-click note refusal and 375px bounds PASS.');
+ console.log('Contextual UI: icon labels, six selected-text actions, format selection, keyboard entry/Escape, block arrows/heading, schema-filtered menu insertion and 375px bounds PASS.');
 }finally{await browser?.close();server.kill();}
