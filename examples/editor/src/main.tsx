@@ -109,15 +109,15 @@ function SelectionToolbar(){
 }
 
 function canOpenBlockMenu(node:LexicalNode):boolean{
+ let hasEditableBlock=false;
  for(let current:LexicalNode|null=node;current;current=current.getParent()){
   if(current instanceof NoteNode)return false;
   const type=current.getType();
-  if(type==='table'||type==='tablerow'||type==='tablecell'||type==='figure'||type==='image'||type==='root') {
-   if(type!=='root')return false;
-   break;
-  }
+  if(['table','tablerow','tablecell','figure','image'].includes(type))return false;
+  if(['paragraph','heading','quote'].includes(type))hasEditableBlock=true;
+  if(type==='root')break;
  }
- return true;
+ return hasEditableBlock;
 }
 function BlockContextMenu(){
  const [editor]=useLexicalComposerContext();
