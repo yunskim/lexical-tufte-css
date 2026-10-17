@@ -1,5 +1,13 @@
 # 재발 방지 대책 및 정기 점검
 
+## M081 — 패키지 직접 import·lockfile과 신규 인라인 명령의 원자성
+
+- E087: 신규 import를 추가할 때 해당 패키지의 `dependencies`/peer dependency, `pnpm-lock.yaml`의 importer, public package export, consumer smoke를 모두 대조한다. 현재 workspace에서 import가 된다는 이유로 clean frozen install을 생략하지 않는다.
+- 신규 Tufte 인라인 span 명령은 기존 span kind 변경과 분리한다. 변환 **전에** range 단일 text key·offset·IME·note/span 중첩·스키마 허용 여부를 검사한다. 다중 텍스트/블록 selection은 명시적으로 거부하고 기존 문서/노트 ID를 유지한다.
+- `TextNode.splitText(start,end)`로 생긴 조각의 반환 순서와 좌우 형식 보존을 Lexical 소스·독립 회귀로 교차 검사한다. span 제거는 자식이 기존 부모에 허용되는 경우에만 이동한다.
+- 코드 리뷰에서 노드 key/selection 보존을 확인해도 통과라고 하지 않는다. 변경 커밋에서 frozen 설치→타입 검사→단위/HTML/브라우저/undo·redo 순으로 일괄 실행하고 완료 상태를 기록한다. 외부 브라우저·실제 IME 범위는 별도.
+
+
 ## M080 — 컨텍스트 메뉴 세 진입 경로와 focus 복원의 불변식
 
 - E086: 메뉴 열림 처리 코드를 수정할 때 `contextmenu`, `Shift+F10/ContextMenu`, 기본 토글 버튼 세 경로를 각각 점검한다. 각 진입점은 (1) 유효한 Lexical RangeSelection 포착, (2) 액션 허용 범위 계산, (3) `menuOpenRef.current=true`, (4) 열린 메뉴의 첫 버튼 focus를 충족해야 한다.
