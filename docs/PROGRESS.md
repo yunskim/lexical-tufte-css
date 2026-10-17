@@ -1,3 +1,9 @@
+## P3.1.c visualViewport 크기 기반 메뉴 제한 (일괄 검증 대기)
+
+- 메뉴가 열린 상태에서 visualViewport의 너비/높이에 맞춰 floating 메뉴의 inline maxWidth/maxHeight를 지정하고, 실제 bounding rect를 다시 읽어 좌표를 보정한다.
+- 효과 정리(cleanup) 시 inline 최대 크기를 해제한다. 극단적으로 작은 viewport에서 메뉴 내용이 잘릴 수 있으므로 실제 모바일 키보드·줌·스크롤 검증이 필요하다.
+- 사용자 요청에 따라 실행 테스트는 일괄 수행하며 CI는 생략한다.
+
 ## P3.1.c 작은 화면 블록 메뉴 높이 및 ARIA CSS 정합성 (일괄 검증 대기)
 
 - 메뉴의 실제 `role=menu`와 CSS의 기존 `role=group` 불일치를 수정했다.
