@@ -39,7 +39,7 @@ try{
  await click('실행 취소');assert.deepEqual(await snapshot(),merged);
  await click('다시 실행');assert.deepEqual(await snapshot(),withRule);
  await click('실행 취소');assert.deepEqual(await snapshot(),merged);
- await page.getByText('제목 검증',{exact:true}).click();
+ await page.getByText('둘째 블록',{exact:true}).click();
  await page.keyboard.press('End');
  await click('섹션 출처 삽입');
  const withFooter=await snapshot();
@@ -52,11 +52,11 @@ try{
  assert.deepEqual(withCite.root.children[0],merged.root.children[0]);
  const publishedCite=renderArticle({schemaVersion:1,id:'section-cite',locale:'ko-KR',title:'섹션 문헌 검증',assets:[],lexicalState:withCite});
  assert.equal(publishedCite.ok,true,JSON.stringify(publishedCite.diagnostics));
- assert.match(publishedCite.html,/<footer>[\\s\\S]*<cite>[\\s\\S]*<\\/cite><\\/footer>/);
+ assert.match(publishedCite.html,/<footer>[\s\S]*<cite>[\s\S]*<\/cite><\/footer>/);
  await click('실행 취소');
  await click('실행 취소');
  assert.deepEqual(await snapshot(),merged);
- await page.getByText('제목 검증',{exact:true}).click();
+ await page.getByText('둘째 블록',{exact:true}).click();
  await page.keyboard.press('End');
  await click('인용문 삽입');
  const withQuote=await snapshot();
@@ -69,11 +69,11 @@ try{
  assert.equal(quote.children.at(-1).children.at(-1).type,'tufte-cite');
  const publishedQuote=renderArticle({schemaVersion:1,id:'quote-browser',locale:'ko-KR',title:'인용문 검증',assets:[],lexicalState:withAttribution});
  assert.equal(publishedQuote.ok,true,JSON.stringify(publishedQuote.diagnostics));
- assert.match(publishedQuote.html,/<blockquote>[\\s\\S]*<footer>[\\s\\S]*<cite>/);
+ assert.match(publishedQuote.html,/<blockquote>[\s\S]*<footer>[\s\S]*<cite>/);
  await click('실행 취소');
  await click('실행 취소');
  assert.deepEqual(await snapshot(),merged);
- await page.getByText('제목 검증',{exact:true}).click();
+ await page.getByText('둘째 블록',{exact:true}).click();
  await page.keyboard.press('End');
  await click('Epigraph 삽입');
  const withEpigraph=await snapshot();

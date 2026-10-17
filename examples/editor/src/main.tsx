@@ -11,7 +11,7 @@ import {$loadLayoutFixture} from './layoutFixture.js';
 import {$createLinkNode} from '@lexical/link';
 import {$generateHtmlFromNodes} from '@lexical/html';
 import {
-  $getRoot, $getSelection, $isRangeSelection, $isNodeSelection, $isElementNode, $isTextNode,
+  $getRoot, $getSelection, $isRangeSelection, $isNodeSelection, $isElementNode, $isTextNode, $createRangeSelection, $setSelection,
   $createParagraphNode, $createTextNode, $createLineBreakNode, $isParagraphNode,
   FORMAT_TEXT_COMMAND, KEY_ESCAPE_COMMAND, KEY_ARROW_DOWN_COMMAND, KEY_ENTER_COMMAND,
   SELECTION_INSERT_CLIPBOARD_NODES_COMMAND, COPY_COMMAND, CUT_COMMAND, PASTE_COMMAND, KEY_BACKSPACE_COMMAND, KEY_DELETE_COMMAND, HISTORY_PUSH_TAG, UNDO_COMMAND, REDO_COMMAND,
@@ -143,11 +143,15 @@ function BlockContextMenu(){
    if(!domSelection)return;
    const range=document.createRange();
    try{range.setStart(node,offset);range.collapse(true);}catch{return;}
-   // Keep the browser's native menu if the click is outside an editable text position.
-   // Lexical reconciles the DOM caret after focus; the menu must not assume a stale selection.
-   domSelection.removeAllRanges();
-   domSelection.addRange(range);
    editor.focus();
+   let valid=false;
+   editor.update(()=>{
+    const selection=$createRangeSelection();
+    selection.applyDOMRange(range);
+    valid=!containingNote(selection.anchor.getNode());
+    if(valid)$setSelection(selection);
+   },{discrete:true});
+   if(!valid)return;
    event.preventDefault();
    setPoint({x:Math.max(8,Math.min(window.innerWidth-260,event.clientX)),y:Math.max(8,Math.min(window.innerHeight-160,event.clientY))});
    setOpen(true);

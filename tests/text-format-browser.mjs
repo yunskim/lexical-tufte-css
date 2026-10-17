@@ -38,13 +38,13 @@ try{
  for(const [original,initial,replacement]of [['서버 본문 & <script> 금지 ',0,'포맷 본문'],['주석 <내용>',1,'포맷 주석'],['문서',0,'포맷 링크']]){
   let expected=initial;
   for(const [name,flag]of [['밑줄',8],['취소선',4],['마크',128]]){
-   await select(original);await page.getByRole('button',{name,exact:true}).click();expected|=flag;assert.equal(await bits(original),expected);
+   await select(original);await page.getByRole('toolbar',{name:'노트 편집',exact:true}).getByRole('button',{name,exact:true}).click();expected|=flag;assert.equal(await bits(original),expected);
    await page.getByRole('button',{name:'실행 취소',exact:true}).click();assert.equal(await bits(original),expected&~flag);
    await page.getByRole('button',{name:'다시 실행',exact:true}).click();assert.equal(await bits(original),expected);
   }
-  for(const [name,flag]of [['밑줄',8],['취소선',4],['마크',128]]){await select(original);await page.getByRole('button',{name,exact:true}).click();expected&=~flag;assert.equal(await bits(original),expected);}
+  for(const [name,flag]of [['밑줄',8],['취소선',4],['마크',128]]){await select(original);await page.getByRole('toolbar',{name:'노트 편집',exact:true}).getByRole('button',{name,exact:true}).click();expected&=~flag;assert.equal(await bits(original),expected);}
   assert.equal(expected,initial);
-  for(const name of ['밑줄','취소선','마크']){await select(original);await page.getByRole('button',{name,exact:true}).click();}
+  for(const name of ['밑줄','취소선','마크']){await select(original);await page.getByRole('toolbar',{name:'노트 편집',exact:true}).getByRole('button',{name,exact:true}).click();}
   if(original==='문서')assert.ok(collect((await snapshot()).root).some(n=>n.type==='link'&&n.url==='https://lexical.dev'&&n.children.some(c=>c.text===original)));
   await select(original);await page.keyboard.press('ArrowLeft');await page.keyboard.press('ArrowRight');await page.keyboard.insertText(replacement);
   const changed=original.slice(0,1)+replacement+original.slice(1);editedText[replacement]=changed;assert.equal(await bits(changed),initial|140);

@@ -174,6 +174,15 @@
 
 # 진행 기록
 
+## 2026-10-17 구분선·출처·컨텍스트 UI 검증
+
+- 최종 기존browser11개 및 추가contextual1개 통과로 이번 검증 작업 종료. E085 focus readiness와 M078을 추가하고 미검증 race 범위를 보고서에 남김.
+
+- main d53d7eb 추가 작업을 별도 worktree에서 검증. check266개(실패/skip0), package4개, Python16개, 실제 TS→Python HTTP→SQLite 통과.
+- 신규 contextual 브라우저 검사를 추가해 선택 toolbar·키보드 메뉴·375px 배치 및 우클릭 실제 선택을 검증. 우클릭이 이전 블록을 바꾸는 제품 오류 수정.
+- E080–E084/M073–M077에 wrapper 가정·중복 selector·우클릭 선택·검사 격리·인계 테스트 구문/위치 가정을 기록하고 반영.
+- 최종 browser 결과 및 남은 gate는 [UI 검증 보고서](VERIFICATION_CONTEXT_UI_2026-10-17.ko.md)를 따른다. CI 생략, 전체 P2–P7/F표 완료는 아님.
+
 ## 2026-10-17 Recovery HTTP 추가 검증 종료
 
 - main5fb4d20에서 frozen/check253개/browser11개/package4개, Python 격리 설치/pytest16개 및 실제 TS→Python HTTP→SQLite 왕복 통과. CI 생략.

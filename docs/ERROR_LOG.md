@@ -1,5 +1,43 @@
 # 에러 기록
 
+## E085 — 메뉴 표시와 키보드 focus 도착 시점 혼동
+
+- contextual 검사에서 Shift+F10 후 group 표시만 기다리고 Escape를 보내, requestAnimationFrame의 첫 버튼 focus 이전에 키가 editor로 전달되어 닫힘 검사가 timeout했다.
+- 키보드 진입 검사는 명시적으로 첫 버튼 focus를 기다린 뒤 Escape/방향키를 보낸다. focus 전에 입력한 매우 빠른 Escape의 사용자 동작 지원은 이번 범위에서 보장하지 않는다.
+- 상태: 검사 readiness 수정. M078.
+
+## E084 — 신규 섹션 브라우저 회귀의 정규식·삽입 위치 가정 오류
+
+- 새 footer/cite 정규식에 이중 escape가 들어가 JS parser가 Invalid regular expression flags로 중단했다. quote의 문자 범위도 이중 escape였다. 실제 mjs literal에 맞춰 수정하고 50개 mjs 파일 node --check 통과.
+- 수정 뒤 footer 테스트가 첫 블록 뒤 삽입인데도 섹션 마지막 자식이라고 기대해 실패했다. 실제 현재 블록 뒤 삽입 계약에 맞춰 마지막 문단을 선택한 뒤 footer/quote/epigraph를 검사한다. 제품 명령 위치는 바꾸지 않았다.
+- 상태: 구문 검사와 target 브라우저 통과. M060 재발 및 M077 참조.
+
+## E080 — 출처 HTML 테스트가 공백 보존 wrapper를 무시
+
+- main d53d7eb의 check에서 footer/cite 의미 구조는 맞지만 텍스트가 span 없이 직결된다는 신규 assertion이 실패했다.
+- footer 범위 안에서 지정된 tufte-pre-wrap span만 벗겨 cite 부모/순서·본문을 정확히 비교한다. 렌더러 동작은 바꾸지 않았다. E049 계열 검사 계약 오류 재발.
+- 상태: 수정 후 전체 check 결과는 UI 검증 보고서 참조. M073.
+
+## E081 — 선택 도구막대 추가 후 포맷 버튼 selector 중복
+
+- text-format-browser에서 밑줄 버튼이 주 도구막대/선택 도구막대 두 곳에 있어 strict locator 오류.
+- 기존 R10 테스트는 이름 있는 주 도구막대로 한정하고 새 선택 UI는 별도 실제 UI 검사로 검증한다. E074/M068의 영역 구분 원칙을 toolbar에도 적용한다.
+- 상태: 수정 후 전체 browser 결과는 UI 검증 보고서 참조. M074.
+
+## E082 — 우클릭 DOM 커서와 Lexical 선택 불일치
+
+- 실제 브라우저에서 두 번째 문단에 커서를 둔 뒤 주석을 포함한 첫 문단 우클릭→h3 실행 시 첫 문단의 거부 대신 이전 두 번째 문단이 변환됐다.
+- focus 뒤 DOMRange를 Lexical RangeSelection.applyDOMRange로 변환하고 discrete update에서 $setSelection한다. 주석 내부는 명령 메뉴로 가로채지 않는다.
+- 상태: 해당 반례·이전 제목 유지·실제 우클릭 제목 변경·키보드/375px 검증 통과. M075.
+
+## E083 — 브라우저 검증 서버 포트 공유
+
+- 새 contextual 검사와 기존 browser 묶음을 동시에 5174로 실행한 시도에서 기존 서버를 재사용할 수 있어 테스트 격리가 확보되지 않았다. 해당 첫 contextual timeout을 제품 실패 증거로 사용하지 않는다.
+- contextual 전용 5177로 분리하고 독립 실행하여 E082를 재현·수정했다. 기존 테스트의 포트 공유 프로세스는 병렬 실행하지 않는다.
+- 상태: 검사 절차 수정. M076.
+
+- 추가: 빌드와 browser를 동시에 실행한 검사에서도 JSON textarea가 비어 파싱이 실패했다. Vite가 참조하는 dist 갱신/HMR 영향을 배제할 수 없어 제품 데이터 유실로 단정하지 않는다. 최종 검증은 build/check/package 종료 후 browser 전체와 target을 직렬 실행한다.
+
 ## E079 — F07 검증 환경에서 GitHub DNS 해석 실패 및 checkout 부재
 
 - 2026-10-17 실행 컨테이너에서 `git ls-remote https://github.com/yunskim/lexical-tufte-css.git HEAD`가 `Could not resolve host: github.com`으로 실패했다. `/mnt/data`에 checkout이 없고 pnpm 실행 파일도 없다. Node v22.16.0은 확인했다.
