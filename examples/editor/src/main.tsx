@@ -20,7 +20,7 @@ import {
 import {registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,registerQuotationCommands,INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_SECTION_CITE_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND,registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_TUFTE_DEFINITION_PAIR_COMMAND,registerSectionCommands,WRAP_TUFTE_ROOT_COMMAND,INSERT_TUFTE_SECTION_COMMAND,SPLIT_TUFTE_SECTION_COMMAND,MERGE_TUFTE_SECTION_COMMAND,SET_TUFTE_BLOCK_COMMAND,inspectEditorStructure,focusStructureIssue,type StructureIssue,replaceEditorDocumentState,TUFTE_NODES,NoteNode, $createNoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, registerNoteEdgeTypingGuard, type NoteKind} from '@lexical-tufte/lexical';
 import './style.css';
 
-type ToolbarIconName='bold'|'italic'|'code'|'quote'|'epigraph'|'sidenote'|'marginnote'|'rule'|'undo'|'redo';
+type ToolbarIconName='bold'|'italic'|'code'|'quote'|'epigraph'|'sidenote'|'marginnote'|'rule'|'undo'|'redo'|'list'|'numbered'|'definition'|'attribution'|'figure';
 const toolbarPaths:Record<ToolbarIconName,string>={
  bold:'M7 4h6a4 4 0 0 1 0 8H7zm0 8h7a4 4 0 0 1 0 8H7z',
  italic:'M10 4h10M4 20h10M14 4 10 20',
@@ -31,7 +31,12 @@ const toolbarPaths:Record<ToolbarIconName,string>={
  marginnote:'M4 5h16M4 10h11M4 15h11m5-3h4v8h-4',
  rule:'M3 12h18',
  undo:'M9 14 4 9l5-5M4 9h10a6 6 0 0 1 0 12',
- redo:'m15 14 5-5-5-5m5 5H10a6 6 0 0 0 0 12'
+ redo:'m15 14 5-5-5-5m5 5H10a6 6 0 0 0 0 12',
+ list:'M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01',
+ numbered:'M8 6h13M8 12h13M8 18h13M3 5h1v4M3 13h2l-2 3h2',
+ definition:'M4 5h16M4 10h10M7 15h13M7 20h10',
+ attribution:'M5 5h14M5 10h14M10 16h9M10 20h9',
+ figure:'M3 4h18v16H3zM7 15l4-4 3 3 2-2 4 4M8 8h.01'
 };
 function ToolbarIcon({name}:{name:ToolbarIconName}){
  return <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d={toolbarPaths[name]}/></svg>;
@@ -384,18 +389,18 @@ function EditorUI(){
       }}>그림 여백 주석 수정</button>
       <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(SET_TUFTE_FIGURE_WIDTH_COMMAND,'body')}>그림 본문 폭</button>
       <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(SET_TUFTE_FIGURE_WIDTH_COMMAND,'fullwidth')}>그림 전체 폭</button>
-      <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(INSERT_TUFTE_LIST_COMMAND,'bullet')}>글머리표 목록 삽입</button>
-      <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(INSERT_TUFTE_LIST_COMMAND,'number')}>번호 목록 삽입</button>
+      <IconButton name="list" label="글머리표 목록 삽입" onMouseDown={preserve} onClick={()=>editor.dispatchCommand(INSERT_TUFTE_LIST_COMMAND,'bullet')}/>
+      <IconButton name="numbered" label="번호 목록 삽입" onMouseDown={preserve} onClick={()=>editor.dispatchCommand(INSERT_TUFTE_LIST_COMMAND,'number')}/>
       <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(APPEND_TUFTE_LIST_ITEM_COMMAND,undefined)}>목록 항목 추가</button>
       {([['quote','인용문 삽입'],['epigraph','Epigraph 삽입'],['section-footer','섹션 출처 삽입']] as const).map(([kind,label])=><IconButton key={kind} name={kind==='epigraph'?'epigraph':'quote'} label={label} onMouseDown={preserve} onClick={()=>editor.dispatchCommand(INSERT_TUFTE_QUOTATION_COMMAND,kind)}/>)}
       <IconButton name="rule" label="구분선 삽입" onMouseDown={preserve} onClick={()=>editor.dispatchCommand(INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,undefined)}/>
-      <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(APPEND_TUFTE_ATTRIBUTION_COMMAND,undefined)}>인용문 출처 추가</button>
-      <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(APPEND_TUFTE_SECTION_CITE_COMMAND,undefined)}>섹션 문헌 추가</button>
-      <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(INSERT_TUFTE_DEFINITION_LIST_COMMAND,undefined)}>정의목록 삽입</button>
+      <IconButton name="attribution" label="인용문 출처 추가" onMouseDown={preserve} onClick={()=>editor.dispatchCommand(APPEND_TUFTE_ATTRIBUTION_COMMAND,undefined)}/>
+      <IconButton name="attribution" label="섹션 문헌 추가" onMouseDown={preserve} onClick={()=>editor.dispatchCommand(APPEND_TUFTE_SECTION_CITE_COMMAND,undefined)}/>
+      <IconButton name="definition" label="정의목록 삽입" onMouseDown={preserve} onClick={()=>editor.dispatchCommand(INSERT_TUFTE_DEFINITION_LIST_COMMAND,undefined)}/>
       <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(APPEND_TUFTE_DEFINITION_PAIR_COMMAND,undefined)}>정의목록 항목 추가</button>
       {(['sans','newthought','numeral','danger'] as const).map(kind=><button key={kind} onMouseDown={preserve} onClick={()=>editor.dispatchCommand(SET_TUFTE_SPAN_KIND_COMMAND,kind)}>인라인 {kind}</button>)}
-      <button onMouseDown={preserve} onClick={()=>insertNote()}>노트 삽입</button>
-      <button onMouseDown={preserve} onClick={()=>insertNote('marginnote')}>여백 주석 삽입</button>
+      <IconButton name="sidenote" label="노트 삽입" onMouseDown={preserve} onClick={()=>insertNote()}/>
+      <IconButton name="marginnote" label="여백 주석 삽입" onMouseDown={preserve} onClick={()=>insertNote('marginnote')}/>
       <button onMouseDown={preserve} onClick={()=>editor.update(()=>{if(!enterNote())setStatus('뒤에 있는 노트를 찾지 못했습니다.');})}>다음 노트로</button>
       <button onMouseDown={preserve} onClick={()=>editor.update(leaveNote)}>본문으로</button>
       <IconButton name="bold" label="굵게" onMouseDown={preserve} onClick={()=>editor.dispatchCommand(FORMAT_TEXT_COMMAND,'bold')}/>
