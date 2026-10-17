@@ -1,3 +1,13 @@
+## 2026-10-17 계획 재점검 4회 및 P2.2.b 구현 착수 (검증 대기)
+
+- 계획 `docs/PLAN.ko.md`: [독립 재점검 보고서](PLAN_AUDIT_2026-10-17.ko.md)에 ① 사용자 글 작성/저장/발행 ② clean package 소비자 ③ 실패·보안·접근성 ④ 관점 간 모순 해소를 각각 기록했다. P2.2.b/c/d 및 P2.3–P6 세부 게이트를 확장하고 P3 UI 재구성보다 P2 데이터/렌더/명령 검증을 우선한다. 계획 커밋 `bd032ac`, 보고서 `5402737`.
+- P2.2.b.0: `examples/editor`의 직접 import `@lexical-tufte/document`, `@lexical/rich-text`를 패키지 manifest와 lockfile importer에 동시 반영했다 (`c2a8e4a`, `e36382f`). 누락된 직접 선언은 E087/M081에 기록했다.
+- P2.2.b.1 **부분 구현**: `WRAP_TUFTE_SPAN_COMMAND`와 `UNWRAP_TUFTE_SPAN_COMMAND`를 `@lexical-tufte/lexical`에서 공개하고 편집기 예제에 연결했다 (`ce937cf`, `565af0c`, `0e65e4e`, `f795bcb`). 하나의 일반 TextNode 선택 범위에만 새 span을 만들고, 기존 span 내부의 접힌 caret에서 자식 구조를 보존하며 해제한다. cross-node·note·이미 감싸진 범위·IME 등 미지원 선택은 진단·거부한다.
+- 작성된 회귀: `packages/lexical/test/inline-commands.test.mjs`에 부분 선택/JSON roundtrip/원자적 거부/링크 URL/노트 ID 보존 (`aa6d83c`, `de566d0`). `tests/inline-span-browser.mjs`에 실제 편집→순수 JSON renderer→저장/재열기→해제→undo/redo (`1e00292`). 루트 `test:browser` 직렬 묶음에 contextual/inline-span 검사를 추가했다 (`63afdca`).
+- 독립 정적 교차 점검: 예제의 직접 import vs manifest vs lockfile, 명령 정의 vs public export vs UI 호출, 선택·스키마 가드 vs unit/browser fixture, renderer의 span 처리와 P2 체크리스트를 각각 다시 대조했다. 구문·타입/빌드/실제 동작 테스트는 수행하지 않았으므로 **검증 성공으로 주장하지 않는다**.
+- 남은 gate: `pnpm install --frozen-lockfile`, `pnpm check`, `pnpm package:check`, 브라우저 묶음, JSON/HTML 의미 roundtrip, 실제 OS IME/키보드/스크린리더. P2.2.b.1의 다중 텍스트·링크 경계·전체 해제 UX 및 P2.2.b.2 목록 중첩 등은 계속 [ ]. **CI 생략, 사용자 지시에 따라 실행 테스트 일괄 보류.**
+- 다음 작업: 일괄 검증 준비 중 범위 확장 전에 본 명령의 타입·동작 실패를 우선 정리하고, P2.2.b.2 목록 중첩/전환·내어쓰기 명령을 한 의미+한 회귀 단위로 진행한다.
+
 ## P3.1.c/d 이전 작업 마무리 — 선택 복원·포커스 흐름 (검증 대기)
 
 - 구현 (`examples/editor/src/main.tsx`): 우클릭·Shift+F10/ContextMenu·토글 버튼으로 메뉴를 열 때 Lexical `RangeSelection`을 복제해 명령 대상과 허용 항목을 보존한다. 메뉴의 DOM focus 이동 중에는 편집 선택 업데이트가 대상 기록을 덮어쓰지 않도록 한다.
