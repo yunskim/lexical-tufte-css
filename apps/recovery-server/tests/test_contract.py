@@ -52,7 +52,7 @@ def test_contract_rejects_bad_inputs_and_denies_access(tmp_path):
     assert client.put(BASE + "/session-1", json=draft(sessionId="session-2")).status_code == 400
     assert client.put(BASE + "/session-1", json=draft(payload="not-json")).json()["diagnostics"][0]["code"] == "INVALID_RECOVERY_JSON"
     assert client.get(BASE).json()["value"] == []
-    denied = setup(tmp_path / "other", allow=False) if False else create_app(str(tmp_path / "recovery.sqlite"), lambda request, post_id: False)
+    denied = create_app(str(tmp_path / "recovery.sqlite"), lambda request, post_id: False)
     denied_client = TestClient(denied)
     result = denied_client.get(BASE)
     assert result.status_code == 403
