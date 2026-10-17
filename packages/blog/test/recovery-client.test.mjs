@@ -26,7 +26,7 @@ test('browser recovery client returns diagnostics for invalid input, malformed r
  const client=new RecoveryHttpClient({baseUrl:'',fetcher:async()=>{count++;return new Response('not-json');}});
  assert.equal((await client.list('bad id')).diagnostics[0].code,'INVALID_RECOVERY_INPUT');
  assert.equal(count,0);
- assert.equal((await client.list('post-1')).diagnostics[0].code,'RECOVERY_NETWORK_ERROR');
+ assert.equal((await client.list('post-1')).diagnostics[0].code,'RECOVERY_PROTOCOL_ERROR');
  const malformed=new RecoveryHttpClient({baseUrl:'',fetcher:async()=>new Response('{"ok":true,"diagnostics":[]}')});
  assert.equal((await malformed.list('post-1')).diagnostics[0].code,'RECOVERY_PROTOCOL_ERROR');
  const unavailable=new RecoveryHttpClient({baseUrl:'',fetcher:async()=>{throw Error('offline');}});
