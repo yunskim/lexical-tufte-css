@@ -108,6 +108,17 @@ function SelectionToolbar(){
  </div>;
 }
 
+function canOpenBlockMenu(node:LexicalNode):boolean{
+ for(let current:LexicalNode|null=node;current;current=current.getParent()){
+  if(current instanceof NoteNode)return false;
+  const type=current.getType();
+  if(type==='table'||type==='tablerow'||type==='tablecell'||type==='figure'||type==='image'||type==='root') {
+   if(type!=='root')return false;
+   break;
+  }
+ }
+ return true;
+}
 function BlockContextMenu(){
  const [editor]=useLexicalComposerContext();
  const [open,setOpen]=useState(false);
@@ -118,7 +129,7 @@ function BlockContextMenu(){
  useEffect(()=>editor.registerUpdateListener(({editorState})=>{
   editorState.read(()=>{
    const selection=$getSelection();
-   const valid=$isRangeSelection(selection)&&selection.isCollapsed()&&!containingNote(selection.anchor.getNode());
+   const valid=$isRangeSelection(selection)&&selection.isCollapsed()&&canOpenBlockMenu(selection.anchor.getNode());
    setAvailable(valid);
    if(valid){
     let node=selection.anchor.getNode();
@@ -150,7 +161,7 @@ function BlockContextMenu(){
    editor.update(()=>{
     const selection=$createRangeSelection();
     selection.applyDOMRange(range);
-    valid=selection.isCollapsed()&&!containingNote(selection.anchor.getNode())&&selection.anchor.getNode().getType()!=='root';
+    valid=selection.isCollapsed()&&canOpenBlockMenu(selection.anchor.getNode())&&selection.anchor.getNode().getType()!=='root';
     if(valid)$setSelection(selection);
    },{discrete:true});
    if(!valid)return;
@@ -164,7 +175,7 @@ function BlockContextMenu(){
    let valid=false;
    editor.getEditorState().read(()=>{
     const selection=$getSelection();
-    valid=$isRangeSelection(selection)&&selection.isCollapsed()&&!containingNote(selection.anchor.getNode());
+    valid=$isRangeSelection(selection)&&selection.isCollapsed()&&canOpenBlockMenu(selection.anchor.getNode());
    });
    if(!valid)return;
    event.preventDefault();
