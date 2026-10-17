@@ -1,9 +1,9 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createHeadlessEditor} from '@lexical/headless';
-import {$getRoot,$createParagraphNode,$createTextNode,$getNodeByKey} from 'lexical';
+import {$getRoot,$createParagraphNode,$createTextNode,$getNodeByKey,KEY_TAB_COMMAND} from 'lexical';
 import {$createListNode,$createListItemNode} from '@lexical/list';
-import {TUFTE_NODES,$createSectionNode,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,SET_TUFTE_LIST_KIND_COMMAND,CHANGE_TUFTE_LIST_INDENT_COMMAND,UNWRAP_TUFTE_LIST_COMMAND,$createNoteNode} from '../dist/index.js';
+import {TUFTE_NODES,$createSectionNode,registerListKeyboardCommands,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,SET_TUFTE_LIST_KIND_COMMAND,CHANGE_TUFTE_LIST_INDENT_COMMAND,UNWRAP_TUFTE_LIST_COMMAND,$createNoteNode} from '../dist/index.js';
 
 function setup(){
  const diagnostics=[];
@@ -239,4 +239,52 @@ test('P2.2.b list unwrap rejects an ordinary paragraph without modifying a nearb
  assert.equal(JSON.stringify(editor.getEditorState().toJSON()),before);
  assert.ok(diagnostics.some(d=>d.code==='INVALID_LIST_SELECTION'));
  dispose();
+});
+
+test('P2.2.b Tab keyboard command edits list depth only at valid list item',()=>{
+ const {editor,diagnostics,dispose}=setup();
+ const stopKeyboard=registerListKeyboardCommands(editor);
+ editor.update(()=>{
+  const first=$createTextNode('First'),second=$createTextNode('Second');
+  $getRoot().append($createSectionNode().append(
+   $createParagraphNode().append($createTextNode('Outside')),
+   $createListNode('bullet').append($createListItemNode().append(first),$createListItemNode().append(second))
+  ));
+  second.selectEnd();
+ },{discrete:true});
+ const event=(shiftKey=false)=>({shiftKey,ctrlKey:false,metaKey:false,altKey:false,isComposing:false,preventDefault(){this.prevented=true;},prevented:false});
+ const indent=event();
+ assert.equal(editor.dispatchCommand(KEY_TAB_COMMAND,indent),true);
+ assert.equal(indent.prevented,true);
+ editor.update(()=>{},{discrete:true});
+ editor.getEditorState().read(()=>{
+  const list=$getRoot().getFirstChild().getLastChild();
+  assert.equal(list.getLastChild().getIndent(),1);
+ });
+ const outdent=event(true);
+ assert.equal(editor.dispatchCommand(KEY_TAB_COMMAND,outdent),true);
+ assert.equal(outdent.prevented,true);
+ editor.update(()=>{},{discrete:true});
+ editor.getEditorState().read(()=>assert.equal($getRoot().getFirstChild().getLastChild().getLastChild().getIndent(),0));
+ assert.deepEqual(diagnostics,[]);
+ stopKeyboard();dispose();
+});
+
+test('P2.2.b Tab keeps browser focus navigation on paragraph, first item and composition',()=>{
+ const {editor,dispose}=setup();const stopKeyboard=registerListKeyboardCommands(editor);
+ editor.update(()=>{
+  const outside=$createTextNode('Outside'),first=$createTextNode('First');
+  $getRoot().append($createSectionNode().append($createParagraphNode().append(outside),
+   $createListNode('bullet').append($createListItemNode().append(first))));
+  outside.selectEnd();
+ },{discrete:true});
+ const event=(shiftKey=false,isComposing=false)=>({shiftKey,ctrlKey:false,metaKey:false,altKey:false,isComposing,prevented:false,preventDefault(){this.prevented=true;}});
+ const outside=event();
+ assert.equal(editor.dispatchCommand(KEY_TAB_COMMAND,outside),false);
+ assert.equal(outside.prevented,false);
+ editor.update(()=>{$getRoot().getFirstChild().getLastChild().getFirstChild().selectEnd();},{discrete:true});
+ const first=event();assert.equal(editor.dispatchCommand(KEY_TAB_COMMAND,first),false);assert.equal(first.prevented,false);
+ const top=event(true);assert.equal(editor.dispatchCommand(KEY_TAB_COMMAND,top),false);assert.equal(top.prevented,false);
+ const composing=event(false,true);assert.equal(editor.dispatchCommand(KEY_TAB_COMMAND,composing),false);assert.equal(composing.prevented,false);
+ stopKeyboard();dispose();
 });
