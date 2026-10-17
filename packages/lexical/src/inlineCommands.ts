@@ -48,19 +48,19 @@ export function registerInlineCommands(editor:LexicalEditor,onDiagnostic?:(diagn
   if(!parent||!NODE_SCHEMA[parent.getType()]?.children?.includes('tufte-span'))
    return reject('INVALID_SPAN_PARENT','현재 부모 요소에는 Tufte 인라인 속성을 삽입할 수 없습니다.');
   // Validate before splitText: a rejected command must not modify the editor tree.
+  $addUpdateTag(HISTORY_PUSH_TAG);
   const pieces=text.splitText(start,end);
   const fragment=pieces[start>0?1:0];
   if(!fragment)throw Error('Text split failed after validated range');
-  $addUpdateTag(HISTORY_PUSH_TAG);
   const span=$createTufteSpanNode(kind);
-  fragment.replace(span);
+  fragment.insertBefore(span);
   span.append(fragment);
   fragment.select(0,fragment.getTextContentSize());
   return true;
  },COMMAND_PRIORITY_EDITOR),
  editor.registerCommand(UNWRAP_TUFTE_SPAN_COMMAND,()=>{
   const selection=$getSelection();
-  if(!$isRangeSelection(selection)||!selection.isCollapsed()||editor.isComposing()||$getContainingNote(selection.anchor.getNode()))
+  if(!$isRangeSelection(selection)||!selection.isCollapsed()||selection.anchor.type!=='text'||editor.isComposing()||$getContainingNote(selection.anchor.getNode()))
    return reject('INVALID_SPAN_SELECTION','기존 인라인 속성 내부의 한 위치를 선택하세요.');
   const span=nearest(selection.anchor.getNode()),parent=span?.getParent();
   if(!span||!parent||!NODE_SCHEMA[parent.getType()]?.children)
