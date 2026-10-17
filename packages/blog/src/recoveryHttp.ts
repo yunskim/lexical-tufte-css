@@ -10,6 +10,8 @@ export type RecoveryHttpRequest={
  /** Host-authenticated identity and CSRF verification must happen before calling this handler. */
 };
 export type RecoveryHttpResponse={status:number;body:Result<unknown>};
+/** Host verifies authenticated principal and CSRF/origin for mutation requests. */
+export type RecoveryRequestGuard=(request:RecoveryHttpRequest)=>boolean|Promise<boolean>;
 const failure=(code:string,message:string,status:number):RecoveryHttpResponse=>({
  status,body:{ok:false,diagnostics:[{code,path:'$.recovery',message}]}
 });
@@ -24,9 +26,13 @@ const statusFor=(result:Result<unknown>):number=>{
  return 400;
 };
 /** Framework-neutral dispatch only. No HTTP listener, authentication, or CSRF middleware is installed. */
-export async function handleRecoveryRequest(service:AuthorizedRecoveryService,request:RecoveryHttpRequest):Promise<RecoveryHttpResponse>{
+export async function handleRecoveryRequest(service:AuthorizedRecoveryService,request:RecoveryHttpRequest,guard?:RecoveryRequestGuard):Promise<RecoveryHttpResponse>{
  if(!request||!['GET','PUT','DELETE'].includes(request.method))
   return failure('RECOVERY_METHOD_NOT_ALLOWED','Unsupported recovery method',405);
+ if(guard){
+  try{if(!await guard(request))return failure('RECOVERY_REQUEST_DENIED','Request authentication or CSRF verification failed',403);}
+  catch{return failure('RECOVERY_REQUEST_DENIED','Request authentication or CSRF verification failed',403);}
+ }
  let result:Result<unknown>;
  if(request.method==='GET'){
   result=request.sessionId===undefined?await service.list(request.postId):await service.read(request.postId,request.sessionId);
