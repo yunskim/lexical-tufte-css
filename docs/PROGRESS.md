@@ -1,3 +1,12 @@
+## P2.2.b.2/b.3 목록 해제 및 정의목록 쌍 편집 구현 (일괄 검증 대기)
+
+- **P2.2.b.2 목록 해제**: `UNWRAP_TUFTE_LIST_COMMAND`를 추가했다. 최상위 Tufte 섹션의 직계 `ul/ol`이 평평한 `listitem`으로 구성되고 모든 자식이 문단에 허용되는 경우에만 각 항목을 `paragraph`로 변환한다. 노트 ID·텍스트/링크·방향·정렬·문단 호환 서식은 기존 자식과 속성을 유지하고, 불허 중첩 구조·목록 밖 선택·IME에서는 변경 없이 진단한다. 명령 코드 `d3bb4df`, 속성 보존 보강 `d1392b5`, 공개 export `e5f02e8`, editor UI `a6e9991`.
+- **P2.2.b.3 정의목록 쌍 편집**: `REMOVE_TUFTE_DEFINITION_PAIR_COMMAND`, `MOVE_TUFTE_DEFINITION_PAIR_COMMAND`(up/down)를 `packages/lexical/src/definitionCommands.ts`에 추가했다. `dt dd dt dd ...`의 엄격한 쌍 순서만 허용하고, 두 용어가 하나의 설명을 공유하는 `dt dt dd` 등 합법적이지만 의미가 다른 그룹은 무변경 거부한다. 마지막 쌍 삭제는 거부하여 빈 `dl`을 만들지 않으며, 정상 이동은 기존 자식 노드를 재배치해 텍스트와 note ID를 유지한다. 구현 `eac4df6`, export `7e57cf6`, editor UI `a6e9991`.
+- **회귀 테스트 작성(미실행)**: `packages/lexical/test/list-commands.test.mjs`에 정상 목록 해제/중첩·목록 밖 선택 거부 `1d540df`, `packages/lexical/test/definition-commands.test.mjs`에 쌍 이동·삭제·최종 쌍/비정형 그룹 거부와 note ID 보존 `bb608a6` 추가. `tests/list-kind-browser.mjs`에 목록 해제→semantic HTML→undo `28315d0`, `tests/definition-pairs-browser.mjs`에 실제 UI 편집→쌍 이동/삭제→canonical renderer→저장/재열기→undo/redo `7e03463` 추가. 후자는 `package.json`의 직렬 브라우저 테스트 목록에 포함 `9d146fa`.
+- 계약 문서: [목록 구조/해제](LIST_COMMANDS_P22B.ko.md), [정의목록 쌍 편집](DEFINITION_PAIR_COMMANDS_P22B.ko.md), 재발 방지 [M082](ERROR_PREVENTION.md). [이슈 #9](https://github.com/yunskim/lexical-tufte-css/issues/9) 추적 유지.
+- **검증 상태**: 타입 검사·단위·브라우저·package/JSON/HTML 검증은 이번 턴 실행하지 않았다. CI 생략. 마지막 실제 성공 커밋을 현재 코드에 전이하지 않으며 `P2.2.b.2/.3`과 F06은 미완료로 유지한다.
+- 후속: 목록의 혼합/중첩 해제와 키보드 Enter/Tab/Backspace 정책, 정의목록의 다중 용어 그룹·전체 삭제를 설계 계약에 따라 구현. 누적 변경의 일괄 검증에서 문제 발생 시 E088 이후 별도 오류 기록/재발 방지 대책 적용.
+
 ## 2026-10-17 P2.2.b.2 목록 유형 전환·들여쓰기 구현 (일괄 검증 대기)
 
 - [이슈 #9](https://github.com/yunskim/lexical-tufte-css/issues/9) 및 [명령 계약](LIST_COMMANDS_P22B.ko.md)에 따라 `SET_TUFTE_LIST_KIND_COMMAND`(bullet↔number)와 `CHANGE_TUFTE_LIST_INDENT_COMMAND`(indent/outdent)을 추가했다. 각각 기존 ListNode/ListItemNode를 유지하면서 유형 또는 구조적 깊이를 바꾸며, 명령 공개 export 및 기존 editor prototype 버튼에 연결했다.
