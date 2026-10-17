@@ -99,11 +99,16 @@ def create_app(db_file: str, authorize: Callable[[Request, str], bool]):
             async for chunk in request.stream():
                 received += len(chunk)
                 if received > 2_100_000:
-                    return failure('RECOVERY_REQUEST_TOO_LARGE', 413)
+                    return reject('RECOVERY_REQUEST_TOO_LARGE', 413)
                 chunks.append(chunk)
             body = b''.join(chunks)
+            delivered = False
             async def replay():
-                return {'type': 'http.request', 'body': body, 'more_body': False}
+                nonlocal delivered
+                if not delivered:
+                    delivered = True
+                    return {'type': 'http.request', 'body': body, 'more_body': False}
+                return {'type': 'http.disconnect'}
             request._receive = replay
         response = await call_next(request)
         response.headers["Cache-Control"] = "no-store"
