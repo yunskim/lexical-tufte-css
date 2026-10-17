@@ -156,8 +156,24 @@ function BlockContextMenu(){
    setPoint({x:Math.max(8,Math.min(window.innerWidth-260,event.clientX)),y:Math.max(8,Math.min(window.innerHeight-160,event.clientY))});
    setOpen(true);
   };
+  const onKeyboardMenu=(event:KeyboardEvent)=>{
+   if(editor.isComposing()||!(event.key==='ContextMenu'||(event.shiftKey&&event.key==='F10')))return;
+   let valid=false;
+   editor.getEditorState().read(()=>{
+    const selection=$getSelection();
+    valid=$isRangeSelection(selection)&&selection.isCollapsed()&&!containingNote(selection.anchor.getNode());
+   });
+   if(!valid)return;
+   event.preventDefault();
+   const selection=window.getSelection();
+   const rect=selection?.rangeCount?selection.getRangeAt(0).getBoundingClientRect():root.getBoundingClientRect();
+   setPoint({x:Math.max(8,Math.min(window.innerWidth-260,rect.left)),y:Math.max(8,Math.min(window.innerHeight-160,rect.bottom+8))});
+   setOpen(true);
+   requestAnimationFrame(()=>menuRef.current?.querySelector<HTMLButtonElement>('#tufte-block-menu button')?.focus());
+  };
+  root.addEventListener('keydown',onKeyboardMenu);
   root.addEventListener('contextmenu',onContext);
-  return()=>root.removeEventListener('contextmenu',onContext);
+  return()=>{root.removeEventListener('contextmenu',onContext);root.removeEventListener('keydown',onKeyboardMenu);};
  },[editor]);
  useEffect(()=>{
   if(!open)return;
