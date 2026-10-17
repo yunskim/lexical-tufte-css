@@ -1,4 +1,4 @@
-import {$addUpdateTag,$createParagraphNode,$getSelection,$isRangeSelection,createCommand,COMMAND_PRIORITY_EDITOR,HISTORY_PUSH_TAG,type LexicalCommand,type LexicalEditor,type LexicalNode} from 'lexical';
+import {$addUpdateTag,$createParagraphNode,$getSelection,$isRangeSelection,createCommand,COMMAND_PRIORITY_EDITOR,KEY_TAB_COMMAND,HISTORY_PUSH_TAG,type LexicalCommand,type LexicalEditor,type LexicalNode} from 'lexical';
 import {$createListNode,$createListItemNode,ListNode,ListItemNode} from '@lexical/list';
 import {SectionNode} from './LayoutNodes.js';
 import {$getContainingNote} from './noteOperations.js';
@@ -108,4 +108,28 @@ export function registerListCommands(editor:LexicalEditor,onDiagnostic?:(diagnos
   },COMMAND_PRIORITY_EDITOR)
  ];
  return ()=>registrations.forEach(unregister=>unregister());
+}
+
+/** Opt-in keyboard binding: only consume Tab when a valid list nesting edit is possible.
+ * All other Tab presses retain native focus navigation, including toolbars and notes. */
+export function registerListKeyboardCommands(editor:LexicalEditor):()=>void{
+ if(!editor.hasNodes([ListNode,ListItemNode,SectionNode]))throw Error('List keyboard commands require TUFTE_NODES');
+ return editor.registerCommand(KEY_TAB_COMMAND,event=>{
+  if(editor.isComposing()||event.isComposing||event.ctrlKey||event.metaKey||event.altKey)return false;
+  const selection=$getSelection();
+  if(!$isRangeSelection(selection)||!selection.isCollapsed()||$getContainingNote(selection.anchor.getNode()))return false;
+  let node:LexicalNode|null=selection.anchor.getNode();
+  while(node&&!(node instanceof ListItemNode))node=node.getParent();
+  if(!(node instanceof ListItemNode))return false;
+  const list=node.getParent();
+  if(!(list instanceof ListNode)||list.getListType()==='check'||!list.getParent()||
+     !NODE_SCHEMA[list.getParent()!.getType()]?.children?.includes('list'))return false;
+  const depth=node.getIndent(),direction=event.shiftKey?'outdent':'indent';
+  if(direction==='indent'&&(!node.getPreviousSibling()||depth>=20))return false;
+  if(direction==='outdent'&&depth===0)return false;
+  // The structural command owns the mutation and history boundary.
+  event.preventDefault();
+  editor.dispatchCommand(CHANGE_TUFTE_LIST_INDENT_COMMAND,direction);
+  return true;
+ },COMMAND_PRIORITY_EDITOR);
 }
