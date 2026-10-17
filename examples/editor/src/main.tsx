@@ -174,6 +174,9 @@ function BlockContextMenu(){
   };
   const onKeyboardMenu=(event:KeyboardEvent)=>{
    if(editor.isComposing()||!(event.key==='ContextMenu'||(event.shiftKey&&event.key==='F10')))return;
+   const target=event.target;
+   const element=target instanceof Element?target:target instanceof Node?target.parentElement:null;
+   if(element?.closest('figure, img, table, [data-tufte-editor="table-layout"], .tufte-note-editor, [contenteditable="false"]'))return;
    let valid=false;
    editor.getEditorState().read(()=>{
     const selection=$getSelection();
