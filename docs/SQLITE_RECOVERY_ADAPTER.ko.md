@@ -34,3 +34,11 @@
 - [ ] pnpm check, 브라우저 테스트, 패키지 소비 검사 일괄 실행
 
 사용자 요청에 따라 현재 테스트 실행 및 CI를 생략한다. 실행 전 완료 표시하지 않는다.
+
+## 구현 현황 (실행 검증 전)
+
+- `packages/blog/src/recoveryHost.ts`에 `AuthorizedRecoveryService` 구현. `RecoveryAuthorizer` 콜백을 list/read/save/remove 전에 호출한다.
+- `packages/blog/src/index.ts`에서 서버 측 어댑터 API를 공개한다.
+- 권한 콜백은 호스트의 인증 결과와 사용자별 글 소유권을 확인해야 한다. 서비스 자체는 HTTP 인증, CSRF 토큰, 사용자 세션을 제공하지 않는다.
+- 실패한 권한 검사에서는 저장소 접근을 진행하지 않는다. 이 동작과 타입 검사는 일괄 테스트 대기다.
+- 다음: 권한 거부·예외·세션 간 접근 제어 테스트 코드 및 실제 HTTP 호스트 연결. CI 생략.
