@@ -1,3 +1,10 @@
+## P3.1.c 작은 화면 블록 메뉴 높이 및 ARIA CSS 정합성 (일괄 검증 대기)
+
+- 메뉴의 실제 `role=menu`와 CSS의 기존 `role=group` 불일치를 수정했다.
+- floating 메뉴에 `max-height:calc(100dvh - 16px)`, `overflow-y:auto`, `overscroll-behavior:contain`을 적용해 짧은 화면에서 내부 스크롤을 허용한다.
+- visualViewport 높이와 CSS 동적 viewport 높이는 모바일 키보드/확대 시 다를 수 있으므로 실제 단말 검증을 남긴다.
+- 사용자 요청대로 테스트 실행은 누적 후 일괄 수행하고 CI는 생략한다.
+
 ## P3.1.c visualViewport 가시 영역 좌표 보정 (일괄 검증 대기)
 
 - 열린 블록 메뉴의 경계 보정에 visualViewport offsetLeft/offsetTop/width/height를 적용했다. API 미지원 환경에서는 기존 window 크기로 대체한다.
