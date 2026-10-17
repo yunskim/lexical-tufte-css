@@ -58,6 +58,23 @@ def create_app(db_file: str, authorize: Callable[[Request, str], bool]):
 
     @app.middleware("http")
     async def no_store(request, call_next):
+        if request.method in ('PUT', 'DELETE') and request.url.path.startswith('/posts/'):
+            length = request.headers.get('content-length')
+            if length is not None and (not length.isdecimal() or int(length) > 2_100_000):
+                return failure('RECOVERY_REQUEST_TOO_LARGE', 413)
+            if request.headers.get('content-type', '').split(';', 1)[0].strip().lower() != 'application/json':
+                return failure('RECOVERY_CONTENT_TYPE_UNSUPPORTED', 415)
+            received = 0
+            chunks = []
+            async for chunk in request.stream():
+                received += len(chunk)
+                if received > 2_100_000:
+                    return failure('RECOVERY_REQUEST_TOO_LARGE', 413)
+                chunks.append(chunk)
+            body = b''.join(chunks)
+            async def replay():
+                return {'type': 'http.request', 'body': body, 'more_body': False}
+            request._receive = replay
         response = await call_next(request)
         response.headers["Cache-Control"] = "no-store"
         return response
