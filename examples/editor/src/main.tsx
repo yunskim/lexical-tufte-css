@@ -335,6 +335,7 @@ function EditorUI(){
   useEffect(()=>registerQuotationCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
   useEffect(()=>registerFigureCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
   useEffect(()=>registerListCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
+  useEffect(()=>registerListKeyboardCommands(editor),[editor]);
   const [structureIssues,setStructureIssues]=useState<StructureIssue[]>([]);
   const checkpoint=useRef<EditorState|null>(null);
   useEffect(()=>{
