@@ -1,3 +1,9 @@
+## 2026-10-18 P2.2.b.2-K2 Enter 마지막 빈 목록 항목 종료 (검증 대기)
+
+- `registerListKeyboardCommands`에 보수적 Enter 분기를 구현했다. 최상위 섹션 직계 ul/ol의 **마지막 빈 항목**에서만 목록을 종료하고 목록 뒤에 문단을 만든다. 유일한 항목이었다면 빈 목록을 제거한다. 텍스트 분할·중간 항목·중첩 목록·IME·노트·수정키는 Lexical 기본 처리에 위임한다. [구현 `ce17ca0`](https://github.com/yunskim/lexical-tufte-css/commit/ce17ca0de076c1c3e49b9ffa84cca2c0201b23a6).
+- [단위 회귀 `1098d6b`](https://github.com/yunskim/lexical-tufte-css/commit/1098d6bcda59d9647eb1e24a2ec9224fd04cdd06) 작성. [명령 계약](LIST_COMMANDS_P22B.ko.md) 갱신.
+- **테스트 미실행, CI 생략**. Enter 일반/중첩 분할과 Backspace 항목 시작 정책은 여전히 미구현·검증 대기. K2/P2.2.b.2 완료로 표시하지 않는다.
+
 ## 2026-10-18 P2.2.b.2-K4 Tab/Shift+Tab 목록 단축키 구현 (검증 대기)
 
 - 선택적 `registerListKeyboardCommands`를 추가했다. `KEY_TAB_COMMAND`에서 접힌 선택·비조합 입력·노트 밖·유효한 ul/ol `listitem`과 구조적 indent/outdent 가능 경계를 먼저 확인한다. 허용될 때만 `preventDefault` 후 기존 `CHANGE_TUFTE_LIST_INDENT_COMMAND`를 재사용한다. 일반 문단·첫 항목 들여쓰기·최상위 내어쓰기·IME는 기본 Tab 포커스 이동을 유지한다. [구현](https://github.com/yunskim/lexical-tufte-css/commit/ad71b16a6be61174384b33ab64d8ebe0c7f736d8).
