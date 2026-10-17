@@ -159,6 +159,11 @@ P1 gate: 완료. 노트 편집 회귀와 SSR 출력의 실제 브라우저 비�
     - [ ] P2.2.b.0 editor prototype의 직접 import가 package.json과 pnpm-lock에 명시되는지 확인하고 workspace frozen install/package 경계를 검증한다.
     - [ ] P2.2.b.1 기존 span kind 변경에 더해 선택 텍스트를 Tufte span으로 **생성·해제**한다. 부분 선택·같은/다른 인라인 부모·link·note·IME의 보존/거부 기준을 명시하고 atomic undo/redo와 HTML roundtrip을 검증한다.
     - [ ] P2.2.b.2 ul/ol 항목 생성·추가·형태 변경·중첩·들여쓰기·내어쓰기/해제·키보드 Enter/Backspace/Tab 경계(필요한 정책 포함)를 설계·구현한다. 빈 목록/최초·최종 항목, 혼합/중첩 목록, 선택 범위, note payload/ID 보존을 검사한다.
+      - [ ] P2.2.b.2-K1 키보드 소유권 확인: Lexical 기본 Enter/Backspace 명령과 별도 Tufte 목록 명령의 충돌 여부를 headless/browser로 증명한다. Tufte 섹션 안의 ul/ol만 개입하고 note/IME/선택 범위는 우선 보존한다.
+      - [ ] P2.2.b.2-K2 Enter: 일반 항목의 중간/끝에서 분할·추가, 빈 최종 항목에서 목록 종료, 중첩 목록의 빈 항목에서 한 단계 내어쓰기. 이력 한 단계·노트 ID·저장/발행 구조를 각각 검증한다.
+      - [ ] P2.2.b.2-K3 Backspace: 항목 시작에서 앞 항목과 병합 또는 첫 항목의 안전한 목록 해제; 일반 문자 삭제와 다른 키보드 경계만 개입. 선택 범위와 inline note 경계는 기본 Lexical 동작을 방해하지 않는다.
+      - [ ] P2.2.b.2-K4 Tab/Shift+Tab: 목록 내부에서만 indent/outdent, 최상위·첫 항목·최대 깊이 거부 시 브라우저 기본 포커스 이동을 무조건 막지 않는다. 툴바/컨텍스트 메뉴의 Tab 이동과 별도 취급한다.
+      - [ ] P2.2.b.2-K5 수락: 키보드 조합별 최초·중간·최종·빈·중첩 항목, 다른 블록/노트/IME, undo/redo, JSON→HTML, 포커스/접근성, 기존 테스트 재실행. 검증 전 완료 금지.
     - [ ] P2.2.b.3 dl/dt/dd의 추가·수정·삭제·항목 순서 보존을 검증하고 기존 문서·editor·renderer 3경로의 JSON/HTML 왕복을 연결한다.
   - [ ] P2.2.c F07–F09 구분선/section footer/quote·출처/epigraph 명령과 회귀.
     - [ ] P2.2.c.1 이미 구현된 생성·출처 추가 명령을 기준으로 기존 노드의 속성/내용 수정, 출처·인용 삭제, 복수 epigraph 항목 관리의 지원/거부 경계를 정한다.
