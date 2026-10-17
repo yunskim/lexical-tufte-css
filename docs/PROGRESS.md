@@ -1,3 +1,8 @@
+## P2.2.c F07 섹션 문헌 UI 연결 (일괄 테스트 대기)
+
+- `examples/editor/src/main.tsx`: `APPEND_TUFTE_SECTION_CITE_COMMAND`를 import하고 `섹션 문헌 추가` 툴바 버튼 연결. 기존 `인용문 출처 추가` 버튼과 별도로 제공한다.
+- 앞선 GitHub 수정 차단 후 재시도하여 커밋 `e6aff7f` 반영. 사용자 지시에 따라 테스트는 마지막에 일괄 실행하며 UI 동작 확인은 아직 수행하지 않았다. CI 생략.
+
 ## P2.2.c F07 섹션 출처 cite 명령 (일괄 검증 대기)
 
 - `quotationCommands.ts`: `APPEND_TUFTE_SECTION_CITE_COMMAND` 추가. 최상위 섹션의 `tufte-section-footer` 내부 선택만 허용하며, 기존 `tufte-cite`가 있으면 거부하고 스키마를 확인한 뒤 인용 출처를 추가한다.
