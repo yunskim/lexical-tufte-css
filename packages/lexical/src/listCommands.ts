@@ -1,4 +1,4 @@
-import {$addUpdateTag,$createParagraphNode,$getSelection,$isRangeSelection,createCommand,COMMAND_PRIORITY_EDITOR,KEY_ENTER_COMMAND,KEY_TAB_COMMAND,HISTORY_PUSH_TAG,type LexicalCommand,type LexicalEditor,type LexicalNode} from 'lexical';
+import {$addUpdateTag,$createParagraphNode,$getSelection,$isRangeSelection,createCommand,COMMAND_PRIORITY_EDITOR,KEY_ENTER_COMMAND,KEY_BACKSPACE_COMMAND,KEY_TAB_COMMAND,HISTORY_PUSH_TAG,type LexicalCommand,type LexicalEditor,type LexicalNode} from 'lexical';
 import {$createListNode,$createListItemNode,ListNode,ListItemNode} from '@lexical/list';
 import {SectionNode} from './LayoutNodes.js';
 import {$getContainingNote} from './noteOperations.js';
@@ -135,6 +135,31 @@ export function registerListKeyboardCommands(editor:LexicalEditor):()=>void{
   paragraph.selectStart();
   return true;
  },COMMAND_PRIORITY_EDITOR);
+ const unregisterBackspace=editor.registerCommand(KEY_BACKSPACE_COMMAND,event=>{
+  if(!event||editor.isComposing()||event.isComposing||event.shiftKey||event.ctrlKey||event.metaKey||event.altKey)return false;
+  const selection=$getSelection();
+  if(!$isRangeSelection(selection)||!selection.isCollapsed()||$getContainingNote(selection.anchor.getNode()))return false;
+  let node:LexicalNode|null=selection.anchor.getNode();
+  while(node&&!(node instanceof ListItemNode))node=node.getParent();
+  if(!(node instanceof ListItemNode)||node.getChildrenSize()!==0||node.getTextContent()!=='')return false;
+  const list=node.getParent();
+  if(!(list instanceof ListNode)||list.getListType()==='check'||!(list.getParent() instanceof SectionNode)||
+     list.getParent()?.getParent()?.getType()!=='root'||!node.is(list.getFirstChild())||node.getIndent()!==0)return false;
+  // Only remove the empty first item; preserve every nonempty item and its notes.
+  event.preventDefault();
+  $addUpdateTag(HISTORY_PUSH_TAG);
+  const next=node.getNextSibling();
+  if(next instanceof ListItemNode){
+   node.remove();
+   next.selectStart();
+  }else{
+   const paragraph=$createParagraphNode();
+   list.insertBefore(paragraph);
+   list.remove();
+   paragraph.selectStart();
+  }
+  return true;
+ },COMMAND_PRIORITY_EDITOR);
  const unregisterTab=editor.registerCommand(KEY_TAB_COMMAND,event=>{
   if(editor.isComposing()||event.isComposing||event.ctrlKey||event.metaKey||event.altKey)return false;
   const selection=$getSelection();
@@ -153,5 +178,5 @@ export function registerListKeyboardCommands(editor:LexicalEditor):()=>void{
   editor.dispatchCommand(CHANGE_TUFTE_LIST_INDENT_COMMAND,direction);
   return true;
  },COMMAND_PRIORITY_EDITOR);
- return ()=>{unregisterEnter();unregisterTab();};
+ return ()=>{unregisterEnter();unregisterBackspace();unregisterTab();};
 }
