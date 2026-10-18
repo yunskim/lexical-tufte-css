@@ -1,3 +1,9 @@
+## 2026-10-18 P2.2.b 중첩 내어쓰기·노트 보존 테스트 작성
+
+- 중첩 목록의 노트가 붙은 항목을 내어쓸 때 `CHANGE_TUFTE_LIST_INDENT_COMMAND` 경로를 통해 note ID와 노트 본문, 외부 형제 항목이 유지되는지 확인하는 headless 회귀를 추가했다. [커밋 `348d0e9`](https://github.com/yunskim/lexical-tufte-css/commit/348d0e9d4d25f21356f38f313d5ddf2626b90756).
+- 제품의 목록 내어쓰기 로직은 Lexical `ListItemNode.setIndent`에 위임한다. 이번 변경은 동작의 **수락 기준을 테스트로 명시**한 것으로, 실제 실행 결과를 아직 확인하지 않았다.
+- 사용자의 일괄 테스트 지시를 유지한다. CI 생략. P2.2.b.2 완료 판정 보류, P8 Docker 패키징은 계획 마지막 단계 유지.
+
 ## 2026-10-18 P2.2.b 중첩 목록·노트 항목 추가 보존 회귀
 
 - `packages/lexical/test/list-commands.test.mjs`에 노트가 붙은 항목 바로 뒤 삽입 시 note ID 및 후속 항목 보존, 중첩 목록 중간 삽입 시 외부 형제 목록 항목 보존 검사를 추가했다. [커밋 `3016c2d`](https://github.com/yunskim/lexical-tufte-css/commit/3016c2d39b65d03c4a831d42ed834083fdcb5515).
