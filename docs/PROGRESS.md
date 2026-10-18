@@ -1,3 +1,9 @@
+## 2026-10-18 P2.2.b 중첩 목록·노트 항목 추가 보존 회귀
+
+- `packages/lexical/test/list-commands.test.mjs`에 노트가 붙은 항목 바로 뒤 삽입 시 note ID 및 후속 항목 보존, 중첩 목록 중간 삽입 시 외부 형제 목록 항목 보존 검사를 추가했다. [커밋 `3016c2d`](https://github.com/yunskim/lexical-tufte-css/commit/3016c2d39b65d03c4a831d42ed834083fdcb5515).
+- 현재는 테스트 **작성만 완료**, 사용자의 일괄 검증 지시에 따라 실행하지 않았다. 중첩 구조·note 직렬화/HTML 왕복 및 실제 브라우저 동작의 검증은 남아 있다. CI 생략.
+- P8 Docker 패키징은 전체 계획의 마지막 단계로 유지한다.
+
 ## 2026-10-18 P2.2.b 목록 항목 추가 위치 수정 (일괄 테스트 대기)
 
 - 목록 항목 추가 명령이 선택 위치와 관계없이 목록 맨 뒤에 항목을 붙이던 동작을 변경했다. 현재 선택된 `ListItemNode` **바로 뒤**에 빈 항목을 삽입하며 기존 후속 항목은 그대로 유지한다. 체크리스트 및 스키마에서 허용하지 않는 목록은 변경 없이 거부한다. [제품 수정 `dd08a16`](https://github.com/yunskim/lexical-tufte-css/commit/dd08a168bcd7075e6ef6134cfe61871cc61b11ba).
