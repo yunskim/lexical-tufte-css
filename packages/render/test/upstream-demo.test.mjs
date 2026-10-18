@@ -53,7 +53,7 @@ test('upstream margin toggles have matching labels and adjacent payloads',()=>{
  // Upstream attributes are not consistently ordered; parse both orderings.
  const inputs=[...upstream.matchAll(/<input\b[^>]*>/g)]
   .map(m=>m[0]).filter(tag=>/class="margin-toggle"/.test(tag));
- const labels=[...upstream.matchAll(/<label\\b[^>]*>/g)]
+ const labels=[...upstream.matchAll(/<label\b[^>]*>/g)]
   .map(m=>m[0]).filter(tag=>/class="margin-toggle(?: sidenote-number)?"/.test(tag));
  const labelIds=new Set(labels.map(tag=>tag.match(/for="([^"]+)"/)?.[1]));
  assert.ok(inputs.length>0,'upstream note inputs missing');
@@ -67,9 +67,9 @@ test('published article keeps section structure and adjacent note payloads',()=>
  const result=renderArticle(documentFixture());
  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
  const html=result.html;
- assert.match(html,/<article\\b[^>]*>[\\s\\S]*<section\\b/);
- assert.match(html,/<section\\b[^>]*><p\\b/);
+ assert.match(html,/<article\b[^>]*>[\s\S]*<section\b/);
+ assert.match(html,/<section\b[^>]*><p\b/);
  for(const kind of ['sidenote','marginnote']){
-  assert.match(html,new RegExp('<input\\\\b[^>]*class="margin-toggle"[^>]*><span\\\\b[^>]*class="'+kind+'"'));
+  assert.match(html,new RegExp('<input\\b[^>]*class="margin-toggle"[^>]*><span\\b[^>]*class="'+kind+'"'));
  }
 });

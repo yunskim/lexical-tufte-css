@@ -1,5 +1,16 @@
 # 재발 방지 대책 및 정기 점검
 
+2026-10-19 완료 점검: E102/M094의 escape 계층 대책과 독립 DOMParser 실행을 반영했다. check318개/Python16개/browser16개/package4개/실제HTTP 통과. 원본 section9/note7과 별도 발행 section1/note2를 같은 콘텐츠 전수 비교로 확대하지 않는다. 다음 구현 시작/완료와 baseline 변경 때 재점검한다.
+
+## 2026-10-19 DOM 대조 시작 점검
+
+AGENTS 및 M077/M090–M093의 원본/확장 범위·속성 순서·실제 노트 구조 규칙을 검토했다. mainaa7cb0a 별도 worktree에서 frozen 설치 및 신규 mjs 구문 검사 후 실행했다. CI 생략. DOMParser 검사는 독립 upstream와 별도 publication fixture의 의미 구조 비교이며 전체 콘텐츠/시각 parity가 아님을 확인했다.
+
+## M094 — 구문 통과와 정규식 의미 통과 구분
+
+- E102/E084/M077: node --check만으로 과도한 정규식 escape를 검출할 수 없다. literal과 RegExp 문자열의 서로 다른 escape 계층을 확인하고 실제 고정 HTML에서 match 실행까지 확인한다.
+- 정규식 assertion과 별도의 DOMParser 브라우저 결과를 함께 실행한다. 테스트를 성공시키기 위해 원본 파일/공개 HTML을 escape 패턴에 맞춰 변경하지 않는다.
+
 2026-10-18 upstream 대조 완료 점검: E098–E101/M090–M093을 테스트/진단 코드에 반영했다. check316개/Python16개/browser15개/package4개/실제HTTP 모두 통과. 구조 vocabulary와 별도 fixture 노트 구조, 알려진 차이 존재 검사를 전체 페이지 parity로 확대하지 않는다. 다음 구현 시작/완료와 baseline 변경 때 재점검한다.
 
 ## M092 — 진단 분기의 선택/부모 의미 구분

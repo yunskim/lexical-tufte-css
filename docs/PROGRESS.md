@@ -1,3 +1,10 @@
+## 2026-10-19 DOMParser 대조 포함 실행 완료
+
+- mainaa7cb0a 및 정규식 수정 tree에서 frozen/check318개(실패·skip0)/Python16개/browser16개/package4개/실제TS→Python HTTP 왕복 통과. CI 없음.
+- 신규2개 assertion의 이중 escape(E102)를 수정하고 M094 기록. 제품 구현 변경은 없음.
+- 실제 Chromium DOMParser 대조: 원본 section9/note7/epigraph3/fullwidth figure2, 별도 발행 fixture1/2/0/1. known newthought gap 유지. 전체 페이지 동등성 수락이 아님.
+- [최신 실행 보고서](VERIFICATION_DOMPARSER_2026-10-19.ko.md) 범위에서 이번 테스트 완료. 전체 P2–P8/F표·동일 콘텐츠 시각/DOM parity는 유지.
+
 ## 2026-10-18 upstream 대조 포함 실행 완료
 
 - main02bb314와 후속 수정 tree에서 frozen/check316개(실패·skip0)/Python16개/browser15개/package4개/실제TS→Python HTTP 왕복 통과. CI 생략.

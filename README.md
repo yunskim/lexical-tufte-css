@@ -63,6 +63,8 @@ pnpm test:browser
 
 ## 최신 통합 실행 검증
 
+2026-10-19 DOMParser 후속: **단위·통합318개 / Python16개 / browser16개 실행 파일 / package4개 / 실제TS→Python HTTP 왕복** 통과. 신규 정규식 escape 오류를 수정했으며 제품 구현 변경은 없습니다. [최신 DOM 대조 보고서](docs/VERIFICATION_DOMPARSER_2026-10-19.ko.md). 전체 페이지 DOM/시각 parity는 계속 미완료이며 CI는 생략했습니다.
+
 2026-10-18 upstream 대조 후속: **단위·통합316개 / Python16개 / browser15개 실행 파일 / package4개 / 실제TS→Python HTTP 왕복** 통과. 신규 구조 비교3개 포함. 전체 원본 페이지의 DOM/시각 parity는 아직 입증하지 않았습니다. [최신 대조 검증 보고서](docs/VERIFICATION_UPSTREAM_2026-10-18.ko.md), CI 생략.
 
 2026-10-18 누적 테스트 완료: **단위·통합297개 / Python16개 / 브라우저15개 실행 파일 / 패키지4개 / 실제 TS→Python HTTP 왕복** 통과. 정의목록 이동·목록 키 우선순위·메뉴 overflow 및 타입/테스트 회귀를 수정했습니다. CI 생략. [최신 실행 보고서](docs/VERIFICATION_2026-10-18.ko.md)에 완료 증거와 남은 범위를 기록했습니다.

@@ -1,5 +1,12 @@
 # 에러 기록
 
+2026-10-19 완료 판정: E102 수정 후 check318개/browser16개/package4개/실제HTTP와 Python16개 통과. [실행 보고서](VERIFICATION_DOMPARSER_2026-10-19.ko.md)의 범위에서 검증했다. 전체 원본 fidelity 차이는 해결 처리하지 않는다.
+
+## E102 — 신규 upstream 정규식의 이중 escape 재발
+
+- 2026-10-19 mainaa7cb0a check에서 신규2건 실패. label regex literal의 \\b, article/section의 \\b·\\s, RegExp 문자열의 과도한 escape가 실제 HTML 대신 literal backslash를 찾았다.
+- literal은 단일 slash escape, RegExp 생성자 문자열은 문자열 계층을 한 번 더 escape하도록 수정했다. 기존 기대 구조·노트 pairing은 유지한다. E084/M077과 같은 원인 재발이며 M094 참조.
+
 2026-10-18 upstream 후속 판정: E098–E101은 [대조 실행 보고서](VERIFICATION_UPSTREAM_2026-10-18.ko.md)의 최종 check316개/browser15개/package4개 범위에서 검증했다. 기존 원본 전체 fidelity 차이는 해결 처리하지 않는다.
 
 ## E100 — span 부재를 부모 오류로 분류
