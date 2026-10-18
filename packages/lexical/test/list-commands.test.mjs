@@ -416,3 +416,43 @@ test('P2.2.b Backspace leaves nonempty and nonfirst items, IME and outside parag
  const outside=event();assert.equal(editor.dispatchCommand(KEY_BACKSPACE_COMMAND,outside),false);assert.equal(outside.prevented,false);
  stop();dispose();
 });
+
+test('P2.2.b nested empty item Backspace delegates to Lexical without deleting sibling notes',()=>{
+ const {editor,dispose}=setup();const stop=registerListKeyboardCommands(editor);
+ editor.update(()=>{
+  const note=$createNoteNode('nested-backspace-note','marginnote').append($createTextNode('Payload'));
+  const parent=$createListItemNode().append($createTextNode('Parent'),note);
+  const nested=$createListNode('bullet').append($createListItemNode());
+  parent.append(nested);
+  $getRoot().append($createSectionNode().append($createListNode('bullet').append(parent)));
+  nested.getFirstChild().selectStart();
+ },{discrete:true});
+ const before=JSON.stringify(editor.getEditorState().toJSON());
+ const event={isComposing:false,shiftKey:false,ctrlKey:false,metaKey:false,altKey:false,prevented:false,preventDefault(){this.prevented=true;}};
+ assert.equal(editor.dispatchCommand(KEY_BACKSPACE_COMMAND,event),false);
+ assert.equal(event.prevented,false);
+ editor.update(()=>{},{discrete:true});
+ assert.equal(JSON.stringify(editor.getEditorState().toJSON()),before);
+ editor.getEditorState().read(()=>{
+  const parent=$getRoot().getFirstChild().getFirstChild().getFirstChild();
+  assert.equal(parent.getChildren().find(n=>n.getType()==='note').getNoteId(),'nested-backspace-note');
+ });
+ stop();dispose();
+});
+
+test('P2.2.b nested empty item Enter delegates to Lexical without modifying parent',()=>{
+ const {editor,dispose}=setup();const stop=registerListKeyboardCommands(editor);
+ editor.update(()=>{
+  const nested=$createListNode('number').append($createListItemNode());
+  const parent=$createListItemNode().append($createTextNode('Parent'),nested);
+  $getRoot().append($createSectionNode().append($createListNode('bullet').append(parent)));
+  nested.getFirstChild().selectStart();
+ },{discrete:true});
+ const before=JSON.stringify(editor.getEditorState().toJSON());
+ const event={isComposing:false,shiftKey:false,ctrlKey:false,metaKey:false,altKey:false,prevented:false,preventDefault(){this.prevented=true;}};
+ assert.equal(editor.dispatchCommand(KEY_ENTER_COMMAND,event),false);
+ assert.equal(event.prevented,false);
+ editor.update(()=>{},{discrete:true});
+ assert.equal(JSON.stringify(editor.getEditorState().toJSON()),before);
+ stop();dispose();
+});
