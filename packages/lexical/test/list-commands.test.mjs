@@ -586,3 +586,29 @@ test('P2.2.b.2-K4 null Tab event delegates without mutation',()=>{
  assert.deepEqual(diagnostics,[]);
  stop();dispose();
 });
+
+
+for(const [label,command] of [['Enter',KEY_ENTER_COMMAND],['Backspace',KEY_BACKSPACE_COMMAND]]){
+ test(`P2.2.b.2-K${label==='Enter'?'2':'3'} empty list item handles only its own element selection`,()=>{
+  const {editor,diagnostics,dispose}=setup();
+  const stop=registerListKeyboardCommands(editor);
+  editor.update(()=>{
+   const item=$createListItemNode();
+   $getRoot().append($createSectionNode().append($createListNode('bullet').append(item)));
+   item.selectStart();
+  },{discrete:true});
+  const before=JSON.stringify(editor.getEditorState().toJSON());
+  let prevented=false;
+  const event={shiftKey:false,ctrlKey:false,metaKey:false,altKey:false,isComposing:false,preventDefault(){prevented=true;}};
+  assert.equal(editor.dispatchCommand(command,event),true);
+  editor.update(()=>{},{discrete:true});
+  assert.equal(prevented,true);
+  assert.notEqual(JSON.stringify(editor.getEditorState().toJSON()),before);
+  editor.getEditorState().read(()=>{
+   const block=$getRoot().getFirstChild().getFirstChild();
+   assert.equal(block.getType(),'paragraph');
+  });
+  assert.deepEqual(diagnostics,[]);
+  stop();dispose();
+ });
+}
