@@ -186,3 +186,40 @@ test('P2.2.b invalid wrap kind returns a diagnostic and preserves the source sel
  assert.ok(diagnostics.some(d=>d.code==='INVALID_SPAN_KIND'));
  dispose();
 });
+
+
+test('P2.2.b.1 reversed partial selection wraps only the selected text',()=>{
+ const editor=make(),diagnostics=[];
+ const dispose=registerInlineCommands(editor,d=>diagnostics.push(d));
+ editor.update(()=>{
+  const text=$createTextNode('before middle after');
+  $getRoot().append($createParagraphNode().append(text));
+  text.select(13,7);
+ },{discrete:true});
+ assert.equal(editor.dispatchCommand(WRAP_TUFTE_SPAN_COMMAND,'sans'),true);
+ editor.update(()=>{},{discrete:true});
+ editor.getEditorState().read(()=>{
+  const children=$getRoot().getFirstChild().getChildren();
+  assert.deepEqual(children.map(node=>node.getType()),['text','tufte-span','text']);
+  assert.deepEqual(children.map(node=>node.getTextContent()),['before ','middle',' after']);
+  assert.equal(children[1].getKind(),'sans');
+ });
+ assert.deepEqual(diagnostics,[]);
+ dispose();
+});
+
+test('P2.2.b.1 wrapping inside an existing span is rejected atomically',()=>{
+ const editor=make(),diagnostics=[];
+ const dispose=registerInlineCommands(editor,d=>diagnostics.push(d));
+ editor.update(()=>{
+  const text=$createTextNode('keep original');
+  $getRoot().append($createParagraphNode().append($createTufteSpanNode('newthought').append(text)));
+  text.select(1,5);
+ },{discrete:true});
+ const before=JSON.stringify(editor.getEditorState().toJSON());
+ assert.equal(editor.dispatchCommand(WRAP_TUFTE_SPAN_COMMAND,'danger'),true);
+ editor.update(()=>{},{discrete:true});
+ assert.equal(JSON.stringify(editor.getEditorState().toJSON()),before);
+ assert.ok(diagnostics.some(d=>d.code==='INVALID_SPAN_SELECTION'));
+ dispose();
+});
