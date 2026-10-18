@@ -1,3 +1,9 @@
+## 2026-10-18 P2.2.b.2 중첩 목록 키보드 회귀 확대 (신규 테스트 실행 대기)
+
+- [누적 검증 보고서](VERIFICATION_2026-10-18.ko.md)의 기존 자동화 결과(297개, package 4, browser 15, Python 16, HTTP 왕복)를 기준선으로 확인했다. 이 결과는 **이후 추가한 회귀 테스트를 포함하지 않는다**.
+- `tests/list-kind-browser.mjs`에 Tab 중첩의 JSON 구조 변화, Undo로 평면 목록 복원, Redo로 중첩 목록 복원, 중첩 비어 있지 않은 항목의 Enter가 상위 목록을 없애지 않는 시나리오를 추가했다. [변경 `77ab17c`](https://github.com/yunskim/lexical-tufte-css/commit/77ab17c305b31d16f01b881c142ce369f825f75d), [직렬화 검증 보강 `8042202`](https://github.com/yunskim/lexical-tufte-css/commit/8042202fef9b56072dc06a78233453a2a309dcd0).
+- 새 시나리오는 **실행하지 않았으므로** 통과로 기록하지 않는다. 중첩 빈 항목 Backspace 및 노트/IME·접근성은 추가 검증 대기. CI 생략, P2.2.b.2 체크 미완료.
+
 ## 2026-10-18 누적 테스트 실행 완료
 
 - main0411b03와 검증 수정 tree에서 frozen/check297개(실패·skip0)/package4개/browser15개/Python16개/실제TS→Python HTTP 왕복 통과. CI 없음.
