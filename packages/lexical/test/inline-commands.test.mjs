@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createHeadlessEditor} from '@lexical/headless';
 import {$createLinkNode} from '@lexical/link';
-import {$getRoot,$createParagraphNode,$createTextNode,$createRangeSelection,$setSelection} from 'lexical';
+import {$getSelection,$getRoot,$createParagraphNode,$createTextNode,$createRangeSelection,$setSelection} from 'lexical';
 import {TufteSpanNode,$createTufteSpanNode,$createNoteNode,TUFTE_NODES,registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND,WRAP_TUFTE_SPAN_COMMAND,UNWRAP_TUFTE_SPAN_COMMAND} from '../dist/index.js';
 
 const make=()=>createHeadlessEditor({namespace:'inline-command-test',nodes:[TufteSpanNode],onError(error){throw error;}});
@@ -221,5 +221,58 @@ test('P2.2.b.1 wrapping inside an existing span is rejected atomically',()=>{
  editor.update(()=>{},{discrete:true});
  assert.equal(JSON.stringify(editor.getEditorState().toJSON()),before);
  assert.ok(diagnostics.some(d=>d.code==='INVALID_SPAN_SELECTION'));
+ dispose();
+});
+
+
+test('P2.2.b.1 cross-parent link selection is rejected without changing link or note identity',()=>{
+ const editor=createHeadlessEditor({namespace:'inline-cross-parent',nodes:TUFTE_NODES,onError(error){throw error;}});
+ const diagnostics=[];
+ const dispose=registerInlineCommands(editor,d=>diagnostics.push(d));
+ editor.update(()=>{
+  const linked=$createTextNode('linked');
+  const plain=$createTextNode('plain');
+  const note=$createNoteNode('cross-note','sidenote').append($createTextNode('memo'));
+  $getRoot().append($createParagraphNode().append($createLinkNode('https://lexical.dev').append(linked),plain,note));
+  const selection=$createRangeSelection();
+  selection.setTextNodeRange(linked,2,plain,3);
+  $setSelection(selection);
+ },{discrete:true});
+ const before=JSON.stringify(editor.getEditorState().toJSON());
+ assert.equal(editor.dispatchCommand(WRAP_TUFTE_SPAN_COMMAND,'sans'),true);
+ editor.update(()=>{},{discrete:true});
+ assert.equal(JSON.stringify(editor.getEditorState().toJSON()),before);
+ editor.getEditorState().read(()=>{
+  const paragraph=$getRoot().getFirstChild();
+  assert.equal(paragraph.getFirstChild().getURL(),'https://lexical.dev');
+  assert.equal(paragraph.getLastChild().getNoteId(),'cross-note');
+ });
+ assert.ok(diagnostics.some(d=>d.code==='UNSUPPORTED_SPAN_RANGE'));
+ dispose();
+});
+
+test('P2.2.b.1 unwrapping retains the caret text offset and adjacent note identity',()=>{
+ const editor=createHeadlessEditor({namespace:'inline-caret-unwrap',nodes:TUFTE_NODES,onError(error){throw error;}});
+ const diagnostics=[];
+ const dispose=registerInlineCommands(editor,d=>diagnostics.push(d));
+ editor.update(()=>{
+  const text=$createTextNode('abcdef');
+  const note=$createNoteNode('caret-note','marginnote').append($createTextNode('memo'));
+  $getRoot().append($createParagraphNode().append($createTufteSpanNode('danger').append(text),note));
+  text.select(3,3);
+ },{discrete:true});
+ assert.equal(editor.dispatchCommand(UNWRAP_TUFTE_SPAN_COMMAND,undefined),true);
+ editor.update(()=>{},{discrete:true});
+ editor.getEditorState().read(()=>{
+  const paragraph=$getRoot().getFirstChild();
+  assert.equal(paragraph.getFirstChild().getType(),'text');
+  assert.equal(paragraph.getFirstChild().getTextContent(),'abcdef');
+  assert.equal(paragraph.getLastChild().getNoteId(),'caret-note');
+  const selection=$getSelection();
+  assert.equal(selection?.isCollapsed(),true);
+  assert.equal(selection?.anchor.getNode().getTextContent(),'abcdef');
+  assert.equal(selection?.anchor.offset,3);
+ });
+ assert.deepEqual(diagnostics,[]);
  dispose();
 });
