@@ -1,3 +1,10 @@
+## 2026-10-18 upstream 대조 포함 실행 완료
+
+- main02bb314와 후속 수정 tree에서 frozen/check316개(실패·skip0)/Python16개/browser15개/package4개/실제TS→Python HTTP 왕복 통과. CI 생략.
+- upstream에 없는 태그를 필수로 요구한 검사·marginnote glyph 추출·목록 note fixture를 수정하고 span 부재 진단 분기를 정정했다. E098–E101/M090–M093 기록.
+- 신규 대조3개는 원본 vocabulary/별도 fixture 노트 인접 구조/알려진 newthought 차이 존재 검사다. **원본 전체 문서→편집→발행 DOM/시각 parity는 아직 미완료**다.
+- [최신 보고서](VERIFICATION_UPSTREAM_2026-10-18.ko.md)의 실행 범위에서 이번 테스트 작업 완료. 아래 작성/대기 기록은 이력으로 보존한다.
+
 ## 2026-10-18 P2.2.b 중첩 내어쓰기·노트 보존 테스트 작성
 
 - 중첩 목록의 노트가 붙은 항목을 내어쓸 때 `CHANGE_TUFTE_LIST_INDENT_COMMAND` 경로를 통해 note ID와 노트 본문, 외부 형제 항목이 유지되는지 확인하는 headless 회귀를 추가했다. [커밋 `348d0e9`](https://github.com/yunskim/lexical-tufte-css/commit/348d0e9d4d25f21356f38f313d5ddf2626b90756).

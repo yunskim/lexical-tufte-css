@@ -1,5 +1,27 @@
 # 재발 방지 대책 및 정기 점검
 
+2026-10-18 upstream 대조 완료 점검: E098–E101/M090–M093을 테스트/진단 코드에 반영했다. check316개/Python16개/browser15개/package4개/실제HTTP 모두 통과. 구조 vocabulary와 별도 fixture 노트 구조, 알려진 차이 존재 검사를 전체 페이지 parity로 확대하지 않는다. 다음 구현 시작/완료와 baseline 변경 때 재점검한다.
+
+## M092 — 진단 분기의 선택/부모 의미 구분
+
+- E100: 선택 대상 wrapper 부재와 해당 wrapper 부모의 스키마 불허는 별도 진단이다. 무변경 거부뿐 아니라 공개 진단 코드를 계약대로 확인한다.
+
+## M093 — 노트 포함 컨테이너의 실제 선택 대상 확인
+
+- E101: listitem 끝 선택은 마지막 inline note 내부로 들어갈 수 있다. 본문에서 실행하는 테스트는 본문 TextNode를 명시한다. note wire type은 공유 registry의 tufte-note와 일치시킨다.
+
+## 2026-10-18 upstream 대조 검증 시작 점검
+
+이전 fixture/DOM 가정·역할 selector·focus readiness·build/browser 직렬화 대책을 재점검했다. main02bb314 별도 worktree에서 frozen 설치 후 새 대조 검사를 포함해 실행했다. CI 생략. 현재 대조 검사는 구조 smoke이며 전체 페이지/시각 parity가 아님을 확인했다.
+
+## M090 — 원본 포함 요소와 확장 지원 구분
+
+- E098: baseline HTML의 실제 태그·클래스를 읽은 뒤 기대 vocabulary를 작성한다. 자체 확장 기능을 원본에 있었다고 가정하지 않는다. 원본 구조 검사와 전체 콘텐츠·시각 대조의 완료 gate를 구분한다.
+
+## M091 — 노트 종류별 라벨 내용·인접 ID 검증
+
+- E099: sidenote 자동 번호용 빈 라벨과 marginnote의 표시 glyph를 구분한다. 두 kind를 실제로 추출하고 for와 바로 인접한 input id를 비교한다. 문서 어딘가에 같은 ID가 존재한다는 약한 검사로 대체하지 않는다.
+
 2026-10-18 완료 점검: E088–E097/M083–M089의 대책을 코드·단위·브라우저·실행 순서에 반영했다. 최종 check297개/Python16개/browser15개/package4개/실제HTTP 모두 통과. E086/E087도 현재 실행 범위로 확인했다. E064·W001 및 OS IME/접근성·다른 브라우저 제한은 유지한다. 다음 구현 시작/완료 및 같은 원인 재발 때 점검한다.
 
 ## M088 — snapshot 가시성과 fixture 대상 격리

@@ -435,7 +435,7 @@ test('P2.2.b nested empty item Backspace delegates to Lexical without deleting s
  assert.equal(JSON.stringify(editor.getEditorState().toJSON()),before);
  editor.getEditorState().read(()=>{
   const parent=$getRoot().getFirstChild().getFirstChild().getFirstChild();
-  assert.equal(parent.getChildren().find(n=>n.getType()==='note').getNoteId(),'nested-backspace-note');
+  assert.equal(parent.getChildren().find(n=>n.getType()==='tufte-note').getNoteId(),'nested-backspace-note');
  });
  stop();dispose();
 });
@@ -507,14 +507,14 @@ test('append after annotated list item retains note identity and trailing item',
   const first=$createListItemNode().append($createTextNode('First'),note);
   const last=$createListItemNode().append($createTextNode('Last'));
   $getRoot().append($createSectionNode().append($createListNode('bullet').append(first,last)));
-  first.selectEnd();
+  first.getFirstChild().selectEnd();
  },{discrete:true});
  assert.equal(editor.dispatchCommand(APPEND_TUFTE_LIST_ITEM_COMMAND,undefined),true);
  editor.update(()=>{},{discrete:true});
  editor.getEditorState().read(()=>{
   const list=$getRoot().getFirstChild().getFirstChild();
   assert.deepEqual(list.getChildren().map(item=>item.getTextContent()),['FirstAnnotation','','Last']);
-  assert.equal(list.getFirstChild().getChildren().find(n=>n.getType()==='note').getNoteId(),'append-note');
+  assert.equal(list.getFirstChild().getChildren().find(n=>n.getType()==='tufte-note').getNoteId(),'append-note');
  });
  dispose();
 });

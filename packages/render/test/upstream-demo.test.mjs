@@ -14,21 +14,25 @@ test('pinned upstream demo includes the expected Tufte structural vocabulary',()
  for(const pattern of [
   /<article\b/,/<section\b/,/<h1\b/,/<h2\b/,/<p class="subtitle"/,
   /<div class="epigraph"/,/<blockquote\b/,/<footer\b/,/<cite\b/,
-  /<figure\b/,/<figcaption\b/,/<table\b/,/<dl\b/,/<dt\b/,/<dd\b/,
+  /<figure\b/,/<img\b/,/<pre\b/,/<code\b/,/<iframe\b/,
   /class="newthought"/,/class="sans"/,/class="sidenote"/,/class="marginnote"/,
   /class="margin-toggle sidenote-number"/,/<input\b[^>]*class="margin-toggle"/
  ])assert.match(upstream,pattern);
  assert.ok(count(upstream,/<section\b/g)>=3,'upstream section structure unexpectedly changed');
+ // These supported extensions need their own fixtures, not invented upstream coverage.
+ for(const tag of ['figcaption','table','dl','dt','dd'])assert.doesNotMatch(upstream,new RegExp('<'+tag+'\\b'));
 });
 
 test('published notes preserve the upstream label/input/payload relationship, with namespaced ids',()=>{
  const result=renderArticle(documentFixture());
  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
  const html=result.html;
- const notes=[...html.matchAll(/<label\b[^>]*for="([^"]+)"[^>]*><\/label><input\b[^>]*><span\b[^>]*class="(sidenote|marginnote)"/g)];
+ const notes=[...html.matchAll(/<label\b[^>]*for="([^"]+)"[^>]*>([^<]*)<\/label><input\b[^>]*id="([^"]+)"[^>]*><span\b[^>]*class="(sidenote|marginnote)"/g)];
  assert.ok(notes.length>=2,'expected both Tufte note kinds in published fixture');
- for(const [,id,kind] of notes){
-  assert.ok(html.includes('id="'+id+'"'),'label target must exist');
+ assert.deepEqual(new Set(notes.map(note=>note[4])),new Set(['sidenote','marginnote']));
+ for(const [,id,glyph,inputId,kind] of notes){
+  assert.equal(id,inputId,'label must target its adjacent input');
+  assert.equal(glyph,kind==='sidenote'?'':'⊕');
   assert.ok(html.includes('class="margin-toggle'+(kind==='sidenote'?' sidenote-number':'')+'"'));
  }
  assert.match(upstream,/<label\b[^>]*class="margin-toggle sidenote-number"[^>]*><\/label>/);

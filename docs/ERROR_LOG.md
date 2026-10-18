@@ -1,5 +1,27 @@
 # 에러 기록
 
+2026-10-18 upstream 후속 판정: E098–E101은 [대조 실행 보고서](VERIFICATION_UPSTREAM_2026-10-18.ko.md)의 최종 check316개/browser15개/package4개 범위에서 검증했다. 기존 원본 전체 fidelity 차이는 해결 처리하지 않는다.
+
+## E100 — span 부재를 부모 오류로 분류
+
+- 새 회귀에서 span 밖 텍스트의 unwrap은 무변경 거부됐지만 INVALID_SPAN_PARENT를 반환해 명시한 INVALID_SPAN_SELECTION 기대와 불일치했다.
+- span 부재를 먼저 selection 오류로 분리하고 실제 span 부모/자식 불허는 기존 parent 진단을 유지한다. M092.
+
+## E101 — 목록 note fixture의 타입명·선택 위치 오류
+
+- 중첩/추가 회귀가 실제 tufte-note를 note로 조회해 undefined 접근. annotated listitem.selectEnd는 마지막 note payload로 들어가 목록 명령이 의도대로 거부됐다.
+- 실제 노드 타입명과 본문 텍스트 선택을 사용한다. note 내부 거부 정책을 우회하지 않고 note ID·형제/본문 보존 검사를 유지한다. M093.
+
+## E098 — upstream 예제에 없는 확장 요소를 필수로 기대
+
+- 2026-10-18 main02bb314 check의 새 upstream vocabulary 테스트가 figcaption에서 실패했다. 고정 index.html에는 figcaption/table/dl/dt/dd가 없으며 CSS/자체 확장 fixture와 원본 예제를 혼동했다.
+- 실제 원본의 figure/img/pre/code/iframe 등을 검사하고 위 다섯 요소의 부재도 명시적으로 고정한다. 확장 렌더 지원은 기존 자체 fixture에서 검사하며 원본 전체 지원의 증거로 대체하지 않는다. M090 참조.
+
+## E099 — marginnote 라벨 glyph 때문에 구조 비교에서 누락
+
+- 새 노트 구조 regex가 빈 label만 허용해 ⊕ marginnote를 놓치고 두 노트 종류 기대값에서 실패했다.
+- 실제 라벨 텍스트를 capture하여 sidenote 빈 값/marginnote ⊕를 각각 검증한다. 두 kind의 집합과 인접 input ID=label for도 검사하여 무조건 임의 내용을 허용하지 않는다. M091 참조.
+
 2026-10-18 최종 판정: E088–E097의 수정/대책은 [실행 보고서](VERIFICATION_2026-10-18.ko.md)의 check297개·browser15개·package4개 범위에서 검증했다. E086/E087 실행 대기도 현행 타입/명령/UI/의존성 검증 근거를 확보했다. 아래 최초 발견/과거 대기 기록은 이력으로 유지한다.
 
 ## E095 — 신규 browser snapshot이 접힌 details 내부 role을 조회

@@ -63,7 +63,8 @@ export function registerInlineCommands(editor:LexicalEditor,onDiagnostic?:(diagn
   if(!$isRangeSelection(selection)||!selection.isCollapsed()||selection.anchor.type!=='text'||editor.isComposing()||$getContainingNote(selection.anchor.getNode()))
    return reject('INVALID_SPAN_SELECTION','기존 인라인 속성 내부의 한 위치를 선택하세요.');
   const span=nearest(selection.anchor.getNode()),parent=span?.getParent();
-  if(!span||!parent||!NODE_SCHEMA[parent.getType()]?.children?.includes('text'))
+  if(!span)return reject('INVALID_SPAN_SELECTION','기존 인라인 속성 내부의 한 위치를 선택하세요.');
+  if(!parent||!NODE_SCHEMA[parent.getType()]?.children?.includes('text'))
    return reject('INVALID_SPAN_PARENT','현재 부모 요소에는 span의 텍스트를 직접 배치할 수 없습니다.');
   if(span.getChildren().some(child=>!NODE_SCHEMA[parent.getType()]!.children!.includes(child.getType())))
    return reject('INVALID_SPAN_PARENT','인라인 속성 해제로 현재 자식 구조를 보존할 수 없습니다.');
