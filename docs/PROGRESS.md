@@ -1,3 +1,9 @@
+## 2026-10-18 P2.2.b.2 중첩 빈 항목 키 경계·노트 보존 회귀 (실행 대기)
+
+- `packages/lexical/test/list-commands.test.mjs`에 중첩 빈 목록 항목의 Backspace/Enter를 Tufte 키보드 가드가 소비하지 않고 Lexical 기본 처리에 위임하는 headless 회귀를 추가했다. 부모 항목과 inline note ID가 변경되지 않는지도 검증한다. [커밋 `66076e2`](https://github.com/yunskim/lexical-tufte-css/commit/66076e2172a2d8e4ee1ff5c525f26b808eafcf12).
+- 이번 변경은 **제품 명령 수정이 아닌 보호 경계 테스트**다. 실제 키 입력에 따른 중첩 빈 항목 내어쓰기/병합 동작은 browser E2E 검증 및 필요 시 별도 구현이 남아 있다.
+- 기존 2026-10-18 누적 통과 결과에는 이번 회귀가 포함되지 않는다. **테스트 미실행**, CI 생략, P2.2.b.2-K2/K3/K5 체크 미완료.
+
 ## 2026-10-18 P2.2.b.2 중첩 목록 키보드 회귀 확대 (신규 테스트 실행 대기)
 
 - [누적 검증 보고서](VERIFICATION_2026-10-18.ko.md)의 기존 자동화 결과(297개, package 4, browser 15, Python 16, HTTP 왕복)를 기준선으로 확인했다. 이 결과는 **이후 추가한 회귀 테스트를 포함하지 않는다**.
