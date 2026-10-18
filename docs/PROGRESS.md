@@ -1,3 +1,9 @@
+## 2026-10-18 P8 Docker 최종 패키징 계획 및 중첩 목록 브라우저 보호 회귀
+
+- 사용자의 요청에 따라 [계획](PLAN.ko.md) **마지막**에 P8 Docker 패키징·운영 배포 체크리스트를 추가했다. 멀티스테이지/비루트 이미지, Compose 영속 볼륨, secrets·TLS·SQLite 단일 쓰기, 백업·복구, 실제 컨테이너 수락 테스트를 완료 기준으로 정했다. [계획 커밋 `7f1eed8`](https://github.com/yunskim/lexical-tufte-css/commit/7f1eed83d7e5a1581e4c5ed02986fe65337a392b).
+- [브라우저 회귀 `fee99d5`](https://github.com/yunskim/lexical-tufte-css/commit/fee99d57b4bbe5ada0fb422e26d5c907b93c6e7a): 중첩 빈 항목 Enter→Backspace 후 부모·자식 텍스트와 목록 블록 유지 확인. 중첩 빈 항목이 정확히 어떤 구조로 바뀌는지는 별도 구조 수락 조건 수립 필요.
+- **신규 테스트 미실행**, 이전 누적 통과와 구분. CI 생략. P2.2.b.2 및 P8 모두 미완료.
+
 ## 2026-10-18 P2.2.b.2 중첩 빈 항목 키 경계·노트 보존 회귀 (실행 대기)
 
 - `packages/lexical/test/list-commands.test.mjs`에 중첩 빈 목록 항목의 Backspace/Enter를 Tufte 키보드 가드가 소비하지 않고 Lexical 기본 처리에 위임하는 headless 회귀를 추가했다. 부모 항목과 inline note ID가 변경되지 않는지도 검증한다. [커밋 `66076e2`](https://github.com/yunskim/lexical-tufte-css/commit/66076e2172a2d8e4ee1ff5c525f26b808eafcf12).
