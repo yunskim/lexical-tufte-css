@@ -169,7 +169,7 @@ export function registerListKeyboardCommands(editor:LexicalEditor):()=>void{
   return true;
  },COMMAND_PRIORITY_HIGH);
  const unregisterTab=editor.registerCommand(KEY_TAB_COMMAND,event=>{
-  if(editor.isComposing()||event.isComposing||event.ctrlKey||event.metaKey||event.altKey)return false;
+  if(!event||editor.isComposing()||event.isComposing||event.ctrlKey||event.metaKey||event.altKey)return false;
   const selection=$getSelection();
   if(!$isRangeSelection(selection)||!selection.isCollapsed()||$getContainingNote(selection.anchor.getNode()))return false;
   let node:LexicalNode|null=selection.anchor.getNode();
