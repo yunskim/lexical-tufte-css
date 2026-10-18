@@ -48,3 +48,25 @@ test('upstream newthought embeds a note label inside span: known schema/DOM fide
  assert.match(result.html,/<span data-tufte-note="/);
  // Do not mark F05/F10 upstream DOM parity complete until this difference is resolved.
 });
+
+test('upstream margin toggles have matching input ids and adjacent sidenote/marginnote payloads',()=>{
+ // The upstream example sometimes nests the label in a newthought span.
+ // Compare input-to-payload adjacency independently of label nesting.
+ const inputs=[...upstream.matchAll(/<input\\b[^>]*type="checkbox"[^>]*id="([^"]+)"[^>]*class="margin-toggle"[^>]*\\/?>\\s*<span class="(sidenote|marginnote)">/g)];
+ assert.ok(inputs.length>0,'upstream must contain actual note toggles');
+ const labels=[...upstream.matchAll(/<label\\b[^>]*for="([^"]+)"[^>]*class="margin-toggle(?: sidenote-number)?"[^>]*>/g)];
+ const labelIds=new Set(labels.map(m=>m[1]));
+ for(const [,id] of inputs)assert.ok(labelIds.has(id),'unpaired upstream margin toggle: '+id);
+});
+
+test('published article keeps CSS direct-child section layout and note adjacency',()=>{
+ const result=renderArticle(documentFixture());
+ assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+ const html=result.html;
+ assert.match(html,/<article\\b[^>]*>[\\s\\S]*<section\\b/);
+ assert.match(html,/<section\\b[^>]*><p\\b/);
+ // CSS uses the adjacent-sibling selector .margin-toggle:checked + .sidenote/.marginnote.
+ for(const kind of ['sidenote','marginnote']){
+  assert.match(html,new RegExp('<input\\\\b[^>]*class="margin-toggle"[^>]*><span\\\\b[^>]*class="'+kind+'"'));
+ }
+});
