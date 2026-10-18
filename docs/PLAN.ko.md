@@ -319,3 +319,16 @@ P6 gate: 로컬 빌드·타입 검사·관련 테스트 통과, 남은 결함과
 | P5 | [#6](https://github.com/yunskim/lexical-tufte/issues/6) |
 | P6 | [#7](https://github.com/yunskim/lexical-tufte/issues/7) |
 | P7 | [#8](https://github.com/yunskim/lexical-tufte/issues/8) |
+
+## P8 — Docker 패키징 및 실행 배포 (최종 단계)
+
+P0–P7의 기능·보안·복구·배포 검증을 마친 후 수행한다. Docker는 npm 라이브러리 자체의 대체 배포물이 아니라 **블로그 서버·관리 UI·정적 자산을 실행하는 선택적 운영 패키지**로 제공한다.
+
+- [ ] P8.1 배포 경계 확정: 정적 발행만 사용하는 경우와 서버/API·관리 UI를 사용하는 경우를 구분하고 이미지의 entrypoint, 포트, 볼륨, 환경 변수, healthcheck를 문서화한다.
+- [ ] P8.2 멀티스테이지 Dockerfile: pnpm lockfile 고정 설치, 빌드와 런타임 분리, 비루트 사용자, 최소 런타임 파일, `.dockerignore`, 재현 가능한 이미지 태그·버전·라이선스 고지.
+- [ ] P8.3 Compose 예제: 영속 문서·자산·SQLite 저장소의 볼륨, 백업·복구 절차, secrets/환경변수 분리, 명시적 포트와 재시작 정책. SQLite 파일은 여러 독립 쓰기 컨테이너에서 공유하지 않는다.
+- [ ] P8.4 보안: 비밀값 이미지 미포함, 권한 최소화, 읽기 전용 root filesystem 가능성, healthcheck·graceful shutdown, 의존성/이미지 취약점 점검, 외부 공개 시 TLS reverse proxy·인증·CSRF 검증.
+- [ ] P8.5 수락 검증: clean build → `docker compose up` → 관리/발행/저장/재시작/볼륨 유지 → 백업·복구 → 비정상 종료·복구 → 이미지 재빌드. Docker 미설치 환경에서는 실행 완료로 체크하지 않는다.
+- [ ] P8.6 사용 설명서: 로컬 개발과 운영 배포의 차이, Docker/Compose 요구 버전, 초기 설정, 업데이트·롤백·데이터 마이그레이션·문제 해결 절차. 기존 pnpm 패키지 설치 경로는 계속 지원한다.
+
+완료 기준: 이미지와 Compose 설정, 재현 가능한 빌드, 실제 컨테이너 기동·지속성·복구 검증, 운영 문서 및 결과 기록. CI 실행 여부는 별도로 결정하며 현재 지시대로 CI는 생략한다.
