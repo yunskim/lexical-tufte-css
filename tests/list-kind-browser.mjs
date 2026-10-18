@@ -176,7 +176,7 @@ try{
  const afterNestedEnter=await snapshot();
  assert.match(JSON.stringify(afterNestedEnter),/Parent item/);
  assert.match(JSON.stringify(afterNestedEnter),/Nested item/);
- assert.ok(editor.locator('section ul').last());
+ assert.ok(afterNestedEnter.root.children.flatMap(section=>section.children).some(block=>block.type==='list'), 'Nested Enter must retain a list block');
  assert.deepEqual(errors,[]);
  console.log('P2.2.b list browser: ul/ol conversion, structural indent/outdent, safe unwrap, history, save/reopen, renderer, reject PASS.');
 }finally{await browser?.close();server.kill();}
