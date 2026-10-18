@@ -43,9 +43,17 @@ export function registerListCommands(editor:LexicalEditor,onDiagnostic?:(diagnos
   editor.registerCommand(APPEND_TUFTE_LIST_ITEM_COMMAND,()=>{
    const s=selected();if(!s)return reject('목록 안의 한 위치를 선택하세요.');
    const list=ancestor(s.anchor.getNode(),'list');
-   if(!(list instanceof ListNode))return reject('목록 안에서만 항목을 추가할 수 있습니다.');
+   if(!(list instanceof ListNode)||list.getListType()==='check'||!list.getParent()||
+      !NODE_SCHEMA[list.getParent()!.getType()]?.children?.includes('list'))
+    return reject('지원하는 글머리표·번호 목록 안에서만 항목을 추가할 수 있습니다.');
+   const selectedItem=ancestor(s.anchor.getNode(),'listitem');
+   if(!(selectedItem instanceof ListItemNode)||!selectedItem.getParent()?.is(list))
+    return reject('현재 목록의 항목 안에서 추가 위치를 선택하세요.');
    $addUpdateTag(HISTORY_PUSH_TAG);
-   const item=$createListItemNode();list.append(item);item.selectStart();return true;
+   const item=$createListItemNode();
+   selectedItem.insertAfter(item);
+   item.selectStart();
+   return true;
   },COMMAND_PRIORITY_EDITOR),
   editor.registerCommand(SET_TUFTE_LIST_KIND_COMMAND,kind=>{
    if(kind!=='bullet'&&kind!=='number')return reject('지원하지 않는 목록 종류입니다.');
