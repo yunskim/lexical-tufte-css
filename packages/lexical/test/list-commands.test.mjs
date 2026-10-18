@@ -481,3 +481,21 @@ test('P2.2.b keyboard boundary never consumes ranged selections or modifier shor
  editor.getEditorState().read(()=>assert.equal($getRoot().getFirstChild().getFirstChild().getFirstChild().getTextContent(),'Keep text'));
  stop();dispose();
 });
+
+test('append list item inserts after selected middle item without moving trailing content',()=>{
+ const {editor,dispose}=setup();
+ editor.update(()=>{
+  const a=$createListItemNode().append($createTextNode('First'));
+  const b=$createListItemNode().append($createTextNode('Middle'));
+  const z=$createListItemNode().append($createTextNode('Last'));
+  $getRoot().append($createSectionNode().append($createListNode('bullet').append(a,b,z)));
+  b.selectEnd();
+ },{discrete:true});
+ assert.equal(editor.dispatchCommand(APPEND_TUFTE_LIST_ITEM_COMMAND,undefined),true);
+ editor.update(()=>{},{discrete:true});
+ editor.getEditorState().read(()=>{
+  const list=$getRoot().getFirstChild().getFirstChild();
+  assert.deepEqual(list.getChildren().map(item=>item.getTextContent()),['First','Middle','','Last']);
+ });
+ dispose();
+});
