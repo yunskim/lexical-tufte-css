@@ -4,6 +4,12 @@
 상태: P0·P1·P2.1 완료. Chromium 자동 회귀와 조합 이벤트 검증 범위이며, OS별 실제 IME 및 제품 전체 검증은 후속 단계.
 저장소: https://github.com/yunskim/lexical-tufte-css (public, GPL-3.0; 사용자가 생성한 설정 유지).
 
+## 구현 우선순위 보완 (2026-10-18)
+
+고정된 공식 Tufte CSS 예제 페이지의 **의미 있는 모든 노드와 조합을 거의 동일한 DOM/CSS 결과로 재현**하는 것이 우선 목표다. CSS selector 전수 조사만으로 DOM 구조의 완전성을 주장하지 않는다. 별도 예제 DOM 대응표로 실제 구조와 조합을 추적한다. Lexical JSON을 유일한 본문 정본으로 유지하며 Lexical 편집 DOM이나 exportDOM을 발행 정본으로 사용하지 않는다. Tufte HTML의 태그 하나마다 Lexical 노드 하나를 강제하지 않고, note의 label/input/span처럼 하나의 논리 노드가 여러 출력 요소에 대응할 수 있다.
+
+기능 구현 순서는 **예제 DOM 대응 확인 → schema 계약 → Lexical 편집/경계 → 순수 renderer HTML → fixture 작성 → 누적 실행 검증**으로 한다. 기본 Lexical 키 입력을 재구현하기보다 문서 schema를 위반할 수 있는 경계에서만 가로채고, 붙여넣기·IME·undo/redo·저장/발행은 동일 불변식을 검사한다. 사용자 요청에 따라 현재 테스트는 작성·누적하고 일괄 실행하기 전까지 관련 체크박스를 완료 처리하지 않는다. 공식 예제의 지원 범위와 제3자 임의 HTML의 지원 범위는 구분한다.
+
 ## 목표와 완료 정의
 
 Lexical로 Tufte CSS의 모든 표현을 구조적으로 작성·수정하고, 같은 문서를 미리보기·HTML 발행·블로그 운영에 사용하는 재사용 라이브러리를 만든다. 최종 산출물은 편집기, 독립 렌더러, 블로그 코어와 저장소 어댑터, 실제 운영 가능한 예제 블로그, 문서 및 배포 패키지다.
@@ -171,12 +177,15 @@ P1 gate: 완료. 노트 편집 회귀와 SSR 출력의 실제 브라우저 비�
   - [ ] P2.2.d F01–F09 직렬화·발행 지원 경계 통합 검증. F04 전체 폰트/시각 증거는 P4와 연결.
     - [ ] P2.2.d.1 `NODE_SCHEMA`에서 허용되는 타입/속성과 editor import/export 및 순수 renderer capability를 기능별 매트릭스로 대조한다. 구현하지 않은 속성은 침묵 변환 대신 진단·발행 차단.
     - [ ] P2.2.d.2 F01–F09 대표/거부 fixture에 대해 편집→JSON 저장→재열기→HTML 발행→semantic DOM 비교를 실행하고 명령별 history/IME/접근성 증거를 남긴다.
+  - [ ] P2.2.e 공식 Tufte CSS 1.9.0 고정 예제 `index.html`의 의미 있는 DOM 요소·부모/자식·순서·CSS direct-child 관계를 전수 대조한다. `fixtures/tufte/inventory.json`의 selector 목록과 별개로 예제 DOM → F01–F22 → 문서 schema → Lexical node/command → 순수 renderer HTML의 대응표와 대표/거부 fixture를 작성한다. 한 논리 노드가 여러 HTML 요소로 출력되는 note처럼 1:n 관계를 명시하고, 비지원·의도적 차이는 진단/ADR에 남긴다. **P2.2의 기능별 수락 전에 대응표의 관련 행을 먼저 확인한다.**
 - [ ] P2.3 F10–F19 노트·그림·표·코드·embed 구현.
   - [ ] P2.3.a 노트 F10–F12: note 종류 전환/텍스트·이미지 편집/삭제/이동, anchor/ID 일체성, copy/paste/undo/redo, 복수 article 번호와 모바일 fallback.
   - [ ] P2.3.b 그림·ImageQuilts F13/F14/F19: src/alt/caption/asset ID 수정 및 body/fullwidth/여백 변환, 자산 유실·삭제 시 진단, schema 유효성 보존.
   - [ ] P2.3.c 표/전체 폭 F15/F16: 셀·헤더·행/열 편집, 스크롤/폭 전환, 병합 거부와 접근 가능한 설명, 좁은 화면 overflow.
   - [ ] P2.3.d 코드/embed F17/F18: code block·language·fullwidth·공백/탭 및 embed의 provider allowlist/title/aspect ratio/서식 편집. 외부 HTML/sanitization 정책과 통합.
+  - [ ] P2.3.e 각 F10–F19 기능은 문서 schema·Lexical 편집·순수 JSON→HTML 렌더링을 한 단위로 구현한다. 편집만 가능한 상태를 기능 완료로 판정하지 않는다. CSS의 direct-child 관계와 note/asset ID를 보존하는 HTML fixture를 기능별로 준비하고, 실행 검증은 사용자 요청에 따라 묶어서 수행한다.
 - [ ] P2.4 JSON 및 HTML import/export, 지원 subset 명시, 손실 진단과 unknown-node 발행 차단.
+  - [ ] P2.4.0 importer 범위를 단계화한다: (1) 고정 공식 Tufte 예제의 지원 구조, (2) 본 라이브러리 발행 HTML의 역변환, (3) 제3자 Tufte 스타일 HTML. 1·2를 우선하며 범용 HTML 수용을 목표로 하지 않는다. 지원되지 않는 구조는 위치 있는 진단으로 거부하고 침묵 손실을 금지한다.
   - [ ] P2.4.a 문서 정본(JSON)을 유지하고 외부 Tufte HTML importer의 허용 태그/속성/URL·노트 인접 DOM 계약을 고정한다. 비지원 요소는 삭제하지 않고 위치 있는 진단과 중단/명시적 손실 선택을 제공한다.
   - [ ] P2.4.b renderer(순수 JSON→HTML), Lexical exportDOM(편집 보조), preview(발행 출력) 간 의미 차이를 fixture로 검사한다. 발행 정본으로 exportDOM을 사용하지 않는다.
 - [ ] P2.5 schema migration fixture, malformed 입력·ID 충돌·참조 오류 검증.
@@ -218,6 +227,7 @@ P3 gate: 예제 글의 모든 F기능을 HTML 직접 편집 없이 생성·수�
 - [ ] P4.1 Node 서버/정적 renderer, deterministic ID·HTML, JS 없는 공개 글.
 - [ ] P4.2 원본 CSS 전체 페이지 모드와 scoped embedded 모드를 분리 검증; 전역 body 스타일이 관리자 UI를 바꾸지 않게 함.
 - [ ] P4.3 F01–F22 fixture와 공식 baseline 비교, 의도적 차이는 ADR에 명시.
+- [ ] P4.3.a 고정 upstream 예제와 발행 결과를 대표 뷰포트(1440/761/760/759/375px)에서 비교한다. DOM 의미·CSS direct-child 구조·폰트 로딩 상태·노트 위치·표/그림 폭을 분리 기록하고, 의도적 차이는 ADR에 남긴다. P2 단계에서도 기능별 구조/시각 fixture를 준비하되 전체 시각 수락은 P4에서 수행한다.
 - [ ] P4.4 CSS 기본 토글 외에 키보드/스크린리더 가능한 progressive enhancement 결정; JS 없어도 내용 접근 fallback 제공.
 - [ ] P4.5 dark/한글 본명조·본고딕 및 fallback/장문·연속 노트/여러 article/좁은 화면 overflow 검증.
 - [ ] P4.6 `packages/theme`를 편집기 DOM·출판 scoped/full-page 2모드에서 재사용할 수 있게 분리한다. 폰트 subset coverage·ET Book 우선순위·font-display·license·패키지 자산 base URL·CSP/no-JS 및 CSS 충돌을 확인한다.
