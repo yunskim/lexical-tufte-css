@@ -148,6 +148,35 @@ try{
  assert.match(JSON.stringify(mergedState),/AlphaBeta/);
  const mergedLists=mergedState.root.children.flatMap(n=>n.children).filter(n=>n.type==='list');
  assert.ok(mergedLists.some(list=>list.children.some(item=>item.children?.some(child=>child.text==='AlphaBeta'))));
+ // Nested-list keyboard regression: verify Tab/Shift+Tab history and content stability.
+ await editor.focus();await page.keyboard.press('Control+End');
+ await action('다음 섹션 추가').click();
+ await action('글머리표 목록 삽입').click();
+ await page.keyboard.insertText('Parent item');
+ await action('목록 항목 추가').click();
+ await page.keyboard.insertText('Nested item');
+ const nestedKeyboardList=editor.locator('section ul').last();
+ await nestedKeyboardList.locator('li').last().click();
+ const beforeNestedTab=await snapshot();
+ await nestedKeyboardList.locator('li').last().click();
+ await page.keyboard.press('Tab');
+ await page.waitForFunction(()=>[...document.querySelectorAll('.editor section ul ul li')].some(li=>li.textContent?.includes('Nested item')));
+ const afterNestedTab=await snapshot();
+ assert.notDeepEqual(afterNestedTab,beforeNestedTab,'Tab must structurally nest an item');
+ await page.getByRole('button',{name:'실행 취소',exact:true}).click();
+ assert.deepEqual(await snapshot(),beforeNestedTab,'Undo must restore flat list after Tab');
+ await page.getByRole('button',{name:'다시 실행',exact:true}).click();
+ assert.deepEqual(await snapshot(),afterNestedTab,'Redo must restore nested list');
+ // On a nonempty nested item, Enter is delegated to Lexical. It must not
+ // accidentally trigger the top-level empty-final-item exit handler.
+ await editor.locator('section ul ul li').last().click();
+ await page.keyboard.press('End');
+ await page.keyboard.press('Enter');
+ await page.waitForFunction(()=>[...document.querySelectorAll('.editor section ul ul li')].some(li=>li.textContent?.includes('Nested item')));
+ const afterNestedEnter=await snapshot();
+ assert.match(JSON.stringify(afterNestedEnter),/Parent item/);
+ assert.match(JSON.stringify(afterNestedEnter),/Nested item/);
+ assert.ok(editor.locator('section ul').last());
  assert.deepEqual(errors,[]);
  console.log('P2.2.b list browser: ul/ol conversion, structural indent/outdent, safe unwrap, history, save/reopen, renderer, reject PASS.');
 }finally{await browser?.close();server.kill();}
