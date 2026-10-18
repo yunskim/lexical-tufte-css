@@ -177,6 +177,18 @@ try{
  assert.match(JSON.stringify(afterNestedEnter),/Parent item/);
  assert.match(JSON.stringify(afterNestedEnter),/Nested item/);
  assert.ok(afterNestedEnter.root.children.flatMap(section=>section.children).some(block=>block.type==='list'), 'Nested Enter must retain a list block');
+ // Nested empty-item Backspace: record actual browser behavior without assuming
+ // Lexical will outdent, merge, or remove the item. Parent content must survive.
+ await editor.locator('section ul ul li').last().click();
+ await page.keyboard.press('End');
+ await page.keyboard.press('Enter');
+ const beforeNestedBackspace=await snapshot();
+ await page.keyboard.press('Backspace');
+ const afterNestedBackspace=await snapshot();
+ assert.match(JSON.stringify(afterNestedBackspace),/Parent item/);
+ assert.match(JSON.stringify(afterNestedBackspace),/Nested item/);
+ assert.ok(afterNestedBackspace.root.children.flatMap(section=>section.children).some(block=>block.type==='list'));
+ assert.ok(beforeNestedBackspace.root.children.length>0);
  assert.deepEqual(errors,[]);
  console.log('P2.2.b list browser: ul/ol conversion, structural indent/outdent, safe unwrap, history, save/reopen, renderer, reject PASS.');
 }finally{await browser?.close();server.kill();}
