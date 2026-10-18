@@ -128,7 +128,7 @@ export function registerListKeyboardCommands(editor:LexicalEditor):()=>void{
   if(!$isRangeSelection(selection)||!selection.isCollapsed()||$getContainingNote(selection.anchor.getNode()))return false;
   let node:LexicalNode|null=selection.anchor.getNode();
   while(node&&!(node instanceof ListItemNode))node=node.getParent();
-  if(!(node instanceof ListItemNode)||node.getChildrenSize()!==0||node.getTextContent()!=='')return false;
+  if(!(node instanceof ListItemNode)||node.getChildrenSize()!==0||node.getTextContent()!==''||selection.anchor.type!=='element'||!selection.anchor.getNode().is(node))return false;
   const list=node.getParent();
   if(!(list instanceof ListNode)||list.getListType()==='check'||!(list.getParent() instanceof SectionNode)||
      list.getParent()?.getParent()?.getType()!=='root'||!node.is(list.getLastChild())||node.getIndent()!==0)return false;
@@ -149,7 +149,7 @@ export function registerListKeyboardCommands(editor:LexicalEditor):()=>void{
   if(!$isRangeSelection(selection)||!selection.isCollapsed()||$getContainingNote(selection.anchor.getNode()))return false;
   let node:LexicalNode|null=selection.anchor.getNode();
   while(node&&!(node instanceof ListItemNode))node=node.getParent();
-  if(!(node instanceof ListItemNode)||node.getChildrenSize()!==0||node.getTextContent()!=='')return false;
+  if(!(node instanceof ListItemNode)||node.getChildrenSize()!==0||node.getTextContent()!==''||selection.anchor.type!=='element'||!selection.anchor.getNode().is(node))return false;
   const list=node.getParent();
   if(!(list instanceof ListNode)||list.getListType()==='check'||!(list.getParent() instanceof SectionNode)||
      list.getParent()?.getParent()?.getType()!=='root'||!node.is(list.getFirstChild())||node.getIndent()!==0)return false;
