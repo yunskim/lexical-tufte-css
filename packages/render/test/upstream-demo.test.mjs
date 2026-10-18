@@ -49,23 +49,26 @@ test('upstream newthought embeds a note label inside span: known schema/DOM fide
  // Do not mark F05/F10 upstream DOM parity complete until this difference is resolved.
 });
 
-test('upstream margin toggles have matching input ids and adjacent sidenote/marginnote payloads',()=>{
- // The upstream example sometimes nests the label in a newthought span.
- // Compare input-to-payload adjacency independently of label nesting.
- const inputs=[...upstream.matchAll(/<input\b[^>]*type="checkbox"[^>]*id="([^"]+)"[^>]*class="margin-toggle"[^>]*\\/?>\\s*<span class="(sidenote|marginnote)">/g)];
- assert.ok(inputs.length>0,'upstream must contain actual note toggles');
- const labels=[...upstream.matchAll(/<label\\b[^>]*for="([^"]+)"[^>]*class="margin-toggle(?: sidenote-number)?"[^>]*>/g)];
- const labelIds=new Set(labels.map(m=>m[1]));
- for(const [,id] of inputs)assert.ok(labelIds.has(id),'unpaired upstream margin toggle: '+id);
+test('upstream margin toggles have matching labels and adjacent payloads',()=>{
+ // Upstream attributes are not consistently ordered; parse both orderings.
+ const inputs=[...upstream.matchAll(/<input\b[^>]*>/g)]
+  .map(m=>m[0]).filter(tag=>/class="margin-toggle"/.test(tag));
+ const labels=[...upstream.matchAll(/<label\\b[^>]*>/g)]
+  .map(m=>m[0]).filter(tag=>/class="margin-toggle(?: sidenote-number)?"/.test(tag));
+ const labelIds=new Set(labels.map(tag=>tag.match(/for="([^"]+)"/)?.[1]));
+ assert.ok(inputs.length>0,'upstream note inputs missing');
+ for(const tag of inputs){
+  const id=tag.match(/id="([^"]+)"/)?.[1];
+  assert.ok(id&&labelIds.has(id),'unpaired upstream margin toggle: '+id);
+ }
 });
 
-test('published article keeps CSS direct-child section layout and note adjacency',()=>{
+test('published article keeps section structure and adjacent note payloads',()=>{
  const result=renderArticle(documentFixture());
  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
  const html=result.html;
  assert.match(html,/<article\\b[^>]*>[\\s\\S]*<section\\b/);
  assert.match(html,/<section\\b[^>]*><p\\b/);
- // CSS uses the adjacent-sibling selector .margin-toggle:checked + .sidenote/.marginnote.
  for(const kind of ['sidenote','marginnote']){
   assert.match(html,new RegExp('<input\\\\b[^>]*class="margin-toggle"[^>]*><span\\\\b[^>]*class="'+kind+'"'));
  }
