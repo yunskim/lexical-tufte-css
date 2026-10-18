@@ -543,3 +543,28 @@ test('append inside nested list does not modify its outer siblings',()=>{
  });
  dispose();
 });
+
+test('nested outdent preserves note identity and unaffected outer sibling',()=>{
+ const {editor,dispose}=setup();
+ editor.update(()=>{
+  const note=$createNoteNode('outdent-note','marginnote').append($createTextNode('Note body'));
+  const nestedItem=$createListItemNode().append($createTextNode('Child'),note);
+  const nested=$createListNode('bullet').append(nestedItem);
+  const parent=$createListItemNode().append($createTextNode('Parent'),nested);
+  const tail=$createListItemNode().append($createTextNode('Tail'));
+  $getRoot().append($createSectionNode().append($createListNode('bullet').append(parent,tail)));
+  nestedItem.selectStart();
+ },{discrete:true});
+ assert.equal(editor.dispatchCommand(CHANGE_TUFTE_LIST_INDENT_COMMAND,'outdent'),true);
+ editor.update(()=>{},{discrete:true});
+ editor.getEditorState().read(()=>{
+  const outer=$getRoot().getFirstChild().getFirstChild();
+  const items=outer.getChildren();
+  assert.ok(items.some(item=>item.getTextContent().includes('Child')));
+  assert.ok(items.some(item=>item.getTextContent()==='Tail'));
+  const json=JSON.stringify(editor.getEditorState().toJSON());
+  assert.match(json,/outdent-note/);
+  assert.match(json,/Note body/);
+ });
+ dispose();
+});
