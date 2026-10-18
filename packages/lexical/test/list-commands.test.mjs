@@ -456,3 +456,28 @@ test('P2.2.b nested empty item Enter delegates to Lexical without modifying pare
  assert.equal(JSON.stringify(editor.getEditorState().toJSON()),before);
  stop();dispose();
 });
+
+test('P2.2.b keyboard boundary never consumes ranged selections or modifier shortcuts',()=>{
+ const {editor,dispose}=setup();const stop=registerListKeyboardCommands(editor);
+ editor.update(()=>{
+  const text=$createTextNode('Keep text');
+  $getRoot().append($createSectionNode().append($createListNode('bullet').append($createListItemNode().append(text))));
+  text.select(0,4);
+ },{discrete:true});
+ const event=(extra={})=>({isComposing:false,shiftKey:false,ctrlKey:false,metaKey:false,altKey:false,prevented:false,preventDefault(){this.prevented=true;},...extra});
+ for(const command of [KEY_ENTER_COMMAND,KEY_BACKSPACE_COMMAND]){
+  const ranged=event();
+  assert.equal(editor.dispatchCommand(command,ranged),false);
+  assert.equal(ranged.prevented,false);
+ }
+ editor.update(()=>{$getRoot().getFirstChild().getFirstChild().getFirstChild().selectStart();},{discrete:true});
+ for(const command of [KEY_ENTER_COMMAND,KEY_BACKSPACE_COMMAND]){
+  for(const extra of [{ctrlKey:true},{metaKey:true},{altKey:true},{shiftKey:true},{isComposing:true}]){
+   const modified=event(extra);
+   assert.equal(editor.dispatchCommand(command,modified),false);
+   assert.equal(modified.prevented,false);
+  }
+ }
+ editor.getEditorState().read(()=>assert.equal($getRoot().getFirstChild().getFirstChild().getFirstChild().getTextContent(),'Keep text'));
+ stop();dispose();
+});
