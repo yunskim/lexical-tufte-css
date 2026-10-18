@@ -1,0 +1,46 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {renderArticle} from '../dist/index.js';
+
+// Upstream snapshot: edwardtufte/tufte-css v1.9.0,
+// b5d7b7bbe5ce9c4c50fcfad4f19ee3646cfd7ae1/index.html.
+// These are structural compatibility checks, NOT a claim of full-page parity.
+const upstream=readFileSync(new URL('../../../fixtures/tufte/upstream/index.html',import.meta.url),'utf8');
+const documentFixture=()=>JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document.json',import.meta.url),'utf8'));
+const count=(html,pattern)=>[...html.matchAll(pattern)].length;
+
+test('pinned upstream demo includes the expected Tufte structural vocabulary',()=>{
+ for(const pattern of [
+  /<article\b/,/<section\b/,/<h1\b/,/<h2\b/,/<p class="subtitle"/,
+  /<div class="epigraph"/,/<blockquote\b/,/<footer\b/,/<cite\b/,
+  /<figure\b/,/<figcaption\b/,/<table\b/,/<dl\b/,/<dt\b/,/<dd\b/,
+  /class="newthought"/,/class="sans"/,/class="sidenote"/,/class="marginnote"/,
+  /class="margin-toggle sidenote-number"/,/<input\b[^>]*class="margin-toggle"/
+ ])assert.match(upstream,pattern);
+ assert.ok(count(upstream,/<section\b/g)>=3,'upstream section structure unexpectedly changed');
+});
+
+test('published notes preserve the upstream label/input/payload relationship, with namespaced ids',()=>{
+ const result=renderArticle(documentFixture());
+ assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+ const html=result.html;
+ const notes=[...html.matchAll(/<label\b[^>]*for="([^"]+)"[^>]*><\/label><input\b[^>]*><span\b[^>]*class="(sidenote|marginnote)"/g)];
+ assert.ok(notes.length>=2,'expected both Tufte note kinds in published fixture');
+ for(const [,id,kind] of notes){
+  assert.ok(html.includes('id="'+id+'"'),'label target must exist');
+  assert.ok(html.includes('class="margin-toggle'+(kind==='sidenote'?' sidenote-number':'')+'"'));
+ }
+ assert.match(upstream,/<label\b[^>]*class="margin-toggle sidenote-number"[^>]*><\/label>/);
+ assert.match(upstream,/<span class="sidenote">/);
+});
+
+test('upstream newthought embeds a note label inside span: known schema/DOM fidelity gap',()=>{
+ // The current renderer wraps note markup in a data-tufte-note span.
+ // This upstream nesting cannot yet be reproduced by the current note-in-span schema.
+ assert.match(upstream,/<span class="newthought">[^<]*<label\b[^>]*class="margin-toggle sidenote-number"/);
+ const result=renderArticle(documentFixture());
+ assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+ assert.match(result.html,/<span data-tufte-note="/);
+ // Do not mark F05/F10 upstream DOM parity complete until this difference is resolved.
+});
