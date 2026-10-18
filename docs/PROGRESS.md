@@ -1,3 +1,9 @@
+## 2026-10-18 P2.2.b 목록 항목 추가 위치 수정 (일괄 테스트 대기)
+
+- 목록 항목 추가 명령이 선택 위치와 관계없이 목록 맨 뒤에 항목을 붙이던 동작을 변경했다. 현재 선택된 `ListItemNode` **바로 뒤**에 빈 항목을 삽입하며 기존 후속 항목은 그대로 유지한다. 체크리스트 및 스키마에서 허용하지 않는 목록은 변경 없이 거부한다. [제품 수정 `dd08a16`](https://github.com/yunskim/lexical-tufte-css/commit/dd08a168bcd7075e6ef6134cfe61871cc61b11ba).
+- 중간 항목 선택 시 `First, Middle, Last` → `First, Middle, (empty), Last` 순서가 되는 headless 회귀를 추가했다. [테스트 `0f0c676`](https://github.com/yunskim/lexical-tufte-css/commit/0f0c6763b96749334f2507f1afbdb4e098bebe37).
+- 사용자 지시에 따라 단계별 테스트 실행 없이 **최종 일괄 테스트 대기**로 유지한다. CI 생략. 테스트 미실행이므로 완료 체크하지 않는다. P8 Docker 패키징은 계획 마지막 단계로 유지한다.
+
 ## 2026-10-18 P2.2.b.2 실행 경로 확인 및 브라우저 포커스 보정
 
 - 테스트 실행을 시도하기 위해 현재 작업 컨테이너에서 GitHub 원격 저장소 연결을 확인했으나 `Could not resolve host: github.com`으로 clone에 실패했다. GitHub 커넥터는 파일 조회/수정이 가능하지만 실행 환경을 제공하지 않는다. **따라서 신규 테스트는 실행하지 못했으며 통과 판정하지 않는다.**
