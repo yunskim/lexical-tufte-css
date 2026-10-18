@@ -1,5 +1,43 @@
 # 재발 방지 대책 및 정기 점검
 
+2026-10-18 완료 점검: E088–E097/M083–M089의 대책을 코드·단위·브라우저·실행 순서에 반영했다. 최종 check297개/Python16개/browser15개/package4개/실제HTTP 모두 통과. E086/E087도 현재 실행 범위로 확인했다. E064·W001 및 OS IME/접근성·다른 브라우저 제한은 유지한다. 다음 구현 시작/완료 및 같은 원인 재발 때 점검한다.
+
+## M088 — snapshot 가시성과 fixture 대상 격리
+
+- E095: 접힌 details의 접근성 role은 기본 탐색에서 숨겨진다. 명시적으로 연 뒤 조회한다.
+- E097: 누적 편집 fixture에서 last UL을 신규 목록으로 추정하지 않는다. 시나리오별 section을 격리하고 실제 대상 텍스트/순서를 확인한다.
+
+## M089 — 실제 키 처리 우선순위와 안전 위임 증명
+
+- E096: 별도 headless 핸들러만으로 RichText와의 소유권을 증명하지 않는다. 먼저 등록된 EDITOR 소비자와 함께 boundary 우선·일반 텍스트 위임 회귀를 추가하고 실제 browser도 실행한다.
+- HIGH 개입은 비조합·수정키 없는 접힌 선택의 명시한 첫/마지막 빈 최상위 ul/ol 항목에 한정한다. 일반·중첩·노트·IME는 기존 처리로 위임하며 전체 키보드 지원 완료로 확대하지 않는다.
+
+## M086 — fixed 메뉴의 layout 여백 분리
+
+- E092: 일반 배치 margin은 floating 좌표와 분리해 0으로 덮는다. 실제 bounding box의 네 변을 viewport와 비교하며 작은 화면/내용 증가를 포함한다.
+
+## M087 — 브라우저 helper는 명시 계약과 실제 DOM을 기준으로
+
+- E093: Tab 포커스 대상은 사전에 정한 메뉴 안/밖 계약과 일치시킨다. 임의의 과거 selector로 기대값을 정하지 않는다.
+- E094: Lexical text wrapper의 존재를 허용하고 실제 Text node를 탐색한 뒤 offset을 검사한다. 의미 없는 DOM 형태 가정을 제품 기능 실패와 구분한다.
+
+## M084 — 노드 이동 수신자와 그룹 순서 검증
+
+- E090: insertBefore/After의 수신자는 이동 대상이 아니라 삽입 기준 노드다. down/up 왕복, 복수 term 공유 dd, 노트 ID와 저장 JSON을 함께 비교한다.
+
+## M085 — 목록 JSON/중첩 항목의 동일 레벨 비교
+
+- E091: inline 배열은 inline 배열과 비교하고 중첩 wrapper를 선택 항목으로 오인하지 않는다. 구조적 indent는 실제 대상 item의 key/텍스트 부모와 노트 ID를 기준으로 검사한다.
+
+## 2026-10-18 일괄 검증 시작
+
+E086/E087 및 M080–M082, 이전 구문·focus readiness·직렬 browser 실행 대책을 점검했다. main0411b03 별도 worktree에서 frozen 설치와 53개 mjs 구문 검사를 수행했다. 테스트 작성 완료와 실행 완료를 구분한다. CI 생략.
+
+## M083 — 제어 흐름과 타입 좁히기 일치
+
+- E088: 배열 전체 자식 검증 후 하위 타입 API를 쓰려면 타입 술어 every 등 실제 narrowing 경로를 유지한다. 강제 cast로 런타임 검증을 생략하지 않는다.
+- E089: mutable valid 플래그만으로 selection 타입이 좁혀진다고 가정하지 않는다. nullable selection을 소비하는 지점에 공개 type guard를 명시하고 clean build를 실행한다.
+
 
 ## M082 — 구조 편집은 부모 스키마와 그룹 경계를 먼저 확인
 

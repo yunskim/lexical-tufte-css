@@ -248,7 +248,7 @@ function BlockContextMenu(){
    editor.getEditorState().read(()=>{
     const selection=$getSelection();
     valid=$isRangeSelection(selection)&&selection.isCollapsed()&&canOpenBlockMenu(selection.anchor.getNode());
-    if(valid)captureTarget(selection);
+    if($isRangeSelection(selection)&&valid)captureTarget(selection);
    });
    if(!valid)return;
    event.preventDefault();

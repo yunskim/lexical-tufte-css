@@ -1,3 +1,10 @@
+## 2026-10-18 누적 테스트 실행 완료
+
+- main0411b03와 검증 수정 tree에서 frozen/check297개(실패·skip0)/package4개/browser15개/Python16개/실제TS→Python HTTP 왕복 통과. CI 없음.
+- 타입 narrowing2건, 정의 그룹 위 이동, floating margin, 목록 Enter/Backspace 우선순위를 수정했다. 테스트 helper의 JSON 깊이·중첩 대상·접힌 details·DOM wrapper·Shift+Tab 계약·목록 fixture도 보완했다.
+- E088–E097/M083–M089 기록. E086/E087는 현재 자동화 범위 실행 확인, P2.2.b.0 체크. 다른 K1–K5/전체 기능 gate는 범위를 확대해 닫지 않는다.
+- [실행 보고서](VERIFICATION_2026-10-18.ko.md)가 아래 과거 실행 대기 기록의 현행 판정을 대체한다. 이번 누적 테스트 작업 종료.
+
 ## 2026-10-18 P2.2.b.2-K2/K3 일반 목록 항목의 기본 키 처리 수락 테스트 (미실행)
 
 - `tests/list-kind-browser.mjs`에 일반 항목 `AlphaBeta` 중간 Enter 분할 → `Alpha`/`Beta`, 두 번째 항목 시작 Backspace 병합 → `AlphaBeta`를 검증하는 브라우저 회귀를 추가했다. DOM과 JSON을 함께 확인한다. [커밋 `20918d2`](https://github.com/yunskim/lexical-tufte-css/commit/20918d299610524737fa6f7bcff923385ede2f0e).

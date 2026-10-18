@@ -21,6 +21,7 @@ try{
  const action=name=>toolbar.getByRole('button',{name,exact:true});
  async function snapshot(){
   await page.getByRole('button',{name:'JSON·HTML 확인',exact:true}).click();
+  if(!await page.locator('details').evaluate(element=>element.open))await page.getByText('JSON과 발행 HTML 검사',{exact:true}).click();
   return JSON.parse(await page.getByRole('textbox',{name:'문서 JSON',exact:true}).inputValue());
  }
  const extractList=s=>s.root.children.flatMap(n=>n.children).find(n=>n.type==='list');
@@ -89,7 +90,8 @@ try{
  assert.deepEqual(await snapshot(),flattened,'Undo restores the flat list after unwrap');
  // Keyboard boundary regression: keep the published list roundtrip above intact.
  // Start from a normal paragraph so the list shortcut never steals toolbar focus.
- await editor.locator('section').last().locator('p').last().click();
+ await editor.focus();await page.keyboard.press('Control+End');
+ await action('다음 섹션 추가').click();
  await action('글머리표 목록 삽입').click();
  await page.keyboard.insertText('Keyboard first');
  await action('목록 항목 추가').click();
@@ -109,7 +111,8 @@ try{
  assert.match(JSON.stringify(afterEnter),/Keyboard first/);
  assert.match(JSON.stringify(afterEnter),/Keyboard second/);
  // Browser Backspace: empty first item must be removed without touching the next.
- await editor.locator('section').last().locator('p').last().click();
+ await editor.focus();await page.keyboard.press('Control+End');
+ await action('다음 섹션 추가').click();
  await action('글머리표 목록 삽입').click();
  await action('목록 항목 추가').click();
  await page.keyboard.insertText('Keep after Backspace');
@@ -119,7 +122,8 @@ try{
  await page.waitForFunction(()=>[...document.querySelectorAll('.editor section ul')].some(ul=>ul.querySelectorAll(':scope > li').length===1&&ul.textContent?.includes('Keep after Backspace')));
  // Characterize Lexical's native Enter split and Backspace merge on nonempty list items.
  // No custom handler should consume these keys; text and list structure must remain intact.
- await editor.locator('section').last().locator('p').last().click();
+ await editor.focus();await page.keyboard.press('Control+End');
+ await action('다음 섹션 추가').click();
  await action('글머리표 목록 삽입').click();
  await page.keyboard.insertText('AlphaBeta');
  const splitList=editor.locator('section ul').last();

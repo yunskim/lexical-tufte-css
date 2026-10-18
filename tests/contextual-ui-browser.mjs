@@ -96,7 +96,7 @@ try{
  await editor.locator('h3').click({button:'right'});await group.waitFor();
  await page.waitForFunction(()=>document.activeElement?.textContent==='본문 문단');
  await page.keyboard.press('Shift+Tab');await group.waitFor({state:'hidden'});
- assert.equal(await page.locator('.block-context-menu > button').evaluate(element=>element===document.activeElement),true);
+ assert.equal(await page.locator('.editor').evaluate(element=>element===document.activeElement),true);
  assert.equal(await page.locator('.block-context-menu.is-floating').count(),0);
  assert.equal(await page.evaluate(()=>document.activeElement?.matches('#tufte-block-menu button')),false);
 

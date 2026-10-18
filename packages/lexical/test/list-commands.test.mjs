@@ -1,9 +1,25 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createHeadlessEditor} from '@lexical/headless';
-import {$getRoot,$createParagraphNode,$createTextNode,$getNodeByKey,KEY_ENTER_COMMAND,KEY_BACKSPACE_COMMAND,KEY_TAB_COMMAND} from 'lexical';
+import {$getRoot,$createParagraphNode,$createTextNode,$getNodeByKey,KEY_ENTER_COMMAND,KEY_BACKSPACE_COMMAND,KEY_TAB_COMMAND,COMMAND_PRIORITY_EDITOR} from 'lexical';
 import {$createListNode,$createListItemNode} from '@lexical/list';
 import {TUFTE_NODES,$createSectionNode,registerListKeyboardCommands,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,SET_TUFTE_LIST_KIND_COMMAND,CHANGE_TUFTE_LIST_INDENT_COMMAND,UNWRAP_TUFTE_LIST_COMMAND,$createNoteNode} from '../dist/index.js';
+
+for(const [name,command]of [['Enter',KEY_ENTER_COMMAND],['Backspace',KEY_BACKSPACE_COMMAND]])test(`list ${name} boundary precedes an earlier editor-priority handler but delegates normal text`,()=>{
+ const {editor,dispose}=setup();let fallback=0;
+ const stopDefault=editor.registerCommand(command,()=>{fallback++;return true;},COMMAND_PRIORITY_EDITOR);
+ const stop=registerListKeyboardCommands(editor);
+ editor.update(()=>{
+  const item=$createListItemNode();$getRoot().append($createSectionNode().append($createListNode('bullet').append(item)));item.selectStart();
+ },{discrete:true});
+ const event={shiftKey:false,ctrlKey:false,metaKey:false,altKey:false,isComposing:false,preventDefault(){}};
+ editor.dispatchCommand(command,event);editor.update(()=>{},{discrete:true});
+ assert.equal(fallback,0);
+ editor.getEditorState().read(()=>assert.equal($getRoot().getFirstChild().getFirstChild().getType(),'paragraph'));
+ editor.update(()=>{const paragraph=$getRoot().getFirstChild().getFirstChild();paragraph.append($createTextNode('Normal'));paragraph.selectEnd();},{discrete:true});
+ editor.dispatchCommand(command,event);editor.update(()=>{},{discrete:true});assert.equal(fallback,1);
+ stop();stopDefault();dispose();
+});
 
 function setup(){
  const diagnostics=[];
@@ -81,7 +97,7 @@ test('P2.2.b switch bullet/number keeps nested content, note ID and list item id
  const reversed=editor.getEditorState().toJSON();
  assert.equal(reversed.root.children[0].children[0].listType,'bullet');
  assert.equal(reversed.root.children[0].children[0].tag,'ul');
- assert.deepEqual(reversed.root.children[0].children[0].children.map(i=>i.children),original.root.children[0].children[0].children);
+ assert.deepEqual(reversed.root.children[0].children[0].children.map(i=>i.children),original.root.children[0].children[0].children.map(i=>i.children));
  assert.deepEqual(diagnostics,[]);
  dispose();
 });
@@ -259,7 +275,7 @@ test('P2.2.b Tab keyboard command edits list depth only at valid list item',()=>
  editor.update(()=>{},{discrete:true});
  editor.getEditorState().read(()=>{
   const list=$getRoot().getFirstChild().getLastChild();
-  assert.equal(list.getLastChild().getIndent(),1);
+  assert.equal(list.getLastDescendant().getParent().getIndent(),1);
  });
  const outdent=event(true);
  assert.equal(editor.dispatchCommand(KEY_TAB_COMMAND,outdent),true);

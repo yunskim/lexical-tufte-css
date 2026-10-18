@@ -21,6 +21,7 @@ try{
  const action=name=>toolbar.getByRole('button',{name,exact:true});
  const snapshot=async()=>{
   await page.getByRole('button',{name:'JSON·HTML 확인',exact:true}).click();
+  if(!await page.locator('details').evaluate(element=>element.open))await page.getByText('JSON과 발행 HTML 검사',{exact:true}).click();
   return JSON.parse(await page.getByRole('textbox',{name:'문서 JSON',exact:true}).inputValue());
  };
  const collect=node=>[node,...(node.children?.flatMap(collect)??[])];
@@ -31,7 +32,7 @@ try{
  // Select exactly one part of one text node using the browser's real DOM selection.
  await page.evaluate(()=>{
   const paragraph=[...document.querySelectorAll('.editor section p')].find(p=>p.textContent==='Before selected After');
-  const node=paragraph?.firstChild;
+  const node=paragraph?document.createTreeWalker(paragraph,NodeFilter.SHOW_TEXT).nextNode():null;
   if(!node||node.nodeType!==Node.TEXT_NODE)throw Error('Expected a simple text node');
   const range=document.createRange();range.setStart(node,7);range.setEnd(node,15);
   const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);

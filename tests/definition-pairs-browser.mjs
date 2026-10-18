@@ -21,6 +21,7 @@ try{
  const action=name=>toolbar.getByRole('button',{name,exact:true});
  const snapshot=async()=>{
   await page.getByRole('button',{name:'JSON·HTML 확인',exact:true}).click();
+  if(!await page.locator('details').evaluate(element=>element.open))await page.getByText('JSON과 발행 HTML 검사',{exact:true}).click();
   return JSON.parse(await page.getByRole('textbox',{name:'문서 JSON',exact:true}).inputValue());
  };
  const findList=state=>state.root.children.flatMap(section=>section.children).find(node=>node.type==='tufte-definition-list');

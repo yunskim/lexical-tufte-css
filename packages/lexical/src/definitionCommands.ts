@@ -110,8 +110,8 @@ export function registerDefinitionCommands(editor:LexicalEditor,onDiagnostic?:(d
    $addUpdateTag(HISTORY_PUSH_TAG);
    if(direction==='up'){
     const previousFirst=groups[groupIndex-1]!.terms[0]!;
-    for(const term of group.terms)term.insertBefore(previousFirst);
-    group.description.insertBefore(previousFirst);
+    for(const term of group.terms)previousFirst.insertBefore(term);
+    previousFirst.insertBefore(group.description);
    }else{
     const nextDescription=groups[groupIndex+1]!.description;
     // Repeated insertAfter reverses order; advance the insertion anchor instead.

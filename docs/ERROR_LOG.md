@@ -1,5 +1,57 @@
 # 에러 기록
 
+2026-10-18 최종 판정: E088–E097의 수정/대책은 [실행 보고서](VERIFICATION_2026-10-18.ko.md)의 check297개·browser15개·package4개 범위에서 검증했다. E086/E087 실행 대기도 현행 타입/명령/UI/의존성 검증 근거를 확보했다. 아래 최초 발견/과거 대기 기록은 이력으로 유지한다.
+
+## E095 — 신규 browser snapshot이 접힌 details 내부 role을 조회
+
+- inline-span snapshot이 숨겨진 문서 JSON textbox를 role로 찾다 timeout. list/definition helper에도 같은 패턴이 있었다.
+- JSON·HTML 생성 후 details를 명시적으로 연 뒤 접근한다. 입력 데이터와 검사 내용은 유지했다. M088.
+
+## E096 — 기본 RichText Enter가 목록 경계 처리보다 먼저 소비
+
+- 실제 브라우저의 마지막 빈 listitem Enter에서 종료 대신 빈 항목이 추가됐다. 동일 EDITOR 우선순위의 RichText handler가 먼저 소비해 새 경계 핸들러까지 오지 않았다.
+- 좁은 Enter/Backspace 경계 핸들러만 HIGH로 등록한다. 노트/IME/일반 텍스트는 false 반환으로 위임을 유지한다. 먼저 등록된 EDITOR handler와 함께 우선순위/일반 텍스트 위임 headless2건 추가 및 browser Enter/Backspace 실행. M089.
+
+## E097 — 누적 목록 fixture에서 마지막 UL을 새 목록으로 오인
+
+- 일반 Enter 분할 검사에서 이전부터 뒤에 있던 목록을 last UL로 골라 AlphaBeta가 아닌 목록을 편집해 timeout.
+- 키보드 시나리오별 새 최종 section에 목록을 만든다. 마지막 목록 selector가 검사 대상과 일치하는 상태를 보장하고 실제 분할/병합 검사를 유지한다. M088.
+
+## E092 — floating 메뉴의 일반 레이아웃 margin 잔류
+
+- contextual 브라우저에서 메뉴 y+height가 viewport를 넘어섰다. 기본 block-context-menu margin이 fixed top 계산 밖에서 더해졌다.
+- is-floating에 margin:0을 명시했다. 실제 기본/375px 경계 검사 통과. M086 참조.
+
+## E093 — Shift+Tab 검사와 메뉴 밖 이동 계약 불일치
+
+- 구현/M080은 메뉴 컨테이너 밖 이전 tabbable로 이동하지만 테스트는 컨테이너 안 토글을 기대해 실패했다.
+- 이전 외부 요소인 editor focus를 검사한다. 닫힘/floating 제거/숨은 항목 focus 방지 검사는 유지했다. 제품 동작 변경 없음. M087.
+
+## E094 — 인라인 browser가 첫 자식을 DOM Text로 가정
+
+- 신규 inline-span 선택 helper가 Lexical span wrapper를 Text로 가정해 실행 전 실패했다.
+- TreeWalker SHOW_TEXT로 실제 텍스트를 찾고 동일한 부분 offset 선택을 유지한다. wrapper를 제거하거나 제품을 바꾸지 않는다. M087.
+
+## E090 — 정의 그룹 위로 이동의 insertBefore 수신자 반대
+
+- 단위 테스트 두 건에서 down→up 왕복이 원본과 달라졌다. term.insertBefore(previousFirst)는 이전 그룹 첫 용어를 이동시켜 그룹을 손상했다.
+- previousFirst.insertBefore(term/description)으로 선택 그룹 전체를 이전 그룹 앞에 순서대로 이동한다. 단일/다중 용어 그룹·note ID 왕복 테스트로 확인한다. M084 참조.
+
+## E091 — 목록 회귀의 비교 깊이·구조적 들여쓰기 대상 불일치
+
+- 유형 왕복 검사는 inline children 배열과 listitem 객체 배열을 서로 비교했다. Tab 검사는 실제 중첩 대상 대신 Lexical의 최상위 wrapper item 깊이를 기대했다.
+- 양쪽 inline children을 비교하고 Tab 뒤 실제 마지막 텍스트의 부모 listitem 깊이를 검사한다. 제품 코드의 구조적 중첩 동작을 바꾸지 않는다. M085 참조.
+
+## E088 — 목록 자식 검증 뒤 타입 좁히기 유실
+
+- 2026-10-18 main0411b03 clean check에서 listCommands.ts의 getDirection/getChildren 등6개 TS2339 발생. some의 거부 조건은 items 배열을 ListItemNode[]로 좁히지 않았다.
+- every의 명시적 ListItemNode 타입 술어로 동일한 전체 자식 허용 검증을 유지했다. M083 참조. 최종 실행 결과는 후속 보고서에 기록한다.
+
+## E089 — mutable valid 불리언으로 selection 타입 추론 불가
+
+- E088 수정 후 editor typecheck에서 captureTarget(selection)에 nullable BaseSelection이 전달돼 TS2345 발생. valid 변수의 값은 TypeScript의 range type guard가 아니다.
+- captureTarget 호출 직전에 $isRangeSelection을 명시해 런타임/정적 계약을 함께 확인한다. M083 참조. 최종 실행 결과는 후속 보고서에 기록한다.
+
 ## E087 — editor example의 직접 import가 manifest·lockfile importer에 누락됨
 
 - `examples/editor/src/main.tsx`가 `@lexical-tufte/document`와 `@lexical/rich-text`를 직접 import했으나 `examples/editor/package.json`에 둘 다 없었다. lockfile의 `examples/editor` importer에도 직접 선언되지 않았다.

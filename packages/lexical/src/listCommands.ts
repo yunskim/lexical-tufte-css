@@ -1,4 +1,4 @@
-import {$addUpdateTag,$createParagraphNode,$getSelection,$isRangeSelection,createCommand,COMMAND_PRIORITY_EDITOR,KEY_ENTER_COMMAND,KEY_BACKSPACE_COMMAND,KEY_TAB_COMMAND,HISTORY_PUSH_TAG,type LexicalCommand,type LexicalEditor,type LexicalNode} from 'lexical';
+import {$addUpdateTag,$createParagraphNode,$getSelection,$isRangeSelection,createCommand,COMMAND_PRIORITY_EDITOR,COMMAND_PRIORITY_HIGH,KEY_ENTER_COMMAND,KEY_BACKSPACE_COMMAND,KEY_TAB_COMMAND,HISTORY_PUSH_TAG,type LexicalCommand,type LexicalEditor,type LexicalNode} from 'lexical';
 import {$createListNode,$createListItemNode,ListNode,ListItemNode} from '@lexical/list';
 import {SectionNode} from './LayoutNodes.js';
 import {$getContainingNote} from './noteOperations.js';
@@ -88,8 +88,8 @@ export function registerListCommands(editor:LexicalEditor,onDiagnostic?:(diagnos
     return reject('최상위 섹션에 직접 속한 목록만 문단으로 해제할 수 있습니다.');
    const items=list.getChildren();
    const allowed=NODE_SCHEMA.paragraph?.children;
-   if(items.length===0||items.some(item=>!(item instanceof ListItemNode)||
-       item.getIndent()!==0||item.getChildren().some(child=>!allowed?.includes(child.getType()))))
+   if(items.length===0||!items.every((item):item is ListItemNode=>item instanceof ListItemNode&&
+       item.getIndent()===0&&item.getChildren().every(child=>allowed?.includes(child.getType()))))
     return reject('중첩 목록·지원하지 않는 자식이 있는 항목은 내용 보존을 위해 해제하지 않습니다.');
    const selectedItem=ancestor(s.anchor.getNode(),'listitem');
    const selectedIndex=items.findIndex(item=>item.is(selectedItem));
@@ -134,7 +134,7 @@ export function registerListKeyboardCommands(editor:LexicalEditor):()=>void{
   if(list.getChildrenSize()===0)list.remove();
   paragraph.selectStart();
   return true;
- },COMMAND_PRIORITY_EDITOR);
+ },COMMAND_PRIORITY_HIGH);
  const unregisterBackspace=editor.registerCommand(KEY_BACKSPACE_COMMAND,event=>{
   if(!event||editor.isComposing()||event.isComposing||event.shiftKey||event.ctrlKey||event.metaKey||event.altKey)return false;
   const selection=$getSelection();
@@ -159,7 +159,7 @@ export function registerListKeyboardCommands(editor:LexicalEditor):()=>void{
    paragraph.selectStart();
   }
   return true;
- },COMMAND_PRIORITY_EDITOR);
+ },COMMAND_PRIORITY_HIGH);
  const unregisterTab=editor.registerCommand(KEY_TAB_COMMAND,event=>{
   if(editor.isComposing()||event.isComposing||event.ctrlKey||event.metaKey||event.altKey)return false;
   const selection=$getSelection();
