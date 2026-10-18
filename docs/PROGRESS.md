@@ -1,3 +1,9 @@
+## 2026-10-18 P2.2.b.2 실행 경로 확인 및 브라우저 포커스 보정
+
+- 테스트 실행을 시도하기 위해 현재 작업 컨테이너에서 GitHub 원격 저장소 연결을 확인했으나 `Could not resolve host: github.com`으로 clone에 실패했다. GitHub 커넥터는 파일 조회/수정이 가능하지만 실행 환경을 제공하지 않는다. **따라서 신규 테스트는 실행하지 못했으며 통과 판정하지 않는다.**
+- `tests/list-kind-browser.mjs`의 중첩 Backspace 시나리오에서 `snapshot()` 후 검사 UI로 포커스가 이동할 수 있는 문제를 발견해 편집 영역 재선택과 Home 이동을 추가했다. [커밋 `9da21bc`](https://github.com/yunskim/lexical-tufte-css/commit/9da21bc7d44b12195cb476bb4745e9ef8675e5ad).
+- 재실행 필요: `pnpm check`, `pnpm package:check`, `pnpm test:list-kind` (및 관련 브라우저 스위트). CI는 지시대로 생략. 실제 결과 확인 전 P2.2.b.2 체크 미완료.
+
 ## 2026-10-18 P2.2.b.2-K1/K5 선택 범위·수정키 보호 회귀 추가
 
 - `packages/lexical/test/list-commands.test.mjs`에 비접힌 범위 선택 시 Enter/Backspace를 소비하지 않는 검사, Ctrl/Meta/Alt/Shift 및 조합 중 입력의 비개입 검사, 원래 텍스트 유지 검사를 추가했다. [커밋 `daf32ba`](https://github.com/yunskim/lexical-tufte-css/commit/daf32ba94c471ab48e41c5b386b3a600b06680fa).
