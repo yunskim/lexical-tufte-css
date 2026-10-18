@@ -568,3 +568,21 @@ test('nested outdent preserves note identity and unaffected outer sibling',()=>{
  });
  dispose();
 });
+
+
+test('P2.2.b.2-K4 null Tab event delegates without mutation',()=>{
+ const {editor,diagnostics,dispose}=setup();
+ const stop=registerListKeyboardCommands(editor);
+ editor.update(()=>{
+  const first=$createListItemNode().append($createTextNode('First'));
+  const secondText=$createTextNode('Second');
+  $getRoot().append($createSectionNode().append($createListNode('bullet').append(first,$createListItemNode().append(secondText))));
+  secondText.select(2,2);
+ },{discrete:true});
+ const before=JSON.stringify(editor.getEditorState().toJSON());
+ assert.equal(editor.dispatchCommand(KEY_TAB_COMMAND,null),false);
+ editor.update(()=>{},{discrete:true});
+ assert.equal(JSON.stringify(editor.getEditorState().toJSON()),before);
+ assert.deepEqual(diagnostics,[]);
+ stop();dispose();
+});
