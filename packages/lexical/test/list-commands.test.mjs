@@ -499,3 +499,47 @@ test('append list item inserts after selected middle item without moving trailin
  });
  dispose();
 });
+
+test('append after annotated list item retains note identity and trailing item',()=>{
+ const {editor,dispose}=setup();
+ editor.update(()=>{
+  const note=$createNoteNode('append-note','marginnote').append($createTextNode('Annotation'));
+  const first=$createListItemNode().append($createTextNode('First'),note);
+  const last=$createListItemNode().append($createTextNode('Last'));
+  $getRoot().append($createSectionNode().append($createListNode('bullet').append(first,last)));
+  first.selectEnd();
+ },{discrete:true});
+ assert.equal(editor.dispatchCommand(APPEND_TUFTE_LIST_ITEM_COMMAND,undefined),true);
+ editor.update(()=>{},{discrete:true});
+ editor.getEditorState().read(()=>{
+  const list=$getRoot().getFirstChild().getFirstChild();
+  assert.deepEqual(list.getChildren().map(item=>item.getTextContent()),['FirstAnnotation','','Last']);
+  assert.equal(list.getFirstChild().getChildren().find(n=>n.getType()==='note').getNoteId(),'append-note');
+ });
+ dispose();
+});
+
+test('append inside nested list does not modify its outer siblings',()=>{
+ const {editor,dispose}=setup();
+ editor.update(()=>{
+  const parent=$createListItemNode().append($createTextNode('Parent'));
+  const nested=$createListNode('bullet').append(
+   $createListItemNode().append($createTextNode('Nested first')),
+   $createListItemNode().append($createTextNode('Nested last'))
+  );
+  parent.append(nested);
+  const sibling=$createListItemNode().append($createTextNode('Outer last'));
+  $getRoot().append($createSectionNode().append($createListNode('bullet').append(parent,sibling)));
+  nested.getFirstChild().selectEnd();
+ },{discrete:true});
+ assert.equal(editor.dispatchCommand(APPEND_TUFTE_LIST_ITEM_COMMAND,undefined),true);
+ editor.update(()=>{},{discrete:true});
+ editor.getEditorState().read(()=>{
+  const outer=$getRoot().getFirstChild().getFirstChild();
+  assert.equal(outer.getChildrenSize(),2);
+  assert.equal(outer.getLastChild().getTextContent(),'Outer last');
+  const nested=outer.getFirstChild().getChildren().find(n=>n.getType()==='list');
+  assert.deepEqual(nested.getChildren().map(n=>n.getTextContent()),['Nested first','','Nested last']);
+ });
+ dispose();
+});
