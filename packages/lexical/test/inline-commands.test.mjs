@@ -276,3 +276,46 @@ test('P2.2.b.1 unwrapping retains the caret text offset and adjacent note identi
  assert.deepEqual(diagnostics,[]);
  dispose();
 });
+
+
+test('P2.2.b.1 kind change rejects a selection spanning a span and plain text atomically',()=>{
+ const editor=make(),diagnostics=[];
+ const dispose=registerInlineCommands(editor,d=>diagnostics.push(d));
+ editor.update(()=>{
+  const inside=$createTextNode('inside');
+  const outside=$createTextNode('outside');
+  $getRoot().append($createParagraphNode().append($createTufteSpanNode('sans').append(inside),outside));
+  const selection=$createRangeSelection();
+  selection.setTextNodeRange(inside,2,outside,3);
+  $setSelection(selection);
+ },{discrete:true});
+ const before=JSON.stringify(editor.getEditorState().toJSON());
+ assert.equal(editor.dispatchCommand(SET_TUFTE_SPAN_KIND_COMMAND,'danger'),true);
+ editor.update(()=>{},{discrete:true});
+ assert.equal(JSON.stringify(editor.getEditorState().toJSON()),before);
+ assert.ok(diagnostics.some(d=>d.code==='INVALID_SPAN_SELECTION'));
+ dispose();
+});
+
+test('P2.2.b.1 kind change preserves the selected text and caret when both endpoints share a span',()=>{
+ const editor=make(),diagnostics=[];
+ const dispose=registerInlineCommands(editor,d=>diagnostics.push(d));
+ editor.update(()=>{
+  const text=$createTextNode('semantic');
+  $getRoot().append($createParagraphNode().append($createTufteSpanNode('sans').append(text)));
+  text.select(2,6);
+ },{discrete:true});
+ assert.equal(editor.dispatchCommand(SET_TUFTE_SPAN_KIND_COMMAND,'numeral'),true);
+ editor.update(()=>{},{discrete:true});
+ editor.getEditorState().read(()=>{
+  const span=$getRoot().getFirstChild().getFirstChild();
+  assert.equal(span.getKind(),'numeral');
+  assert.equal(span.getTextContent(),'semantic');
+  const selection=$getSelection();
+  assert.equal(selection?.anchor.offset,2);
+  assert.equal(selection?.focus.offset,6);
+  assert.equal(selection?.getTextContent(),'mant');
+ });
+ assert.deepEqual(diagnostics,[]);
+ dispose();
+});
