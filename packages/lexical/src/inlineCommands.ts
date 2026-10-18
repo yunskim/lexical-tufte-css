@@ -1,4 +1,4 @@
-import {$getSelection,$setSelection,$isRangeSelection,$isTextNode,createCommand,COMMAND_PRIORITY_EDITOR,HISTORY_PUSH_TAG,$addUpdateTag,type LexicalCommand,type LexicalEditor,type LexicalNode} from 'lexical';
+import {$getSelection,$isRangeSelection,$isTextNode,createCommand,COMMAND_PRIORITY_EDITOR,HISTORY_PUSH_TAG,$addUpdateTag,type LexicalCommand,type LexicalEditor,type LexicalNode} from 'lexical';
 import {NODE_SCHEMA,type Diagnostic} from '@lexical-tufte/document';
 import {TufteSpanNode,$createTufteSpanNode,type TufteSpanKind} from './TufteSpanNode.js';
 import {$getContainingNote} from './noteOperations.js';
@@ -67,11 +67,13 @@ export function registerInlineCommands(editor:LexicalEditor,onDiagnostic?:(diagn
    return reject('INVALID_SPAN_SELECTION','선택 위치에 해제할 Tufte 인라인 속성이 없습니다.');
   if(span.getChildren().some(child=>!NODE_SCHEMA[parent.getType()]!.children!.includes(child.getType())))
    return reject('INVALID_SPAN_PARENT','인라인 속성 해제로 현재 자식 구조를 보존할 수 없습니다.');
-  const saved=selection.clone();
+  // Preserve the logical caret inside the unwrapped text, not a potentially
+  // stale selection clone pointing through a removed element.
+  const caret=selection.anchor.getNode(),offset=selection.anchor.offset;
   $addUpdateTag(HISTORY_PUSH_TAG);
   for(const child of span.getChildren())span.insertBefore(child);
   span.remove();
-  $setSelection(saved);
+  if($isTextNode(caret)&&caret.isAttached())caret.select(offset,offset);
   return true;
  },COMMAND_PRIORITY_EDITOR)
  ];
