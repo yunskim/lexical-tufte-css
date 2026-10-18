@@ -45,6 +45,13 @@ try{
  assert.ok(span,'Selection should create a semantic Tufte span');
  assert.equal(span.children.map(node=>node.text).join(''),'selected');
  assert.equal(await editor.locator('.newthought').innerText(),'selected');
+ // Wrapping must form a single undoable history boundary before persistence.
+ await page.getByRole('button',{name:'실행 취소',exact:true}).click();
+ const undoneWrap=await snapshot();
+ assert.equal(collect(undoneWrap.root).some(node=>node.type==='tufte-span'),false,'Undo must remove the newly created wrapper');
+ assert.equal(await editor.locator('section').last().innerText(),'Before selected After');
+ await page.getByRole('button',{name:'다시 실행',exact:true}).click();
+ assert.deepEqual(await snapshot(),wrapped,'Redo must restore the same semantic wrapper');
  const published=renderArticle({schemaVersion:1,id:'inline-span-case',locale:'ko-KR',title:'인라인 속성',assets:[],lexicalState:wrapped});
  assert.equal(published.ok,true,JSON.stringify(published.diagnostics));
  assert.match(published.html,/class="newthought"/);
@@ -63,5 +70,5 @@ try{
  await page.getByRole('button',{name:'다시 실행',exact:true}).click();
  assert.deepEqual(await snapshot(),unwrapped,'Redo must remove wrapper again');
  assert.deepEqual(errors,[]);
- console.log('P2.2.b browser: selected-text span wrapping, pure renderer, save/reopen, unwrap and undo/redo PASS.');
+ console.log('P2.2.b browser: selected-text span wrapping and undo/redo, pure renderer, save/reopen, unwrap and undo/redo PASS.');
 }finally{await browser?.close();server.kill();}
