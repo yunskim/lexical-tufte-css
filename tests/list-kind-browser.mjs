@@ -183,6 +183,10 @@ try{
  await page.keyboard.press('End');
  await page.keyboard.press('Enter');
  const beforeNestedBackspace=await snapshot();
+ // snapshot() opens an inspection panel and may steal keyboard focus.
+ // Explicitly restore the editor selection before dispatching Backspace.
+ await editor.locator('section ul ul li').last().click();
+ await page.keyboard.press('Home');
  await page.keyboard.press('Backspace');
  const afterNestedBackspace=await snapshot();
  assert.match(JSON.stringify(afterNestedBackspace),/Parent item/);
