@@ -6,6 +6,7 @@ import {renderArticle} from '../packages/render/dist/index.js';
 // P2.2.e: real browser DOM parsing, not regex or byte-for-byte HTML matching.
 // Upstream: edwardtufte/tufte-css@b5d7b7bbe5ce9c4c50fcfad4f19ee3646cfd7ae1.
 const upstream=readFileSync(new URL('../fixtures/tufte/upstream/index.html',import.meta.url),'utf8');
+const splitParentReference=readFileSync(new URL('../fixtures/tufte/newthought-sidenote-reference.html',import.meta.url),'utf8');
 const fixture=JSON.parse(readFileSync(new URL('../fixtures/tufte/server-document.json',import.meta.url),'utf8'));
 const result=renderArticle(fixture);
 assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
@@ -42,6 +43,12 @@ try{
    notes
   };
  },html);
+ const minimal=await inspect(splitParentReference);
+ assert.equal(minimal.sections,1);
+ assert.equal(minimal.notes.length,1);
+ assert.equal(minimal.notes[0].labelInsideNewthought,true);
+ assert.equal(minimal.notes[0].adjacent,true);
+ assert.equal(minimal.notes[0].labelIsPreviousSibling,false,'label belongs to newthought, not input parent');
  const original=await inspect(upstream);
  const published=await inspect(result.html);
  assert.ok(original.sections>=3,'upstream sections should be direct article children');
