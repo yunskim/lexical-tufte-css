@@ -52,7 +52,7 @@ test('upstream newthought embeds a note label inside span: known schema/DOM fide
 test('upstream margin toggles have matching input ids and adjacent sidenote/marginnote payloads',()=>{
  // The upstream example sometimes nests the label in a newthought span.
  // Compare input-to-payload adjacency independently of label nesting.
- const inputs=[...upstream.matchAll(/<input\\b[^>]*type="checkbox"[^>]*id="([^"]+)"[^>]*class="margin-toggle"[^>]*\\/?>\\s*<span class="(sidenote|marginnote)">/g)];
+ const inputs=[...upstream.matchAll(/<input\b[^>]*type="checkbox"[^>]*id="([^"]+)"[^>]*class="margin-toggle"[^>]*\\/?>\\s*<span class="(sidenote|marginnote)">/g)];
  assert.ok(inputs.length>0,'upstream must contain actual note toggles');
  const labels=[...upstream.matchAll(/<label\\b[^>]*for="([^"]+)"[^>]*class="margin-toggle(?: sidenote-number)?"[^>]*>/g)];
  const labelIds=new Set(labels.map(m=>m[1]));
