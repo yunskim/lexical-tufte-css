@@ -28,7 +28,7 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
     for(let i=0;i<n.children.length;i++){
      const child=n.children[i]!;
      const next=n.children[i+1];
-     if(child.type==='tufte-span'&&child.kind==='newthought'&&(next?.type==='tufte-sidenote'||(next?.type==='tufte-note'&&next.kind==='sidenote'))){
+     if(child.type==='tufte-span'&&child.kind==='newthought'&&next?.type==='tufte-sidenote'){
       const notePieces=render(next);
       output.push(element('span',withClass(child,'newthought'),[
        ...child.children.flatMap(render),notePieces[0]!,
@@ -87,8 +87,8 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
    case 'tufte-inline-image':return [element('img',{src:String(n.src),alt:String(n.alt)},[],true)];
    case 'tufte-sidenote':
    case 'tufte-marginnote':
-   case 'tufte-note':{
-    const id=`tufte-${prefix.length}-${prefix}-${n.noteId}`,kind=n.type==='tufte-sidenote'?'sidenote':n.type==='tufte-marginnote'?'marginnote':String(n.kind);
+   {
+    const id=`tufte-${prefix.length}-${prefix}-${n.noteId}`,kind=n.type==='tufte-sidenote'?'sidenote':'marginnote';
     return [
      element('label',{for:id,class:`margin-toggle${kind==='sidenote'?' sidenote-number':''}`},kind==='marginnote'?['⊕']:[]),
      element('input',{id,type:'checkbox',class:'margin-toggle'},[],true),
