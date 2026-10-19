@@ -39,14 +39,14 @@ test('published notes preserve the upstream label/input/payload relationship, wi
  assert.match(upstream,/<span class="sidenote">/);
 });
 
-test('upstream newthought embeds a note label inside span: known schema/DOM fidelity gap',()=>{
- // The current renderer wraps note markup in a data-tufte-note span.
- // This upstream nesting cannot yet be reproduced by the current note-in-span schema.
+test('publication avoids obsolete note wrappers; newthought split-parent is verified separately',()=>{
+ // The full upstream page puts one sidenote label inside a newthought span.
+ // See newthought-sidenote.test.mjs and upstream-newthought-sidenote-browser.mjs for
+ // the same-content split-parent comparison; this fixture uses ordinary notes.
  assert.match(upstream,/<span class="newthought">[^<]*<label\b[^>]*class="margin-toggle sidenote-number"/);
  const result=renderArticle(documentFixture());
  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
- assert.match(result.html,/<span data-tufte-note="/);
- // Do not mark F05/F10 upstream DOM parity complete until this difference is resolved.
+ assert.doesNotMatch(result.html,/<span data-tufte-note="/);
 });
 
 test('upstream margin toggles have matching labels and adjacent payloads',()=>{
