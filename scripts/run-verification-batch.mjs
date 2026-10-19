@@ -1,7 +1,9 @@
 /**
- * Local/Work verification runner. No CI, no hidden skips.
- * Build once, run test files independently so a single import error cannot
- * prevent later files from being exercised, then aggregate the exit statuses.
+ * Local/Work verification runner; CI is never invoked.
+ * Build before tests, run discovered files independently so a single import
+ * error cannot hide later files, then aggregate per-file exit statuses.
+ * Individual node:test assertion/skip totals stay visible in each runner's
+ * output; the summary counts steps, not assertions or skipped subtests.
  */
 import {readdirSync} from 'node:fs';
 import {spawnSync} from 'node:child_process';
