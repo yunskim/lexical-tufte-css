@@ -9,7 +9,7 @@ import {$getContainingNote} from './noteOperations.js';
 export type InsertTufteFigure={src:string;alt:string;assetId?:string;imageWidth?:number;imageHeight?:number;width?:FigureWidth;caption?:string};
 export const INSERT_TUFTE_FIGURE_COMMAND:LexicalCommand<InsertTufteFigure>=createCommand('INSERT_TUFTE_FIGURE');
 export const SET_TUFTE_FIGURE_WIDTH_COMMAND:LexicalCommand<FigureWidth>=createCommand('SET_TUFTE_FIGURE_WIDTH');
-export type InsertFigureMarginNote={noteId:string;text:string};
+export type InsertFigureMarginNote={noteId:string;text:string;placement?:'before-image'|'after-image'};
 export const INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND:LexicalCommand<InsertFigureMarginNote>=createCommand('INSERT_TUFTE_FIGURE_MARGINNOTE');
 export const REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND:LexicalCommand<string>=createCommand('REMOVE_TUFTE_FIGURE_MARGINNOTE');
 export type UpdateFigureMarginNote={noteId:string;text:string};
@@ -75,7 +75,8 @@ export function registerFigureCommands(editor:LexicalEditor,onDiagnostic?:(diagn
    $addUpdateTag(HISTORY_PUSH_TAG);figure.setWidth(width);return true;
   },COMMAND_PRIORITY_EDITOR),
   editor.registerCommand(INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,payload=>{
-   if(!payload||!isIdentifier(payload.noteId)||typeof payload.text!=='string'||!payload.text.trim()||payload.text.length>2000)
+   if(!payload||!isIdentifier(payload.noteId)||typeof payload.text!=='string'||!payload.text.trim()||payload.text.length>2000||
+     (payload.placement!==undefined&&!['before-image','after-image'].includes(payload.placement)))
     return reject('INVALID_FIGURE_NOTE','여백 주석 ID와 내용을 확인하세요.');
    const figure=selectedFigure();
    if(!figure)return reject('INVALID_FIGURE_SELECTION','그림을 선택한 후 여백 주석을 삽입하세요.');
@@ -83,10 +84,10 @@ export function registerFigureCommands(editor:LexicalEditor,onDiagnostic?:(diagn
    if(ids.has(payload.noteId))return reject('DUPLICATE_NOTE_ID','이미 사용 중인 여백 주석 ID입니다.');
    $addUpdateTag(HISTORY_PUSH_TAG);
    const note=$createMarginnoteNode(payload.noteId).append($createTextNode(payload.text));
-   // The upstream Tufte CSS figure places its margin annotation before the image.
-   const first=figure.getFirstChild();
-   if(first)first.insertBefore(note);
-   else figure.append(note);
+   const image=figure.getChildren().find(child=>child instanceof InlineImageNode||child.getType()==='tufte-imagequilt');
+   if(!image)return reject('INVALID_FIGURE','그림에 이미지가 없습니다.');
+   if(payload.placement==='before-image')image.insertBefore(note);
+   else image.insertAfter(note);
    note.selectEnd();return true;
   },COMMAND_PRIORITY_EDITOR),
   editor.registerCommand(REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,noteId=>{
