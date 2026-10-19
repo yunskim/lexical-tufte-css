@@ -69,5 +69,21 @@ try{
   });
  },result.html);
  assert.deepEqual(actual,source,'Getting Started text/inline-code/link/pre semantics changed');
+ const strictDOM=await page.evaluate(({upstream,published})=>{
+  const parse=html=>new DOMParser().parseFromString(html,'text/html');
+  const canonical=node=>{
+   if(node.nodeType===Node.TEXT_NODE)return {type:'#text',value:node.nodeValue};
+   if(node.nodeType!==Node.ELEMENT_NODE)throw Error('unexpected DOM node '+node.nodeName);
+   return {type:node.tagName.toLowerCase(),
+    attrs:[...node.attributes].map(a=>[a.name,a.value]).sort((a,b)=>a[0].localeCompare(b[0])),
+    children:[...node.childNodes].map(canonical)};
+  };
+  const source=parse(upstream).querySelectorAll('article > section')[1];
+  const actual=parse(published).querySelector('article > section');
+  // Upstream headings have authoring IDs, which the current heading schema cannot encode.
+  // No normalization is permitted: this intentionally fails until heading IDs are supported.
+  return {upstream:canonical(source),published:canonical(actual)};
+ },{upstream,published:result.html});
+ assert.deepEqual(strictDOM.published,strictDOM.upstream,'Getting Started exact upstream DOM, including heading IDs');
  console.log('Same-content Getting Started section: heading, paragraphs, inline code, links, pre/code preserved.');
 }finally{await browser.close();}
