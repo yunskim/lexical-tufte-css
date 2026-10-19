@@ -83,7 +83,7 @@ export function validateDocument(input:unknown):ValidationResult{
   if(type==='listitem'&&raw.checked!==undefined)add('UNSUPPORTED_PROPERTY',path+'.checked','Checklist semantics are outside this schema');
   if(type==='listitem'&&!integer(raw.value,1,Number.MAX_SAFE_INTEGER))add('INVALID_LIST_VALUE',path+'.value','Invalid list value');
   if(type==='tufte-span'&&!enumeration(raw.kind,['sans','newthought','numeral','danger']))add('INVALID_SPAN_KIND',path+'.kind','Unsupported Tufte inline class');
-  if(type==='tufte-span'&&Array.isArray(raw.children)&&raw.children.some(c=>plain(c)&&c.type==='tufte-note')&&(raw.kind!=='newthought'||raw.children.at(-1)?.type!=='tufte-note'||raw.children.filter(c=>plain(c)&&c.type==='tufte-note').length!==1))add('INVALID_NEWTHOUGHT_NOTE',path,'Only one final note may be anchored inside newthought');
+  if(type==='tufte-span'&&Array.isArray(raw.children)&&raw.children.some(c=>plain(c)&&c.type==='tufte-note')&&(raw.kind!=='newthought'||raw.children.at(-1)?.type!=='tufte-note'||raw.children.filter(c=>plain(c)&&c.type==='tufte-note').length!==1||raw.children.some(c=>plain(c)&&c.type==='tufte-note'&&c.kind!=='sidenote')))add('INVALID_NEWTHOUGHT_NOTE',path,'Only one final note may be anchored inside newthought');
   if(type==='link'){
    if(inLink)add('NESTED_LINK',path,'Links cannot be nested through inline wrappers');
    if(!isSafeURL(raw.url,'link'))add('UNSAFE_URL',path+'.url','Unsupported link URL');
