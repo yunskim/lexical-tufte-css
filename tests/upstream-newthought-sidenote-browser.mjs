@@ -25,10 +25,10 @@ try{
    suffix:payload.nextSibling?.nodeValue,href:anchor.getAttribute('href'),emphasis:emphasis.textContent,
    original:html};
  },reference);
- const note=base('tufte-note',[base('link',[text(source.emphasis,2)],{url:source.href,rel:null,target:null,title:null})],{noteId:source.labelFor,kind:'sidenote'});
- const span=base('tufte-span',[text(source.prefix),note],{kind:'newthought'});
+ const note=base('tufte-sidenote',[base('link',[text(source.emphasis,2)],{url:source.href,rel:null,target:null,title:null})],{noteId:source.labelFor});
+ const span=base('tufte-span',[text(source.prefix)],{kind:'newthought'});
  const document={schemaVersion:1,id:'reference',locale:'en-US',title:'Tufte CSS',
-  lexicalState:{root:{...base('root',[base('tufte-section',[base('paragraph',[span,text(source.suffix)])])]),textFormat:0,textStyle:''}}};
+  lexicalState:{root:{...base('root',[base('tufte-section',[base('paragraph',[span,note,text(source.suffix)])])]),textFormat:0,textStyle:''}}};
  const result=renderArticle(document);
  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
  const dom=await page.evaluate(({original,published})=>{
