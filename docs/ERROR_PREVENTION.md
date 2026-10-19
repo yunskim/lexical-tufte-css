@@ -611,3 +611,16 @@ E059/M052 및 E067/M060의 선행 대책을 그림 주석 명령·회귀 테스�
 - debounce만 사용하는 자동 저장은 pagehide/visibilitychange/unmount 직전의 마지막 변경을 잃을 수 있다. pending EditorState를 별도 보유하고 종료 이벤트에서 동기 localStorage 쓰기를 시도한다.
 - 최신 상태를 성공적으로 쓴 뒤에만 pending 참조를 비운다. 저장 실패는 사용자에게 표시하고 정상 문서 슬롯을 덮어쓰지 않는다.
 - 종료 이벤트는 강제 종료·OS kill에서 보장되지 않는다. Work 브라우저 검증에 800ms 미만 종료, 숨김, 복귀, quota 실패, 여러 탭 시나리오를 포함한다.
+
+## M102 — 요소 존재를 먼저 검증하고 모든 조건 검사를 수행
+
+- E111: DOM 검사에서 선택자를 변경하거나 렌더링 구조를 바꾼 뒤에는 `every`/`some`/iteration 이전에 요소 개수와 종류를 확인한다. 빈 배열의 `every` 참값을 발행 DOM 성공으로 해석하지 않는다.
+- 편집기 DOM과 발행 DOM의 경계를 명시하고, 구형 `data-tufte-note` 래퍼 selector는 발행 검사에 재사용하지 않는다. label/input/span 형제·for/id 대응·CSS 인접성은 실제 출력에서 검사한다.
+- 적용: `tests/note-browser.mjs`. 실제 브라우저에서 전체 note count와 모바일 동작을 다시 검증해야 verified 처리한다.
+
+## M103 — 노드 타입·오류 문자열·삽입 순서를 코드 계약과 함께 갱신
+
+- E112: `kind`/getKind 기반 주석 테스트는 구체 노드 `type`과 `getType()`을 사용한다. serializer/import의 실제 거부 메시지와 관련 assertion을 대조하고, 제목/노트처럼 등록 클래스를 바꿀 경우 golden 및 모든 factory 사용자를 함께 점검한다.
+- 여러 sibling을 반복 삽입하는 명령은 단발 삽입만 확인하지 않고 선후 관계·ID·caption 안정성과 selection 복귀까지 검증한다. CSS는 주석을 첫 이미지 앞에 강제하지 않는다.
+- `canBeEmpty=false`의 자식을 옮길 때는 공식 Lexical `replace(replacement, true)` 등 자식 보존 동작을 우선 사용한다. `clear` 뒤 `append`나 자식 선이동으로 임시 빈 컨테이너를 만들지 않는다(M052).
+- 적용: figure 삽입 명령과 단위 회귀, 문서 bridge 노드 교체, note/figure 테스트. Work 실행 전에는 해결 검증으로 표시하지 않는다.
