@@ -83,8 +83,9 @@ export function registerFigureCommands(editor:LexicalEditor,onDiagnostic?:(diagn
    if(ids.has(payload.noteId))return reject('DUPLICATE_NOTE_ID','이미 사용 중인 여백 주석 ID입니다.');
    $addUpdateTag(HISTORY_PUSH_TAG);
    const note=$createMarginnoteNode(payload.noteId).append($createTextNode(payload.text));
-   const caption=figure.getChildren().find(child=>child instanceof CaptionNode);
-   if(caption)caption.insertBefore(note);
+   // The upstream Tufte CSS figure places its margin annotation before the image.
+   const first=figure.getFirstChild();
+   if(first)first.insertBefore(note);
    else figure.append(note);
    note.selectEnd();return true;
   },COMMAND_PRIORITY_EDITOR),
