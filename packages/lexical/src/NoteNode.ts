@@ -29,7 +29,9 @@ export abstract class NoteNode extends ElementNode {
   return false;
  }
  exportJSON():SerializedNoteNode{
-  return {...super.exportJSON(),type:this.getType() as SerializedNoteNode['type'],version:1,noteId:this.getNoteId()};
+  const type=this.getType();
+  if(type!=='tufte-sidenote'&&type!=='tufte-marginnote')throw Error('Unknown note node type');
+  return {...super.exportJSON(),type,version:1,noteId:this.getNoteId()};
  }
  exportDOM(_editor:LexicalEditor):DOMExportOutput{
   const element=document.createElement('span');
