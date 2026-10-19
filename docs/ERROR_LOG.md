@@ -768,3 +768,9 @@ E001–E049/M001–M042를 검토했다. E024의 경계 입력은 실제 Chromiu
 - 발견: `figure-commands.test.mjs`에서 삭제된 `getKind()`를 호출하고, `note.test.mjs`는 future-version import가 기존 `Unsupported` 오류를 던질 것으로 기대했다. 새 `SidenoteNode.importJSON()`은 `Invalid sidenote`를 반환한다. 그림의 기본 `after-image` 삽입은 매번 이미지 바로 뒤에 붙여 연속 주석의 순서가 역전됐다.
 - 처리: 테스트는 실제 구체 타입 및 버전 거부 메시지를 확인한다. 그림 노트 삽입은 이미지 뒤에 연속된 `MarginnoteNode` 중 마지막 뒤에 넣어 기존 순서를 유지한다. before/after 위치에 각각 두 번 삽입한 순서와 캡션 보존을 확인하는 단위 회귀를 추가했다. 타입 변경 테스트는 Lexical 공식 `replace(replacement, true)`로 자식 트리를 옮겨 일시적 빈 주석을 만들지 않게 수정했다.
 - 상태: 수정 코드와 회귀 추가, 빌드·테스트 실행은 대기. M103 및 E059/M052 참조.
+
+## E113 — Lexical HTML export와 발행 렌더러의 newthought 레이블 부모 불일치
+
+- 발견: P2 노트 모델을 구체 타입으로 이전한 뒤 새 실제 HTML 비교 시나리오를 설계하면서, 발행 렌더러는 연속된 `newthought / sidenote`에 대해 레이블을 `span.newthought` 내부에 넣지만 `NoteNode.exportDOM()`은 모든 레이블을 체크박스와 같은 부모의 형제로 출력한다는 차이를 확인했다. JSON 논리 모델은 형제 관계가 맞다.
+- 처리: Lexical HTML 내보내기에서만 직전 논리 형제가 `TufteSpanNode(kind='newthought')`이며 부모가 paragraph인 경우 앞서 출력된 `span.newthought`에 레이블을 추가한다. `input + span.sidenote`은 paragraph 형제로 유지한다. 중간 일반 텍스트, 다른 종류의 노트, 다른 부모는 결합하지 않는다. 실제 `$generateHtmlFromNodes`와 `renderArticle`가 같은 문서의 6개 주석(풍부한 payload/그림/직접 인접/텍스트 간섭/여백 노트)을 동일한 구조로 출력하는 브라우저 회귀를 추가했다.
+- 상태: 코드 및 테스트 커밋 완료, **Work 재실행 전**. DOM/소비자 검사 실제 결과를 받기 전에는 verified나 phase 완료로 표시하지 않는다. M104 참조.
