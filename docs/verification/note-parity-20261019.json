@@ -1,0 +1,473 @@
+{
+  "date": "2026-10-19",
+  "branch": "test/upstream-full-page-baseline-20261019",
+  "baseCommit": "c4f0411039c733331425d349bf7668f49fb22ff2",
+  "command": "RECOVERY_PYTHON=<test-venv>/bin/python pnpm verify:batch",
+  "environment": {
+    "node": "24.19.0",
+    "pnpm": "11.25.0",
+    "lexical": "0.52.0",
+    "playwright": "1.51.1",
+    "chromium": "134.0.6998.35",
+    "python": "3.12"
+  },
+  "summaryUnit": "steps/files, not assertions",
+  "summary": {
+    "passed": 69,
+    "failed": 0,
+    "total": 69,
+    "results": [
+      {
+        "label": "Frozen install",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "Lint",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 1
+      },
+      {
+        "label": "CSS inventory",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 1
+      },
+      {
+        "label": "Font verification",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 1
+      },
+      {
+        "label": "Build",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 7
+      },
+      {
+        "label": "Typecheck",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 5
+      },
+      {
+        "label": "packages/document/test/backup-cleanup.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/document/test/backup-file.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/document/test/backup-snapshot.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/document/test/document.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/document/test/editor-boundary.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/document/test/note-fixture-contract.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/document/test/sqlite-backup.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/document/test/sqlite-integration.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/document/test/sqlite-restore.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/document/test/storage-keys.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/render/test/figure-marginnote.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/render/test/newthought-sidenote.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/render/test/render.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/render/test/tree.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/render/test/upstream-demo.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/blog/test/publication.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/blog/test/recovery-client.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/blog/test/recovery-fetch.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/blog/test/recovery-host.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/blog/test/recovery-http.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/blog/test/recovery-shared-contract.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/blog/test/recovery.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/lexical/test/all-nodes.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 1
+      },
+      {
+        "label": "packages/lexical/test/definition-commands.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/lexical/test/document-bridge.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 1
+      },
+      {
+        "label": "packages/lexical/test/document-contract.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/lexical/test/figure-commands.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/lexical/test/figure-structure.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/lexical/test/heading-id.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/lexical/test/inline-commands.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/lexical/test/layout.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/lexical/test/list-commands.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/lexical/test/nested-comparison.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/lexical/test/note-dom-export.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/lexical/test/note.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/lexical/test/quotation-commands.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/lexical/test/section-commands.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "packages/lexical/test/server-comparison.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 1
+      },
+      {
+        "label": "packages/lexical/test/structure-recovery.test.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "tests/all-nodes-browser.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 5
+      },
+      {
+        "label": "tests/contextual-ui-browser.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 3
+      },
+      {
+        "label": "tests/definition-pairs-browser.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 3
+      },
+      {
+        "label": "tests/font-proof-browser.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 1
+      },
+      {
+        "label": "tests/inline-span-browser.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 2
+      },
+      {
+        "label": "tests/layout-browser.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 2
+      },
+      {
+        "label": "tests/list-kind-browser.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 5
+      },
+      {
+        "label": "tests/note-browser.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 2
+      },
+      {
+        "label": "tests/note-dom-browser.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 2
+      },
+      {
+        "label": "tests/note-editing-browser.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 10
+      },
+      {
+        "label": "tests/note-export-parity-browser.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 1
+      },
+      {
+        "label": "tests/publication-browser.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 2
+      },
+      {
+        "label": "tests/recovery-browser.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 2
+      },
+      {
+        "label": "tests/section-commands-browser.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 4
+      },
+      {
+        "label": "tests/server-browser.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 2
+      },
+      {
+        "label": "tests/text-format-browser.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 7
+      },
+      {
+        "label": "tests/upstream-dom-browser.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "tests/upstream-full-page-baseline-browser.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 1
+      },
+      {
+        "label": "tests/upstream-geometry-browser.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 1
+      },
+      {
+        "label": "tests/upstream-newthought-sidenote-browser.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "tests/upstream-same-content-getting-started-browser.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "tests/upstream-same-content-opening-browser.mjs",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 0
+      },
+      {
+        "label": "Packed package consumption",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 9
+      },
+      {
+        "label": "Python HTTP/SQLite integration",
+        "ok": true,
+        "exitCode": 0,
+        "elapsedSeconds": 1
+      }
+    ]
+  },
+  "counts": {
+    "document": {
+      "files": 10,
+      "tests": 49,
+      "pass": 49,
+      "fail": 0,
+      "skipped": 0
+    },
+    "render": {
+      "files": 5,
+      "tests": 45,
+      "pass": 45,
+      "fail": 0,
+      "skipped": 0
+    },
+    "blog": {
+      "files": 7,
+      "tests": 34,
+      "pass": 34,
+      "fail": 0,
+      "skipped": 0
+    },
+    "lexical": {
+      "files": 17,
+      "tests": 211,
+      "pass": 211,
+      "fail": 0,
+      "skipped": 0
+    }
+  },
+  "pythonPytest": {
+    "passed": 16,
+    "failed": 0,
+    "skipped": 0,
+    "warnings": 1
+  },
+  "ci": "omitted by user instruction"
+}

@@ -1,3 +1,10 @@
+## 2026-10-19 concrete note 후속 변경 재검증 — 전체 로컬 검사 통과
+
+- `test/upstream-full-page-baseline-20261019`의 `c4f0411`과 후속 테스트 수정에서 최종 `pnpm verify:batch` 69/69단계 통과. JS 단위 339개(39파일), browser22개, packed4개 실제 JS/선언 소비 및 HTTP/SQLite 통과. 별도 Python16개 통과. 실패·runner skip0, CI 생략.
+- 첫 batch의 render 2개 실패는 제거된 pre-wrap wrapper 기대 및 inline-style 검사 escape를 수정했다. 정확한 서식 중첩·본문·이스케이프 검사는 유지했다. 실제 registry와 다른 고정 33종 진단 문구도 정정했다.
+- E109의 현행 fixture/API 이전, E111–E113 및 새 HTML 노트 parity 6가지 실행 검증 완료. 구형 노트 호환/migration 미도입 결정 유지. 오류 E114–E116/대책 M105/M106 반영.
+- [최신 실행 보고서](VERIFICATION_NOTE_PARITY_2026-10-19.ko.md)와 [파일별 결과](verification/note-parity-20261019.json). 전체 원본 페이지 시각 parity·production 폰트 coverage·native IME·전체 제품 기능 완료는 아님.
+
 ## 2026-10-19 full-page baseline 브랜치 검증 — 일부 실패 유지
 
 - 대상 `test/upstream-full-page-baseline-20261019`의 `851cedd` 이후 수정. CI 생략.

@@ -1,6 +1,6 @@
 # Sidenote / Marginnote: core model and parity plan
 
-Status: implementation and regression-fixture migration in progress. Work verification on 2026-10-19 confirmed build and typecheck, but the full suite did not pass; subsequent fixture edits are not yet rerun.
+Status: post-fixture Work verification passed all 69 batch steps, 339 JS assertions, 22 browser files, packed consumers, HTTP/SQLite integration and 16 separate Python tests. Results and limitations are recorded in `docs/VERIFICATION_NOTE_PARITY_2026-10-19.ko.md`. The older execution/pending notes below are historical checkpoints. Six-case note HTML parity does not imply complete upstream-page visual parity or completion of every editor matrix case.
 
 ## Decisions
 
@@ -46,7 +46,7 @@ Status: implementation and regression-fixture migration in progress. Work verifi
 - [x] Audit runnable source, tests, serialized fixtures and golden for old note constructors and wire types; migrate known consumers. Dedicated negative tests intentionally keep legacy literals. Execution verification remains pending.
 - [x] Render both concrete note types in source order, including newthought label split-parent placement (focused browser comparison passed at baseline; full post-migration suite pending).
 - [ ] Complete DOM parity and editor regression matrix. Direct DOM, renderer, figure commands and real HTML-export parity tests are written; final execution/remaining matrix cases are outstanding.
-- [ ] Run build/typecheck and batched tests when requested; no CI unless requested.
+- [x] Run build/typecheck and batched tests when requested; see the post-fixture Work report for per-file/assertion results and limitations. CI omitted.
 
 ## Work verification and follow-up (2026-10-19)
 

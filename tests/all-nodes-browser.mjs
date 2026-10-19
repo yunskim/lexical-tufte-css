@@ -71,5 +71,5 @@ try {
   await panel.getByRole('button',{name:'마지막 정상 구조로 복구',exact:true}).click();await panel.waitFor({state:'detached'});assert.deepEqual(await exported(),edited);
  }
  assert.deepEqual(errors,[]);
- console.log('R02/R03.d browser: history boundary and actual React editor loads all 33 types, edits definition text, saves/reopens without losing code tokens, note IDs or structure.');
+ console.log('R02/R03.d browser: history boundary and actual React editor loads all registered types, edits definition text, saves/reopens without losing code tokens, note IDs or structure.');
 }finally{await browser.close();server?.kill();}

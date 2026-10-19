@@ -65,16 +65,16 @@ test('length-delimited namespaces avoid prefix and note ID ambiguity',()=>{
  for(const result of [first,second])assert.ok(result.html.includes('for="'+id(result.html)+'"'));
 });
 
-test('publication output has no inline style and uses scoped CSS classes',()=>{
+test('publication output has no inline style and keeps ordinary text wrapper-free',()=>{
  const d=fixture();
  const result=renderArticle(d);
  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
- assert.doesNotMatch(result.html,/\\sstyle=/);
+ assert.doesNotMatch(result.html,/\sstyle\s*=/i);
  assert.match(result.html,/class="tufte-article/);
- assert.match(result.html,/class="tufte-pre-wrap"/);
+ assert.doesNotMatch(result.html,/class="tufte-pre-wrap"/);
+ assert.ok(result.html.includes('<p>서버 본문 &amp; &lt;script&gt; 금지 <label'));
  const css=readFileSync(new URL('../styles.css',import.meta.url),'utf8');
  assert.match(css,/counter-reset: sidenote-counter/);
- assert.match(css,/white-space: pre-wrap/);
 });
 
 test('table column headers use thead and preserve tbody and scope',()=>{
@@ -105,17 +105,17 @@ test('R10 underline, strike and highlight compose without losing text',()=>{
  for(const [flag,tag] of [[4,'s'],[8,'u'],[128,'mark']]){
   const d=fixture();
   const text=note(d).children[0];
+  text.text='표식 & <tag>';
   text.format=flag;
   const result=renderArticle(d);
   assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
-  assert.match(result.html,new RegExp('<'+tag+'><span class="tufte-pre-wrap">'));
-  assert.match(result.html,new RegExp('</span></'+tag+'>'));
+  assert.ok(result.html.includes('<'+tag+'>표식 &amp; &lt;tag&gt;</'+tag+'>'));
  }
  const d=fixture();note(d).children[0].format=4|8|128;
+ note(d).children[0].text='표식 & <tag>';
  const combined=renderArticle(d);
  assert.equal(combined.ok,true,JSON.stringify(combined.diagnostics));
- assert.match(combined.html,/<mark><u><s><span class="tufte-pre-wrap">/);
- assert.match(combined.html,/<\/span><\/s><\/u><\/mark>/);
+ assert.ok(combined.html.includes('<mark><u><s>표식 &amp; &lt;tag&gt;</s></u></mark>'));
 });
 
 test('P2.2 F02-F09 headings, lists, definitions and quotations render semantically',()=>{

@@ -1,5 +1,19 @@
 # 재발 방지 대책 및 정기 점검
 
+## 2026-10-19 concrete note 재검증 점검
+
+시작 시 AGENTS, E103–E113/M095–M104 및 NOTE_MODEL_PARITY_PLAN을 검토했다. 특히 구형 노트 호환/migration을 도입하지 않는 후속 사용자 결정을 적용하고, 입력 생산자·소비자와 HTML 두 경로를 검사했다. 첫 batch의 실패 E114는 기대 계약 수정 후 다시 실행했다. 완료 시 batch69/69·JS339·browser22·Python16·package/HTTP 통과, 실패·skip0 확인. E109 현행 fixture/API 이전 및 E111–E113/M101–M104도 이 범위에서 검증됐다. 상세 완료 판정과 제한은 [재검증 보고서](VERIFICATION_NOTE_PARITY_2026-10-19.ko.md)를 따른다. 다음 점검은 노트 모델/출력 계약/고정 fixture 변경 시 및 다음 P단계 시작·완료 시 수행한다. CI 생략.
+
+## M105 — 출력 래퍼 변경 시 서식·내용·보안 assertion 함께 검토
+
+- E114/E102: ordinary text 래퍼를 제거하면 서식 태그의 실제 자식·전체 중첩 순서·이스케이프 결과를 검증한다. class 존재만 삭제해 통과시키지 않는다. pre/code 공백 보존 검사는 별도 유지한다.
+- literal regex에서 공백을 뜻하는 `\s`와 리터럴 backslash를 뜻하는 `\\s`를 구분한다. 구문 검사 외 실제 결과에 assertion을 실행한다.
+
+## M106 — 도구 준비와 최종 결과의 증거 구분
+
+- E115: 설치기의 공식 fallback 성공 뒤 exit code 및 실제 실행을 확인한다. 손상 다운로드를 제품 실패로 보고하거나 다른 버전으로 조용히 바꾸지 않는다.
+- E116: 설명 문구에 registry 크기를 고정하지 않는다. 중간 출력의 일부 PASS가 아니라 batch 최종 summary와 각 node:test 파일의 tests/pass/fail/skipped를 합산해 전체 결과를 판단한다. 단계 수·파일 수·assertion 수를 혼동하지 않는다.
+
 ## 2026-10-19 full-page baseline 시작·완료 점검
 
 AGENTS, E001–E102 및 M001–M094의 관련 항목을 검토했다. 특히 M031/M036/M045/M060/M077/M090–M094를 현재 concrete note/heading 모델과 대조했다. 과거 main의 통과와 이 브랜치의 검증을 분리한다. E103–E110/M095–M100을 코드·실행 순서에 반영했다. 최종 build/typecheck 및 browser 16/21 통과, 단위 65/150 통과, 패키지 소비 실패이며 E109는 미해결이다. 다음 점검은 저장 모델 migration 구현 시작·완료와 golden 변경 시 수행한다. CI 없음.

@@ -1,5 +1,27 @@
 # 에러 기록
 
+## 2026-10-19 최신 브랜치 재검증
+
+기준 `c4f0411039c733331425d349bf7668f49fb22ff2`. 후속 수정 포함 최종 batch69/69·JS339·browser22·Python16·packed 소비/HTTP 통과, 실패·skip0, CI 생략. 이전 실행 보고서는 역사 기록이며 이번 결과는 [재검증 보고서](VERIFICATION_NOTE_PARITY_2026-10-19.ko.md)를 따른다. E109의 현행 concrete note 생성기·fixture·golden/API 이전과 E111–E113 수정은 실행 검증 완료다. 사용자 결정에 따라 구형 `tufte-note` 저장 형식 호환/migration은 추가하지 않으며 명시적 거부 계약을 유지한다.
+
+## E114 — 일반 텍스트 wrapper 제거 뒤 남은 렌더러 기대값
+
+- 첫 `verify:batch`에서 render.test.mjs의 28개 중 2개가 실패했다. 일반 텍스트에 없어진 `span.tufte-pre-wrap`을 요구하고 s/u/mark의 자식도 같은 래퍼를 기대했다. 나머지 파일은 모두 통과했다.
+- 현재 upstream 지향 출력에 맞춰 일반 텍스트의 래퍼 부재와 escaped 본문을 확인한다. s/u/mark 각각 및 조합의 정확한 태그 순서, 한글·&·<tag> 보존/이스케이프를 함께 확인한다. inline style 금지 regex의 이중 escape도 실제 공백 패턴으로 수정했다.
+- 집중 재실행 28/28 및 최종 단위339/batch69단계 통과. 제품 renderer는 변경하지 않았다. M105.
+
+## E115 — Playwright CDN 다운로드의 손상된 ZIP
+
+- Chromium/FFMPEG 최초 CDN 응답을 설치기가 ZIP으로 열면서 `end of central directory record signature not found`가 발생했다.
+- 설치기 자체의 공식 대체 CDN fallback으로 다운로드·설치를 완료했다. 최종 install exit 0과 실제 Chromium 테스트로 확인한다. 캐시 임의 조작이나 브라우저 버전 변경 없이 고정 Playwright 1.51.1/Chromium 134를 사용했다.
+- 상태: 환경 준비 완료. 다운로드 오류를 제품 테스트 실패로 집계하지 않는다. M106.
+
+## E116 — 고정 노드 개수 문구와 중간 상태 보고의 부정확성
+
+- registry는 34종인데 all-nodes browser/structure recovery 설명은 이전 33종 문구를 유지했다. 중간 진행 보고도 전체 실패 집계를 확인하기 전에 단위 테스트 전체 통과로 잘못 안내했다.
+- 개수를 고정한 두 설명을 실제 registry 전체를 가리키도록 수정했다. 보고는 즉시 정정했으며 최종 summary 및 파일별 node:test pass/fail/skip를 모아 판정한다. 첫 batch는 69단계 중 68 통과/1 실패, 단위 assertion은 337 통과/2 실패였다.
+- 상태: 기능 assertion은 유지하고 진단/집계 절차를 수정했다. M106.
+
 ## 2026-10-19 full-page baseline 브랜치 검증
 
 대상 `test/upstream-full-page-baseline-20261019`, 기준 `851ceddb7b363beb63a39784848441965960f2e6`. 아래 판정은 이 브랜치에 한정한다. 이전 main 통과 기록은 이번 브랜치의 통과 증거가 아니다. 상세 결과는 [실행 보고서](VERIFICATION_FULL_BASELINE_2026-10-19.ko.md)를 따른다. CI 생략.
