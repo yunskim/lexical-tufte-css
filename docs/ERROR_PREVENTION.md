@@ -624,3 +624,10 @@ E059/M052 및 E067/M060의 선행 대책을 그림 주석 명령·회귀 테스�
 - 여러 sibling을 반복 삽입하는 명령은 단발 삽입만 확인하지 않고 선후 관계·ID·caption 안정성과 selection 복귀까지 검증한다. CSS는 주석을 첫 이미지 앞에 강제하지 않는다.
 - `canBeEmpty=false`의 자식을 옮길 때는 공식 Lexical `replace(replacement, true)` 등 자식 보존 동작을 우선 사용한다. `clear` 뒤 `append`나 자식 선이동으로 임시 빈 컨테이너를 만들지 않는다(M052).
 - 적용: figure 삽입 명령과 단위 회귀, 문서 bridge 노드 교체, note/figure 테스트. Work 실행 전에는 해결 검증으로 표시하지 않는다.
+
+## M104 — 같은 논리 트리의 HTML 출력 경로를 비교하고 특수한 DOM 부모 규칙을 분리
+
+- E113: 정본 발행 렌더러의 Tufte CSS DOM 구조와 Lexical `exportDOM`/`$generateHtmlFromNodes`의 클립보드·HTML 출력이 모두 필요한 범위에서는 같은 canonical JSON 문서를 각각 통과시켜 비교한다. 직접 생성한 label/input DOM이나 개별 `exportDOM()` 호출만으로 최종 Lexical exporter 동작을 대체하지 않는다.
+- newthought/sidenote는 **논리적으로 형제**이며 HTML에서만 레이블 부모가 바뀐다. 직전 실제 논리 형제가 newthought이고 paragraph 직속일 때만 레이블을 이전 `span.newthought` 안에 추가한다. 중간 텍스트, marginnote, 다른 컨테이너, 부분 내보내기에서 선행 span이 없는 경우는 독립 제어 구조를 유지한다.
+- ID namespace만 정규화하되 체크박스 type, 레이블 대응, `input + span` CSS 인접성, label parent, 주석 순서/개수, 이미지·링크·서식은 엄격하게 비교한다. 원본 전체 페이지 parity로 확대하지 않는다.
+- 적용: `tests/note-export-parity-browser.mjs`의 6개 시나리오와 `packages/lexical/src/NoteNode.ts`. 최종 브라우저·패키지 소비 재검증 전에는 구현을 verified로 판단하지 않는다.
