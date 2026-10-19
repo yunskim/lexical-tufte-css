@@ -22,7 +22,8 @@
     "test:inline-span": "pnpm build && node tests/inline-span-browser.mjs",
     "test:list-kind": "pnpm build && node tests/list-kind-browser.mjs",
     "test:definition-pairs": "pnpm build && node tests/definition-pairs-browser.mjs",
-    "test:upstream-dom": "pnpm build && node tests/upstream-dom-browser.mjs"
+    "test:upstream-dom": "pnpm build && node tests/upstream-dom-browser.mjs",
+    "test:upstream-full-page": "node tests/upstream-full-page-baseline-browser.mjs"
   },
   "devDependencies": {
     "playwright": "1.51.1"
