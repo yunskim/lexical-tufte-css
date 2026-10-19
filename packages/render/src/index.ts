@@ -23,7 +23,21 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
   switch(n.type){
    case 'root':return inner();
    case 'tufte-section':return [element('section',attrs(n),inner())];
-   case 'paragraph':return [element('p',attrs(n),inner())];
+   case 'paragraph':{
+    const output:RenderChild[]=[];
+    for(let i=0;i<n.children.length;i++){
+     const child=n.children[i]!;
+     const next=n.children[i+1];
+     if(child.type==='tufte-span'&&child.kind==='newthought'&&next?.type==='tufte-note'&&next.kind==='sidenote'){
+      const notePieces=render(next);
+      output.push(element('span',withClass(child,'newthought'),[
+       ...child.children.flatMap(render),notePieces[0]!,
+      ]),...notePieces.slice(1));
+      i++;
+     }else output.push(...render(child));
+    }
+    return [element('p',attrs(n),output)];
+   }
    case 'heading':return [element(n.tag,{...attrs(n),...(n.id?{id:String(n.id)}:{})},inner())];
    case 'horizontalrule':return [element('hr',{},[],true)];
    case 'list':return [element(n.tag,{...attrs(n),...(n.tag==='ol'&&n.start!==1?{start:String(n.start)}:{})},
