@@ -3,6 +3,8 @@ export {createEditor} from "lexical";
 export {createHeadlessEditor} from "@lexical/headless";
 export {TufteHeadingNode,$createTufteHeadingNode,type SerializedTufteHeadingNode} from './TufteHeadingNode.js';
 export {$createNoteNode, NoteNode, type NoteKind, type SerializedNoteNode} from './NoteNode.js';
+export {SidenoteNode,$createSidenoteNode} from './SidenoteNode.js';
+export {MarginnoteNode,$createMarginnoteNode} from './MarginnoteNode.js';
 export {$createInlineImageNode, InlineImageNode} from './InlineImageNode.js';
 export {$getContainingNote,$splitNoteAtSelection,$mergeNoteWithNext,$moveNote,$insertNotePhrasing} from './noteOperations.js';
 export {SectionNode,FigureNode,CaptionNode,TableLayoutNode,$createSectionNode,$createFigureNode,$createCaptionNode,$createTableLayoutNode,type FigureWidth,type TableLayout} from './LayoutNodes.js';
