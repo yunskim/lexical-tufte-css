@@ -2,7 +2,7 @@
 export {createEditor} from "lexical";
 export {createHeadlessEditor} from "@lexical/headless";
 export {TufteHeadingNode,$createTufteHeadingNode,type SerializedTufteHeadingNode} from './TufteHeadingNode.js';
-export {$createNoteNode, NoteNode, type NoteKind, type SerializedNoteNode} from './NoteNode.js';
+export {NoteNode,type SerializedNoteNode} from './NoteNode.js';
 export {SidenoteNode,$createSidenoteNode} from './SidenoteNode.js';
 export {MarginnoteNode,$createMarginnoteNode} from './MarginnoteNode.js';
 export {$createInlineImageNode, InlineImageNode} from './InlineImageNode.js';
