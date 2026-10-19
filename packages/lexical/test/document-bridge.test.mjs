@@ -384,8 +384,7 @@ test('P2 replacing a concrete sidenote with a marginnote preserves identity and 
   note.append($createTextNode('변경해도 보존'));
   $getRoot().append($createSectionNode().append($createParagraphNode().append(note)));
   const replacement=$createMarginnoteNode(note.getNoteId());
-  replacement.append(...note.getChildren());
-  note.replace(replacement);
+  note.replace(replacement,true);
   assert.equal(typeof replacement.setKind,'undefined','a note type cannot be mutated through a kind field');
  },{discrete:true});
  const note=e.getEditorState().toJSON().root.children[0].children[0].children[0];
