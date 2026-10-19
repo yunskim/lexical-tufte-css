@@ -25,7 +25,7 @@
     "test:upstream-dom": "pnpm build && node tests/upstream-dom-browser.mjs",
     "test:upstream-full-page": "node tests/upstream-full-page-baseline-browser.mjs",
     "test:upstream-geometry": "pnpm build && node tests/upstream-geometry-browser.mjs",
-    "test:upstream-same-content": "pnpm build && node tests/upstream-same-content-opening-browser.mjs"
+    "test:upstream-same-content": "pnpm build && node tests/upstream-same-content-opening-browser.mjs && node tests/upstream-same-content-getting-started-browser.mjs"
   },
   "devDependencies": {
     "playwright": "1.51.1"
