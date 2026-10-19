@@ -19,7 +19,7 @@ import {EmbedNode} from './EmbedNode.js';
 /** Full document-schema registry. Registration does not imply renderer/UI support. */
 export const TUFTE_NODE_CLASSES=Object.freeze([
  SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,
- HeadingNode,QuoteNode,ListNode,ListItemNode,LinkNode,TableNode,TableRowNode,TableCellNode,
+ TufteHeadingNode,QuoteNode,ListNode,ListItemNode,LinkNode,TableNode,TableRowNode,TableCellNode,
  HorizontalRuleNode,DefinitionListNode,DefinitionTermNode,DefinitionDescriptionNode,
  EpigraphNode,AttributionNode,CiteNode,SectionFooterNode,FullwidthNode,TufteCodeNode,ImageQuiltNode,EmbedNode,TufteCodeHighlightNode,
 ]);
