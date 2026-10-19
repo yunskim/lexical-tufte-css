@@ -16,6 +16,22 @@ figure.children.splice(1,0,{
  children:[{detail:0,format:0,mode:'normal',style:'',text:'Figure margin',type:'text',version:1}],
  direction:null,format:'',indent:0,type:'tufte-marginnote',version:1,noteId:'figure-margin-export'
 });
+// The logical model keeps newthought and sidenote as siblings. Both HTML
+// exporters must reproduce the upstream split-parent control markup.
+const existingParagraph=section.children.find(node=>node.type==='paragraph');
+assert.ok(existingParagraph);
+const text=value=>({type:'text',version:1,text:value,format:0,detail:0,mode:'normal',style:''});
+const inline=(type,children,extra={})=>({
+ type,version:1,children,direction:null,format:'',indent:0,...extra
+});
+section.children.push({
+ ...structuredClone(existingParagraph),
+ children:[
+  inline('tufte-span',[text('In his later books')],{kind:'newthought'}),
+  inline('tufte-sidenote',[text('Reference')],{noteId:'split-parent-export'}),
+  text(' this is a separate paragraph.')
+ ]
+});
 const published=renderArticle(source);
 assert.equal(published.ok,true,JSON.stringify(published.diagnostics));
 
@@ -57,7 +73,11 @@ try{
    const dom=new DOMParser().parseFromString(markup,'text/html');
    return [...dom.querySelectorAll('span.sidenote,span.marginnote')].map(payload=>{
     const input=payload.previousElementSibling;
-    const label=input?.previousElementSibling;
+    const preceding=input?.previousElementSibling;
+    const label=preceding?.matches('span.newthought')
+     ?preceding.lastElementChild
+     :preceding;
+    const splitParent=label?.closest('span.newthought')===preceding;
     return {
      id:input?.id,
      kind:payload.className,
@@ -65,8 +85,11 @@ try{
      glyph:label?.textContent,
      checkbox:input?.tagName==='INPUT'&&input.type==='checkbox',
      paired:!!input?.id&&label?.htmlFor===input.id,
-     adjacent:label?.nextElementSibling===input&&input?.nextElementSibling===payload,
-     sharedParent:label?.parentElement===input?.parentElement&&input?.parentElement===payload.parentElement,
+     adjacent:input?.nextElementSibling===payload&&
+      (splitParent?preceding?.nextElementSibling===input:label?.nextElementSibling===input),
+     sharedParent:payload.parentElement===input?.parentElement&&
+      (splitParent?preceding?.parentElement===input?.parentElement:label?.parentElement===input?.parentElement),
+     splitParent,
      inFigure:!!payload.closest('figure'),
      text:payload.textContent,
      strong:!!payload.querySelector('strong'),
@@ -78,14 +101,15 @@ try{
   return {lexical:notes(lexicalHtml),publication:notes(publicationHtml)};
  },{lexicalHtml:lexical.html,publicationHtml:published.html});
 
- const expectedKinds=['sidenote','marginnote','marginnote'];
- const expectedIds=['server-note','server-margin','figure-margin-export'];
+ const expectedKinds=['sidenote','marginnote','marginnote','sidenote'];
+ const expectedIds=['server-note','server-margin','figure-margin-export','split-parent-export'];
  const semantic=notes=>notes.map(({id,...rest})=>rest);
  for(const [route,notes] of Object.entries(compared)){
-  assert.equal(notes.length,3,route+': all three notes should be exported');
+  assert.equal(notes.length,4,route+': all four notes should be exported');
   assert.deepEqual(notes.map(note=>note.kind),expectedKinds,route+': note types and document order');
-  assert.deepEqual(notes.map(note=>note.inFigure),[false,false,true],route+': note location');
-  assert.equal(new Set(notes.map(note=>note.id)).size,3,route+': unique toggle IDs');
+  assert.deepEqual(notes.map(note=>note.inFigure),[false,false,true,false],route+': note location');
+  assert.deepEqual(notes.map(note=>note.splitParent),[false,false,false,true],route+': upstream split-parent note markup');
+  assert.equal(new Set(notes.map(note=>note.id)).size,4,route+': unique toggle IDs');
   for(let i=0;i<notes.length;i++){
    assert.ok(notes[i].id?.endsWith(expectedIds[i]),route+': stable note identity '+expectedIds[i]);
    assert.equal(notes[i].checkbox,true);
@@ -100,8 +124,9 @@ try{
  assert.deepEqual(compared.lexical[0].links,[{href:'https://lexical.dev',text:'문서'}]);
  assert.deepEqual(compared.lexical[0].images,[{src:'/fixture.svg',alt:'주석 그림'}]);
  assert.deepEqual(compared.lexical[2].text,'Figure margin');
+ assert.deepEqual(compared.lexical[3].text,'Reference');
  assert.deepEqual(errors,[]);
- console.log('Note HTML parity: real Lexical export and renderer agree for rich sidenote, marginnote and figure marginnote (IDs normalized only).');
+ console.log('Note HTML parity: real Lexical export and publisher agree for rich sidenote, marginnote, figure note and upstream newthought split-parent (IDs normalized only).');
 }finally{
  await browser.close();
  server?.kill();
