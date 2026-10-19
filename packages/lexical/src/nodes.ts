@@ -1,4 +1,5 @@
-import {HeadingNode,QuoteNode} from '@lexical/rich-text';
+import {QuoteNode} from '@lexical/rich-text';
+import {TufteHeadingNode} from './TufteHeadingNode.js';
 import {ListNode,ListItemNode} from '@lexical/list';
 import {LinkNode} from '@lexical/link';
 import {TableNode,TableRowNode,TableCellNode} from '@lexical/table';
