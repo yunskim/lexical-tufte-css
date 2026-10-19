@@ -82,12 +82,18 @@ export function registerFigureCommands(editor:LexicalEditor,onDiagnostic?:(diagn
    if(!figure)return reject('INVALID_FIGURE_SELECTION','그림을 선택한 후 여백 주석을 삽입하세요.');
    const ids=$collectNoteIds();
    if(ids.has(payload.noteId))return reject('DUPLICATE_NOTE_ID','이미 사용 중인 여백 주석 ID입니다.');
-   $addUpdateTag(HISTORY_PUSH_TAG);
-   const note=$createMarginnoteNode(payload.noteId).append($createTextNode(payload.text));
    const image=figure.getChildren().find(child=>child instanceof InlineImageNode||child.getType()==='tufte-imagequilt');
    if(!image)return reject('INVALID_FIGURE','그림에 이미지가 없습니다.');
+   $addUpdateTag(HISTORY_PUSH_TAG);
+   const note=$createMarginnoteNode(payload.noteId).append($createTextNode(payload.text));
    if(payload.placement==='before-image')image.insertBefore(note);
-   else image.insertAfter(note);
+   else {
+    // Repeated after-image inserts retain their insertion order rather than
+    // reversing each other immediately after the image.
+    let anchor:LexicalNode=image;
+    while(anchor.getNextSibling() instanceof MarginnoteNode)anchor=anchor.getNextSibling()!;
+    anchor.insertAfter(note);
+   }
    note.selectEnd();return true;
   },COMMAND_PRIORITY_EDITOR),
   editor.registerCommand(REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,noteId=>{
