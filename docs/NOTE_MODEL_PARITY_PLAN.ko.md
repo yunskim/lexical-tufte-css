@@ -51,3 +51,39 @@ Status: design decision; implementation incomplete. Do not treat the current bra
 ## Current known integration risks
 
 The shared `NoteNode` is now abstract and has no `kind` field. Concrete classes own the serialized type. Existing fixtures and call sites may still refer to the removed legacy constructor or serialized node. Do not assume build or round-trip success until the full reference audit and batched tests are complete.
+
+## CSS-first logical model review (2026-10-19)
+
+### Principle: CSS contract vs semantic ownership
+
+Tufte CSS positions a note through the `sidenote`/`marginnote` class and a margin-toggle control. It does **not** require an image and its annotation to have a particular parent-child relationship. The renderer must emit an adjacent `input.margin-toggle + span.marginnote` pair for responsive behavior; this is an **output DOM contract**, not a requirement to store three nodes in the document. The preceding label references the input ID. Float position depends on the emitted order, so order is preserved rather than inferred from a presumed association.
+
+A `marginnote` containing an image means the **image is in the margin**. A `marginnote` next to an image inside a `figure` means the **note is in the margin and the image remains in the figure flow**. These are distinct compositions, not separate note types.
+
+### Proposed minimal hierarchy
+
+- `section` contains blocks, including paragraphs and figures.
+- A paragraph's phrasing sequence may contain `sidenote` or `marginnote` at any valid text position.
+- A `figure` is a semantic group for image, optional caption and zero or more margin annotations. Their source order is meaningful, but **neither first-image nor first-note is mandated by CSS**. The figure invariant is one image, at most one caption, with the caption after the image; revisit the last rule if upstream examples demand otherwise.
+- Notes contain rich inline phrasing, including inline images, but no nested notes. Image dimensions and asset identity belong to the image.
+- The publisher emits label/input/span for each note without storing those HTML controls as logical nodes. For `newthought` adjacency it may move only the rendered label into the preceding span to reproduce the reference DOM.
+
+### Current code audit
+
+| Area | Current implementation | Assessment / follow-up |
+| --- | --- | --- |
+| `document/schema.ts` | Separate note types; figure allows image, caption, marginnote | Correct compositional basis; figure is still a domain-level grouping |
+| `document/validate.ts` | Exactly one image, at most one caption after image, margin notes in any order | No CSS-motivated image-first restriction; keep semantic image count |
+| `render/index.ts` | Figure renders children in source order; note emits label/input/span | Good; add parity tests for both figure child orders and image-inside-note |
+| `render/profile.ts` | Figure margin notes no longer blocked | Good; confirm with batched tests |
+| `lexical/figureCommands.ts` | Figure note insert always prepends before first child | **Overconstrained by reference sample**, not CSS. Change to position-aware insertion with a simple default, preserving user-controlled order |
+| `render/index.ts` newthought special case | Pairing only when newthought and sidenote are adjacent in a paragraph | Targeted DOM parity rule; retain and test boundary cases |
+
+### Follow-up sequence (no test execution until batch)
+
+1. Remove hard-coded note-first behavior from the figure insertion command; allow a caller-selected placement without requiring extra structural node types.
+2. Add fixture coverage for figure `note,image,caption` and `image,note,caption`, plus `paragraph > marginnote > image,text`.
+3. Compare the emitted note control adjacency and responsive CSS behavior against pinned upstream; keep logical ordering intact.
+4. Review schema/renderer/editor parity again before declaring the note phase ready for user-run batch tests.
+
+This review does not authorize the deferred agent API implementation.
