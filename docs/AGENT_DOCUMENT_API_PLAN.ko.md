@@ -1,6 +1,6 @@
 # AI agent document API and revision history plan
 
-Status: planned, not implemented. Begin after the current note-model parity phase and its batched tests. The GUI remains primary; agents use the same validated document model.
+Status: DESIGN ONLY / DEFERRED. Do not implement agent-specific features until the core editor, document format, Tufte publication parity and existing features are complete and the plan has passed repeated design reviews. The GUI remains primary; agents will eventually use the same validated document model.
 
 ## Goals
 - Read document structure, text, annotations, assets and revision metadata without relying on transient Lexical NodeKey.
@@ -27,6 +27,34 @@ Status: planned, not implemented. Begin after the current note-model parity phas
 - `uploadAsset({bytes,mimeType,filename,alt,source})`, `insertAsset({assetId,anchor,layout})`, `replaceAsset({nodeId,assetId})`
 - `listRevisions({cursor?})`, `getRevision({id})`, `diffRevisions({from,to})`, `restoreRevision({id,expectedRevision})`
 These are proposed contracts, not existing APIs.
+
+## Delivery gate and staged design reviews
+
+- **Now:** planning and repeated review only. No agent API, revision store, suggestion UI, new dependencies, or migrations in the current implementation phase.
+- **Review 1 — model boundaries:** compare proposed operations with existing schema, Lexical state, validation, renderer and asset ownership; identify coupling and missing invariants.
+- **Review 2 — adversarial scenarios:** examine concurrent edits, stale anchors, malformed documents, partial asset failures, unsafe SVG, impersonation, undo/redo and lost updates.
+- **Review 3 — usability and interoperability:** evaluate GUI-first workflows, provider-neutral agent access, permission boundaries, diff readability and portability of stored documents.
+- **Review 4 — implementation readiness:** resolve open decisions, define contracts and acceptance tests, assess migrations and costs, then explicitly request approval before implementation.
+- Gate: core product functionality complete, its batch tests passing, design reviews recorded and user explicitly authorizes implementation. Until then, checklist items below remain deferred.
+
+## Low-cost extensibility rules for current core work
+
+- Keep document parsing/validation/rendering independent of GUI commands, network transports and agent SDKs.
+- Do not expose transient Lexical NodeKey as a persistent external identifier or bake it into stored cross-document references.
+- Centralize mutation invariants and diagnostics where practical; avoid a second undocumented document format for future agents.
+- Maintain asset references as logical IDs rather than editor DOM URLs, and keep raw asset ingestion separate from HTML publication.
+- Avoid hardcoding a single actor, storage backend, review provider or transport into core types. Do not introduce speculative abstraction layers before a real second implementation exists.
+- Preserve deterministic serialization and rendering to support future revision diffs and auditability.
+- Record any current design decision that would make later stable IDs, optimistic concurrency or provenance prohibitively expensive; prefer a small seam now over a premature subsystem.
+
+## Open design questions (do not prematurely settle)
+
+- Whether revisions live in the document envelope, an append-only sidecar, or a separate host store.
+- Whether stable IDs are assigned to blocks only or also inline spans and text ranges, and how anchors survive edits.
+- How agent proposals interact with GUI undo history, approval, and multi-step transactions.
+- Whether SVG is preserved as sanitized SVG, rasterized for display, or both, and what the threat model permits.
+- How identity and timestamp provenance are verified across offline, local-first and remote workflows.
+- Whether HTTP, MCP, or another transport is justified once the in-process contracts stabilize.
 
 ## Implementation phases
 - [ ] A0. Inventory existing document schema, asset storage, editor commands, export/import, and validation boundaries; document gaps.
