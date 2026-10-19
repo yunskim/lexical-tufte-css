@@ -1,6 +1,6 @@
 # Sidenote / Marginnote: core model and parity plan
 
-Status: design decision; implementation incomplete. Do not treat the current branch as build-verified.
+Status: implementation and regression-fixture migration in progress. Work verification on 2026-10-19 confirmed build and typecheck, but the full suite did not pass; subsequent fixture edits are not yet rerun.
 
 ## Decisions
 
@@ -40,13 +40,21 @@ Status: design decision; implementation incomplete. Do not treat the current bra
 
 ## Implementation sequence
 
-- [x] Resolve base-class and JSON type compatibility; register and export both concrete node classes (pending typecheck).
-- [x] Extend schema, document types, validation and render profile to the two types (pending tests).
+- [x] Resolve base-class and JSON type compatibility; register and export both concrete node classes (build/typecheck verified in Work baseline).
+- [x] Extend schema, document types, validation and render profile to the two types (build/typecheck verified; regression suite incomplete).
 - [x] Remove legacy `tufte-note` from schema, renderer and Lexical registry; no migration or backward compatibility.
-- [ ] Audit all old constructors and serialized fixtures; note operations and figure commands now use concrete types, composition/clipboard use shared base.
+- [ ] Audit all old constructors and serialized fixtures. Lexical test imports, shared all-node generator and its golden were migrated after the 2026-10-19 run; remaining repository fixtures and tests still require review.
 - [ ] Generalize inline-sequence rendering for both types, including newthought label placement.
 - [ ] Rewrite DOM parity and editor regression tests for each row of the matrix.
 - [ ] Run build/typecheck and batched tests when requested; no CI unless requested.
+
+## Work verification and follow-up (2026-10-19)
+
+- Work baseline commit `c0a29b0` built and typechecked but reported 65 passing / 85 failing JS runner items, 16 passing / 5 failing browser files. See `docs/VERIFICATION_FULL_BASELINE_2026-10-19.ko.md`.
+- Following that report, converted `packages/lexical/test/golden/lexical-0.52.0-all-nodes.json` (all four note IDs preserved), its generator and assertion suite, plus the ten Lexical test files listed as import-blocked. The shared fixture now uses the registered Tufte heading factory as well.
+- The former mutable `note.setKind(...)` expectation is replaced by an explicit concrete-node replacement contract; `kind` remains valid on `tufte-span`, not on note nodes.
+- Do **not** add legacy `tufte-note` wire-format compatibility or migration: that is a deliberate user decision. The separate storage-envelope v1→v2 migration tests remain applicable to otherwise valid documents.
+- No post-migration build/tests were run in this editing pass. Import resolution, golden runtime fidelity and the remaining failures must be confirmed at the next Work test batch.
 
 ## Current known integration risks
 
