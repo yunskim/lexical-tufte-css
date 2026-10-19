@@ -19,3 +19,14 @@
 5. 관련 로컬 테스트 실행 후 오류·대책 문서와 검증 보고서를 갱신한다. CI는 실행하지 않는다.
 
 현재 PR의 full-page baseline/geometry 및 opening/Getting Started 비교는 이 계약의 완료를 뜻하지 않는다. 실제 브라우저 실행 검증은 별도로 필요하다.
+
+
+## 테스트 오라클 강화 (사용자 지시, 2026-10-19)
+
+**공식 Tufte CSS `index.html`의 DOM 자체가 오라클이다.** 렌더링이 비슷하다는 이유로 다른 DOM을 허용하지 않는다. 테스트는 동일 콘텐츠를 비교하며 태그, 중첩, 형제 순서, 클래스, 의미 있는 속성, 텍스트 및 note의 label/input/span 위치를 보존해야 한다.
+
+- `data-tufte-note` wrapper, `span.tufte-pre-wrap` 등 발행 전용 추가 요소도 DOM parity 실패로 취급한다.
+- note ID 네임스페이스나 안전성에 필요한 차이는 **명시적인 별도 예외 계약**과 테스트로만 허용한다. 원본 구조의 임의 정규화는 금지한다.
+- 기존 opening/Getting Started 의미 비교와 geometry 검증은 부분적인 회귀 테스트일 뿐, DOM 동일성 완료 증거가 아니다.
+- 편집기 내부 Lexical DOM은 오라클 대상이 아니며, **발행 결과 DOM**이 대상이다.
+- renderer 변경 시 기존 노드의 편집·JSON 왕복·복사/붙여넣기·접근성 계약을 함께 재검증한다.
