@@ -4,7 +4,7 @@ const inline=phrasing.filter(t=>t!=='tufte-note');
 const blocks=['paragraph','heading','list','tufte-definition-list','horizontalrule','quote','tufte-epigraph','tufte-figure','tufte-table-layout','tufte-code','tufte-embed','tufte-fullwidth','tufte-section-footer'];
 export const NODE_SCHEMA:Readonly<Record<string,{readonly fields:readonly string[];readonly children?:readonly string[]}>>=Object.freeze({
  root:{fields:[],children:['tufte-section']},'tufte-section':{fields:[],children:blocks},
- paragraph:{fields:[],children:phrasing},heading:{fields:['tag'],children:inline},
+ paragraph:{fields:[],children:phrasing},heading:{fields:['tag','id'],children:inline},
  list:{fields:['listType','tag','start'],children:['listitem']},listitem:{fields:['value','checked'],children:[...phrasing,'list']},
  'tufte-definition-list':{fields:[],children:['tufte-term','tufte-definition']},
  'tufte-term':{fields:[],children:inline},'tufte-definition':{fields:[],children:['paragraph','list']},
