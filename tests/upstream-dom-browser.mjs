@@ -67,12 +67,14 @@ try{
   }
  }
  assert.ok(original.notes.some(n=>n.labelInsideNewthought),'upstream newthought/note combination changed');
- assert.ok(published.notes.every(n=>!n.labelInsideNewthought),'known newthought parity gap needs review');
+ // The server fixture exercises ordinary notes. The separate same-content
+ // newthought/sidenote browser test checks split-parent label placement.
+ assert.ok(published.notes.every(n=>!n.labelInsideNewthought),'server fixture contains only ordinary note placements');
  assert.ok(published.notes.every(n=>!n.wrapper),'publication must not add note wrapper absent from upstream');
  assert.ok(published.notes.every(n=>n.labelIsPreviousSibling),'ordinary note label/input must be siblings as in upstream');
  console.log('P2.2.e DOM comparison:',JSON.stringify({
   upstream:{sections:original.sections,notes:original.notes.length,epigraphs:original.epigraphs,fullwidthFigures:original.fullwidthFigures},
   published:{sections:published.sections,notes:published.notes.length,epigraphs:published.epigraphs,fullwidthFigures:published.fullwidthFigures},
-  knownGap:'newthought > sidenote label'
+  newthoughtComparison:'covered by upstream-newthought-sidenote-browser.mjs'
  }));
 }finally{await browser.close();}
