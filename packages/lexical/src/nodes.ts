@@ -6,7 +6,6 @@ import {TableNode,TableRowNode,TableCellNode} from '@lexical/table';
 import {TufteCodeHighlightNode} from './CodeHighlightNode.js';
 import {HorizontalRuleNode} from '@lexical/react/LexicalHorizontalRuleNode';
 import {SectionNode,FigureNode,CaptionNode,TableLayoutNode} from './LayoutNodes.js';
-import {NoteNode} from './NoteNode.js';
 import {SidenoteNode} from './SidenoteNode.js';
 import {MarginnoteNode} from './MarginnoteNode.js';
 import {InlineImageNode} from './InlineImageNode.js';
@@ -20,7 +19,7 @@ import {ImageQuiltNode} from './ImageQuiltNode.js';
 import {EmbedNode} from './EmbedNode.js';
 /** Full document-schema registry. Registration does not imply renderer/UI support. */
 export const TUFTE_NODE_CLASSES=Object.freeze([
- SectionNode,NoteNode,SidenoteNode,MarginnoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,
+ SectionNode,SidenoteNode,MarginnoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,
  TufteHeadingNode,QuoteNode,ListNode,ListItemNode,LinkNode,TableNode,TableRowNode,TableCellNode,
  HorizontalRuleNode,DefinitionListNode,DefinitionTermNode,DefinitionDescriptionNode,
  EpigraphNode,AttributionNode,CiteNode,SectionFooterNode,FullwidthNode,TufteCodeNode,ImageQuiltNode,EmbedNode,TufteCodeHighlightNode,
