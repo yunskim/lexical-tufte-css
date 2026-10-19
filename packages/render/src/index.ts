@@ -73,11 +73,11 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
    case 'tufte-inline-image':return [element('img',{src:String(n.src),alt:String(n.alt)},[],true)];
    case 'tufte-note':{
     const id=`tufte-${prefix.length}-${prefix}-${n.noteId}`,kind=String(n.kind);
-    return [element('span',{'data-tufte-note':String(n.noteId)},[
+    return [
      element('label',{for:id,class:`margin-toggle${kind==='sidenote'?' sidenote-number':''}`},kind==='marginnote'?['⊕']:[]),
      element('input',{id,type:'checkbox',class:'margin-toggle'},[],true),
      element('span',withClass(n,kind),inner()),
-    ])];
+    ];
    }
    case 'tufte-embed':{
     const wrapper=n.wrapper==='figure'?'figure':'div';
