@@ -62,4 +62,21 @@ test('upstream rhinoceros example: image and rich citation remain inside paragra
  assert.match(result.html,/<label for="([^"]+)" class="margin-toggle">⊕<\/label><input id="\1" type="checkbox" class="margin-toggle"><span class="marginnote"><img src="https:\/\/example.com\/rhino.png" alt="Image of a Rhinoceros">F\.J\. Cole, /);
  assert.match(result.html,/<\/span> But tight integration of graphics with text is central\./);
  assert.ok(result.html.indexOf('<img ')<result.html.indexOf('F.J. Cole'));
+ assert.match(result.html,/<a href="https:\/\/example.com\/book">Visual Explanations<\/a>/);
+ assert.ok(result.html.indexOf('<a href=')<result.html.indexOf('</span> But tight integration'));
+});
+
+test('note containing an image cannot contain another margin note',()=>{
+ const nested=element('tufte-marginnote',[text('Nested')],{noteId:'nested-note'});
+ const outer=element('tufte-marginnote',[
+  element('tufte-inline-image',[],{src:'https://example.com/rhino.png',alt:'Rhinoceros'}),
+  nested
+ ],{noteId:'outer-note'});
+ const document={
+  schemaVersion:1,id:'nested-margin-fixture',locale:'en-US',title:'Nested note',assets:[],
+  lexicalState:{root:{...element('root',[element('tufte-section',[element('paragraph',[outer])])]),textFormat:0,textStyle:''}}
+ };
+ const result=renderArticle(document);
+ assert.equal(result.ok,false);
+ assert.ok(result.diagnostics.some(d=>d.code==='INVALID_CHILD'||d.code==='NESTED_NOTE'),JSON.stringify(result.diagnostics));
 });
