@@ -21,7 +21,7 @@ try{
    throw Error('unsupported inline element: '+node.tagName);
   };
   return [...section.children].map(e=>{
-   if(e.tagName==='H2')return {type:'heading',text:e.textContent};
+   if(e.tagName==='H2')return {type:'heading',text:e.textContent,id:e.id};
    if(e.tagName==='P')return {type:'paragraph',parts:[...e.childNodes].map(inline)};
    if(e.tagName==='PRE'){
     if(e.children.length!==1||e.firstElementChild.tagName!=='CODE')throw Error('unsupported pre structure');
@@ -34,7 +34,7 @@ try{
  const text=(value,format=0)=>({type:'text',version:1,detail:0,format,mode:'normal',style:'',text:value});
  const base=(type,children)=>({type,version:1,children,direction:null,format:'',indent:0});
  const nodes=source.map(item=>{
-  if(item.type==='heading')return {...base('heading',[text(item.text)]),tag:'h2'};
+  if(item.type==='heading')return {...base('heading',[text(item.text)]),tag:'h2',id:item.id};
   if(item.type==='pre')return {...base('tufte-code',[text(item.text)]),width:'body',language:null};
   return base('paragraph',item.parts.map(part=>{
    if(part.type==='text')return text(part.value);
@@ -50,7 +50,7 @@ try{
   const doc=new DOMParser().parseFromString(html,'text/html');
   const section=doc.querySelector('article > section');
   return [...section.children].map(e=>{
-   if(e.tagName==='H2')return {type:'heading',text:e.textContent};
+   if(e.tagName==='H2')return {type:'heading',text:e.textContent,id:e.id};
    if(e.tagName==='PRE')return {type:'pre',text:e.querySelector('code')?.textContent};
    if(e.tagName==='P'){
     // Renderer uses tufte-pre-wrap spans around text and formatted code.
@@ -80,8 +80,6 @@ try{
   };
   const source=parse(upstream).querySelectorAll('article > section')[1];
   const actual=parse(published).querySelector('article > section');
-  // Upstream headings have authoring IDs, which the current heading schema cannot encode.
-  // No normalization is permitted: this intentionally fails until heading IDs are supported.
   return {upstream:canonical(source),published:canonical(actual)};
  },{upstream,published:result.html});
  assert.deepEqual(strictDOM.published,strictDOM.upstream,'Getting Started exact upstream DOM, including heading IDs');
