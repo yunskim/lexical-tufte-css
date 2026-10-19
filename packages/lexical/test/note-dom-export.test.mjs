@@ -6,7 +6,7 @@ import {SidenoteNode,MarginnoteNode} from '../dist/index.js';
 // Minimal DOM fixture for the export contract; no optional dependency or silent skip.
 class FakeNode {
  constructor(nodeType,tagName=''){this.nodeType=nodeType;this.tagName=tagName;this.childNodes=[];this.className='';this.textContent='';this.id='';this.htmlFor='';this.parentNode=null;}
- append(...nodes){for(const node of nodes){node.parentNode=this;this.childNodes.push(node);}}
+ append(...nodes){for(const node of nodes){if(node.nodeType===11){for(const child of [...node.childNodes])this.append(node.removeChild(child));continue;}if(node.parentNode)node.parentNode.removeChild(node);node.parentNode=this;this.childNodes.push(node);}}
  appendChild(node){this.append(node);return node;}
  get firstChild(){return this.childNodes[0]??null;}
  removeChild(node){const i=this.childNodes.indexOf(node);if(i<0)throw Error('Missing child');this.childNodes.splice(i,1);node.parentNode=null;return node;}
