@@ -15,7 +15,7 @@
     "test": "pnpm -r --if-present test",
     "test:recovery-python": "node tests/recovery-python-http.mjs",
     "test:contextual-ui": "pnpm build && node tests/contextual-ui-browser.mjs",
-    "test:browser": "pnpm build && node tests/note-browser.mjs && node tests/note-editing-browser.mjs && node tests/note-dom-browser.mjs && node tests/layout-browser.mjs && node tests/server-browser.mjs && node tests/publication-browser.mjs && node tests/all-nodes-browser.mjs && node tests/text-format-browser.mjs && node tests/font-proof-browser.mjs && node tests/section-commands-browser.mjs && node tests/recovery-browser.mjs && node tests/contextual-ui-browser.mjs && node tests/inline-span-browser.mjs && node tests/list-kind-browser.mjs && node tests/definition-pairs-browser.mjs",
+    "test:browser": "pnpm build && node tests/note-browser.mjs && node tests/note-editing-browser.mjs && node tests/note-dom-browser.mjs && node tests/note-export-parity-browser.mjs && node tests/layout-browser.mjs && node tests/server-browser.mjs && node tests/publication-browser.mjs && node tests/all-nodes-browser.mjs && node tests/text-format-browser.mjs && node tests/font-proof-browser.mjs && node tests/section-commands-browser.mjs && node tests/recovery-browser.mjs && node tests/contextual-ui-browser.mjs && node tests/inline-span-browser.mjs && node tests/list-kind-browser.mjs && node tests/definition-pairs-browser.mjs",
     "dev:editor": "pnpm --filter @lexical-tufte/lexical build && pnpm --filter @lexical-tufte/editor-prototype dev",
     "font:check": "node scripts/check-font-proof.mjs",
     "package:check": "pnpm build && node scripts/pack-and-check.mjs",
@@ -26,7 +26,8 @@
     "test:upstream-full-page": "node tests/upstream-full-page-baseline-browser.mjs",
     "test:upstream-geometry": "pnpm build && node tests/upstream-geometry-browser.mjs",
     "test:upstream-same-content": "pnpm build && node tests/upstream-same-content-opening-browser.mjs && node tests/upstream-same-content-getting-started-browser.mjs",
-    "test:upstream-newthought": "pnpm --filter @lexical-tufte/render build && node tests/upstream-newthought-sidenote-browser.mjs"
+    "test:upstream-newthought": "pnpm --filter @lexical-tufte/render build && node tests/upstream-newthought-sidenote-browser.mjs",
+    "test:note-export-parity": "pnpm build && node tests/note-export-parity-browser.mjs"
   },
   "devDependencies": {
     "playwright": "1.51.1"
