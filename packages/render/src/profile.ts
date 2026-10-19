@@ -1,6 +1,6 @@
 import type {Diagnostic,JsonNode,TufteDocument} from '@lexical-tufte/document';
 export const RENDER_PROFILE='p1-v1' as const;
-const supported=new Set(['root','tufte-section','paragraph','heading','horizontalrule','list','listitem','tufte-definition-list','tufte-term','tufte-definition','quote','tufte-epigraph','tufte-attribution','tufte-cite','tufte-section-footer','tufte-fullwidth','tufte-code','tufte-embed','tab','code-highlight','tufte-span','text','linebreak','link','tufte-note','tufte-inline-image','tufte-imagequilt','tufte-figure','tufte-caption','tufte-table-layout','table','tablerow','tablecell']);
+const supported=new Set(['root','tufte-section','paragraph','heading','horizontalrule','list','listitem','tufte-definition-list','tufte-term','tufte-definition','quote','tufte-epigraph','tufte-attribution','tufte-cite','tufte-section-footer','tufte-fullwidth','tufte-code','tufte-embed','tab','code-highlight','tufte-span','text','linebreak','link','tufte-sidenote','tufte-marginnote','tufte-inline-image','tufte-imagequilt','tufte-figure','tufte-caption','tufte-table-layout','table','tablerow','tablecell']);
 /** Called only after shared structural validation succeeds. */
 export function validateRenderProfile(doc:TufteDocument):Diagnostic[]{
  const diagnostics:Diagnostic[]=[];
@@ -12,7 +12,7 @@ export function validateRenderProfile(doc:TufteDocument):Diagnostic[]{
   if(n.type==='code-highlight')add('highlightType','Code syntax highlighting is not yet published');
   if(n.type==='tufte-table-layout'&&n.layout!=='scroll'&&(n.format||n.direction))add('','Unwrapped layout attributes must be defaults');
   if(n.type==='tufte-inline-image')for(const key of ['assetId','width','height'] as const)if(n[key]!==undefined)add(key,'Managed/sized image output is deferred');
-  if(n.type==='tufte-figure'&&(n.children.length>2||n.children.some(c=>c.type==='tufte-note')))add('children','Figure margin note renderer is deferred');
+  if(n.type==='tufte-figure'&&(n.children.length>2||n.children.some(c=>c.type==='tufte-marginnote')))add('children','Figure margin note renderer is deferred');
   if(n.type==='table'){
    if(n.rowStriping)add('rowStriping','Table striping is deferred');
    if(n.frozenColumnCount)add('frozenColumnCount','Frozen columns are deferred');
