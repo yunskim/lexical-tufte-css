@@ -53,23 +53,7 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
    case 'tufte-attribution':return [element('footer',attrs(n),inner())];
    case 'tufte-cite':return [element('cite',attrs(n),inner())];
    case 'tufte-section-footer':return [element('footer',attrs(n),inner())];
-   case 'tufte-span':{
-    // The upstream sample places a sidenote label *inside* newthought, while
-    // its checkbox and sidenote payload remain siblings *outside* that span.
-    // A logical note remains a single Lexical node; only publication is split.
-    if(n.kind==='newthought'){
-     const inside:RenderChild[]=[],after:RenderChild[]=[];
-     for(const child of n.children){
-      if(child.type==='tufte-note'){
-       const pieces=render(child);
-       inside.push(pieces[0]!);
-       after.push(...pieces.slice(1));
-      }else inside.push(...render(child));
-     }
-     return [element('span',withClass(n,'newthought'),inside),...after];
-    }
-    return [element('span',withClass(n,n.kind),inner())];
-   }
+   case 'tufte-span':return [element('span',withClass(n,n.kind),inner())];
    case 'text':{
     let child:RenderChild=String(n.text);
     for(const [flag,tag] of [[16,'code'],[1,'strong'],[2,'em'],[4,'s'],[8,'u'],[32,'sub'],[64,'sup'],[128,'mark']] as const)
