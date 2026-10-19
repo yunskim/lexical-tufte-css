@@ -25,6 +25,7 @@ export function $splitNoteAtSelection(newId:string):NoteNode|null {
     const wrapper=$copyNode(parent);wrapper.append(...right);
     right=[wrapper,...parent.getNextSiblings()];parent=parent.getParentOrThrow();
   }
+  if(!(note instanceof SidenoteNode)&&!(note instanceof MarginnoteNode))return null;
   const second=(note instanceof SidenoteNode?$createSidenoteNode(newId):$createMarginnoteNode(newId)).append(...right);
   note.insertAfter(second);second.selectStart();return second;
 }
