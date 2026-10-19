@@ -6,7 +6,7 @@ const element=(type,children,fields={})=>({type,version:1,children,direction:nul
 const text=value=>({type:'text',version:1,text:value,format:0,detail:0,mode:'normal',style:''});
 const figure=(noteType,placement='before-image')=>element('tufte-figure',[
  ...(placement==='before-image'&&noteType?[element(noteType,[text('Additional context')],{noteId:'figure-context'})]:[]),
- element('tufte-inline-image',[],{src:'https://example.com/figure.png',alt:'Diagram'}),
+ {type:'tufte-inline-image',version:1,src:'https://example.com/figure.png',alt:'Diagram'},
  ...(placement==='after-image'&&noteType?[element(noteType,[text('Additional context')],{noteId:'figure-context'})]:[]),
  element('tufte-caption',[text('A figure caption')])
 ],{width:'body'});
@@ -46,7 +46,7 @@ test('figure marginnote before image also preserves adjacent checkbox and span',
 
 test('upstream rhinoceros example: image and rich citation remain inside paragraph marginnote',()=>{
  const note=element('tufte-marginnote',[
-  element('tufte-inline-image',[],{src:'https://example.com/rhino.png',alt:'Image of a Rhinoceros'}),
+  {type:'tufte-inline-image',version:1,src:'https://example.com/rhino.png',alt:'Image of a Rhinoceros'},
   text('F.J. Cole, '),
   element('link',[text('Visual Explanations')],{url:'https://example.com/book',rel:'',target:null,title:null}),
   text('.')
@@ -69,7 +69,7 @@ test('upstream rhinoceros example: image and rich citation remain inside paragra
 test('note containing an image cannot contain another margin note',()=>{
  const nested=element('tufte-marginnote',[text('Nested')],{noteId:'nested-note'});
  const outer=element('tufte-marginnote',[
-  element('tufte-inline-image',[],{src:'https://example.com/rhino.png',alt:'Rhinoceros'}),
+  {type:'tufte-inline-image',version:1,src:'https://example.com/rhino.png',alt:'Rhinoceros'},
   nested
  ],{noteId:'outer-note'});
  const document={

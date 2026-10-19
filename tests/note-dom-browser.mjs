@@ -26,12 +26,14 @@ try {
  const before=await page.getByRole('textbox',{name:'문서 JSON',exact:true}).inputValue();
  const html=await page.getByRole('textbox',{name:'발행 HTML',exact:true}).inputValue();
  assert.doesNotMatch(html,/tufte-note-editor|data-lexical-|contenteditable/i,'publication HTML excludes editing-only attributes');
+ assert.doesNotMatch(html,/data-tufte-note\b/,'publication does not restore the obsolete note wrapper');
  const structure=await page.evaluate(html=>{
   const doc=new DOMParser().parseFromString(html,'text/html');
-  const notes=[...doc.querySelectorAll('[data-tufte-note]')];
-  return notes.map(n=>{
-   const [label,input,payload]=n.children;
-   return {count:n.children.length,label:label?.tagName,input:input?.tagName,type:input?.type,
+  const notes=[...doc.querySelectorAll('input.margin-toggle')];
+  return notes.map(input=>{
+   const label=input.previousElementSibling,payload=input.nextElementSibling;
+   return {label:label?.tagName,input:input.tagName,type:input.type,id:input.id,
+    sharedParent:label?.parentElement===input.parentElement&&payload?.parentElement===input.parentElement,
     adjacent:label?.nextElementSibling===input&&input?.nextElementSibling===payload,
     reference:label?.htmlFor===input?.id,checked:input?.checked,kind:payload?.className,
     numbered:label?.classList.contains('sidenote-number'),symbol:label?.textContent,
@@ -39,7 +41,8 @@ try {
   });
  },html);
  assert.equal(structure.length,2);
- for(const n of structure){assert.equal(n.count,3);assert.equal(n.label,'LABEL');assert.equal(n.input,'INPUT');assert.equal(n.type,'checkbox');assert.equal(n.adjacent,true);assert.equal(n.reference,true);assert.equal(n.checked,false);assert.equal(n.blockChildren,0);}
+ assert.equal(new Set(structure.map(n=>n.id)).size,2,'note toggle IDs are unique');
+ for(const n of structure){assert.ok(n.id);assert.equal(n.sharedParent,true);assert.equal(n.label,'LABEL');assert.equal(n.input,'INPUT');assert.equal(n.type,'checkbox');assert.equal(n.adjacent,true);assert.equal(n.reference,true);assert.equal(n.checked,false);assert.equal(n.blockChildren,0);}
  assert.equal(structure[0].kind,'sidenote');assert.equal(structure[0].numbered,true);
  assert.equal(structure[1].kind,'marginnote');assert.equal(structure[1].numbered,false);assert.equal(structure[1].symbol,'⊕');
  await page.getByRole('button',{name:'JSON·HTML 확인',exact:true}).click();
@@ -49,8 +52,10 @@ try {
  await page.setContent(`<style>${css}</style><article><section>${html}</section></article>`);
  for(const kind of ['sidenote','marginnote']){
   const payload=page.locator(`span.${kind}`);assert.equal(await payload.evaluate(e=>getComputedStyle(e).display),'none');
-  const label=page.locator(`[data-tufte-note]:has(span.${kind}) > label`);await label.click();
+  const inputId=await payload.evaluate(e=>e.previousElementSibling.id);
+  const label=page.locator(`label[for="${inputId}"]`);await label.click();
   assert.equal(await payload.evaluate(e=>getComputedStyle(e).display),'block','upstream adjacent CSS toggle works');
+  await label.click();assert.equal(await payload.evaluate(e=>getComputedStyle(e).display),'none','toggle can close again');
  }
  assert.deepEqual(errors,[]);
  console.log('P1.3 DOM: both note kinds, editing/publication separation, label-input-payload adjacency, JSON immutability and upstream mobile CSS toggles passed.');

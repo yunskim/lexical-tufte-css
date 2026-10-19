@@ -1,3 +1,11 @@
+## 2026-10-19 full-page baseline 브랜치 검증 — 일부 실패 유지
+
+- 대상 `test/upstream-full-page-baseline-20261019`의 `851cedd` 이후 수정. CI 생략.
+- 노트 label/input/span 브라우저 검사, concrete note 타입/예제, 등록 heading factory와 ID 보존, 그림 inspector 및 신규 fixture 오류를 수정했다. 독립 회귀 7개와 공식 same-content/newthought 대조 통과.
+- frozen install/build/typecheck/lint/inventory/font 통과. JS 단위 runner 150항목 중 65 통과·85 실패·skip0(10개 import 실패 파일 내부 테스트는 차단), Python16개 및 실제 TS→Python HTTP 왕복 통과. browser21개 중 16 통과·5 실패. package 소비 실패 및 이후 선언 검사 차단.
+- 구형 노트 저장 문서/fixture/golden/API의 concrete model migration 누락(E109)은 미해결이다. 전체 통과·배포 가능·전체 원본 parity로 판정하지 않는다.
+- [최종 결과 및 남은 체크리스트](VERIFICATION_FULL_BASELINE_2026-10-19.ko.md), 오류 E103–E110/대책 M095–M100 반영.
+
 ## 2026-10-19 DOMParser 대조 포함 실행 완료
 
 - mainaa7cb0a 및 정규식 수정 tree에서 frozen/check318개(실패·skip0)/Python16개/browser16개/package4개/실제TS→Python HTTP 왕복 통과. CI 없음.

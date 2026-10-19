@@ -24,7 +24,7 @@ export class TufteHeadingNode extends HeadingNode{
   if(this.__id)dom.id=this.__id;
   return dom;
  }
- updateDOM(previous:TufteHeadingNode,dom:HTMLElement,config:EditorConfig):boolean{
+ updateDOM(previous:this,dom:HTMLElement,config:EditorConfig):boolean{
   if(previous.__id!==this.__id){
    if(this.__id)dom.id=this.__id;
    else dom.removeAttribute('id');

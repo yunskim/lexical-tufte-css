@@ -31,7 +31,7 @@ try{
   if(part.kind==='text')return text(part.text);
   return {...base('link',[text(part.text)]),url:part.href,rel:null,target:null,title:null};
  })));
- const document={schemaVersion:1,id:'upstream-opening-section',locale:'en-US',title:source.title,subtitle:source.subtitle,
+ const document={schemaVersion:1,id:'upstream-opening-section',locale:'en-US',title:source.title,subtitle:source.subtitle,assets:[],
   lexicalState:{root:{...base('root',[{...base('tufte-section',paragraphs)}]),textFormat:0,textStyle:''}}};
  const result=renderArticle(document);
  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
@@ -54,13 +54,14 @@ try{
    if(node.nodeType!==Node.ELEMENT_NODE)throw Error('unexpected DOM node '+node.nodeName);
    return {type:node.tagName.toLowerCase(),
     attrs:[...node.attributes].map(a=>[a.name,a.value]).sort((a,b)=>a[0].localeCompare(b[0])),
-    children:[...node.childNodes].map(canonical)};
+    // Ignore source indentation between section blocks; preserve all inline whitespace.
+    children:[...node.childNodes].filter(child=>!(node.tagName==='SECTION'&&child.nodeType===Node.TEXT_NODE&&(child.nodeValue??'').trim()==='')).map(canonical)};
   };
   return {
    upstream:canonical(parse(upstream).querySelector('article > section')),
    published:canonical(parse(published).querySelector('article > section'))
   };
  },{upstream,published:result.html});
- assert.deepEqual(strictDOM.published,strictDOM.upstream,'opening section must match upstream DOM exactly');
+ assert.deepEqual(strictDOM.published,strictDOM.upstream,'opening DOM must match except section indentation');
  console.log('Same-content upstream opening section: '+compare.actual.length+' paragraphs, text and links preserved.');
 }finally{await browser.close();}

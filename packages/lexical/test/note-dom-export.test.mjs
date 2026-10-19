@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
-import {SidenoteNode,MarginnoteNode} from '../dist/index.js';
+import {SidenoteNode,MarginnoteNode,createHeadlessEditor,TUFTE_NODES} from '../dist/index.js';
 
 
 // Minimal DOM fixture for the export contract; no optional dependency or silent skip.
@@ -28,6 +28,8 @@ for(const [name,Node] of [['sidenote',SidenoteNode],['marginnote',MarginnoteNode
   globalThis.document=makeDocument();
   globalThis.HTMLElement=FakeElement;
   try{
+   const editor=createHeadlessEditor({namespace:'note-dom-export',nodes:[...TUFTE_NODES],onError:error=>{throw error;}});
+   editor.update(()=>{
    const node=new Node('note-test');
    const exported=node.exportDOM(null);
    const content=exported.element;
@@ -47,6 +49,7 @@ for(const [name,Node] of [['sidenote',SidenoteNode],['marginnote',MarginnoteNode
    assert.equal(span.firstChild.textContent,'Rich note body');
    assert.equal(label.classList.contains('sidenote-number'),name==='sidenote');
    assert.equal(label.textContent,name==='marginnote'?'⊕':'');
+   },{discrete:true});
   }finally{
    globalThis.document=previousDocument;
    globalThis.HTMLElement=previousHTMLElement;

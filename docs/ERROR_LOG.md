@@ -1,5 +1,60 @@
 # 에러 기록
 
+## 2026-10-19 full-page baseline 브랜치 검증
+
+대상 `test/upstream-full-page-baseline-20261019`, 기준 `851ceddb7b363beb63a39784848441965960f2e6`. 아래 판정은 이 브랜치에 한정한다. 이전 main 통과 기록은 이번 브랜치의 통과 증거가 아니다. 상세 결과는 [실행 보고서](VERIFICATION_FULL_BASELINE_2026-10-19.ko.md)를 따른다. CI 생략.
+
+## E103 — 발행 노트 테스트가 제거된 wrapper를 조회
+
+- `tests/note-dom-browser.mjs`가 `[data-tufte-note]` 안의 자식을 기대해 현재 label/input/span 형제 구조를 검사하지 못했다.
+- checkbox에서 앞 label·뒤 payload를 찾아 부모/인접성/for=id/고유 ID/종류/phrasing을 검사한다. 발행 wrapper 부재, 편집 DOM 분리, JSON 불변성, 모바일 열기·닫기도 확인한다.
+- 상태: Chromium 실행 통과. M095.
+
+## E104 — 노트·제목 모델 변경의 타입 및 예제 반영 누락
+
+- renderer는 concrete note와 heading ID를 사용하지만 공개 JsonNode는 기존 `tufte-note`만 선언했다. 제목 override는 superclass의 polymorphic this와 불일치했고 예제는 삭제된 `$createNoteNode`/NoteKind를 import했다. 빌드/타입 검사가 순차 실패했다.
+- JsonNode를 현행 schema에 맞추고 updateDOM 인자를 `this`로 수정했다. 예제는 구체적인 노트 생성 함수를 사용한다.
+- 상태: 전체 build/typecheck 통과. 저장 포맷 이전 문제 E109는 별도 미해결. M096.
+
+## E105 — 신규 Lexical 테스트의 active editor 및 canonical root 전제 오류
+
+- note DOM export 테스트가 editor.update 밖에서 노드를 생성해 active editor 오류를 냈다. heading fixture는 Lexical root가 내보내지 않는 textFormat/textStyle을 포함하여 strict bridge의 정규화 거부에 걸렸다.
+- DOM export는 등록된 headless editor의 discrete update 안에서 실행한다. heading fixture의 비정본 root 필드만 제거하고 strict bridge의 손실 감지는 유지한다.
+- 새 figure-marginnote fixture는 이미지 leaf를 element helper로 만들어 children/direction/format/indent의 UNKNOWN_FIELD를 일으켰다. 세 이미지 fixture를 올바른 leaf JSON으로 바꿨고 해당 파일의 6개 테스트가 통과했다.
+- 상태: 해당 테스트 통과. M099.
+
+## E106 — 공식 샘플 비교 fixture의 envelope 누락과 들여쓰기 차이
+
+- 신규 비교 3개가 필수 `assets`를 빠뜨려 INVALID_ASSETS로 실패했다. 추가 후 opening/Getting Started는 section 블록 사이 원본 HTML 들여쓰기 Text node에서만 달랐다.
+- assets:[]를 추가했다. 두 section 비교는 SECTION 직속 공백-only Text node만 제외하며 inline/pre/code의 공백·속성·계층은 계속 비교한다. assertion에 예외를 명시했다. newthought는 ID namespace 외 DOM을 그대로 비교한다.
+- 상태: 세 비교 최종 실행 통과. 페이지 전체 시각 동등성 판정은 아니다. M099.
+
+## E107 — 제목 명령이 미등록 기본 HeadingNode를 생성
+
+- section/contextual UI 브라우저 테스트의 h2 생성이 timeout으로 실패했다. 독립 headless 회귀에서 `Type heading in node HeadingNode does not match registered node TufteHeadingNode`를 재현했다.
+- sectionCommands의 등록 확인·생성을 TufteHeadingNode로 통일하고 h2↔h3 변환 시 ID를 보존한다. 클래스·텍스트·ID를 검증하는 회귀를 추가했다.
+- publication browser harness에도 같은 기본 heading factory가 남아 있어 교체했다.
+- 상태: headless 및 section/contextual UI/publication 브라우저 재실행 통과. M097.
+
+## E108 — 구조 검사기가 변경 전 그림 순서·노트 타입을 유지
+
+- schema는 marginnote→image를 허용하지만 inspector는 image-first를 강제했다. 직접 sidenote 검사는 과거 `tufte-note.kind`를 보고 있었다. 독립 회귀에서 두 오류를 재현했다.
+- 이미지 정확히 하나/캡션 최대 하나·이미지 뒤 조건으로 변경하고 concrete sidenote를 진단한다. 노트 앞뒤 허용 및 캡션 역순·직접 sidenote 거부를 검사한다.
+- 상태: 신규 회귀 2개 통과. M098.
+
+## E109 — concrete note 전환의 저장 fixture/API 회귀 미이전 (미해결)
+
+- `fixtures/tufte/server-document{,-v2}.json`, all-nodes golden 및 여러 테스트 생성기는 `tufte-note {kind}`를 유지한다. 현행 validator는 UNKNOWN_NODE로 거부하며 기존 v1/v2 envelope migration도 이 내부 노드 형식을 변환하지 않는다.
+- Lexical 테스트 10개 파일이 삭제된 `$createNoteNode` import로 실행 전 실패한다. 서버·서식·전체 노드 및 upstream DOM/geometry 브라우저 테스트와 packed JS consumer도 기존 fixture에 막힌다. 기존 진단/known-gap 기대값에도 후속 재검토가 필요하다.
+- 이번에 저장 JSON/골든을 일괄 치환하거나 validator를 완화하지 않았다. 구형 저장 문서를 판별하는 명시적 migration과 보존 회귀, concrete factory로 생성하는 새 fixture/golden, 기존 소비자 호환성 정책을 함께 완성해야 한다. schemaVersion:1이 기존/신규 내부 형식을 함께 가리키는 문제를 해결해야 한다.
+- 상태: 최종 재실행에서도 실패. 전체 테스트 통과·발행 가능·기능 완료로 판정하지 않는다. 실패 수와 차단된 후속 검사는 실행 보고서에 명시한다. M096/M100.
+
+## E110 — 진단 도구의 구문·escape 계층 오류 재발
+
+- 임시 진단의 중첩 append 괄호, 패키지 밖에서의 pnpm 의존성 import, section 공백 정규식의 이중 escape로 진단 자체가 실패했다. encoded-slash GitHub branch 조회와 확인하지 않은 문서 제목의 patch도 실패했다. 커밋 전 대용량 문서 JSON 읽기는 출력 한도로 잘려 분할 읽기로 바꿨다.
+- 회귀는 패키지의 독립 테스트 파일과 단계별 지역 변수로 구성한다. 공백 판정은 trim으로 바꾸고 실제 비교 실행을 확인했다. GitHub 조회는 git/ref/heads 경로를 사용하고 patch 문맥을 먼저 읽는다.
+- 상태: 진단 실패를 제품 실패의 증거로 사용하지 않음. E067/M060, E102/M094 재점검 및 M100 반영.
+
 2026-10-19 완료 판정: E102 수정 후 check318개/browser16개/package4개/실제HTTP와 Python16개 통과. [실행 보고서](VERIFICATION_DOMPARSER_2026-10-19.ko.md)의 범위에서 검증했다. 전체 원본 fidelity 차이는 해결 처리하지 않는다.
 
 ## E102 — 신규 upstream 정규식의 이중 escape 재발

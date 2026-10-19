@@ -42,7 +42,7 @@ try{
    return {...base('link',[text(part.value)]),url:part.href,rel:null,target:null,title:null};
   }));
  });
- const document={schemaVersion:1,id:'upstream-getting-started',locale:'en-US',title:'Tufte CSS',
+ const document={schemaVersion:1,id:'upstream-getting-started',locale:'en-US',title:'Tufte CSS',assets:[],
   lexicalState:{root:{...base('root',[base('tufte-section',nodes)]),textFormat:0,textStyle:''}}};
  const result=renderArticle(document);
  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
@@ -76,12 +76,13 @@ try{
    if(node.nodeType!==Node.ELEMENT_NODE)throw Error('unexpected DOM node '+node.nodeName);
    return {type:node.tagName.toLowerCase(),
     attrs:[...node.attributes].map(a=>[a.name,a.value]).sort((a,b)=>a[0].localeCompare(b[0])),
-    children:[...node.childNodes].map(canonical)};
+    // Ignore source indentation between section blocks; preserve all inline whitespace.
+    children:[...node.childNodes].filter(child=>!(node.tagName==='SECTION'&&child.nodeType===Node.TEXT_NODE&&(child.nodeValue??'').trim()==='')).map(canonical)};
   };
   const source=parse(upstream).querySelectorAll('article > section')[1];
   const actual=parse(published).querySelector('article > section');
   return {upstream:canonical(source),published:canonical(actual)};
  },{upstream,published:result.html});
- assert.deepEqual(strictDOM.published,strictDOM.upstream,'Getting Started exact upstream DOM, including heading IDs');
+ assert.deepEqual(strictDOM.published,strictDOM.upstream,'Getting Started DOM, including heading IDs, must match except section indentation');
  console.log('Same-content Getting Started section: heading, paragraphs, inline code, links, pre/code preserved.');
 }finally{await browser.close();}

@@ -1,6 +1,6 @@
 import {$getRoot,$createParagraphNode,$createTextNode} from 'lexical';
 import {$createTableNode,$createTableRowNode,$createTableCellNode,TableCellHeaderStates} from '@lexical/table';
-import {$createSectionNode,$createFigureNode,$createCaptionNode,$createTableLayoutNode,$createInlineImageNode,$createNoteNode,type TableLayout} from '@lexical-tufte/lexical';
+import {$createSectionNode,$createFigureNode,$createCaptionNode,$createTableLayoutNode,$createInlineImageNode,$createMarginnoteNode,type TableLayout} from '@lexical-tufte/lexical';
 function table(layout:TableLayout){
  const table=$createTableNode();
  for(let row=0;row<2;row++){
@@ -15,7 +15,7 @@ function table(layout:TableLayout){
 }
 export function $loadLayoutFixture(){
  const section=$createSectionNode().append(
-  $createParagraphNode().append($createTextNode('섹션 본문과 여백 그림 '),$createNoteNode('layout-margin','marginnote').append($createInlineImageNode('/fixture.svg','여백 막대 그림'),$createTextNode('여백 설명'))),
+  $createParagraphNode().append($createTextNode('섹션 본문과 여백 그림 '),$createMarginnoteNode('layout-margin').append($createInlineImageNode('/fixture.svg','여백 막대 그림'),$createTextNode('여백 설명'))),
   $createFigureNode().append($createInlineImageNode('/fixture.svg','본문 막대 그림'),$createCaptionNode().append($createTextNode('본문 그림의 충분히 긴 캡션입니다. 구조와 폭을 비교합니다.'))),
   $createFigureNode('fullwidth').append($createInlineImageNode('/fixture.svg','전체 폭 막대 그림'),$createCaptionNode().append($createTextNode('전체 폭 그림의 캡션입니다. 본문과 여백을 함께 사용합니다.'))),
   table('body'),table('fullwidth'),table('scroll'),

@@ -8,11 +8,11 @@ type Text<T extends string='text',P={}>={type:T;version:1;text:string;format:num
 export type ImageFields={src:string;alt:string;assetId?:string;width?:number;height?:number};
 export type JsonNode=
  | Element<'root'|'tufte-section'|'paragraph'|'tufte-caption'|'quote'|'tufte-epigraph'|'tufte-attribution'|'tufte-cite'|'tufte-section-footer'|'tufte-definition-list'|'tufte-term'|'tufte-definition'|'tufte-fullwidth'>
- | Element<'heading',{tag:'h2'|'h3'}>
+ | Element<'heading',{tag:'h2'|'h3';id?:string}>
  | Element<'list',{listType:'bullet'|'number';tag:'ul'|'ol';start:number}>
  | Element<'listitem',{value:number;checked?:undefined}>
  | Element<'link',{url:string;rel?:string|null;target?:'_blank'|'_self'|null;title?:string|null}>
- | Element<'tufte-note',{noteId:string;kind:'sidenote'|'marginnote'}>
+ | Element<'tufte-sidenote'|'tufte-marginnote',{noteId:string}>
  | Element<'tufte-span',{kind:'sans'|'newthought'|'numeral'|'danger'}>
  | Element<'tufte-figure',{width:'body'|'fullwidth'}>
  | Element<'tufte-table-layout',{layout:'body'|'fullwidth'|'scroll'}>

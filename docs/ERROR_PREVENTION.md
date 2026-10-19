@@ -1,5 +1,38 @@
 # 재발 방지 대책 및 정기 점검
 
+## 2026-10-19 full-page baseline 시작·완료 점검
+
+AGENTS, E001–E102 및 M001–M094의 관련 항목을 검토했다. 특히 M031/M036/M045/M060/M077/M090–M094를 현재 concrete note/heading 모델과 대조했다. 과거 main의 통과와 이 브랜치의 검증을 분리한다. E103–E110/M095–M100을 코드·실행 순서에 반영했다. 최종 build/typecheck 및 browser 16/21 통과, 단위 65/150 통과, 패키지 소비 실패이며 E109는 미해결이다. 다음 점검은 저장 모델 migration 구현 시작·완료와 golden 변경 시 수행한다. CI 없음.
+
+## M095 — 노트 제어 구조는 현재 발행 DOM에서 검사
+
+- E103: wrapper 존재를 전제로 하지 않는다. input의 인접 label/payload, 부모, for/id, 종류, 고유성 및 모바일 왕복 toggle을 실제 DOM/CSS에서 확인한다. newthought의 split-parent 예외는 별도 고정 샘플로 검사한다.
+
+## M096 — 노드 타입 변경은 저장·공개 타입·생성기·소비자까지 검토
+
+- E104/E109: registry/schema/JsonNode/editor factory/renderer뿐 아니라 기존 저장 JSON, migration, fixture/golden 및 packed consumer를 함께 검색한다. 타입 빌드 통과를 데이터 호환성 통과로 간주하지 않는다.
+- schemaVersion이 같은 기존 저장 문서의 의미를 깨면 판별 가능한 명시적 migration과 무손실 왕복 테스트를 먼저 준비한다. validator 완화나 golden 일괄 재생성으로 실패를 숨기지 않는다.
+- M093의 `tufte-note` 조회 지시는 당시 모델의 역사 기록이다. 현재는 concrete 두 타입을 사용한다.
+
+## M097 — 같은 wire type의 등록 클래스와 생성 함수 일치
+
+- E107: HeadingNode subclass를 등록하면 모든 명령이 등록 클래스의 factory를 생성하는지 확인한다. 실제 명령 dispatch 후 클래스·내용·ID 보존, undo/redo 및 브라우저 UI까지 검사한다. JSON import만 통과해서는 충분하지 않다.
+
+## M098 — inspector와 validator의 그림 순서 계약 일치
+
+- E108: marginnote는 이미지 앞뒤 모두 허용하며 caption은 이미지 뒤에만 둔다. 유효한 두 순서 및 역순 캡션/직접 sidenote 반례를 함께 검사한다. 편집기 진단과 발행 validator의 제한을 별도 확인한다.
+
+## M099 — 비교 fixture와 정규화 범위를 명시
+
+- E105/E106: envelope 필수 필드와 Lexical이 실제 내보내는 root를 사용한다. strict import의 손실 거부를 완화하지 않는다. headless node 생성은 active update 안에서 한다.
+- 공백 정규화는 SECTION 직속 들여쓰기만 허용하며 inline/pre/code는 보존한다. 노트 ID namespace 예외도 assertion에 명시한다. 부분 DOM 비교나 원본 inventory를 전체 페이지의 시각적 동등성으로 확대하지 않는다.
+
+## M100 — 검증 실패와 실행 차단을 함께 기록
+
+- E109/E110: build/typecheck 결과를 회수한 뒤 browser를 실행한다. browser 실행 중 dist를 rebuild하지 않는다. 각 패키지와 browser 파일은 독립 실행하여 첫 실패 뒤 테스트도 확인한다.
+- import 실패 파일을 내부 모든 테스트가 실행된 것처럼 집계하지 않는다. packed JS 소비 실패 뒤 도달하지 못한 선언 소비 검사는 차단/건너뜀으로 기록한다. 구문 확인 외 실제 assertion을 실행한다.
+- 임시 진단은 패키지 의존성 범위에서 지역 변수로 구성하고 변경 전 patch 문맥을 읽는다. escape 계층을 줄일 수 있으면 단순 문자열 연산을 쓴다.
+
 2026-10-19 완료 점검: E102/M094의 escape 계층 대책과 독립 DOMParser 실행을 반영했다. check318개/Python16개/browser16개/package4개/실제HTTP 통과. 원본 section9/note7과 별도 발행 section1/note2를 같은 콘텐츠 전수 비교로 확대하지 않는다. 다음 구현 시작/완료와 baseline 변경 때 재점검한다.
 
 ## 2026-10-19 DOM 대조 시작 점검

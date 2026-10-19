@@ -27,7 +27,7 @@ try{
  },reference);
  const note=base('tufte-sidenote',[base('link',[text(source.emphasis,2)],{url:source.href,rel:null,target:null,title:null})],{noteId:source.labelFor});
  const span=base('tufte-span',[text(source.prefix)],{kind:'newthought'});
- const document={schemaVersion:1,id:'reference',locale:'en-US',title:'Tufte CSS',
+ const document={schemaVersion:1,id:'reference',locale:'en-US',title:'Tufte CSS',assets:[],
   lexicalState:{root:{...base('root',[base('tufte-section',[base('paragraph',[span,note,text(source.suffix)])])]),textFormat:0,textStyle:''}}};
  const result=renderArticle(document);
  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
