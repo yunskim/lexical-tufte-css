@@ -47,5 +47,20 @@ try{
   return {original:signature(original),actual:signature(actual)};
  },{upstream,published:result.html});
  assert.deepEqual(compare.actual,compare.original,'same-content opening section lost text/link semantics');
+ const strictDOM=await page.evaluate(({upstream,published})=>{
+  const parse=html=>new DOMParser().parseFromString(html,'text/html');
+  const canonical=node=>{
+   if(node.nodeType===Node.TEXT_NODE)return {type:'#text',value:node.nodeValue};
+   if(node.nodeType!==Node.ELEMENT_NODE)throw Error('unexpected DOM node '+node.nodeName);
+   return {type:node.tagName.toLowerCase(),
+    attrs:[...node.attributes].map(a=>[a.name,a.value]).sort((a,b)=>a[0].localeCompare(b[0])),
+    children:[...node.childNodes].map(canonical)};
+  };
+  return {
+   upstream:canonical(parse(upstream).querySelector('article > section')),
+   published:canonical(parse(published).querySelector('article > section'))
+  };
+ },{upstream,published:result.html});
+ assert.deepEqual(strictDOM.published,strictDOM.upstream,'opening section must match upstream DOM exactly');
  console.log('Same-content upstream opening section: '+compare.actual.length+' paragraphs, text and links preserved.');
 }finally{await browser.close();}
