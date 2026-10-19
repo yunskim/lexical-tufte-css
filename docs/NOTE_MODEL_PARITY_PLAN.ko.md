@@ -28,7 +28,6 @@ Status: design decision; implementation incomplete. Do not treat the current bra
 | Multiple adjacent notes | note / note | distinct controls and IDs | split, merge, copy |
 | Empty note | invalid or editor placeholder | never silently publish | empty-state recovery |
 | Notes in links or inside another note | prohibited | explicit validation error | paste normalization |
-| Legacy `tufte-note` | migration input only | new node representation | lossless migration |
 
 ## Required invariants
 
@@ -41,14 +40,14 @@ Status: design decision; implementation incomplete. Do not treat the current bra
 
 ## Implementation sequence
 
-- [ ] Resolve base-class and JSON type compatibility; register and export both concrete node classes.
-- [ ] Extend schema, document types, validation and render profile to the two types.
-- [ ] Migrate legacy `tufte-note` by `kind`, preserving IDs, children and position; disallow legacy form in newly written documents.
-- [ ] Replace old constructors in note operations, composition, clipboard, figures and commands.
+- [x] Resolve base-class and JSON type compatibility; register and export both concrete node classes (pending typecheck).
+- [x] Extend schema, document types, validation and render profile to the two types (pending tests).
+- [x] Remove legacy `tufte-note` from schema, renderer and Lexical registry; no migration or backward compatibility.
+- [ ] Audit all old constructors and serialized fixtures; note operations and figure commands now use concrete types, composition/clipboard use shared base.
 - [ ] Generalize inline-sequence rendering for both types, including newthought label placement.
 - [ ] Rewrite DOM parity and editor regression tests for each row of the matrix.
 - [ ] Run build/typecheck and batched tests when requested; no CI unless requested.
 
 ## Current known integration risks
 
-The first two concrete subclasses were introduced before the complete schema/renderer migration. Existing `NoteNode` still has a `kind` field, and its `exportJSON` contract does not yet cleanly model subclass-specific type literals. Do not assume these classes compile or round-trip until the migration and tests are complete.
+The shared `NoteNode` is now abstract and has no `kind` field. Concrete classes own the serialized type. Existing fixtures and call sites may still refer to the removed legacy constructor or serialized node. Do not assume build or round-trip success until the full reference audit and batched tests are complete.
