@@ -45,7 +45,7 @@ Status: implementation and regression-fixture migration in progress. Work verifi
 - [x] Remove legacy `tufte-note` from schema, renderer and Lexical registry; no migration or backward compatibility.
 - [x] Audit runnable source, tests, serialized fixtures and golden for old note constructors and wire types; migrate known consumers. Dedicated negative tests intentionally keep legacy literals. Execution verification remains pending.
 - [x] Render both concrete note types in source order, including newthought label split-parent placement (focused browser comparison passed at baseline; full post-migration suite pending).
-- [ ] Rewrite DOM parity and editor regression tests for each row of the matrix.
+- [ ] Complete DOM parity and editor regression matrix. Direct DOM, renderer, figure commands and real HTML-export parity tests are written; final execution/remaining matrix cases are outstanding.
 - [ ] Run build/typecheck and batched tests when requested; no CI unless requested.
 
 ## Work verification and follow-up (2026-10-19)
@@ -72,6 +72,7 @@ Status: implementation and regression-fixture migration in progress. Work verifi
 - `figureCommands.ts` now keeps the insertion order of consecutive `after-image` margin notes; tests cover two before-image and two after-image insertions with caption preserved.
 - Changed the node-type replacement test to use Lexical `replace(replacement, true)` to transfer children atomically rather than emptying a `canBeEmpty=false` note.
 - Documentation: `docs/ERROR_LOG.md` E111/E112 and `docs/ERROR_PREVENTION.md` M102/M103. Changes **not yet run**; the 2026-10-19 Work baseline test counts are still the last known actual results.
+- Added `tests/note-export-parity-browser.mjs` as a **real Lexical HTML export vs document renderer** comparison: load the same canonical server document, add a figure marginnote, and assert three note types/positions/unique IDs, sibling controls, link/image/bold rich payload and non-mutating JSON. Only generated note ID namespaces are ignored; all semantic descendants are compared. Included in `pnpm test:browser` and available as `pnpm test:note-export-parity`. This additional test has **not been executed yet**.
 
 ## Current known integration risks
 
