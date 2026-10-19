@@ -94,6 +94,42 @@ test('figure marginnote is inserted before caption and rejects duplicate IDs',()
  dispose();
 });
 
+test('repeated figure margin notes keep explicit before/after-image insertion order',()=>{
+ const {editor,diagnostics,dispose}=setup();
+ editor.update(()=>{
+  const figure=$createFigureNode('body').append(
+   $createInlineImageNode('/diagram.png','diagram'),
+   $createCaptionNode().append($createTextNode('caption'))
+  );
+  $getRoot().append($createSectionNode().append(figure));
+ },{discrete:true});
+ const insert=(noteId,placement)=>{
+  editor.update(()=>{
+   const figure=$getRoot().getFirstChild().getFirstChild();
+   const selection=$createNodeSelection();selection.add(figure.getKey());$setSelection(selection);
+  },{discrete:true});
+  assert.equal(editor.dispatchCommand(INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,
+   {noteId,text:noteId,...(placement?{placement}:{})}),true);
+  editor.update(()=>{},{discrete:true});
+ };
+ insert('after-one');
+ insert('after-two');
+ insert('before-one','before-image');
+ insert('before-two','before-image');
+ editor.getEditorState().read(()=>{
+  const figure=$getRoot().getFirstChild().getFirstChild(),children=figure.getChildren();
+  assert.deepEqual(children.map(n=>n.getType()),[
+   'tufte-marginnote','tufte-marginnote','tufte-inline-image',
+   'tufte-marginnote','tufte-marginnote','tufte-caption'
+  ]);
+  assert.deepEqual(children.filter(n=>n.getType()==='tufte-marginnote').map(n=>n.getNoteId()),
+   ['before-one','before-two','after-one','after-two']);
+  assert.equal(children[5].getTextContent(),'caption');
+ });
+ assert.deepEqual(diagnostics,[]);
+ dispose();
+});
+
 test('clipboard note reidentification traverses notes nested inside figures',()=>{
  const {editor,dispose}=setup();
  editor.update(()=>{
