@@ -80,7 +80,7 @@ test('figure marginnote is inserted before caption and rejects duplicate IDs',()
   assert.deepEqual(figure.getChildren().map(n=>n.getType()),['tufte-inline-image','tufte-marginnote','tufte-caption']);
   const note=figure.getChildAtIndex(1);
   assert.equal(note.getNoteId(),'figure-note-1');
-  assert.equal(note.getKind(),'marginnote');
+  assert.equal(note.getType(),'tufte-marginnote');
   assert.equal(note.getTextContent(),'margin annotation');
  });
  editor.update(()=>{
