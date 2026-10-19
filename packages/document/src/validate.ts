@@ -53,7 +53,10 @@ export function validateDocument(input:unknown):ValidationResult{
    if(type==='tufte-table-layout'&&(raw.children.length!==1||!plain(raw.children[0])||raw.children[0].type!=='table'))add('INVALID_TABLE_LAYOUT',path,'Expected exactly one table');
    if(type==='tufte-figure'){
     const types=raw.children.map(n=>plain(n)?n.type:null);
-    if(!['tufte-inline-image','tufte-imagequilt'].includes(String(types[0]))||types.filter(t=>t==='tufte-inline-image'||t==='tufte-imagequilt').length!==1||types.filter(t=>t==='tufte-caption').length>1)add('INVALID_FIGURE',path,'Expected one leading image and at most one caption');
+    const images=types.filter(t=>t==='tufte-inline-image'||t==='tufte-imagequilt');
+    const captions=types.filter(t=>t==='tufte-caption');
+    if(images.length!==1||captions.length>1||types.indexOf('tufte-caption')!==-1&&types.indexOf('tufte-caption')<types.findIndex(t=>t==='tufte-inline-image'||t==='tufte-imagequilt'))
+     add('INVALID_FIGURE',path,'Expected exactly one image, at most one caption after it, and optional margin notes');
     for(const child of raw.children)if(plain(child)&&child.type==='tufte-sidenote')add('INVALID_FIGURE_NOTE',path,'Direct figure notes must be margin notes');
    }
    if(type==='tufte-definition-list'){
