@@ -7,7 +7,7 @@ import {
 
 export type NoteKind = 'sidenote' | 'marginnote';
 export type SerializedNoteNode = SerializedElementNode & {
-  type: 'tufte-note'; version: 1; noteId: string; kind: NoteKind;
+  type: 'tufte-note' | 'tufte-sidenote' | 'tufte-marginnote'; version: 1; noteId: string; kind: NoteKind;
 };
 
 /** Inline prototype. Rich phrasing content shares the main editor's selection. */
