@@ -32,3 +32,14 @@ test('v1 and v2 server fixtures preserve concrete note types, IDs and payloads',
   assert.equal(notes[1].children[0].text,'번호 없는 주석');
  }
 });
+
+test('obsolete tufte-note wire type is rejected rather than silently migrated',()=>{
+ const fixture=load('server-document.json');
+ const first=collect(fixture.lexicalState.root).find(node=>node.type==='tufte-sidenote');
+ assert.ok(first);
+ first.type='tufte-note';
+ first.kind='sidenote';
+ const checked=validateDocument(fixture);
+ assert.equal(checked.ok,false);
+ assert.ok(checked.diagnostics.some(issue=>issue.code==='UNKNOWN_NODE'),JSON.stringify(checked.diagnostics));
+});
