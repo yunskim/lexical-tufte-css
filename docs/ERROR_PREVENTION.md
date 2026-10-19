@@ -27,6 +27,13 @@ AGENTS, E001–E102 및 M001–M094의 관련 항목을 검토했다. 특히 M03
 - E105/E106: envelope 필수 필드와 Lexical이 실제 내보내는 root를 사용한다. strict import의 손실 거부를 완화하지 않는다. headless node 생성은 active update 안에서 한다.
 - 공백 정규화는 SECTION 직속 들여쓰기만 허용하며 inline/pre/code는 보존한다. 노트 ID namespace 예외도 assertion에 명시한다. 부분 DOM 비교나 원본 inventory를 전체 페이지의 시각적 동등성으로 확대하지 않는다.
 
+## M101 — wire type 교체 시 입력 생산자와 소비자 동시 이전
+
+- E109: schema/renderer/editor에서 노드 타입 또는 factory를 삭제할 때 생성기, v1/v2 고정 fixture, golden, 테스트 import/registry/기대값, 브라우저 편집·발행 입력, 패키지 소비 테스트까지 함께 검색해 이전한다. 현재 노트는 `tufte-sidenote`/`tufte-marginnote` 두 타입이며 `kind`는 저장하지 않는다.
+- 저장 envelope 변경과 노드 타입 변경을 혼동하지 않는다. 구형 내부 노드 자동 마이그레이션은 사용자 결정상 도입하지 않는다. validator 거부와 신규 fixture 유효성 검증을 각각 유지한다.
+- 모든 fixture 재생성기는 실제 등록 클래스/factory를 사용하며 동일한 wire type을 재생성하는지 golden 검증으로 비교한다. v1/v2 저장 문서의 lexicalState·assets 동일성과 주석 ID·링크·이미지 보존을 새 회귀로 검사한다.
+- 빌드·타입 검사 결과는 테스트 실행을 대신하지 않는다. import 실패를 해결한 다음 각 패키지·브라우저·packed consumer 검사를 다시 수행하고 skip/차단을 구분한다. 2026-10-19 이후 수정 건은 재실행 전까지 verified로 표시하지 않는다.
+
 ## M100 — 검증 실패와 실행 차단을 함께 기록
 
 - E109/E110: build/typecheck 결과를 회수한 뒤 browser를 실행한다. browser 실행 중 dist를 rebuild하지 않는다. 각 패키지와 browser 파일은 독립 실행하여 첫 실패 뒤 테스트도 확인한다.
@@ -52,7 +59,7 @@ AGENTS 및 M077/M090–M093의 원본/확장 범위·속성 순서·실제 노�
 
 ## M093 — 노트 포함 컨테이너의 실제 선택 대상 확인
 
-- E101: listitem 끝 선택은 마지막 inline note 내부로 들어갈 수 있다. 본문에서 실행하는 테스트는 본문 TextNode를 명시한다. note wire type은 공유 registry의 tufte-note와 일치시킨다.
+- E101/E109: listitem 끝 선택은 마지막 inline note 내부로 들어갈 수 있다. 본문에서 실행하는 테스트는 본문 TextNode를 명시한다. note wire type은 공유 registry의 구체적인 `tufte-sidenote` 또는 `tufte-marginnote`와 일치시킨다. 구형 `tufte-note`/`kind`에 의존하지 않는다.
 
 ## 2026-10-18 upstream 대조 검증 시작 점검
 
