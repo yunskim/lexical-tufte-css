@@ -29,8 +29,6 @@ export function registerInlineCommands(editor:LexicalEditor,onDiagnostic?:(diagn
   if(!first||!last||!first.is(last))
    return reject('INVALID_SPAN_SELECTION','같은 Tufte 인라인 요소 안에서만 속성을 변경할 수 있습니다.');
   if(first.getKind()===kind)return true;
-  if(first.getChildren().some(child=>child.getType()==='tufte-note'))
-   return reject('INVALID_SPAN_KIND','주석 앵커를 포함한 newthought는 다른 span 종류로 바꿀 수 없습니다.');
   $addUpdateTag(HISTORY_PUSH_TAG);
   first.setKind(kind);
   return true;
