@@ -103,8 +103,8 @@ export function registerFigureCommands(editor:LexicalEditor,onDiagnostic?:(diagn
     return reject('INVALID_FIGURE_NOTE','수정할 주석 ID와 내용을 확인하세요.');
    const figure=selectedFigure();
    if(!figure)return reject('INVALID_FIGURE_SELECTION','그림을 선택한 후 여백 주석을 수정하세요.');
-   const note=figure.getChildren().find(child=>child instanceof NoteNode&&child.getKind()==='marginnote'&&child.getNoteId()===payload.noteId);
-   if(!(note instanceof NoteNode))return reject('FIGURE_NOTE_NOT_FOUND','선택한 그림에 해당 여백 주석이 없습니다.');
+   const note=figure.getChildren().find(child=>child instanceof MarginnoteNode&&child.getNoteId()===payload.noteId);
+   if(!(note instanceof MarginnoteNode))return reject('FIGURE_NOTE_NOT_FOUND','선택한 그림에 해당 여백 주석이 없습니다.');
    if(note.getTextContent()===payload.text)return true;
    $addUpdateTag(HISTORY_PUSH_TAG);
    const previous=note.getChildren();
