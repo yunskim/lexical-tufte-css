@@ -27,14 +27,15 @@ test('planned semantic node contracts compose in one document before editor/rend
   el('tufte-fullwidth',[p()]),
   el('tufte-code',[text('const x ='),{type:'tab',version:1,text:'\t',format:0},{type:'code-highlight',version:1,text:'1',format:0,highlightType:'number'},{type:'linebreak',version:1}],{width:'fullwidth',language:'typescript'}),
   {type:'tufte-embed',version:1,provider:'youtube',src:'https://www.youtube-nocookie.com/embed/abcdefghijk',title:'예제 동영상',wrapper:'figure',width:'body',aspectRatio:16/9},
-  el('tufte-figure',[{type:'tufte-imagequilt',version:1,src:'/quilt.svg',alt:'완성된 ImageQuilt',width:800,height:400},el('tufte-caption',[text('그림 설명')]),el('tufte-note',[text('그림 여백')],{noteId:'figure-margin',kind:'marginnote'})],{width:'fullwidth'})
+  el('tufte-figure',[{type:'tufte-imagequilt',version:1,src:'/quilt.svg',alt:'완성된 ImageQuilt',width:800,height:400},el('tufte-caption',[text('그림 설명')]),el('tufte-marginnote',[text('그림 여백')],{noteId:'figure-margin'})],{width:'fullwidth'})
  );
  const result=validateDocument(d);assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
 });
 test('malformed structures and unsupported versions fail with precise paths',()=>{
  for(const [mutate,code]of [
   [d=>d.schemaVersion=2,'UNSUPPORTED_VERSION'],[d=>note(d).version=2,'UNSUPPORTED_NODE_VERSION'],
-  [d=>d.locale='not_a_locale','INVALID_LOCALE'],[d=>note(d).kind=['sidenote'],'INVALID_NOTE_KIND'],
+  [d=>d.locale='not_a_locale','INVALID_LOCALE'],[d=>note(d).type='tufte-unknown-note','UNKNOWN_NODE'],
+  [d=>note(d).kind='sidenote','UNKNOWN_FIELD'],
   [d=>d.lexicalState.root.children[0].children.push(el('heading',[text()],{tag:'h4'})),'INVALID_HEADING'],
   [d=>d.lexicalState.root.children[0].children.push(el('tufte-definition-list',[el('tufte-definition',[p()])])),'INVALID_DEFINITION_LIST'],
   [d=>note(d).children.push(el('paragraph',[text()])),'INVALID_CHILD'],
