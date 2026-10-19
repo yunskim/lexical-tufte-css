@@ -35,7 +35,6 @@ export abstract class NoteNode extends ElementNode {
  }
  exportDOM(_editor:LexicalEditor):DOMExportOutput{
   const element=document.createElement('span');
-  element.dataset.tufteNote=this.getNoteId();
   const id=`prototype-${this.getNoteId()}`;
   const kind=this.getType()==='tufte-sidenote'?'sidenote':'marginnote';
   return {element,after:(generated)=>{
@@ -46,7 +45,10 @@ export abstract class NoteNode extends ElementNode {
    label.className=kind==='sidenote'?'margin-toggle sidenote-number':'margin-toggle';
    label.textContent=kind==='marginnote'?'⊕':'';
    const input=document.createElement('input');input.id=id;input.type='checkbox';input.className='margin-toggle';
-   generated.append(label,input,payload);return generated;
+   generated.replaceChildren(label,input,payload);
+   const fragment=document.createDocumentFragment();
+   while(generated.firstChild)fragment.append(generated.firstChild);
+   return fragment;
   }};
  }
 }
