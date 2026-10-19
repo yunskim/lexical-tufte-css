@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createHeadlessEditor} from '@lexical/headless';
 import {$getRoot,$createParagraphNode,$createTextNode} from 'lexical';
-import {TUFTE_NODES,$createSectionNode,registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_PAIR_COMMAND,MOVE_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_LIST_COMMAND,$createDefinitionListNode,$createDefinitionTermNode,$createDefinitionDescriptionNode,$createNoteNode} from '../dist/index.js';
+import {TUFTE_NODES,$createSectionNode,registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_PAIR_COMMAND,MOVE_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_LIST_COMMAND,$createDefinitionListNode,$createDefinitionTermNode,$createDefinitionDescriptionNode,$createMarginnoteNode} from '../dist/index.js';
 
 function setup(){
  const diagnostics=[];
@@ -58,7 +58,7 @@ test('P2.2.b move two complete dt/dd pairs down and back keeps text and note IDs
    $createDefinitionTermNode().append(first),
    $createDefinitionDescriptionNode().append($createParagraphNode().append($createTextNode('first explanation'))),
    $createDefinitionTermNode().append(second),
-   $createDefinitionDescriptionNode().append($createParagraphNode().append($createTextNode('second explanation'),$createNoteNode('definition-note','marginnote').append($createTextNode('reference'))))
+   $createDefinitionDescriptionNode().append($createParagraphNode().append($createTextNode('second explanation'),$createMarginnoteNode('definition-note').append($createTextNode('reference'))))
   );
   $getRoot().append($createSectionNode().append(list));first.select(2,2);
  },{discrete:true});
