@@ -1,5 +1,6 @@
 import {isIdentifier} from '@lexical-tufte/document';
 import {ElementNode,isHTMLElement,type EditorConfig,type LexicalEditor,type NodeKey,type SerializedElementNode,type DOMExportOutput} from 'lexical';
+import {TufteSpanNode} from './TufteSpanNode.js';
 
 export type SerializedNoteNode = SerializedElementNode & {
  type:'tufte-sidenote'|'tufte-marginnote';version:1;noteId:string;
@@ -37,6 +38,11 @@ export abstract class NoteNode extends ElementNode {
   const element=document.createElement('span');
   const id=`prototype-${this.getNoteId()}`;
   const kind=this.getType()==='tufte-sidenote'?'sidenote':'marginnote';
+  const previous=this.getPreviousSibling();
+  const pairedNewthought=kind==='sidenote'
+   &&this.getParent()?.getType()==='paragraph'
+   &&previous instanceof TufteSpanNode
+   &&previous.getKind()==='newthought';
   return {element,after:(generated)=>{
    if(!isHTMLElement(generated))return generated;
    const payload=document.createElement('span');payload.className=kind;
@@ -46,7 +52,14 @@ export abstract class NoteNode extends ElementNode {
    label.textContent=kind==='marginnote'?'⊕':'';
    const input=document.createElement('input');input.id=id;input.type='checkbox';input.className='margin-toggle';
    const fragment=document.createDocumentFragment();
-   fragment.append(label,input,payload);
+   // Keep the Lexical tree as newthought/sidenote siblings. Only exported HTML
+   // pairs their DOM: upstream puts the label inside the preceding newthought
+   // while checkbox and note payload remain following paragraph siblings.
+   const preceding=generated.previousElementSibling;
+   if(pairedNewthought&&isHTMLElement(preceding)&&preceding.classList.contains('newthought'))
+    preceding.append(label);
+   else fragment.append(label);
+   fragment.append(input,payload);
    return fragment;
   }};
  }
