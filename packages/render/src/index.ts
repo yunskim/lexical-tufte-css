@@ -24,7 +24,7 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
    case 'root':return inner();
    case 'tufte-section':return [element('section',attrs(n),inner())];
    case 'paragraph':return [element('p',attrs(n),inner())];
-   case 'heading':return [element(n.tag,attrs(n),inner())];
+   case 'heading':return [element(n.tag,{...attrs(n),...(n.id?{id:String(n.id)}:{})},inner())];
    case 'horizontalrule':return [element('hr',{},[],true)];
    case 'list':return [element(n.tag,{...attrs(n),...(n.tag==='ol'&&n.start!==1?{start:String(n.start)}:{})},
     n.children.map(item=>item.type==='listitem'
