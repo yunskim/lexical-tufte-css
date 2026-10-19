@@ -43,8 +43,8 @@ Status: implementation and regression-fixture migration in progress. Work verifi
 - [x] Resolve base-class and JSON type compatibility; register and export both concrete node classes (build/typecheck verified in Work baseline).
 - [x] Extend schema, document types, validation and render profile to the two types (build/typecheck verified; regression suite incomplete).
 - [x] Remove legacy `tufte-note` from schema, renderer and Lexical registry; no migration or backward compatibility.
-- [ ] Complete repository-wide audit of old constructors and serialized fixtures. The previously import-blocked Lexical tests, all-node golden, server v1/v2 fixtures and generator, browser note assertions and document/render regressions have been migrated; a full verified sweep remains.
-- [ ] Generalize inline-sequence rendering for both types, including newthought label placement.
+- [x] Audit runnable source, tests, serialized fixtures and golden for old note constructors and wire types; migrate known consumers. Dedicated negative tests intentionally keep legacy literals. Execution verification remains pending.
+- [x] Render both concrete note types in source order, including newthought label split-parent placement (focused browser comparison passed at baseline; full post-migration suite pending).
 - [ ] Rewrite DOM parity and editor regression tests for each row of the matrix.
 - [ ] Run build/typecheck and batched tests when requested; no CI unless requested.
 
@@ -63,6 +63,15 @@ Status: implementation and regression-fixture migration in progress. Work verifi
 - Server-comparison, document-validation, upstream-demo, all-nodes browser, text-format browser and upstream DOM comparison expectations have been aligned to the two types. `packages/document/test/note-fixture-contract.test.mjs` explicitly guards v1/v2 parity.
 - Existing `tufte-note` stored documents are intentionally rejected; **no** compatibility shim or node migration is planned. The separate storage envelope v1/v2 validation/migration remains supported for valid current nodes.
 - Post-edit `pnpm build`, package unit tests, browser tests and packed consumer checks are **not yet rerun**. Do not mark this phase complete before those results are collected.
+
+### Follow-up audit after fixture conversion
+
+- Audited product source (`document`, `render`, `lexical`, `blog`, editor), unit/browser tests and fixed v1/v2 fixture/golden paths for legacy note constructors, wire type, wrappers, and removed methods. The obsolete note payload remains only in explicit rejection assertions or historical documentation.
+- Fixed `tests/note-browser.mjs`: the prior `querySelectorAll('[data-tufte-note]').every(...)` passed vacuously when the wrapper was removed. The test now requires both sidenotes and checks actual sibling controls.
+- Removed the stale `getKind()` assertion on a concrete marginnote and aligned the future-version error assertion to `SidenoteNode.importJSON`.
+- `figureCommands.ts` now keeps the insertion order of consecutive `after-image` margin notes; tests cover two before-image and two after-image insertions with caption preserved.
+- Changed the node-type replacement test to use Lexical `replace(replacement, true)` to transfer children atomically rather than emptying a `canBeEmpty=false` note.
+- Documentation: `docs/ERROR_LOG.md` E111/E112 and `docs/ERROR_PREVENTION.md` M102/M103. Changes **not yet run**; the 2026-10-19 Work baseline test counts are still the last known actual results.
 
 ## Current known integration risks
 
