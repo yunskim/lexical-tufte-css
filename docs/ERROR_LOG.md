@@ -756,3 +756,15 @@ E001–E049/M001–M042를 검토했다. E024의 경계 입력은 실제 Chromiu
 - 발견: 예제 편집기의 cutIds는 cut 또는 paste 때만 초기화되어 cut→copy→paste에서 오래된 cut ID를 새 클립보드 내용에 적용할 수 있었다.
 - 처리: COPY_COMMAND에 초기화 핸들러를 추가하고 Work 검증에 cut→copy→paste 시나리오를 등록했다.
 - 상태: 코드 수정, Work 실행 검증 대기. 외부 앱의 clipboard 변경과 취소된 cut/copy는 미해결. M064 참조.
+
+## E111 — 구형 래퍼 selector의 빈 배열 검사로 브라우저 테스트가 허위 통과
+
+- 발견: `tests/note-browser.mjs`에서 `querySelectorAll('[data-tufte-note]')` 결과에 바로 `.every(...)`를 호출한다. 발행 DOM이 래퍼 없는 `label + input + span` 구조로 변경된 이후 대상이 0개여도 true를 반환한다. 이전 Work의 해당 browser 파일 통과는 노트 발행 HTML 인접성의 독립적 증거가 아니었다.
+- 처리: `span.sidenote` 2개 존재를 먼저 강제하고, 각 note의 이전 형제 `input.margin-toggle` 및 `label`, 체크박스·for/id·번호 class·요소 인접성, 구형 래퍼 부재를 검사한다.
+- 상태: 코드 수정, 후속 Work 일괄 재실행 전. M102 참조.
+
+## E112 — 구체 노트 타입 전환에 남은 API 기대와 반복 그림 삽입의 역순
+
+- 발견: `figure-commands.test.mjs`에서 삭제된 `getKind()`를 호출하고, `note.test.mjs`는 future-version import가 기존 `Unsupported` 오류를 던질 것으로 기대했다. 새 `SidenoteNode.importJSON()`은 `Invalid sidenote`를 반환한다. 그림의 기본 `after-image` 삽입은 매번 이미지 바로 뒤에 붙여 연속 주석의 순서가 역전됐다.
+- 처리: 테스트는 실제 구체 타입 및 버전 거부 메시지를 확인한다. 그림 노트 삽입은 이미지 뒤에 연속된 `MarginnoteNode` 중 마지막 뒤에 넣어 기존 순서를 유지한다. before/after 위치에 각각 두 번 삽입한 순서와 캡션 보존을 확인하는 단위 회귀를 추가했다. 타입 변경 테스트는 Lexical 공식 `replace(replacement, true)`로 자식 트리를 옮겨 일시적 빈 주석을 만들지 않게 수정했다.
+- 상태: 수정 코드와 회귀 추가, 빌드·테스트 실행은 대기. M103 및 E059/M052 참조.
