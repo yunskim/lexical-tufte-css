@@ -41,7 +41,7 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
    case 'tufte-section-footer':return [element('footer',attrs(n),inner())];
    case 'tufte-span':return [element('span',withClass(n,n.kind==='sans'?'sans':n.kind),inner())];
    case 'text':{
-    let child:RenderChild=element('span',{class:'tufte-pre-wrap'},[String(n.text)]);
+    let child:RenderChild=String(n.text);
     for(const [flag,tag] of [[16,'code'],[1,'strong'],[2,'em'],[4,'s'],[8,'u'],[32,'sub'],[64,'sup'],[128,'mark']] as const)
      if((Number(n.format)&flag)!==0)child=element(tag,{},[child]);
     return [child];
