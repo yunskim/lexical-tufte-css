@@ -43,3 +43,23 @@ test('figure marginnote before image also preserves adjacent checkbox and span',
  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
  assert.match(result.html,/<label for="([^"]+)" class="margin-toggle">⊕<\/label><input id="\1" type="checkbox" class="margin-toggle"><span class="marginnote">Additional context<\/span><img /);
 });
+
+test('upstream rhinoceros example: image and rich citation remain inside paragraph marginnote',()=>{
+ const note=element('tufte-marginnote',[
+  element('tufte-inline-image',[],{src:'https://example.com/rhino.png',alt:'Image of a Rhinoceros'}),
+  text('F.J. Cole, '),
+  element('link',[text('Visual Explanations')],{url:'https://example.com/book',rel:'',target:null,title:null}),
+  text('.')
+ ],{noteId:'mn-figure-1'});
+ const document={
+  schemaVersion:1,id:'rhino-margin-fixture',locale:'en-US',title:'Margin figure',assets:[],
+  lexicalState:{root:{...element('root',[
+   element('tufte-section',[element('paragraph',[note,text(' But tight integration of graphics with text is central.')])])
+  ]),textFormat:0,textStyle:''}}
+ };
+ const result=renderArticle(document);
+ assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+ assert.match(result.html,/<label for="([^"]+)" class="margin-toggle">⊕<\/label><input id="\1" type="checkbox" class="margin-toggle"><span class="marginnote"><img src="https:\/\/example.com\/rhino.png" alt="Image of a Rhinoceros">F\.J\. Cole, /);
+ assert.match(result.html,/<\/span> But tight integration of graphics with text is central\./);
+ assert.ok(result.html.indexOf('<img ')<result.html.indexOf('F.J. Cole'));
+});
