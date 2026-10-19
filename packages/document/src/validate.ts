@@ -100,7 +100,7 @@ export function validateDocument(input:unknown):ValidationResult{
     else if(raw.src!==a.src||(['width','height'] as const).some(k=>raw[k]!==undefined&&a[k]!==undefined&&raw[k]!==a[k]))add('ASSET_MISMATCH',path,'Image URL/dimensions conflict with asset metadata');
    }
   }
-  if(['tufte-note','tufte-sidenote','tufte-marginnote'].includes(type)){
+  if(['tufte-sidenote','tufte-marginnote'].includes(type)){
    if(inNote)add('NESTED_NOTE',path,'Nested notes are not supported');
    if(!isIdentifier(raw.noteId)||notes.has(String(raw.noteId)))add('INVALID_NOTE_ID',path+'.noteId','Invalid or duplicate note id');notes.add(String(raw.noteId));
   }
