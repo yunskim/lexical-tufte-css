@@ -1,6 +1,6 @@
 /** Versioned node registry: schemas do not imply editor/render capability. */
-const phrasing=['text','linebreak','link','tufte-inline-image','tufte-span','tufte-note','tufte-sidenote','tufte-marginnote'];
-const inline=phrasing.filter(t=>!['tufte-note','tufte-sidenote','tufte-marginnote'].includes(t));
+const phrasing=['text','linebreak','link','tufte-inline-image','tufte-span','tufte-sidenote','tufte-marginnote'];
+const inline=phrasing.filter(t=>!['tufte-sidenote','tufte-marginnote'].includes(t));
 const blocks=['paragraph','heading','list','tufte-definition-list','horizontalrule','quote','tufte-epigraph','tufte-figure','tufte-table-layout','tufte-code','tufte-embed','tufte-fullwidth','tufte-section-footer'];
 export const NODE_SCHEMA:Readonly<Record<string,{readonly fields:readonly string[];readonly children?:readonly string[]}>>=Object.freeze({
  root:{fields:[],children:['tufte-section']},'tufte-section':{fields:[],children:blocks},
@@ -12,11 +12,10 @@ export const NODE_SCHEMA:Readonly<Record<string,{readonly fields:readonly string
  'tufte-epigraph':{fields:[],children:['quote']},'tufte-attribution':{fields:[],children:[...inline,'tufte-cite']},
  'tufte-cite':{fields:[],children:inline},'tufte-section-footer':{fields:[],children:[...inline,'tufte-cite']},
  'tufte-span':{fields:['kind'],children:inline},link:{fields:['url','target','rel','title'],children:['text','linebreak','tufte-inline-image','tufte-span']},
- 'tufte-note':{fields:['noteId','kind'],children:inline},
  'tufte-sidenote':{fields:['noteId'],children:inline},
  'tufte-marginnote':{fields:['noteId'],children:inline},
  'tufte-inline-image':{fields:['src','alt','assetId','width','height']},'tufte-imagequilt':{fields:['src','alt','assetId','width','height']},
- 'tufte-figure':{fields:['width'],children:['tufte-inline-image','tufte-imagequilt','tufte-caption','tufte-note','tufte-marginnote']},
+ 'tufte-figure':{fields:['width'],children:['tufte-inline-image','tufte-imagequilt','tufte-caption','tufte-marginnote']},
  'tufte-caption':{fields:[],children:inline},'tufte-fullwidth':{fields:[],children:blocks.filter(t=>t!=='tufte-fullwidth'&&t!=='tufte-section-footer')},
  'tufte-table-layout':{fields:['layout'],children:['table']},
  table:{fields:['colWidths','rowStriping','frozenColumnCount','frozenRowCount'],children:['tablerow']},
