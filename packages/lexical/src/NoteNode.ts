@@ -45,9 +45,8 @@ export abstract class NoteNode extends ElementNode {
    label.className=kind==='sidenote'?'margin-toggle sidenote-number':'margin-toggle';
    label.textContent=kind==='marginnote'?'⊕':'';
    const input=document.createElement('input');input.id=id;input.type='checkbox';input.className='margin-toggle';
-   generated.replaceChildren(label,input,payload);
    const fragment=document.createDocumentFragment();
-   while(generated.firstChild)fragment.append(generated.firstChild);
+   fragment.append(label,input,payload);
    return fragment;
   }};
  }
