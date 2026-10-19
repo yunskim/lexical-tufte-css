@@ -43,7 +43,7 @@ Status: implementation and regression-fixture migration in progress. Work verifi
 - [x] Resolve base-class and JSON type compatibility; register and export both concrete node classes (build/typecheck verified in Work baseline).
 - [x] Extend schema, document types, validation and render profile to the two types (build/typecheck verified; regression suite incomplete).
 - [x] Remove legacy `tufte-note` from schema, renderer and Lexical registry; no migration or backward compatibility.
-- [ ] Audit all old constructors and serialized fixtures. Lexical test imports, shared all-node generator and its golden were migrated after the 2026-10-19 run; remaining repository fixtures and tests still require review.
+- [ ] Complete repository-wide audit of old constructors and serialized fixtures. The previously import-blocked Lexical tests, all-node golden, server v1/v2 fixtures and generator, browser note assertions and document/render regressions have been migrated; a full verified sweep remains.
 - [ ] Generalize inline-sequence rendering for both types, including newthought label placement.
 - [ ] Rewrite DOM parity and editor regression tests for each row of the matrix.
 - [ ] Run build/typecheck and batched tests when requested; no CI unless requested.
@@ -55,6 +55,14 @@ Status: implementation and regression-fixture migration in progress. Work verifi
 - The former mutable `note.setKind(...)` expectation is replaced by an explicit concrete-node replacement contract; `kind` remains valid on `tufte-span`, not on note nodes.
 - Do **not** add legacy `tufte-note` wire-format compatibility or migration: that is a deliberate user decision. The separate storage-envelope v1→v2 migration tests remain applicable to otherwise valid documents.
 - No post-migration build/tests were run in this editing pass. Import resolution, golden runtime fidelity and the remaining failures must be confirmed at the next Work test batch.
+
+## Server fixture completion (after the first Work baseline)
+
+- Both `fixtures/tufte/server-document.json` and `server-document-v2.json` now encode the same concrete-note `lexicalState`, preserving `server-note`/`server-margin`, original rich link/image payload, and all assets.
+- `packages/lexical/test/create-server-document.mjs` generates these concrete note types. The shared all-node generator, golden, and test expectations also use fixed concrete wire identities.
+- Server-comparison, document-validation, upstream-demo, all-nodes browser, text-format browser and upstream DOM comparison expectations have been aligned to the two types. `packages/document/test/note-fixture-contract.test.mjs` explicitly guards v1/v2 parity.
+- Existing `tufte-note` stored documents are intentionally rejected; **no** compatibility shim or node migration is planned. The separate storage envelope v1/v2 validation/migration remains supported for valid current nodes.
+- Post-edit `pnpm build`, package unit tests, browser tests and packed consumer checks are **not yet rerun**. Do not mark this phase complete before those results are collected.
 
 ## Current known integration risks
 
@@ -84,14 +92,14 @@ A `marginnote` containing an image means the **image is in the margin**. A `marg
 | `document/validate.ts` | Exactly one image, at most one caption after image, margin notes in any order | No CSS-motivated image-first restriction; keep semantic image count |
 | `render/index.ts` | Figure renders children in source order; note emits label/input/span | Good; add parity tests for both figure child orders and image-inside-note |
 | `render/profile.ts` | Figure margin notes no longer blocked | Good; confirm with batched tests |
-| `lexical/figureCommands.ts` | Figure note insert always prepends before first child | **Overconstrained by reference sample**, not CSS. Change to position-aware insertion with a simple default, preserving user-controlled order |
+| `lexical/figureCommands.ts` | Figure note insertion supports `placement: before-image / after-image`, default after-image | CSS does not mandate note-first; preserve source order and verify repeated insertions in final batch |
 | `render/index.ts` newthought special case | Pairing only when newthought and sidenote are adjacent in a paragraph | Targeted DOM parity rule; retain and test boundary cases |
 
 ### Follow-up sequence (no test execution until batch)
 
-1. Remove hard-coded note-first behavior from the figure insertion command; allow a caller-selected placement without requiring extra structural node types.
-2. Add fixture coverage for figure `note,image,caption` and `image,note,caption`, plus `paragraph > marginnote > image,text`.
-3. Compare the emitted note control adjacency and responsive CSS behavior against pinned upstream; keep logical ordering intact.
+1. [implemented, unverified in full batch] Allow caller-selected figure note placement without creating extra structural nodes.
+2. [implemented, unverified in full batch] Cover figure `note,image,caption` and `image,note,caption`, plus `paragraph > marginnote > image,text`.
+3. [partially verified 2026-10-19] Compare note control adjacency and responsive CSS behavior against pinned upstream; browser note DOM/mobile toggles and newthought split-parent were verified before subsequent fixture edits.
 4. Review schema/renderer/editor parity again before declaring the note phase ready for user-run batch tests.
 
 This review does not authorize the deferred agent API implementation.
