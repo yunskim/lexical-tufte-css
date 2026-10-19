@@ -42,12 +42,13 @@
 - 이미지 정확히 하나/캡션 최대 하나·이미지 뒤 조건으로 변경하고 concrete sidenote를 진단한다. 노트 앞뒤 허용 및 캡션 역순·직접 sidenote 거부를 검사한다.
 - 상태: 신규 회귀 2개 통과. M098.
 
-## E109 — concrete note 전환의 저장 fixture/API 회귀 미이전 (미해결)
+## E109 — concrete note 전환의 저장 fixture/API 회귀 미이전 (수정 후 재검증 대기)
 
-- `fixtures/tufte/server-document{,-v2}.json`, all-nodes golden 및 여러 테스트 생성기는 `tufte-note {kind}`를 유지한다. 현행 validator는 UNKNOWN_NODE로 거부하며 기존 v1/v2 envelope migration도 이 내부 노드 형식을 변환하지 않는다.
-- Lexical 테스트 10개 파일이 삭제된 `$createNoteNode` import로 실행 전 실패한다. 서버·서식·전체 노드 및 upstream DOM/geometry 브라우저 테스트와 packed JS consumer도 기존 fixture에 막힌다. 기존 진단/known-gap 기대값에도 후속 재검토가 필요하다.
-- 이번에 저장 JSON/골든을 일괄 치환하거나 validator를 완화하지 않았다. 구형 저장 문서를 판별하는 명시적 migration과 보존 회귀, concrete factory로 생성하는 새 fixture/golden, 기존 소비자 호환성 정책을 함께 완성해야 한다. schemaVersion:1이 기존/신규 내부 형식을 함께 가리키는 문제를 해결해야 한다.
-- 상태: 최종 재실행에서도 실패. 전체 테스트 통과·발행 가능·기능 완료로 판정하지 않는다. 실패 수와 차단된 후속 검사는 실행 보고서에 명시한다. M096/M100.
+- 발견: 2026-10-19 Work 전체 검증에서 `tufte-note {kind}` 입력을 현행 validator가 `UNKNOWN_NODE`로 거부했다. Lexical 테스트 10개 파일은 삭제된 `$createNoteNode` import로 실행 전 실패했으며, 이로 인해 서버·브라우저·packed JS consumer도 연쇄 실패했다.
+- 원인: 핵심 schema/renderer/editor에서 노드 분리 후, 저장 v1/v2 fixture와 golden·공통 생성기·테스트의 wire type/생성 함수/기대 진단까지 함께 이전하지 않았다. 저장 envelope v1→v2 변환은 구형 내부 노드 의미 변환과 별개다.
+- 사용자 결정: 구형 `tufte-note` 문서 호환성이나 자동 마이그레이션은 도입하지 않는다. schema validator의 `UNKNOWN_NODE` 거부를 유지한다. 과거 실행 보고서의 호환성 도입 체크리스트는 이 결정으로 대체한다.
+- 처리(현재 브랜치, 후속 실행 전): 서버 v1/v2 fixture, all-nodes golden/생성기, 서버 fixture 생성기, Lexical 테스트 API·노드 등록과 관련 기대값을 concrete note로 이전했다. 문서 검증 테스트는 `kind`의 `UNKNOWN_FIELD` 거부를 확인하게 변경했고, 렌더러의 구형 래퍼 미지원 기대값을 수정했다. v1/v2 데이터에서 주석 ID·링크·이미지를 보존하고 내부 Lexical state가 일치하는지 검사하는 고정 fixture 회귀도 추가했다.
+- 상태: 코드/fixture 이전은 진행됐지만 이후 전체 빌드·단위·브라우저·패키지 소비 검증은 **미실행**. 2026-10-19 Work의 85 JS 실패/5 브라우저 실패를 아직 해결 확인한 것으로 집계하지 않는다. 다음 일괄 실행에서 새로 드러나는 실패도 조사한다. M096/M100/M101 참조.
 
 ## E110 — 진단 도구의 구문·escape 계층 오류 재발
 
