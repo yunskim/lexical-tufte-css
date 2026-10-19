@@ -32,6 +32,23 @@ section.children.push({
   text(' this is a separate paragraph.')
  ]
 });
+// Text between the nodes must prevent the split-parent special case.
+section.children.push({
+ ...structuredClone(existingParagraph),
+ children:[
+  inline('tufte-span',[text('Another heading')],{kind:'newthought'}),
+  text(' intervening text '),
+  inline('tufte-sidenote',[text('Separate note')],{noteId:'separated-export'})
+ ]
+});
+// A marginnote next to newthought retains its ordinary sibling controls.
+section.children.push({
+ ...structuredClone(existingParagraph),
+ children:[
+  inline('tufte-span',[text('Margin heading')],{kind:'newthought'}),
+  inline('tufte-marginnote',[text('Ordinary margin')],{noteId:'margin-after-newthought-export'})
+ ]
+});
 const published=renderArticle(source);
 assert.equal(published.ok,true,JSON.stringify(published.diagnostics));
 
@@ -101,15 +118,18 @@ try{
   return {lexical:notes(lexicalHtml),publication:notes(publicationHtml)};
  },{lexicalHtml:lexical.html,publicationHtml:published.html});
 
- const expectedKinds=['sidenote','marginnote','marginnote','sidenote'];
- const expectedIds=['server-note','server-margin','figure-margin-export','split-parent-export'];
+ const expectedKinds=['sidenote','marginnote','marginnote','sidenote','sidenote','marginnote'];
+ const expectedIds=[
+  'server-note','server-margin','figure-margin-export','split-parent-export',
+  'separated-export','margin-after-newthought-export'
+ ];
  const semantic=notes=>notes.map(({id,...rest})=>rest);
  for(const [route,notes] of Object.entries(compared)){
-  assert.equal(notes.length,4,route+': all four notes should be exported');
+  assert.equal(notes.length,6,route+': all six notes should be exported');
   assert.deepEqual(notes.map(note=>note.kind),expectedKinds,route+': note types and document order');
-  assert.deepEqual(notes.map(note=>note.inFigure),[false,false,true,false],route+': note location');
-  assert.deepEqual(notes.map(note=>note.splitParent),[false,false,false,true],route+': upstream split-parent note markup');
-  assert.equal(new Set(notes.map(note=>note.id)).size,4,route+': unique toggle IDs');
+  assert.deepEqual(notes.map(note=>note.inFigure),[false,false,true,false,false,false],route+': note location');
+  assert.deepEqual(notes.map(note=>note.splitParent),[false,false,false,true,false,false],route+': upstream split-parent note markup');
+  assert.equal(new Set(notes.map(note=>note.id)).size,6,route+': unique toggle IDs');
   for(let i=0;i<notes.length;i++){
    assert.ok(notes[i].id?.endsWith(expectedIds[i]),route+': stable note identity '+expectedIds[i]);
    assert.equal(notes[i].checkbox,true);
@@ -125,8 +145,10 @@ try{
  assert.deepEqual(compared.lexical[0].images,[{src:'/fixture.svg',alt:'주석 그림'}]);
  assert.deepEqual(compared.lexical[2].text,'Figure margin');
  assert.deepEqual(compared.lexical[3].text,'Reference');
+ assert.deepEqual(compared.lexical[4].text,'Separate note');
+ assert.deepEqual(compared.lexical[5].text,'Ordinary margin');
  assert.deepEqual(errors,[]);
- console.log('Note HTML parity: real Lexical export and publisher agree for rich sidenote, marginnote, figure note and upstream newthought split-parent (IDs normalized only).');
+ console.log('Note HTML parity: rich notes, figure notes and newthought split-parent/negative cases agree between Lexical and publisher (IDs normalized only).');
 }finally{
  await browser.close();
  server?.kill();
