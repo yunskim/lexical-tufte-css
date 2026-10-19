@@ -78,6 +78,7 @@ export function validateDocument(input:unknown):ValidationResult{
    if(type==='code-highlight'&&raw.highlightType!==null&&(typeof raw.highlightType!=='string'||!/^[a-zA-Z][a-zA-Z0-9_-]{0,63}$/.test(raw.highlightType)))add('INVALID_HIGHLIGHT',path+'.highlightType','Invalid highlight token');
   }
   if(type==='heading'&&!enumeration(raw.tag,['h2','h3']))add('INVALID_HEADING',path+'.tag','Only h2/h3 supported');
+  if(type==='heading'&&raw.id!==undefined&&!isIdentifier(raw.id))add('INVALID_HEADING_ID',path+'.id','Heading ID must be a safe identifier');
   if(type==='list'&&(!enumeration(raw.listType,['bullet','number'])||raw.tag!==(raw.listType==='bullet'?'ul':'ol')||!integer(raw.start,1,Number.MAX_SAFE_INTEGER)))add('INVALID_LIST',path,'Invalid list kind/tag/start');
   if(type==='listitem'&&raw.checked!==undefined)add('UNSUPPORTED_PROPERTY',path+'.checked','Checklist semantics are outside this schema');
   if(type==='listitem'&&!integer(raw.value,1,Number.MAX_SAFE_INTEGER))add('INVALID_LIST_VALUE',path+'.value','Invalid list value');
