@@ -645,3 +645,10 @@ E059/M052 및 E067/M060의 선행 대책을 그림 주석 명령·회귀 테스�
 - newthought/sidenote는 **논리적으로 형제**이며 HTML에서만 레이블 부모가 바뀐다. 직전 실제 논리 형제가 newthought이고 paragraph 직속일 때만 레이블을 이전 `span.newthought` 안에 추가한다. 중간 텍스트, marginnote, 다른 컨테이너, 부분 내보내기에서 선행 span이 없는 경우는 독립 제어 구조를 유지한다.
 - ID namespace만 정규화하되 체크박스 type, 레이블 대응, `input + span` CSS 인접성, label parent, 주석 순서/개수, 이미지·링크·서식은 엄격하게 비교한다. 원본 전체 페이지 parity로 확대하지 않는다.
 - 적용: `tests/note-export-parity-browser.mjs`의 6개 시나리오와 `packages/lexical/src/NoteNode.ts`. 최종 브라우저·패키지 소비 재검증 전에는 구현을 verified로 판단하지 않는다.
+
+## M107 — 외부 고정 HTML 경로 보존과 URL 보안 계약의 최소 확장
+
+- E117: HTML 속성의 원본 값을 맞추기 위해 `img/...`를 `./img/...`로 조용히 바꾸지 않는다. document·Lexical·renderer가 공유하는 URL 경계에서 명시적으로 안전한 bare-relative 경로만 수용하고 JSON/HTML 왕복을 확인한다.
+- URI scheme `javascript:`/`data:`, protocol-relative `//`, credential-bearing URL, control/공백·역슬래시, 새 bare-relative 입력에서 query/fragment를 허용하지 않는다. 기존 HTTP(S) 및 `/`/`./`/`../` 정책의 변경은 별도 검토 대상으로 둔다.
+- 정규식 구문 통과만으로 URL 안전성을 판단하지 않는다. 정상 상대 경로 + 보안 반례 + 실제 `renderArticle` 결과의 src 속성 보존을 연속 검증한다.
+- 적용: `packages/document/src/schema.ts`, `packages/document/test/document.test.mjs`, `tests/upstream-same-content-final-sections-browser.mjs`. 테스트 재실행 대기.
