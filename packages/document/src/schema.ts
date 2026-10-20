@@ -37,7 +37,7 @@ export function isSafeURL(value:unknown,kind:'image'|'link'):value is string{
  // The pinned upstream demo uses 'img/name.png' rather than '/img/name.png'.
  // Allow ordinary root-relative-to-document path segments without introducing
  // new schemes, authority URLs, query strings, or control/escape characters.
- if(/^[A-Za-z0-9][A-Za-z0-9._~/-]*$/.test(value))return true;
+ if(/^[A-Za-z0-9][A-Za-z0-9._~/-]*$/.test(value)&&value.split('/').every(segment=>segment!==''&&segment!=='.'&&segment!=='..'))return true;
  try{const u=new URL(value);return (kind==='image'?['http:','https:']:['http:','https:','mailto:','tel:','sms:']).includes(u.protocol)&&!u.username&&!u.password;}catch{return false;}
 }
 export function isEmbedURL(value:unknown,provider:unknown):value is string{
