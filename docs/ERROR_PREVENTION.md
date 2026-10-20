@@ -652,3 +652,10 @@ E059/M052 및 E067/M060의 선행 대책을 그림 주석 명령·회귀 테스�
 - URI scheme `javascript:`/`data:`, protocol-relative `//`, credential-bearing URL, control/공백·역슬래시, 새 bare-relative 입력에서 query/fragment 및 빈 경로 구간(`//`)·상위/현재 디렉터리 구간(`..`/`.`)을 허용하지 않는다. 기존 HTTP(S) 및 `/`/`./`/`../` 정책의 변경은 별도 검토 대상으로 둔다.
 - 정규식 구문 통과만으로 URL 안전성을 판단하지 않는다. 정상 상대 경로 + 보안 반례 + 실제 `renderArticle` 결과의 src 속성 보존을 연속 검증한다.
 - 적용: `packages/document/src/schema.ts`, `packages/document/test/document.test.mjs`, `tests/upstream-same-content-final-sections-browser.mjs`. 테스트 재실행 대기.
+
+## M108 — 블록의 CSS 의미와 URL 속성은 인라인 대체·가상 필드 삭제로 보정하지 않는다
+
+- E118: 고정 공식 샘플에 직접 달린 `p.sans`, `blockquote[cite]` 속성은 인라인 `span.sans`나 인용 출처 본문으로 대체할 수 없다. 정확한 DOM 부모/태그/속성은 같은 원본 콘텐츠에서 비교한다.
+- 새 block 속성은 `JsonNode` 타입·`NODE_SCHEMA` 허용 필드·정확한 값 검증·순수 발행 렌더러·HTML 속성 whitelist·Lexical 노드 create/export/update/import/clone의 모든 계층에서 동일하게 정의한다. 임의 class/style 주입과 비안전 cite URL은 거부한다. `src`/외부 URL과 구분되는 인용 `cite`는 링크 URL 정책을 따른다.
+- Lexical 0.52.0 기본 `ParagraphNode`/`QuoteNode`를 subclass로 바꿀 때 `$createParagraphNode`/`$createQuoteNode`의 replace/withKlass, 원본 factory의 importJSON이 subclass `updateFromJSON`으로 dispatch하는 경로를 모두 확인한다. 기본 속성 미지정 JSON과 Tufte 전용 속성 JSON의 roundtrip을 각각 확인한다. 다른 node type·기존 golden fixture에 없는 필드를 임의로 쓰지 않는다.
+- 적용: `packages/lexical/src/TufteBlockNodes.ts`, `packages/lexical/src/nodes.ts`, document schema/validator, render tree/profile, 단위 테스트 `fundamentals-attributes.test.mjs` 두 파일, strict DOM `tests/upstream-same-content-fundamentals-browser.mjs`. 실제 테스트 재실행 전에는 완료 판정하지 않는다.
