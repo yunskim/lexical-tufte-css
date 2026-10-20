@@ -649,6 +649,6 @@ E059/M052 및 E067/M060의 선행 대책을 그림 주석 명령·회귀 테스�
 ## M107 — 외부 고정 HTML 경로 보존과 URL 보안 계약의 최소 확장
 
 - E117: HTML 속성의 원본 값을 맞추기 위해 `img/...`를 `./img/...`로 조용히 바꾸지 않는다. document·Lexical·renderer가 공유하는 URL 경계에서 명시적으로 안전한 bare-relative 경로만 수용하고 JSON/HTML 왕복을 확인한다.
-- URI scheme `javascript:`/`data:`, protocol-relative `//`, credential-bearing URL, control/공백·역슬래시, 새 bare-relative 입력에서 query/fragment를 허용하지 않는다. 기존 HTTP(S) 및 `/`/`./`/`../` 정책의 변경은 별도 검토 대상으로 둔다.
+- URI scheme `javascript:`/`data:`, protocol-relative `//`, credential-bearing URL, control/공백·역슬래시, 새 bare-relative 입력에서 query/fragment 및 빈 경로 구간(`//`)·상위/현재 디렉터리 구간(`..`/`.`)을 허용하지 않는다. 기존 HTTP(S) 및 `/`/`./`/`../` 정책의 변경은 별도 검토 대상으로 둔다.
 - 정규식 구문 통과만으로 URL 안전성을 판단하지 않는다. 정상 상대 경로 + 보안 반례 + 실제 `renderArticle` 결과의 src 속성 보존을 연속 검증한다.
 - 적용: `packages/document/src/schema.ts`, `packages/document/test/document.test.mjs`, `tests/upstream-same-content-final-sections-browser.mjs`. 테스트 재실행 대기.
