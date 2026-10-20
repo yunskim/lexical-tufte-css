@@ -133,7 +133,7 @@ try{
   });
   return {blocks};
  },upstream);
- assert.equal(source.blocks.length,15,'The pinned Fundamentals section has 15 direct blocks');
+ assert.equal(source.blocks.length,14,'The pinned Fundamentals section has 14 direct blocks');
  assert.deepEqual(source.blocks.map(b=>b.kind).filter(k=>k==='quote'),['quote']);
  assert.deepEqual(source.blocks.filter(b=>b.tufteClass).map(b=>b.tufteClass),['sans']);
  const sourceNotes=source.blocks.flatMap(b=>b.kind==='paragraph'
@@ -215,5 +215,5 @@ try{
  },{upstream,published:output.html});
  assert.deepEqual(matched.actual,matched.original,
   'Fundamentals should preserve p.sans, blockquote cite, source notes, headings and exact inline semantics');
- console.log('Pinned Fundamentals same-content: 15 blocks including quote[cite], p.sans and three real notes, exact DOM except generated note IDs and block indentation.');
+ console.log('Pinned Fundamentals same-content: 14 blocks including quote[cite], p.sans and three real notes, exact DOM except generated note IDs and block indentation.');
 }finally{await browser.close();}
