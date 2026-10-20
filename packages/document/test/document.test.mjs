@@ -66,7 +66,8 @@ test('pinned upstream image paths remain exact relative URLs without relaxing sc
  for(const src of [
   'javascript:alert(1)','data:image/svg+xml,foo','//evil.test/asset.png',
   'https://user:pass@example.com/a.png','img/bad.png?autoplay=1',
-  'img/unsafe.png#fragment','img/evil name.png','img/evil\\\\name.png'
+  'img/unsafe.png#fragment','img/evil name.png',
+  'img/../private.png','img//double-slash.png','img/./file.png','img/evil\\\\name.png'
  ])assert.equal(isSafeURL(src,'image'),false,src);
 });
 test('embed URLs are provider specific and titles are mandatory',()=>{
