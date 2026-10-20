@@ -19,10 +19,6 @@ const element=(type,children,extra={})=>({
  type,version:1,children,direction:null,format:'',indent:0,...extra
 });
 const paragraph=parts=>element('paragraph',parts,{textFormat:0,textStyle:''});
-const allowedAttrs=(node,fields)=>{
- const actual=[...node.attributes].map(a=>a.name).sort();
- assert.deepEqual(actual,fields.slice().sort(),'Unsupported upstream '+node.tagName+' attrs');
-};
 const browser=await chromium.launch({
  headless:true,
  ...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{}),
@@ -91,6 +87,9 @@ try{
    return out;
   };
   attrs(section,[]);
+  if([...section.childNodes].some(node=>node.nodeType!==Node.ELEMENT_NODE&&
+   (node.nodeType!==Node.TEXT_NODE||(node.nodeValue??'').trim()!=='')))
+   throw Error('Unsupported direct section content');
   const blocks=[...section.children].map(node=>{
    if(node.tagName==='H2'){
     attrs(node,['id']);
@@ -190,11 +189,13 @@ try{
     if(child.nodeType!==Node.TEXT_NODE||(child.nodeValue??'').trim()!=='')
      return true;
     if(node.tagName==='SECTION')return false;
-    const previous=child.previousElementSibling,next=child.nextElementSibling;
+    const previous=child.previousSibling,next=child.nextSibling;
     const controlGap=(
-     previous?.matches('label.margin-toggle')&&next?.matches('input.margin-toggle')
+     previous?.nodeType===Node.ELEMENT_NODE&&next?.nodeType===Node.ELEMENT_NODE&&
+     previous.matches('label.margin-toggle')&&next.matches('input.margin-toggle')
     )||(
-     previous?.matches('input.margin-toggle')&&next?.matches('span.sidenote,span.marginnote')
+     previous?.nodeType===Node.ELEMENT_NODE&&next?.nodeType===Node.ELEMENT_NODE&&
+     previous.matches('input.margin-toggle')&&next.matches('span.sidenote,span.marginnote')
     );
     if(controlGap){omittedWhitespace++;return false;}
     return true;
