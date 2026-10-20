@@ -7,7 +7,9 @@ type Element<T extends string,P={}> = ElementBase<T>&P;
 type Text<T extends string='text',P={}>={type:T;version:1;text:string;format:number;detail?:0|2;mode?:'normal';style?:''}&P;
 export type ImageFields={src:string;alt:string;assetId?:string;width?:number;height?:number};
 export type JsonNode=
- | Element<'root'|'tufte-section'|'paragraph'|'tufte-caption'|'quote'|'tufte-epigraph'|'tufte-attribution'|'tufte-cite'|'tufte-section-footer'|'tufte-definition-list'|'tufte-term'|'tufte-definition'|'tufte-fullwidth'>
+ | Element<'root'|'tufte-section'|'tufte-caption'|'tufte-epigraph'|'tufte-attribution'|'tufte-cite'|'tufte-section-footer'|'tufte-definition-list'|'tufte-term'|'tufte-definition'|'tufte-fullwidth'>
+ | Element<'paragraph',{tufteClass?:'sans'}>
+ | Element<'quote',{cite?:string}>
  | Element<'heading',{tag:'h2'|'h3';id?:string}>
  | Element<'list',{listType:'bullet'|'number';tag:'ul'|'ol';start:number}>
  | Element<'listitem',{value:number;checked?:undefined}>
