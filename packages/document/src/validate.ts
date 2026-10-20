@@ -80,6 +80,8 @@ export function validateDocument(input:unknown):ValidationResult{
    if(type==='tab'&&raw.text!=='\t')add('INVALID_TAB',path+'.text','Tab node must contain one tab');
    if(type==='code-highlight'&&raw.highlightType!==null&&(typeof raw.highlightType!=='string'||!/^[a-zA-Z][a-zA-Z0-9_-]{0,63}$/.test(raw.highlightType)))add('INVALID_HIGHLIGHT',path+'.highlightType','Invalid highlight token');
   }
+  if(type==='paragraph'&&raw.tufteClass!==undefined&&raw.tufteClass!=='sans')add('INVALID_PARAGRAPH_CLASS',path+'.tufteClass','Only sans is a supported paragraph class');
+  if(type==='quote'&&raw.cite!==undefined&&!isSafeURL(raw.cite,'link'))add('INVALID_QUOTE_CITE',path+'.cite','Quote cite must be a safe URL');
   if(type==='heading'&&!enumeration(raw.tag,['h2','h3']))add('INVALID_HEADING',path+'.tag','Only h2/h3 supported');
   if(type==='heading'&&raw.id!==undefined&&!isIdentifier(raw.id))add('INVALID_HEADING_ID',path+'.id','Heading ID must be a safe identifier');
   if(type==='list'&&(!enumeration(raw.listType,['bullet','number'])||raw.tag!==(raw.listType==='bullet'?'ul':'ol')||!integer(raw.start,1,Number.MAX_SAFE_INTEGER)))add('INVALID_LIST',path,'Invalid list kind/tag/start');
