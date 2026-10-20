@@ -802,3 +802,9 @@ E001–E049/M001–M042를 검토했다. E024의 경계 입력은 실제 Chromiu
 - 발견: 원본 8번째 섹션의 두 figure는 `src="img/imagequilt-*.png"`를 사용한다. 기존 `isSafeURL(value,'image')`는 `/`/`./`/`../` 또는 HTTP(S) 절대 URL만 허용하여, 원본과 같은 HTML을 생성하려는 새 동일 콘텐츠 fixture가 검증 단계에서 거부된다.
 - 처리: 영숫자로 시작하며 영숫자·`.`·`_`·`~`·`-`·`/`만 포함하는 제한된 bare-relative 경로를 추가했다. URI scheme, protocol-relative URL, 자격 증명, 공백, 역슬래시, bare-relative 경로의 query/fragment는 새 허용 경로에 포함하지 않는다. 공식 `img/...` 입력과 공격적 반례를 문서 검증 단위 테스트에 함께 추가했다.
 - 상태: 코드 및 테스트 작성, 실제 Work 빌드·검증 **대기**. 보안 회귀와 전체 발행 경로가 통과하기 전 verified로 표시하지 않는다. M107 참조.
+
+## E118 — Fundamentals 원본의 블록 레벨 속성이 기존 논리 모델에서 보존되지 않음
+
+- 발견: 공식 Tufte CSS 샘플 Fundamentals 섹션은 `<p class="sans">`와 `<blockquote cite="...">`를 사용한다. 기존 문서 스키마의 paragraph/quote는 해당 속성의 직렬화를 허용하지 않았으며, 인라인 `tufte-span(kind='sans')`로 바꾸면 CSS selector/원본 DOM 구조가 달라진다. `blockquote`의 citation URL을 본문 텍스트로 넣어도 원본 속성은 사라진다.
+- 처리: **새 wire node type 추가 없이** paragraph에 선택적 `tufteClass:'sans'`, quote에 선택적 `cite` 필드를 명시하고, 검사 없는 CSS 문자열/위험한 URL은 거부한다. Pure renderer에는 직접 요소 클래스·`cite` 출력과 whitelist를 추가했다. Lexical 0.52.0의 native paragraph/quote factory를 subclass+withKlass 교체로 연결하고, 저장/복원 시 기본 importJSON의 가상 `updateFromJSON`을 통해 선택적 필드를 보존하게 했다. 기존 기본 노드의 wire JSON은 속성 없는 형태를 유지한다. 단위 검증 및 고정 원본 Fundamentals 14블록/3노트 strict DOM 비교 테스트를 추가했다.
+- 상태: 수정 코드·테스트 작성, 새 빌드·타입·단위·브라우저 **검증 대기**. 코드 작성만으로 원본 parity 성공이나 이전 전체 batch 통과를 주장하지 않는다. M108 참조.
