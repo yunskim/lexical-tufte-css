@@ -10,6 +10,21 @@
 
 기능 구현 순서는 **예제 DOM 대응 확인 → schema 계약 → Lexical 편집/경계 → 순수 renderer HTML → fixture 작성 → 누적 실행 검증**으로 한다. 기본 Lexical 키 입력을 재구현하기보다 문서 schema를 위반할 수 있는 경계에서만 가로채고, 붙여넣기·IME·undo/redo·저장/발행은 동일 불변식을 검사한다. 사용자 요청에 따라 현재 테스트는 작성·누적하고 일괄 실행하기 전까지 관련 체크박스를 완료 처리하지 않는다. 공식 예제의 지원 범위와 제3자 임의 HTML의 지원 범위는 구분한다.
 
+## 고정 upstream 9개 섹션 동일 콘텐츠 진행표 (2026-10-20)
+
+[섹션별 동일 콘텐츠 DOM 추적표](UPSTREAM_PAGE_PARITY_MATRIX.ko.md)를 기준으로 진행한다.
+2026-10-19 Work 결과는 기존 두 섹션(Opening, Getting Started)과 독립
+newthought 샘플에 한해 동일 콘텐츠 DOM 검증을 완료했다.
+Epigraphs 및 Code·ImageQuilts·Epilogue의 4개 섹션 비교와 bare-relative
+이미지 URL 정책 수정은 **코드 작성 상태이며 새 Work 검증은 미실행**이다.
+모두 통과하면 섹션 단위 DOM 비교 범위가 2/9→6/9로 넓어진다.
+
+`pnpm test:upstream-same-content`가 위 신규 검사를 포함한다. `pnpm verify:batch`
+또한 전체 브라우저 파일을 자동 발견한다. 기존 69/69 검증은
+신규 코드 이전의 결과이므로 재실행 전 상태를 혼동하지 않는다.
+원본 9개 섹션을 하나의 Lexical 문서로 묶은 발행·저장·수정 후
+전체 DOM, geometry 및 이미지·폰트 parity는 아직 미완료다. CI 생략.
+
 ## 목표와 완료 정의
 
 Lexical로 Tufte CSS의 모든 표현을 구조적으로 작성·수정하고, 같은 문서를 미리보기·HTML 발행·블로그 운영에 사용하는 재사용 라이브러리를 만든다. 최종 산출물은 편집기, 독립 렌더러, 블로그 코어와 저장소 어댑터, 실제 운영 가능한 예제 블로그, 문서 및 배포 패키지다.
