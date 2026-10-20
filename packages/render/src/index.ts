@@ -36,7 +36,7 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
       i++;
      }else output.push(...render(child));
     }
-    return [element('p',attrs(n),output)];
+    return [element('p',n.tufteClass==='sans'?withClass(n,'sans'):attrs(n),output)];
    }
    case 'heading':return [element(n.tag,{...attrs(n),...(n.id?{id:String(n.id)}:{})},inner())];
    case 'horizontalrule':return [element('hr',{},[],true)];
@@ -48,7 +48,7 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
    case 'tufte-definition-list':return [element('dl',attrs(n),inner())];
    case 'tufte-term':return [element('dt',attrs(n),inner())];
    case 'tufte-definition':return [element('dd',attrs(n),inner())];
-   case 'quote':return [element('blockquote',attrs(n),inner())];
+   case 'quote':return [element('blockquote',{...attrs(n),...(n.cite?{cite:n.cite}:{})},inner())];
    case 'tufte-epigraph':return [element('div',withClass(n,'epigraph'),inner())];
    case 'tufte-attribution':return [element('footer',attrs(n),inner())];
    case 'tufte-cite':return [element('cite',attrs(n),inner())];
