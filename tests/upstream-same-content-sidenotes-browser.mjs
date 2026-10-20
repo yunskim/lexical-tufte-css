@@ -163,8 +163,10 @@ try{
  assert.equal(JSON.stringify(document),before,'Publishing must not mutate source JSON');
 
  const comparison=await page.evaluate(({original,published})=>{
-  const parse=markup=>new DOMParser().parseFromString(markup,'text/html')
-   .querySelector('article > section');
+  const parse=markup=>{
+   const doc=new DOMParser().parseFromString(markup,'text/html');
+   return doc.querySelector('article > section')??doc.querySelector('section');
+  };
   const source=parse(original),actual=parse(published);
   if(!source||!actual)throw Error('Source or published section missing');
   const sourceNotes=[...source.querySelectorAll('input.margin-toggle')];
