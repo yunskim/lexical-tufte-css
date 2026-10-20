@@ -1,6 +1,6 @@
 import {
  $applyNodeReplacement,ParagraphNode,isHTMLElement,
- type DOMExportOutput,type EditorConfig,type LexicalEditor,type NodeKey,
+ type DOMExportOutput,type EditorConfig,type LexicalEditor,type LexicalUpdateJSON,type NodeKey,
  type SerializedParagraphNode,type SerializedPartial
 } from 'lexical';
 import {QuoteNode,type SerializedQuoteNode} from '@lexical/rich-text';
@@ -37,6 +37,11 @@ export class TufteParagraphNode extends ParagraphNode {
   if(isHTMLElement(result.element)&&this.getTufteClass()==='sans')
    result.element.classList.add('sans');
   return result;
+ }
+ // Built-in ParagraphNode.importJSON uses $createParagraphNode (which is
+ // replaced by this class), so its virtual updater must restore our field.
+ updateFromJSON(value:LexicalUpdateJSON<SerializedTufteParagraph>):this{
+  return super.updateFromJSON(value).setTufteClass(value.tufteClass);
  }
  exportJSON(compact?:false):SerializedTufteParagraph;
  exportJSON(compact:boolean):SerializedPartial<SerializedTufteParagraph>;
@@ -87,6 +92,11 @@ export class TufteQuoteNode extends QuoteNode {
   if(isHTMLElement(result.element)&&this.getCite())
    result.element.setAttribute('cite',this.getCite()!);
   return result;
+ }
+ // Built-in QuoteNode.importJSON creates the replacement subclass.
+ // Preserve cite when the base parser dispatches through updateFromJSON.
+ updateFromJSON(value:LexicalUpdateJSON<SerializedTufteQuote>):this{
+  return super.updateFromJSON(value).setCite(value.cite);
  }
  exportJSON(compact?:false):SerializedTufteQuote;
  exportJSON(compact:boolean):SerializedPartial<SerializedTufteQuote>;
