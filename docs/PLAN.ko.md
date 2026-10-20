@@ -25,6 +25,18 @@ Epigraphs 및 Code·ImageQuilts·Epilogue의 4개 섹션 비교와 bare-relative
 원본 9개 섹션을 하나의 Lexical 문서로 묶은 발행·저장·수정 후
 전체 DOM, geometry 및 이미지·폰트 parity는 아직 미완료다. CI 생략.
 
+## Wagtail 참고 범용 에셋 라이브러리 (2026-10-20)
+
+이미지뿐 아니라 PDF·일반 첨부파일·오디오·동영상까지 관리하기 위한
+[**에셋 라이브러리 설계 및 A0–A8 체크리스트**](ASSET_LIBRARY_WAGTAIL_PLAN.ko.md)를
+별도 실행 계획으로 둔다. Wagtail의 중앙 라이브러리·검색/업로드 chooser·태그/컬렉션·사용처·파생 이미지 UX를
+참고하지만 Wagtail/Django 의존성을 추가하지 않는다.
+
+현재 `AssetRef`는 이미지 전용 메타데이터이며 실제 파일 업로드/라이브러리/범용 바이너리 저장 구현은 없다.
+새 계획은 파일 저장과 문서 표현을 분리하고, immutable 파일 버전 및 발행 스냅샷 참조를 기본으로 한다.
+**계획 작성만 완료**, 실제 A0–A8 구현·검증은 모두 미완료. 구형 `tufte-note` 문서 호환성 정책은 바꾸지 않는다.
+기존 Tufte CSS 전체 샘플 재현 검증과 에셋 개발 수락 기준을 서로 혼동하지 않는다.
+
 ## 목표와 완료 정의
 
 Lexical로 Tufte CSS의 모든 표현을 구조적으로 작성·수정하고, 같은 문서를 미리보기·HTML 발행·블로그 운영에 사용하는 재사용 라이브러리를 만든다. 최종 산출물은 편집기, 독립 렌더러, 블로그 코어와 저장소 어댑터, 실제 운영 가능한 예제 블로그, 문서 및 배포 패키지다.
@@ -230,7 +242,7 @@ P2 gate: F01–F19의 데이터 보존 및 구조 검증 통과. 편집·시각 
 - [ ] P3.3 동일 렌더러로 preview, draft 복구·dirty state·오류 표시.
   - [ ] P3.3.a `renderArticle` 정본 결과를 독립 sandbox/격리 스타일의 preview로 보여 주고 발행 실패 진단을 위치·원인과 연결한다. JSON/HTML 텍스트 표시를 실제 미리보기로 오인하지 않는다.
   - [ ] P3.3.b 로컬 복구본 목록·선택적 복원·복원 전 diff/확인, dirty/saving/saved/error/conflict 표시와 navigate-away 보호, 비공개 draft 및 최종 공개 snapshot 분리를 검증한다.
-- [ ] P3.4 assets 업로드/진행/취소/실패 재시도, alt/caption, 본문/여백/전체 폭 전환.
+- [ ] P3.4 assets 업로드/진행/취소/실패 재시도, alt/caption, 본문/여백/전체 폭 전환. 상세 단계/완료 조건: [에셋 계획 A0–A4](ASSET_LIBRARY_WAGTAIL_PLAN.ko.md).
   - [ ] P3.4.a `AssetStore` 어댑터와 브라우저 임시 blob/외부 URL/저장 asset ID의 소유권·중복 제거·미참조 회수 기준을 명시한다. 업로드 실패 시 공개본 참조 보호, 취소 후 복구·재시도를 검증한다.
   - [ ] P3.4.b 파일 MIME 매직바이트·크기 제한·SVG 정책·alt 필수/장식 이미지·캡션 수정/삭제를 테스트하고 외부 URL과 호스트 인증 경계를 유지한다.
 - [ ] P3.5 노트의 모바일 작성 UI는 항상 접근 가능하게 제공; 독자용 접힘 상태와 구분.
@@ -251,7 +263,7 @@ P4 gate: F01–F22 완료 증거 확보, 공개 페이지에 editor dependency�
 
 ### P5 — 블로그 운영 라이브러리 (P4 이후)
 
-- [ ] P5.1 filesystem repository와 asset adapter, 원자적 저장·revision 충돌·초안 복구.
+- [ ] P5.1 filesystem repository와 asset adapter, 원자적 저장·revision 충돌·초안 복구. 범용 바이너리 저장 및 버전/사용처 계약: [에셋 계획 A1/A5/A6](ASSET_LIBRARY_WAGTAIL_PLAN.ko.md).
   - [ ] P5.1.a `packages/adapter-fs` 구현: fsync/원자 rename·expectedRevision CAS·경로/slug 중복·삭제/정리 오류·동시 프로세스 쓰기·복구/백업·Windows 파일명 경계를 테스트한다.
   - [ ] P5.1.b `packages/blog`의 현 SQLite publication/recovery proof를 실제 호스트 저장소 어댑터와 연결하되 공개 snapshot·초안·편집 세션·복구본 데이터 소유권 및 retention/삭제 규칙을 분리한다.
 - [ ] P5.2 create/edit/preview/publish/update/unpublish/delete; 공개 snapshot과 초안 분리.
@@ -259,7 +271,7 @@ P4 gate: F01–F22 완료 증거 확보, 공개 페이지에 editor dependency�
 - [ ] P5.4 SEO title/description/canonical/Open Graph, RSS/Atom·sitemap·robots, HTML escape.
 - [ ] P5.5 정적 build, 콘텐츠/자산 누락 검출, 백업·복원 및 포맷 내보내기.
 - [ ] P5.6 호스트가 인증/권한/CSRF/배포를 책임지는 경계 문서화; 예제 관리 API는 인증 또는 로컬 전용으로 제한.
-- [ ] P5.7 업로드 MIME/크기 제한·path traversal 방지·URL protocol allowlist·embed provider 정책·SVG 처리·XSS 회귀 검증.
+- [ ] P5.7 업로드 MIME/크기 제한·path traversal 방지·URL protocol allowlist·embed provider 정책·SVG 처리·XSS 회귀 검증. 종류별 파일 정책 및 다운로드 권한: [에셋 계획 A2/A8](ASSET_LIBRARY_WAGTAIL_PLAN.ko.md).
 - [ ] P5.8 `examples/blog` 소비자 예제로 문서 생성→편집→preview→publish→update→unpublish→restore→delete·검색/목록을 실제 경로로 연결한다. 공개 라우트는 편집 의존성, 초안·복구본·인증 비밀 누출 금지. 호스트의 인증·ACL·Origin/CSRF와 recovery 서비스 연결 책임을 문서화한다.
 
 P5 gate: 실제 예제 블로그에서 작성→발행→수정→비공개→복원 및 revision 충돌 시나리오 통과.
