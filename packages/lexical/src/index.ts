@@ -1,6 +1,7 @@
 /** Dependency smoke surface; Tufte nodes are implemented in P1/P2. */
 export {createEditor} from "lexical";
 export {createHeadlessEditor} from "@lexical/headless";
+export {TufteParagraphNode,TufteQuoteNode,$createTufteParagraphNode,$createTufteQuoteNode,type SerializedTufteParagraph,type SerializedTufteQuote} from './TufteBlockNodes.js';
 export {TufteHeadingNode,$createTufteHeadingNode,type SerializedTufteHeadingNode} from './TufteHeadingNode.js';
 export {NoteNode,type SerializedNoteNode} from './NoteNode.js';
 export {SidenoteNode,$createSidenoteNode} from './SidenoteNode.js';
