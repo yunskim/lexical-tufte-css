@@ -13,7 +13,7 @@
 | --- | --- | --- | --- |
 | 1 | Opening (h2 없음) | `upstream-same-content-opening-browser.mjs`: 통과(2026-10-19 Work) | 실제 편집 후 저장·재열기/전체 페이지 재구성 연결 |
 | 2 | Getting Started | `upstream-same-content-getting-started-browser.mjs`: 통과(2026-10-19 Work) | 실제 편집기 재열기/시각 비교 |
-| 3 | Fundamentals | 미작성 | blockquote의 `cite` 속성, 문단 자체의 `sans` class, 여러 rich sidenote/marginnote·newthought 결합의 동등 모델 검토 |
+| 3 | Fundamentals | `upstream-same-content-fundamentals-browser.mjs`: **코드 추가, 실행 대기** | 기존 `paragraph`에 선택적 `tufteClass:'sans'`, `quote`에 안전한 `cite`를 추가. 14개 원본 블록·실제 3개 주석·newthought 결합·인라인 링크/강조, 전체 DOM을 비교. Lexical factory/저장 왕복 테스트도 작성, 실제 검증 대기 |
 | 4 | Epigraphs | `upstream-same-content-epigraphs-browser.mjs`: **코드 추가, 실행 대기** | 세 인용문, 문단 있는/없는 블록, footer·cite·강조를 원본과 비교; 검증 후 편집 경로 연결 |
 | 5 | Sidenotes: Footnotes and Marginal Notes | `upstream-same-content-sidenotes-browser.mjs`: **코드 추가, 실행 대기** | 12개 원본 블록·2개 실제 note·pre/code 및 인라인 강조·ID 참조·375/760/761/1440px 모바일 토글; 실행 후 검증 판정 |
 | 6 | Figures | 미작성 | figure 내부/문단 내부 marginnote의 이미지·링크·강조; `figure.iframe-wrapper`와 원본 YouTube iframe 속성/URL 정책은 현재 렌더러와 **구조적으로 불일치** |
@@ -22,9 +22,9 @@
 | 9 | Epilogue | 같은 파일: **코드 추가, 실행 대기** | 실제 편집 후 전체 문서 저장·발행 경로 |
 
 현재 **검증 완료된 섹션은 2/9**, 새로 작성된 동일 콘텐츠 테스트 대상은
-5개 섹션(Epigraphs, Sidenotes, Code, ImageQuilts, Epilogue)이며,
-나머지 2개 섹션(Fundamentals, Figures)은 아직 전체 재구성 검사가 없다.
-새로운 5개가 모두 통과하면 섹션 단위 DOM 대응 범위는 **7/9**가 된다.
+6개 섹션(Fundamentals, Epigraphs, Sidenotes, Code, ImageQuilts, Epilogue)이며,
+**Figures**만 아직 전체 동일 콘텐츠 재구성 검사가 없다.
+새로운 6개가 모두 통과하면 섹션 단위 DOM 대응 범위는 **8/9**가 된다.
 부분 섹션 테스트를 전체 문서 동등성으로 해석하지 않는다.
 
 ## 엄격한 비교 계약
@@ -55,7 +55,7 @@
 ## 다음 작업 순서
 
 1. 새 `Epigraphs`·`Sidenotes` 및 마지막 세 섹션 테스트를 Work에서 **일괄 실행**하고 진단·재발 대책을 기록한다. CI는 생략한다.
-2. Fundamentals의 `blockquote[cite]`와 `p.sans`를 보존할 최소 구조 계약 결정 후 편집기·렌더러·테스트 반영.
+2. Fundamentals의 `blockquote[cite]`와 `p.sans` 속성은 기존 wire type을 유지한 선택적 속성으로 추가했고, Lexical node replacement 및 renderer 비교 코드를 작성했다. **일괄 실행 후** 이행 결과를 판정한다.
 3. Figures의 일반 margin image와 독립 embed 보안/DOM 정책을 구분한다. 원본 iframe으로 되돌리는 방식의 안전성 약화는 별도 검토 없이 하지 않는다.
 4. 9개 섹션을 **하나의 Lexical 문서**로 묶어 정본 저장·재열기, 전체 원본 대비 DOM·viewport별 geometry/실제 이미지·폰트/스크린샷을 확인한다.
 
