@@ -1,6 +1,8 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createHeadlessEditor} from '@lexical/headless';
+import {withDOM} from '@lexical/headless/dom';
+import {$generateHtmlFromNodes} from '@lexical/html';
 import {$getRoot,$createParagraphNode,$createTextNode} from 'lexical';
 import {$createQuoteNode,QuoteNode} from '@lexical/rich-text';
 import {
@@ -77,4 +79,19 @@ test('mutation and JSON imports reject unsupported classes and unsafe cite URLs'
    type:'quote',version:1,children:[],cite:'data:text/html,evil'
   }),/Invalid Tufte quotation citation/);
  },{discrete:true});
+});
+
+test('real Lexical HTML exporter keeps direct p.sans and blockquote cite attributes',()=>{
+ const e=editor();
+ e.update(()=>{
+  $getRoot().append($createSectionNode().append(
+   $createTufteParagraphNode('sans').append($createTextNode('Gill Sans')),
+   $createTufteQuoteNode(quoteURL).append($createTextNode('Quote'))
+  ));
+ },{discrete:true});
+ const json=e.getEditorState().toJSON();
+ const html=withDOM(()=>e.getEditorState().read(()=>$generateHtmlFromNodes(e)));
+ assert.match(html,/<p class="sans">Gill Sans<\/p>/);
+ assert.ok(html.includes('<blockquote cite="'+quoteURL+'">Quote</blockquote>'));
+ assert.deepEqual(e.getEditorState().toJSON(),json,'HTML export does not alter editor JSON');
 });
