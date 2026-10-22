@@ -1,3 +1,10 @@
+## 2026-10-22 — Figures 동일 콘텐츠 오라클·현대식 iframe 계층 (구현 및 테스트 작성, 실행 대기)
+
+- 기준 브랜치 `test/upstream-full-page-baseline-20261019`. 사용자 결정에 따라 원본의 `figure.iframe-wrapper > iframe` DOM/CSS hierarchy는 유지하고, `youtube-nocookie.com`, title, lazy/referrer/sandbox/fullscreen을 유지했다. renderer/Lexical export 양쪽에서 SVG spacer·기존 `tufte-embed` class·`data-tufte-ratio` 발행을 제거하고, scoped CSS는 공식 Tufte의 16:9/25px iframe-wrapper 규칙과 같은 값을 사용한다. 기존 JSON `tufte-embed` 계약은 변경하지 않았다.
+- `tests/upstream-same-content-figures-browser.mjs`: 공식 Figures 원본 11블록·2개 rich marginnote와 이미지/코드/도메인 예외를 고정했다. 원본의 정확히 한 iframe과 설명용 pre/code만 현대식 변환을 허용하고 전체 DOM을 비교하며, 375/759/760/761/1024/1440px CSS hierarchy/geometry 비교 코드를 추가했다. `pnpm test:upstream-same-content` 및 자동 발견 batch에 등록했다.
+- `packages/render/test/render.test.mjs`, `packages/lexical/test/embed-html.test.mjs`, `tests/publication-browser.mjs`: direct-child 구조·원래 보안속성·CSS/CSP·Lexical/pure HTML 비교와 intrinsic width/height의 보존을 검사하도록 추가/갱신했다. **실제 CSS는 원본의 16:9 예약 공간**이며 임의 intrinsic 비율을 화면 비율로 강제하지 않음을 명시했다. ADR 0003/E119/M109 기록.
+- 현재 **9/9 섹션 단독 비교 테스트 코드 작성**, 실행으로 통과 확인된 것은 기존 Opening/Getting Started **2/9**에 한정된다. 추가 7개·전체 batch의 build/type/unit/browser/packed 실행은 사용자 지시에 따라 보류한다. 다음: 한 문서 전체 저장→재열기→편집→발행 및 통합 DOM/geometry·실제 이미지·폰트·스크린샷 검증. CI 생략. Wagtail asset 구현은 보류.
+
 ## 2026-10-19 concrete note 후속 변경 재검증 — 전체 로컬 검사 통과
 
 - `test/upstream-full-page-baseline-20261019`의 `c4f0411`과 후속 테스트 수정에서 최종 `pnpm verify:batch` 69/69단계 통과. JS 단위 339개(39파일), browser22개, packed4개 실제 JS/선언 소비 및 HTTP/SQLite 통과. 별도 Python16개 통과. 실패·runner skip0, CI 생략.
