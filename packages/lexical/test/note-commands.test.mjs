@@ -179,13 +179,15 @@ test('unsafe URL and malformed payload do not mutate note contents',()=>{
   const before=JSON.stringify(editor.getEditorState().toJSON().root);
   for(const payload of [
    {src:'javascript:alert(1)'},{src:'//bad.example/image.png'},
-   {alt:42},{src:'/ok.png',unrecognized:'discarded'},{}
+   {alt:42},{src:undefined},{alt:undefined},
+   {src:'/ok.png',unrecognized:'discarded'},{}
   ]){
    editor.dispatchCommand(UPDATE_TUFTE_NOTE_IMAGE_COMMAND,payload);
    editor.update(()=>{},{discrete:true});
    assert.equal(JSON.stringify(editor.getEditorState().toJSON().root),before);
   }
   assert.deepEqual(diagnostics.map(d=>d.code),[
+   'INVALID_NOTE_IMAGE_PAYLOAD','INVALID_NOTE_IMAGE_PAYLOAD',
    'INVALID_NOTE_IMAGE_PAYLOAD','INVALID_NOTE_IMAGE_PAYLOAD',
    'INVALID_NOTE_IMAGE_PAYLOAD','INVALID_NOTE_IMAGE_PAYLOAD',
    'INVALID_NOTE_IMAGE_PAYLOAD'

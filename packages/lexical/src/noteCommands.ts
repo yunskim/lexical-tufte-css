@@ -78,8 +78,8 @@ export function registerNoteCommands(editor:LexicalEditor,onDiagnostic?:(diagnos
    if(!payload||typeof payload!=='object'||Array.isArray(payload)||
       Object.keys(payload).some(key=>key!=='src'&&key!=='alt')||
       !Object.hasOwn(payload,'src')&&!Object.hasOwn(payload,'alt')||
-      payload.src!==undefined&&!isSafeURL(payload.src,'image')||
-      payload.alt!==undefined&&typeof payload.alt!=='string')
+      Object.hasOwn(payload,'src')&&!isSafeURL(payload.src,'image')||
+      Object.hasOwn(payload,'alt')&&typeof payload.alt!=='string')
     return reject('INVALID_NOTE_IMAGE_PAYLOAD','이미지 URL 또는 대체 텍스트가 올바르지 않습니다.');
    const target=selectedImage();
    if(!target)return reject('INVALID_NOTE_IMAGE_SELECTION',
