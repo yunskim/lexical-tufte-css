@@ -11,7 +11,9 @@ export type PublicationSnapshot={snapshotVersion:1;post:PostRecordV2;publishedRe
 export type PublishedSnapshot={snapshotId:string;snapshot:PublicationSnapshot};
 export type PublicationState={generation:number;snapshotId:string|null;lastSnapshotId:string|null;firstPublishedAt:string|null;publishedAt:string|null;publishedRevision:number|null};
 export type PublishOptions={expectedRevision:number;expectedGeneration:number;publishedAt:string;assetExists:(src:string)=>Promise<boolean>};
-const fail=(code:string,message:string):Result<never>=>({ok:false,diagnostics:[{code,path:'$.publication',message}]});
+const fail=(code:string,message:string,path='$.publication'):Result<never>=>({
+ ok:false,diagnostics:[{code,path,message}]
+});
 const validCount=(n:number,min=0)=>Number.isSafeInteger(n)&&n>=min;
 const emptyState=():PublicationState=>({generation:0,snapshotId:null,lastSnapshotId:null,firstPublishedAt:null,publishedAt:null,publishedRevision:null});
 const sha256=async(text:string)=>Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text))),n=>n.toString(16).padStart(2,'0')).join('');
@@ -56,11 +58,26 @@ export class SqlitePublicationStore{
     if(last.value.snapshot.post.metadata.slug!==draft.value.metadata.slug)return fail('SLUG_RENAME_REQUIRED','Published slug changes require a separate redirect transaction');
    }
    const {editorFormat:_,schemaVersion:__,...legacy}=draft.value.document;
-   const rendered=renderArticle({...legacy,schemaVersion:1} satisfies TufteDocument);if(!rendered.ok)return rendered;
+   // Renderer failures are not storage failures. Preserve safe structured
+   // diagnostics for rejected documents; classify unexpected renderer throws.
+   let rendered:ReturnType<typeof renderArticle>;
+   try{
+    rendered=renderArticle({...legacy,schemaVersion:1} satisfies TufteDocument);
+   }catch{
+    return fail('PUBLICATION_RENDER_ERROR','Renderer failed unexpectedly; publication was not changed','$.publication.render');
+   }
+   if(!rendered.ok)return rendered;
    const sources=new Set(draft.value.document.assets.map(asset=>asset.src));
    const scan=(node:{type:string;src?:string;children?:unknown[]})=>{if((node.type==='tufte-inline-image'||node.type==='tufte-imagequilt')&&node.src)sources.add(node.src);for(const child of node.children??[])scan(child as Parameters<typeof scan>[0]);};
    scan(draft.value.document.lexicalState.root);
-   for(const src of sources)if(!await options.assetExists(src))return fail('MISSING_PUBLICATION_ASSET','A referenced publication asset is unavailable');
+   for(const src of sources){
+    let available:boolean;
+    try{available=await options.assetExists(src);}
+    catch{
+     return fail('PUBLICATION_ASSET_CHECK_ERROR','Asset availability could not be checked; publication was not changed','$.publication.assets');
+    }
+    if(!available)return fail('MISSING_PUBLICATION_ASSET','A referenced publication asset is unavailable','$.publication.assets');
+   }
    const snapshot:PublicationSnapshot={snapshotVersion:1,post:structuredClone(draft.value),publishedRevision:options.expectedRevision,generation:head.generation+1,firstPublishedAt:head.firstPublishedAt??options.publishedAt,publishedAt:options.publishedAt,rendererProfile:RENDER_PROFILE,assets:structuredClone(draft.value.document.assets),assetSources:[...sources].sort(),html:rendered.html};
    const payload=JSON.stringify(snapshot),snapshotId=await sha256(payload);
    // No await inside the transaction: lock, recheck both heads, insert, pointer switch.
@@ -74,7 +91,10 @@ export class SqlitePublicationStore{
    else this.db.prepare('UPDATE publication_heads_v1 SET generation=?,snapshot_id=?,last_snapshot_id=?,first_published_at=?,last_published_at=?,published_revision=? WHERE post_id=?').run(snapshot.generation,snapshotId,snapshotId,snapshot.firstPublishedAt,snapshot.publishedAt,snapshot.publishedRevision,id);
    this.db.exec('COMMIT');started=false;
    return {ok:true,value:{snapshotId,snapshot:structuredClone(snapshot)},diagnostics:[]};
-  }catch{if(started)try{this.db.exec('ROLLBACK');}catch{/* Preserve original storage failure. */}return fail('PUBLICATION_STORAGE_ERROR','Publication preflight or storage failed; no successful publication was reported');}
+  }catch{
+   if(started)try{this.db.exec('ROLLBACK');}catch{/* Never report success after rollback failure. */}
+   return fail('PUBLICATION_STORAGE_ERROR','Publication storage or transaction failed; no successful publication was reported','$.publication.storage');
+  }
  }
  unpublish(id:string,expectedGeneration:number):Result<PublicationState>{
   if(!isIdentifier(id)||!validCount(expectedGeneration,1))return fail('INVALID_PUBLICATION_INPUT','Invalid id or publication generation');
