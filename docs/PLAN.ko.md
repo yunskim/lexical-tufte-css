@@ -56,8 +56,8 @@ Figures의 iframe은 사용자 결정에 따라 **현대적인 접근성/보안 
 **60블록/7노트 전체 문서 v1→v2·Lexical 저장→재열기→발행·문장 수정 후 재발행 오라클 코드를 추가했다.**
 이 코드는 `pnpm test:upstream-same-content`와 batch에 등록됐으나 **실행되지 않았다**.
 실제 편집기 키 입력/undo, 전체 페이지 이미지·폰트·스크린샷 parity도 아직 미완료다.
-공식 `h1#tufte-css`가 발행 HTML에서는 ID 없는 h1이 되는 현재 한계는
-섹션 대응표에 명시적 차이로 기록한다. CI 생략.
+과거 공식 `h1#tufte-css` ID 누락은 P2.2.e.4의 `titleId`
+계약으로 수정했으나 실행 검증은 여전히 대기한다. CI 생략.
 
 ## Wagtail 참고 범용 에셋 라이브러리 (2026-10-20)
 
@@ -266,10 +266,10 @@ P1 gate: 완료. 노트 편집 회귀와 SSR 출력의 실제 브라우저 비�
     교집합 하나만 마스킹하고 면적은 전체 화면의 25% 미만이다.
     **코드 작성 후 실행 대기**. 스크린리더·Source Han 검증은 별도다.
     batch에서는 미설치 자산만 SKIP으로 보고하며, 존재하는 자산의 손상/해시 불일치는 FAIL로 보고한다.
-  - [ ] P2.2.e.4 **발행 제목 앵커 계약**: 공식 `h1#tufte-css`와
-    현재 발행의 ID 없는 h1, article의 제품 고유 namespace/class/lang
-    차이를 설계 결정으로 확정하거나 schema에 ID를 보존하도록 확장한다.
-    이 차이를 DOM 비교에서 무조건 무시하지 않는다.
+  - [ ] P2.2.e.4 **발행 제목 앵커 계약**: 공식 `h1#tufte-css`를
+    선택적 문서 `titleId`로 보존하기로 결정했다. 제품이 추가하는
+    article의 고유 namespace/class/lang는 별도의 명시적 차이로 유지한다.
+    h1 ID 누락은 DOM 비교의 허용 예외에서 제거했다.
     **2026-10-22 코드 추가/실행 대기:** 정본에 선택적
     `TufteDocument.titleId?:string`을 추가했다. 공식 `tufte-css` ID를
     원본 재구성→v1/v2 migration→실제 Lexical import/export→HTML 발행에

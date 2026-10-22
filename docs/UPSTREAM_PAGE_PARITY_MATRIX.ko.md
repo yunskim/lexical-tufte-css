@@ -44,11 +44,10 @@
   JSON 문장 변경은 실제 키보드 편집/undo 검증을 대신하지 않는다.
 - 전체 페이지 상단의 `article`은 제품 발행이
   `id="upstream-complete-demo-article" class="tufte-article" lang="en-US"`
-  를 추가한다. 원본 `h1 id="tufte-css"`는 현행 document envelope에
-  제목 앵커 필드가 없으므로 **현재는 보존되지 않는 차이**다.
-  통합 오라클은 이 차이를 묵인하지 않고 원본/출력의 정확한 값과
-  h1 텍스트/부제 DOM을 각각 검증한다.
-  제목 앵커를 완전 보존할지는 별도의 schema/편집 계약 결정이 필요하다.
+  를 추가한다. 이 article 속성은 원본과의 명시적 차이로 남는다.
+  원본 `h1 id="tufte-css"`는 P2.2.e.4의 선택적 `titleId`로
+  보존하고, 통합 DOM 오라클은 원본/발행 제목 ID, 텍스트,
+  부제 DOM을 정확히 대조한다. **실행 전 수락 보류**.
 - 기존의 정확한 note ID namespace와 모든 note `aria-label`,
   Figures의 **한 iframe 전체 속성 집합과 한 설명 코드 블록**만
   의도적으로 현대화한다. 태그·중첩·순서·일반 텍스트는 정밀 비교하며,
@@ -160,6 +159,6 @@
 3. **작성된** 전체 9섹션 단일 Lexical 문서 왕복 테스트를 누적 batch에서 실행하여,
    저장·재열기·수정본/발행 DOM의 실패 원인을 수정한다.
    이후 실제 editor 키보드 수정·undo/redo 및 전체 페이지 이미지·폰트·스크린샷 parity를 진행한다.
-   제목 `h1#tufte-css`의 원본 앵커 ID 보존 여부는 별도 schema 결정으로 추적한다.
+   제목 `h1#tufte-css`는 선택적 `titleId`로 보존하는 코드가 추가되었으며, 실행 검증은 보류한다.
 
 임시 완화나 보이지 않는 노드 삭제로 테스트를 통과시키지 않는다.
