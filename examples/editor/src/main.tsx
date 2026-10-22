@@ -693,12 +693,12 @@ function EditorUI(){
       <button onMouseDown={preserve} onClick={()=>insertPayload('link')}>노트 링크 삽입</button>
       <button onMouseDown={preserve} onClick={()=>insertPayload('image')}>노트 이미지 삽입</button>
        <button onMouseDown={preserve} onClick={()=>{
-         const alt=window.prompt('선택한 노트 이미지의 새 대체 텍스트');
-         if(alt!==null)editor.dispatchCommand(UPDATE_TUFTE_NOTE_IMAGE_COMMAND,{alt});
+        const alt=window.prompt('선택한 노트 이미지의 새 대체 텍스트');
+        if(alt!==null)editor.dispatchCommand(UPDATE_TUFTE_NOTE_IMAGE_COMMAND,{alt});
        }}>노트 이미지 설명 수정</button>
        <button onMouseDown={preserve} onClick={()=>{
-         const src=window.prompt('선택한 노트 이미지의 새 URL (HTTPS 또는 상대 경로)');
-         if(src!==null)editor.dispatchCommand(UPDATE_TUFTE_NOTE_IMAGE_COMMAND,{src});
+        const src=window.prompt('선택한 노트 이미지의 새 URL (HTTP(S) 또는 상대 경로)');
+        if(src!==null)editor.dispatchCommand(UPDATE_TUFTE_NOTE_IMAGE_COMMAND,{src});
        }}>노트 이미지 URL 수정</button>
       <button onMouseDown={preserve} onClick={()=>noteOperation('split')}>노트 나누기</button>
       <button onMouseDown={preserve} onClick={()=>noteOperation('merge')}>다음 노트와 합치기</button>
