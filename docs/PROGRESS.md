@@ -1,3 +1,27 @@
+## 2026-10-23 — P2.3.a.3 노트 이미지 선택 목록·명령 (작성/실행 대기)
+
+- 기존 `UPDATE_TUFTE_NOTE_IMAGE_COMMAND`는 노트 하나에 이미지가
+  여러 개이면 명확한 image node selection을 요구했다. 일반 편집기 UI에서
+  이를 얻는 동선이 부족했다.
+- `$listSelectedTufteNoteImages()`를 추가하여 현재 sidenote/marginnote의
+  이미지를 alt/src·세션 내 nodeKey·noteKey로 조회한다. 새
+  `SELECT_TUFTE_NOTE_IMAGE_COMMAND`는 noteId/noteKey/nodeKey
+  모두 확인하고 다른 노트·삭제/이동된 이미지·본문으로 바뀐 선택에
+  실패 진단을 반환한다. 선택만 변경하므로 저장 내용/undo를 바꾸지 않는다.
+- 예제 편집기에는 `노트 이미지 선택` 버튼과 image 번호/alt/URL
+  목록(접근 가능한 group 및 버튼)을 추가했다. 열린 메뉴에서 첫 항목에
+  키보드 초점을 맞추고 Escape/취소 가능하게 했다. 선택 후 편집기
+  초점을 복원하고 기존 이미지 src/alt 명령으로 수정한다.
+  375px 좁은 화면에서는 URL을 줄바꿈하는 레이아웃을 작성했다.
+- `packages/lexical/test/note-image-selection.test.mjs`:
+  둘 이상의 이미지 중 지정 이미지, 오래된/다른 노트 키 거부, 잘못된
+  명령 payload, v1 문서 검증·순수 HTML 발행을 검사한다.
+  `tests/note-image-chooser-browser.mjs`: 좁은 화면 목록·키보드 초점,
+  두 번째 이미지 alt 변경/HTML/저장·재열기 사례를 추가했다.
+- 실제 설치·타입/빌드·단위/브라우저·CI는 모두 **미실행**.
+  실제 keyboard/dialog/focus 연계 동작과 스크린리더 품질은
+  실행 확인 전까지 미검증이며 P2.3.a.3 수락 미완료다.
+
 ## 2026-10-22 — P2.3.a.2 노트 이미지 대체 텍스트·URL 편집 (실행 대기)
 
 - `UPDATE_TUFTE_NOTE_IMAGE_COMMAND` 추가: 기존 사이드노트/마진노트

@@ -294,10 +294,20 @@ P1 gate: 완료. 노트 편집 회귀와 SSR 출력의 실제 브라우저 비�
       요청도 진단하고 거부한다. 기존 노트 종류·ID·주변 서식·링크/형제는 보존한다.
       React prototype에 이미지 URL/대체 텍스트 버튼 2개를 연결하고
       Lexical/문서/순수 renderer 회귀를 추가했다. **실행 전 수락 미완료**.
-    - [ ] P2.3.a.3 **남은 기본 기능**: 이미지의 관리 자산 참조 및
-      크기 업데이트 통합, 이미지 다중 선택 UX, 특정 노트 ID 선택·이동 UI,
-      모바일·스크린리더·복수 article 번호/IME 검증. 종류 전환은 편의 기능으로
-      후순위이며 prototype toolbar에서는 제외했다(내부 명령은 유지).
+    - [ ] P2.3.a.3 **노트 이미지 대상 선택 UI**: 현재 노트의
+      이미지만 나열하는 `$listSelectedTufteNoteImages`와 정확한 이미지
+      선택 명령 `SELECT_TUFTE_NOTE_IMAGE_COMMAND`를 추가했다.
+      단일/복수 이미지를 alt·URL·순서로 구분하는 `role=group`
+      선택 패널과 키보드 초점/취소·375px 반응형 스타일을 작성했다.
+      대상은 편집 세션 내 noteId+noteKey+nodeKey로 확인하므로
+      다른 노트·삭제된 이미지·진행 중 변경으로 오래된 키가 되면 거부한다.
+      headless target/reject·발행 및 브라우저 선택→수정→저장/재열기
+      회귀 코드 작성. **실행 전 미완료**.
+    - [ ] P2.3.a.4 **남은 기본 기능**: 관리 자산 참조·크기 변경의
+      원자적 재검증, 특정 노트 ID 선택/이동 UI, 실제 키보드 초점/
+      클릭 후 선택 보존/IME·모바일·스크린리더 및 복수 article 번호 수락.
+      종류 전환은 편의 기능으로 후순위이며 prototype toolbar에서
+      제외했다(내부 명령만 유지).
   - [ ] P2.3.b 그림·ImageQuilts F13/F14/F19: src/alt/caption/asset ID 수정 및 body/fullwidth/여백 변환, 자산 유실·삭제 시 진단, schema 유효성 보존.
   - [ ] P2.3.c 표/전체 폭 F15/F16: 셀·헤더·행/열 편집, 스크롤/폭 전환, 병합 거부와 접근 가능한 설명, 좁은 화면 overflow.
   - [ ] P2.3.d 코드/embed F17/F18: code block·language·fullwidth·공백/탭 및 embed의 provider allowlist/title/aspect ratio/서식 편집. 외부 HTML/sanitization 정책과 통합.

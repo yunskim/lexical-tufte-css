@@ -180,6 +180,23 @@
 - **명령 및 테스트 작성 상태, 실행 미판정**. 실제 이미지
   노드 선택 UX, undo/redo, 스크린리더/모바일 수락은 남았다.
 
+## P2.3.a.3 현재 노트의 이미지 목록·선택 경계 (2026-10-23, 실행 대기)
+
+- 기존 문서의 `tufte-inline-image` 타입과 parent note DOM은
+  바꾸지 않는다. 편집기에서만 현재 sidenote/marginnote의 이미지를
+  원래 순서대로 alt/src와 함께 나열하고 한 대상의 Lexical
+  NodeSelection을 지정하는 독립 UI를 추가했다.
+- 선택 대상은 `noteId+noteKey+nodeKey`에 정확히 연결한다.
+  선택 이후 noteId/source/alt 또는 인접 note DOM에 변화가 없으며,
+  별도의 update 명령을 발행했을 때만 src/alt가 바뀐다.
+  저장 후 복원할 때 NodeKey를 정본에 남기지 않는다.
+- 한 노트에서 두 이미지·두 번째 이미지 수정·다른 노트/삭제된
+  이미지 선택 거부·375px 접근 가능한 목록·초점·저장/재열기
+  오라클을 추가했다. Tufte CSS 발행의 label/input/span 규칙
+  자체는 변경하지 않았다.
+- **누적 테스트 미실행**. 실제 화면의 사용성과 스크린리더
+  연동은 실측 증거가 있을 때만 완료 표시한다.
+
 ## 다음 작업 순서
 
 1. 9개 섹션의 단독 동일 콘텐츠 비교 테스트와 Lexical/document/render 회귀를 **한 번에 실행**해
