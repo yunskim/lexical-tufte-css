@@ -808,3 +808,10 @@ E001–E049/M001–M042를 검토했다. E024의 경계 입력은 실제 Chromiu
 - 발견: 공식 Tufte CSS 샘플 Fundamentals 섹션은 `<p class="sans">`와 `<blockquote cite="...">`를 사용한다. 기존 문서 스키마의 paragraph/quote는 해당 속성의 직렬화를 허용하지 않았으며, 인라인 `tufte-span(kind='sans')`로 바꾸면 CSS selector/원본 DOM 구조가 달라진다. `blockquote`의 citation URL을 본문 텍스트로 넣어도 원본 속성은 사라진다.
 - 처리: **새 wire node type 추가 없이** paragraph에 선택적 `tufteClass:'sans'`, quote에 선택적 `cite` 필드를 명시하고, 검사 없는 CSS 문자열/위험한 URL은 거부한다. Pure renderer에는 직접 요소 클래스·`cite` 출력과 whitelist를 추가했다. Lexical 0.52.0의 native paragraph/quote factory를 subclass+withKlass 교체로 연결하고, 저장/복원 시 기본 importJSON의 가상 `updateFromJSON`을 통해 선택적 필드를 보존하게 했다. 기존 기본 노드의 wire JSON은 속성 없는 형태를 유지한다. 단위 검증 및 고정 원본 Fundamentals 14블록/3노트 strict DOM 비교 테스트를 추가했다.
 - 상태: 수정 코드·테스트 작성, 새 빌드·타입·단위·브라우저 **검증 대기**. 코드 작성만으로 원본 parity 성공이나 이전 전체 batch 통과를 주장하지 않는다. M108 참조.
+
+## E119 — Figures의 iframe 렌더러가 Tufte CSS 계층과 달라 CSS 오라클이 무효화됨
+
+- 발견: 공식 예제 Figures의 `figure.iframe-wrapper > iframe`와 달리 기존 pure renderer/Lexical export는 `figure.tufte-embed > svg + iframe` 구조다. 자체 CSS·SVG가 비율을 예약하여 공식 `.iframe-wrapper iframe` 선택자/반응형 계층과 달랐으며, 원본 예제에는 `frameborder="0"` 및 제목 없는 `youtube.com` URL이 있다. 원본만 베껴서는 현재 URL allowlist/접근성·보안 계약이 후퇴한다.
+- 처리: 문서 wire model과 HTTPS 제공자 allowlist/제목/지연 로딩/referrerpolicy/sandbox는 유지하고, 두 HTML 출력 경로를 `(figure|div).iframe-wrapper > iframe`으로 통일했다. SVG·추가 data 속성 및 오래된 frameborder는 발행 HTML에서 제거한다. 기존 HTML 코드 스니펫도 게시 예제에서 현대식으로 설명한다. `packages/render/styles.css`는 Tufte의 16:9 padding-bottom/25px padding-top 계층을 미러링한다.
+- 회귀 계약: `tests/upstream-same-content-figures-browser.mjs`는 원본 11블록·rich note 2개를 정확히 재구성한다. iframe **전체 속성 집합**과 이 iframe을 보여주는 `pre > code` 한 곳만 현대화 예외로 허용하며, 다른 DOM은 tag/attrs/order/텍스트를 엄격 비교한다. 6개 폭에서 기존/현대 구조의 CSS 위치·크기를 비교한다. renderer/Lexical 두 HTML 경로·CSP/비율 메타데이터 회귀도 추가/수정했다. ADR 0003 참고.
+- 제한/상태: 사용자 선택에 따라 CSS 표시는 공식 iframe-wrapper의 **16:9 예약 공간**을 따른다. 기존 임의 `aspectRatio` 메타데이터는 iframe intrinsic `width/height`에 반영되지만 실제 CSS 표시 비율을 바꾸지 않는다. 필요 시 별도 비율별 CSS 정책을 도입할 것. 코드·테스트 작성, 실제 build/type/unit/browser/packed 검사 **미실행·대기**. M109 참조. 이 단계는 9개 섹션 전체 발행/저장 및 pixel parity 검증 완료가 아니다.
