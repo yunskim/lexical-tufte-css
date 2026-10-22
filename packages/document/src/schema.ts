@@ -27,6 +27,11 @@ export const NODE_SCHEMA:Readonly<Record<string,{readonly fields:readonly string
  'tufte-embed':{fields:['provider','src','title','wrapper','width','aspectRatio']},
 });
 for(const spec of Object.values(NODE_SCHEMA)){Object.freeze(spec.fields);if(spec.children)Object.freeze(spec.children);Object.freeze(spec);}
+/** Accessible checkbox names shared by the DOM publisher and Lexical HTML export. */
+export const NOTE_TOGGLE_ACCESSIBLE_NAME=Object.freeze({
+ sidenote:'Toggle sidenote',
+ marginnote:'Toggle margin note',
+} as const);
 export const DOCUMENT_SCHEMA_VERSION=1 as const;
 export const DOCUMENT_LIMITS=Object.freeze({jsonCharacters:5_000_000,nodes:10_000,depth:64,textCharacters:2_000_000,assets:1000,diagnostics:100});
 export const isIdentifier=(value:unknown):value is string=>typeof value==='string'&&/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(value);
