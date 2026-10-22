@@ -4,7 +4,7 @@ import {$createQuoteNode as quote} from '@lexical/rich-text';
 import {$createListNode as list,$createListItemNode as item} from '@lexical/list';
 import {$createLinkNode as link} from '@lexical/link';
 import {$createTableNode as table,$createTableRowNode as row,$createTableCellNode as cell} from '@lexical/table';
-import {$createHorizontalRuleNode as hr} from '@lexical/react/LexicalHorizontalRuleNode';
+import {$createHorizontalRuleNode as hr} from '@lexical/extension/HorizontalRuleExtension';
 import {
  TUFTE_NODES,$createTufteHeadingNode as heading,$createTufteCodeHighlightNode as token,$createSectionNode as section,$createSidenoteNode as sidenote,$createMarginnoteNode as marginnote,$createInlineImageNode as image,$createTufteSpanNode as span,
  $createFigureNode as figure,$createCaptionNode as caption,$createTableLayoutNode as layout,
