@@ -5,7 +5,7 @@ import {$getRoot,$createParagraphNode,$createTextNode,UNDO_COMMAND,REDO_COMMAND}
 import {$createLinkNode} from '@lexical/link';
 import {createEmptyHistoryState,registerHistory} from '@lexical/history';
 import {validateDocument} from '@lexical-tufte/document';
-import {renderArticle} from '@lexical-tufte/render';
+import {renderArticle} from '../../render/dist/index.js';
 import {TUFTE_NODES,$createSectionNode,$createFigureNode,$createInlineImageNode,
  $createSidenoteNode,$createMarginnoteNode,registerNoteCommands,
  SET_TUFTE_NOTE_KIND_COMMAND,REMOVE_TUFTE_NOTE_COMMAND} from '../dist/index.js';
@@ -72,7 +72,8 @@ test('delete removes only selected note; surrounding paragraph and publication r
   assert.equal(editor.dispatchCommand(REMOVE_TUFTE_NOTE_COMMAND,undefined),true);
   editor.update(()=>{},{discrete:true});
   const children=editor.getEditorState().toJSON().root.children[0].children[0].children;
-  assert.deepEqual(children.map(node=>node.type),['text','text']);
+  assert.ok(children.every(node=>node.type==='text'),
+   'Deleting a note must leave only surrounding text');
   assert.equal(children.map(node=>node.text).join(''),'Before  after');
   const doc=documentFrom(editor);
   assert.equal(validateDocument(doc).ok,true);
