@@ -90,12 +90,6 @@ try{
  const screenshotDir=process.env.TUFTE_SCREENSHOT_DIR;
  if(screenshotDir)mkdirSync(screenshotDir,{recursive:true});
 
- const rect=element=>{
-  const box=element.getBoundingClientRect();
-  return {
-   x:box.x,y:box.y,width:box.width,height:box.height
-  };
- };
  // Browser-evaluated collectors cannot close over Node functions.
  const measure=async page=>page.evaluate(async()=>{
   const fontCases=[

@@ -261,7 +261,7 @@ P1 gate: 완료. 노트 편집 회귀와 SSR 출력의 실제 브라우저 비�
     동일한 9섹션 원본/발행본에 로컬 파일을 제공하여 이미지 decode·
     FontFace 로드·6폭 geometry를 비교하고, 선택적으로 screenshot 쌍을 남긴다.
     pixel diff·스크린리더·한글 Source Han 비교는 **별도 미완료**다.
-    batch에서는 미설치/손상 원본 자산을 성공으로 세지 않고 SKIP으로 보고한다.
+    batch에서는 미설치 자산만 SKIP으로 보고하며, 존재하는 자산의 손상/해시 불일치는 FAIL로 보고한다.
   - [ ] P2.2.e.4 **발행 제목 앵커 계약**: 공식 `h1#tufte-css`와
     현재 발행의 ID 없는 h1, article의 제품 고유 namespace/class/lang
     차이를 설계 결정으로 확정하거나 schema에 ID를 보존하도록 확장한다.

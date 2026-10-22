@@ -5,10 +5,10 @@
  * Individual node:test assertion/skip totals stay visible in each runner's
  * output; the summary counts steps, not assertions or skipped subtests.
  */
-import {readdirSync} from 'node:fs';
+import {readdirSync,existsSync} from 'node:fs';
 import {spawnSync} from 'node:child_process';
 import {setTimeout} from 'node:timers/promises';
-import {loadVerifiedUpstreamAssets} from './upstream-visual-assets.mjs';
+import {upstreamAssetManifest,upstreamAssetRoot} from './upstream-visual-assets.mjs';
 
 const packageCommand=process.platform==='win32'?'pnpm.cmd':'pnpm';
 const results=[];
@@ -57,13 +57,18 @@ const browsers=readdirSync('tests')
  .sort();
 for(const name of browsers){
  if(name==='upstream-full-document-visual-browser.mjs'){
-  try{loadVerifiedUpstreamAssets();}
-  catch(error){
-   const reason=error instanceof Error?error.message:String(error);
+  const missing=[...upstreamAssetManifest.images,...upstreamAssetManifest.fonts]
+   .filter(entry=>!existsSync(new URL(entry.path,upstreamAssetRoot)))
+   .map(entry=>entry.path);
+  if(missing.length){
+   const reason='Pinned assets not downloaded: '+missing.join(', ')+
+    '. Run pnpm assets:upstream-visual before the full visual gate.';
    results.push({label:'tests/'+name,skipped:true,reason});
    console.log('=== SKIP tests/'+name+': '+reason+' ===');
    continue;
   }
+  // Present but corrupt assets, bad hashes or source drift are test FAILURES,
+  // never SKIP. The visual browser test verifies every byte before launch.
  }
  run('tests/'+name,process.execPath,['tests/'+name]);
  // Browser test files may release their own Vite child process in finally.

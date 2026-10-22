@@ -16,7 +16,8 @@
 - `pnpm assets:upstream-visual`로 자료를 명시적으로 준비하고
   `pnpm test:upstream-visual`로 단독 수락 가능하다.
   `pnpm verify:batch`는 파일이 없거나 해시가 틀리면 해당 시각
-  브라우저 테스트만 **SKIP 사유와 함께 기록**, 있으면 실행한다.
+  브라우저 테스트만 **SKIP 사유와 함께 기록**한다. 파일이 모두 있지만 해시가
+  틀리거나 원본 인벤토리가 바뀌었으면 **FAIL**로 보고한다.
 - 테스트·빌드·설치·CI **전부 실행하지 않았다**. 전 9섹션 DOM/실제 editor
   및 6폭 자산 geometry는 아직 합격 판정할 수 없다. 이미지/font geometry
   비교 실패가 발견되면 CSS·정규화 범위를 넓혀 통과시키지 않고 원인 기록 후 수정한다.
