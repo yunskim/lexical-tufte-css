@@ -189,6 +189,14 @@ try{
   const outputNotes=[...result.querySelectorAll('input.margin-toggle')];
   if(origNotes.length!==3||outputNotes.length!==3)throw Error('Wrong note count');
   for(let i=0;i<origNotes.length;i++){
+   // Explicit accessibility-only oracle exception: keep the upstream
+   // label/input/span hierarchy while naming the modern focusable checkbox.
+   const kind=origNotes[i].nextElementSibling?.classList.contains('sidenote')
+    ?'sidenote':'marginnote';
+   const accessibleName=kind==='sidenote'?'Toggle sidenote':'Toggle margin note';
+   if(outputNotes[i].getAttribute('aria-label')!==accessibleName)
+    throw Error('Missing modern accessible note name');
+   origNotes[i].setAttribute('aria-label',accessibleName);
    const from=origNotes[i].id,to=outputNotes[i].id;
    if(!to.endsWith(from)||!to.startsWith('tufte-'))
     throw Error('Generated note ID unexpectedly differs');
