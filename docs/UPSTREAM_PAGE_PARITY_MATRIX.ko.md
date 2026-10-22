@@ -58,8 +58,15 @@
   CSS 위치·크기를 비교하는 코드를 포함한다.
   **실제 이미지/폰트 파일 로드, 전체 페이지 pixel/screenshot parity,
   브라우저 editor UI 키 입력**은 아직 수락되지 않은 별도 단계다.
-- `pnpm test:upstream-same-content` 마지막에 등록하고,
-  `pnpm verify:batch`의 browser-file 자동 발견에도 포함된다.
+- `pnpm test:upstream-same-content` 마지막에 단일 문서 JSON/DOM 회귀를 등록하고,
+  `pnpm test:browser`에는 **실제 React 편집기 UI** 테스트
+  `tests/upstream-full-document-editor-browser.mjs`를 추가했다.
+  이 UI 검사는 9섹션/60블록 전체를 브라우저 편집기에 로드한 뒤
+  실제 키보드로 본문 한 곳을 수정·undo/redo·로컬 저장/재열기하고,
+  바뀌지 않은 나머지 8개 섹션/7개 note/iframe의 발행 HTML을 대조한다.
+  임베드는 편집 화면에서는 decorator placeholder, 발행 시 iframe이다.
+  이 1개 본문 편집 수락 코드는 개별 note/figure 입력 UI를 전부 검사하지 않는다.
+- `pnpm verify:batch`의 browser-file 자동 발견에 **두 전체 문서 회귀가 모두** 포함된다.
   **빌드/타입/브라우저 등 실행은 사용자 지시에 따라 모아서 진행**한다.
   코드가 추가된 사실은 수락 완료나 오라클 통과가 아니다. CI 생략.
 
