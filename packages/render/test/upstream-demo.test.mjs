@@ -30,6 +30,8 @@ test('published notes preserve the upstream label/input/payload relationship, wi
  const notes=[...html.matchAll(/<label\b[^>]*for="([^"]+)"[^>]*>([^<]*)<\/label><input\b[^>]*id="([^"]+)"[^>]*><span\b[^>]*class="(sidenote|marginnote)"/g)];
  assert.ok(notes.length>=2,'expected both Tufte note kinds in published fixture');
  assert.deepEqual(new Set(notes.map(note=>note[4])),new Set(['sidenote','marginnote']));
+ assert.match(html,/<input[^>]*aria-label="Toggle sidenote"[^>]*><span class="sidenote">/);
+ assert.match(html,/<input[^>]*aria-label="Toggle margin note"[^>]*><span class="marginnote">/);
  for(const [,id,glyph,inputId,kind] of notes){
   assert.equal(id,inputId,'label must target its adjacent input');
   assert.equal(glyph,kind==='sidenote'?'':'⊕');
