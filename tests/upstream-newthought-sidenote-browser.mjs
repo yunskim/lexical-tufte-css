@@ -68,6 +68,8 @@ try{
  await page.setContent('<!doctype html><style>'+css+'\n'+scoped+'</style>'+result.html);
  const control=page.getByRole('checkbox',{name:'Toggle sidenote',exact:true});
  assert.equal(await control.count(),1,'Split-parent checkbox has an accessible name');
+ // Establish keyboard modality before asserting the :focus-visible cue.
+ await page.keyboard.press('Tab');
  await control.focus();
  assert.equal(await control.evaluate(e=>document.activeElement===e),true);
  const label=page.locator('span.newthought > label.margin-toggle.sidenote-number');
