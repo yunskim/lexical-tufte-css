@@ -38,6 +38,16 @@
   확대하지 않는다.
 - 서로 다른 note ID namespace가 있으면 ID/for의 대응만 명시적으로 정규화한다.
   원본의 노트 순서, 태그 및 부모 관계를 변형하지 않는다.
+- **모바일 주석 접근성 예외**: 공식 원본의 빈 `label.sidenote-number`와
+  `input.margin-toggle {display:none}`는 그대로 복제하지 않는다.
+  발행 HTML에는 각 `input.margin-toggle`에 종류에 따른 고정
+  `aria-label="Toggle sidenote" / "Toggle margin note"`가 들어간다.
+  비교기는 원본 문서 파일을 수정하지 않고, 파싱된 원본 INPUT 하나에
+  기대되는 `aria-label`만 추가하고 발행 INPUT의 정확한 값/유일한 추가 속성을
+  비교한다. 주석의 tag/parent/child/sibling 관계·문자열·다른 속성은 엄격 비교한다.
+  `packages/render/styles.css`는 모바일에서 체크박스를 시각적으로만 숨겨
+  키보드 포커스 및 Space 전환과 시각 포커스 표시를 허용한다.
+  실제 접근성 트리/모바일 브라우저/스크린리더 수동 수락은 여전히 별도 단계다.
 - Sidenotes 섹션에는 `label → input` / `input → span` 사이에 **서식용 공백-only Text 노드 두 개**가 있다.
   이는 `margin-toggle` 형제 간 레이아웃에만 영향을 주지 않는 소스 들여쓰기다.
   해당 두 간격에서만 DOM 정규화를 허용하며, label 전후 일반 본문 공백·노트 내부
