@@ -1,6 +1,6 @@
 import type {Diagnostic,JsonNode,TufteDocument} from '@lexical-tufte/document';
 export const RENDER_PROFILE='p1-v1' as const;
-export const RENDER_SUPPORTED_NODE_TYPES=Object.freeze(['root','tufte-section','paragraph','heading','horizontalrule','list','listitem','tufte-definition-list','tufte-term','tufte-definition','quote','tufte-epigraph','tufte-attribution','tufte-cite','tufte-section-footer','tufte-fullwidth','tufte-code','tufte-embed','tab','code-highlight','tufte-span','text','linebreak','link','tufte-sidenote','tufte-marginnote','tufte-inline-image','tufte-imagequilt','tufte-figure','tufte-caption','tufte-table-layout','table','tablerow' ,'tablecell']);
+export const RENDER_SUPPORTED_NODE_TYPES=Object.freeze(['root','tufte-section','paragraph','heading','horizontalrule','list','listitem','tufte-definition-list','tufte-term','tufte-definition','quote','tufte-epigraph','tufte-attribution','tufte-cite','tufte-section-footer','tufte-fullwidth','tufte-code','tufte-embed','tab','code-highlight','tufte-span','text','linebreak','link','tufte-sidenote','tufte-marginnote','tufte-inline-image','tufte-imagequilt','tufte-figure','tufte-caption','tufte-table-layout','table','tablerow','tablecell']);
 const supported=new Set<string>(RENDER_SUPPORTED_NODE_TYPES);
 /** Called only after shared structural validation succeeds. */
 export function validateRenderProfile(doc:TufteDocument):Diagnostic[]{
