@@ -6,7 +6,7 @@ import {ListNode,ListItemNode} from '@lexical/list';
 import {LinkNode} from '@lexical/link';
 import {TableNode,TableRowNode,TableCellNode} from '@lexical/table';
 import {TufteCodeHighlightNode} from './CodeHighlightNode.js';
-import {HorizontalRuleNode} from '@lexical/react/LexicalHorizontalRuleNode';
+import {HorizontalRuleNode} from '@lexical/extension/HorizontalRuleExtension';
 import {SectionNode,FigureNode,CaptionNode,TableLayoutNode} from './LayoutNodes.js';
 import {SidenoteNode} from './SidenoteNode.js';
 import {MarginnoteNode} from './MarginnoteNode.js';
