@@ -51,6 +51,32 @@ ID를 연결한다.
 정리한 것이며 아래 체크리스트는 실제 수락 전까지 표시하지 않는다. 새로운
 Figures·Fundamentals 등 7개 단독 섹션 테스트와 함께 검사해야 한다.
 
+## 2026-10-22 후속 정적 검증 및 실행 환경 제약
+
+- 후속 조사에서 `packages/lexical/test/document-bridge.test.mjs`와
+  `packages/lexical/test/publication-browser-harness.mjs`가 기존
+  `@lexical/react/LexicalHorizontalRuleNode`를 import하는 것을 추가 확인했다.
+  두 파일을 `@lexical/extension/HorizontalRuleExtension`으로 교체했다.
+  `react-free-horizontal-rule.test.mjs`가 해당 2곳을 포함한 총 5개
+  import 경로를 검사하도록 확대했다.
+- GitHub 최신 브랜치의 **소스 기반 정적 집합 대조** 결과:
+  `NODE_SCHEMA` **34개** ↔ `RENDER_SUPPORTED_NODE_TYPES` **34개** ↔
+  실제 renderer `case` **34개**가 정확히 일치한다(누락·불필요 타입 0개).
+  freeze 선언, manifest↔pnpm lock의 extension 직접 의존성,
+  React peer 제거, note 양쪽 exporter의 `aria-label` 및 serializer allowlist,
+  발행 단계별 오류 코드 존재도 소스 대조 일치다.
+  이는 **실제 TypeScript 컴파일/단위 assertion 실행과 다르다**.
+- 현재 실행 환경은 Node.js **22.16.0**과 Chromium 실행 파일은 있지만
+  저장소 로컬 체크아웃, `pnpm` 및 설치 의존성이 없다.
+  `git ls-remote`로 원격을 가져오는 작업은
+  `Could not resolve host: github.com`으로 차단됐다.
+  연결된 GitHub 커넥터로 원격 소스 조회/커밋은 가능하나
+  로컬 `pnpm check`/`pnpm verify:batch` 실행을 대신하지 않는다.
+- 결과: frozen install/build/typecheck/lint/unit/browser/package/HTTP/Python
+  **모두 미실행·미판정**, CI는 지시대로 미실행. CR01–CR08 모두
+  수락 체크 전으로 유지한다. 실행 환경이 준비된 Work에서 순서대로 검증하고
+  실제 실패를 수정한 후 보고서를 갱신해야 한다.
+
 ## 변경 체크리스트 (문서 끝 유지)
 
 - [ ] CR01. Lexical registry의 `TUFTE_NODES` immutable 계약 복구, 기존 R02/golden 검사 및 회귀 추가 후 실행 통과.
