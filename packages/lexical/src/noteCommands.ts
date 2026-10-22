@@ -54,6 +54,11 @@ export function registerNoteCommands(editor:LexicalEditor,onDiagnostic?:(diagnos
  const reject=(code:string,message:string)=>{
   onDiagnostic?.({code,path:'$.selection',message});return true;
  };
+ // Selection-only commands return false if refused, so the chooser does not
+ // announce success for stale image keys (unlike handled mutation diagnostics).
+ const rejectSelection=(code:string,message:string):false=>{
+  onDiagnostic?.({code,path:'$.selection',message});return false;
+ };
  const selectedNote=():NoteNode|null=>{
   const selection=$getSelection();
   if(editor.isComposing()||!$isRangeSelection(selection)||!selection.isCollapsed())return null;
@@ -88,18 +93,18 @@ export function registerNoteCommands(editor:LexicalEditor,onDiagnostic?:(diagnos
    if(!payload||typeof payload!=='object'||Array.isArray(payload)||
       !isIdentifier(payload.noteId)||typeof payload.nodeKey!=='string'||
       Object.keys(payload).some(key=>key!=='noteId'&&key!=='nodeKey'))
-    return reject('INVALID_NOTE_IMAGE_TARGET','이미지 선택 대상이 올바르지 않습니다.');
-   if(editor.isComposing())return reject('INVALID_NOTE_IMAGE_SELECTION',
+    return rejectSelection('INVALID_NOTE_IMAGE_TARGET','이미지 선택 대상이 올바르지 않습니다.');
+   if(editor.isComposing())return rejectSelection('INVALID_NOTE_IMAGE_SELECTION',
     '한글 입력 조합 중에는 이미지를 선택할 수 없습니다.');
    // Re-enumerate at the moment of the command. A detached/stale key, another
    // note's key or a focus moved into the body must not be accepted.
    const available=$listSelectedTufteNoteImages();
    if(!available.some(item=>item.noteId===payload.noteId&&item.nodeKey===payload.nodeKey))
-    return reject('INVALID_NOTE_IMAGE_TARGET',
+    return rejectSelection('INVALID_NOTE_IMAGE_TARGET',
      '이미지가 이동했거나 현재 선택한 노트에 속하지 않습니다.');
    const image=$getNodeByKey(payload.nodeKey);
    if(!(image instanceof InlineImageNode))
-    return reject('INVALID_NOTE_IMAGE_TARGET','이미지 노드를 찾을 수 없습니다.');
+    return rejectSelection('INVALID_NOTE_IMAGE_TARGET','이미지 노드를 찾을 수 없습니다.');
    const selection=$createNodeSelection();
    selection.add(image.getKey());
    $setSelection(selection);
