@@ -244,9 +244,13 @@ P1 gate: 완료. 노트 편집 회귀와 SSR 출력의 실제 브라우저 비�
     전체 렌더링 DOM·문장 단일 수정 후 재발행·6폭 iframe CSS geometry를
     비교한다. [재구성/전체 DOM 추적표](UPSTREAM_PAGE_PARITY_MATRIX.ko.md).
     **테스트 작성 및 명령 등록, 일괄 실행 전 미완료**.
-  - [ ] P2.2.e.2 **실제 편집 동작 수락**: 같은 전체 샘플 문서를
-    React editor UI에서 로드해 본문·주석·figures를 키보드로 수정하고
-    undo/redo→저장/재열기→순수 HTML이 일치하는지 검사한다.
+  - [ ] P2.2.e.2 **실제 편집 동작 수락**:
+    `tests/upstream-full-document-editor-browser.mjs`에 공식
+    9섹션 문서를 React editor로 불러와 본문 실제 키보드 수정·
+    undo/redo→로컬 저장/재열기→변경하지 않은 8섹션과 note/figure/iframe
+    HTML 무손실을 검사하는 코드를 추가했다.
+    **실행 검증 전 미완료**이며 이 1개 문장의 실제 입력 테스트가
+    note/figure 각자의 사용자 편집 명령/IME/접근성을 전부 보증하지 않는다.
     JSON 필드 1개를 직접 바꾸는 통합 fixture 테스트는 실제 키보드 검증이 아니다.
   - [ ] P2.2.e.3 **완전 시각 비교**: 공식 이미지·폰트 파일을 재현성 있게 제공한
     환경에서 모든 섹션의 geometry·이미지 로딩·Source Han/ET Book 폰트·
