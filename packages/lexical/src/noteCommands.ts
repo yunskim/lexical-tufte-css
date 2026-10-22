@@ -17,9 +17,9 @@ export const UPDATE_TUFTE_NOTE_IMAGE_COMMAND:LexicalCommand<UpdateTufteNoteImage
 
 /** Read-only choices for an explicitly selected note, not all document images. */
 export type TufteNoteImageChoice={
- noteId:string;nodeKey:string;src:string;alt:string;
+ noteId:string;noteKey:string;nodeKey:string;src:string;alt:string;
 };
-export type SelectTufteNoteImage={noteId:string;nodeKey:string};
+export type SelectTufteNoteImage={noteId:string;noteKey:string;nodeKey:string};
 export const SELECT_TUFTE_NOTE_IMAGE_COMMAND:LexicalCommand<SelectTufteNoteImage>=
  createCommand('SELECT_TUFTE_NOTE_IMAGE');
 
@@ -39,7 +39,7 @@ export function $listSelectedTufteNoteImages():TufteNoteImageChoice[]{
  const visit=(node:LexicalNode):void=>{
   if(node instanceof InlineImageNode){
    const image=node.exportJSON();
-   choices.push({noteId:note.getNoteId(),nodeKey:node.getKey(),
+   choices.push({noteId:note.getNoteId(),noteKey:note.getKey(),nodeKey:node.getKey(),
     src:image.src,alt:image.alt});
   }else if($isElementNode(node))
    for(const child of node.getChildren())visit(child);
@@ -91,20 +91,31 @@ export function registerNoteCommands(editor:LexicalEditor,onDiagnostic?:(diagnos
  const registrations=[
   editor.registerCommand(SELECT_TUFTE_NOTE_IMAGE_COMMAND,payload=>{
    if(!payload||typeof payload!=='object'||Array.isArray(payload)||
-      !isIdentifier(payload.noteId)||typeof payload.nodeKey!=='string'||
-      Object.keys(payload).some(key=>key!=='noteId'&&key!=='nodeKey'))
+      !isIdentifier(payload.noteId)||typeof payload.noteKey!=='string'||
+      typeof payload.nodeKey!=='string'||
+      Object.keys(payload).some(key=>!['noteId','noteKey','nodeKey'].includes(key)))
     return rejectSelection('INVALID_NOTE_IMAGE_TARGET','이미지 선택 대상이 올바르지 않습니다.');
    if(editor.isComposing())return rejectSelection('INVALID_NOTE_IMAGE_SELECTION',
     '한글 입력 조합 중에는 이미지를 선택할 수 없습니다.');
-   // Re-enumerate at the moment of the command. A detached/stale key, another
-   // note's key or a focus moved into the body must not be accepted.
-   const available=$listSelectedTufteNoteImages();
-   if(!available.some(item=>item.noteId===payload.noteId&&item.nodeKey===payload.nodeKey))
-    return rejectSelection('INVALID_NOTE_IMAGE_TARGET',
-     '이미지가 이동했거나 현재 선택한 노트에 속하지 않습니다.');
    const image=$getNodeByKey(payload.nodeKey);
-   if(!(image instanceof InlineImageNode))
-    return rejectSelection('INVALID_NOTE_IMAGE_TARGET','이미지 노드를 찾을 수 없습니다.');
+   const note=image instanceof InlineImageNode?$getContainingNote(image):null;
+   if(!(image instanceof InlineImageNode)||!note||
+      note.getKey()!==payload.noteKey||note.getNoteId()!==payload.noteId)
+    return rejectSelection('INVALID_NOTE_IMAGE_TARGET',
+     '이미지가 이동했거나 선택 당시의 노트에 속하지 않습니다.');
+   // A keyboard-focused chooser may blur Lexical and leave selection null.
+   // But a caret now inside a DIFFERENT note/body must reject the stale choice.
+   const current=$getSelection();
+   if($isRangeSelection(current)&&
+      (!current.isCollapsed()||!$getContainingNote(current.anchor.getNode())?.is(note)))
+    return rejectSelection('INVALID_NOTE_IMAGE_TARGET',
+     '현재 커서가 선택 당시의 노트를 벗어났습니다.');
+   if($isNodeSelection(current)){
+    const nodes=current.getNodes();
+    if(nodes.length!==1||!$getContainingNote(nodes[0]!)?.is(note))
+     return rejectSelection('INVALID_NOTE_IMAGE_TARGET',
+      '다른 노드 선택으로 변경되었습니다.');
+   }
    const selection=$createNodeSelection();
    selection.add(image.getKey());
    $setSelection(selection);
