@@ -1,3 +1,36 @@
+## 2026-10-22 — 공식 9섹션 단일 문서 및 실제 React 편집 통합 오라클 추가 (실행 대기)
+
+- 사용자 요청: **테스트는 나중에 한 번에 실행**. 이번 단계에서는 빌드·lint·
+  pnpm install·단위·브라우저·Python·CI를 실행하지 않고, 다음 코드 및 수락
+  체크리스트를 작성했다. 이전 검증 통과가 이 커밋에 전이되지는 않는다.
+- `tests/helpers/pinned-upstream-article.mjs`: 변경 금지된 upstream
+  `index.html`의 9섹션/60블록/7노트 inventory·태그·속성·
+  부모/자식/형제 관계를 고정한 fail-closed browser DOM→Lexical JSON
+  재구성기. 독립 섹션 fixture를 붙이는 방식이 아닌 **하나의 문서**를 만든다.
+- `tests/upstream-full-document-roundtrip-browser.mjs`: v1 정본·v2 envelope
+  migration→실제 headless Lexical parse/export→JSON 저장/새 editor 재열기→
+  단일 pure renderer 전체 HTML로 이어지는 테스트 작성. 현대화 예외는
+  note 7개 ID/aria-label, Figures iframe 한 곳 및 pre/code 설명 한 곳,
+  article namespace와 현재 지원되지 않는 원본 h1 ID에만 한정한다.
+  소스 첫 문장을 변경한 저장 복제본의 다른 8개 섹션과 7개 노트/iframe 유지도
+  다시 확인한다. 375/759/760/761/1024/1440px iframe-wrapper geometry 비교 포함.
+- `tests/upstream-full-document-editor-browser.mjs`: 동일 JSON을 **실제 React
+  editor UI**에 로드하고 본문에 키보드로 한 문자열 입력, undo/redo,
+  저장·페이지 재로드·복구한 다음 나머지 8개 섹션 및 7개 note와 iframe
+  내용이 그대로 발행되는지 검사한다.
+  Edit DOM에서는 iframe 대신 decorator placeholder를 기대하며
+  발행 HTML에서만 실제 `figure.iframe-wrapper > iframe`를 검증한다.
+- `package.json`: `test:upstream-same-content`에 단일 JSON/DOM 경로,
+  `test:browser`에 실제 editor UI 경로를 추가했다.
+  `pnpm verify:batch`는 `tests/*-browser.mjs` 전체 자동 발견으로 둘 다 실행한다.
+- [전체 섹션 대응표](UPSTREAM_PAGE_PARITY_MATRIX.ko.md)와
+  [P2.2.e.1–4 체크리스트](PLAN.ko.md), 오류 E126/예방 M116 갱신.
+  **지금은 모두 테스트 작성·커밋, 실행 결과 없음**.
+  향후 Work 일괄 실행에서 failures 수정 후 수락을 판정한다.
+- 남은 별도 범위: 공식 title `h1#tufte-css` 앵커를 저장할 schema/API 여부,
+  실제 이미지·폰트 로딩과 전 페이지 geometry/스크린샷,
+  구체 note/figure 편집 명령, OS IME/스크린리더 테스트. CI 생략.
+
 ## 2026-10-22 — CR 일괄 테스트 진입 점검: GitHub 코드 정합성 확인, 실행 환경 차단
 
 - 사용자 지시에 따라 다음 단계인 누적 일괄 검증을 시도했다. 현재 실행 컨테이너에는
