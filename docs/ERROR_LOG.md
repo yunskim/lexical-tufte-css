@@ -865,13 +865,19 @@ E001–E049/M001–M042를 검토했다. E024의 경계 입력은 실제 Chromiu
   브라우저 fixture 변환기를 추가했다. 지원하지 않는 태그/속성/임베드 호스트/
   예제 코드 구조를 임의 생략하지 않고 실패시킨다.
   `tests/upstream-full-document-roundtrip-browser.mjs`에 v1→v2 migration,
-  전체 Lexical 저장·재열기, 한 곳의 문장 변경 후 재발행, 9섹션 DOM 대조와
-  6개 viewport의 iframe-wrapper geometry를 추가했다.
-  `pnpm test:upstream-same-content` 및 batch auto-discovery에 등록했다.
+  전체 Lexical 저장·재열기, 저장 JSON 복제본의 한 문장 변경 후 재발행,
+  9섹션 DOM 대조와 6개 viewport의 iframe-wrapper geometry를 추가했다.
+  이와 **별개로** `tests/upstream-full-document-editor-browser.mjs`에서
+  동일 문서를 실제 React Lexical 편집기에 로드하고 키보드 본문 수정·
+  undo/redo·저장/재열기 후 8개 무변경 섹션과 전체 note/iframe 발행을 비교한다.
+  `pnpm test:upstream-same-content`, `pnpm test:browser`,
+  batch auto-discovery에 각 회귀를 등록했다.
 - 의도적 차이: 원본 `article` 무속성 ↔ 발행 `article#upstream-complete-demo-article.tufte-article[lang]`,
   원본 `h1#tufte-css` ↔ 현재 발행 h1 ID 없음. 이를 명시적으로 고정 검사한다.
   실제 7개 노트의 네임스페이스 ID/접근성 aria-label 및 Figures iframe
   한 곳/설명 코드 한 곳을 제외하고 의미 있는 DOM을 느슨하게 정규화하지 않는다.
-- 상태: **코드 작성·커밋, 테스트 미실행**. JSON 객체의 한 문장 편집 테스트는
-  실제 editor 키보드/undo·이미지/폰트/스크린샷 검사를 대체하지 않는다.
+- 상태: **코드 작성·커밋, 두 브라우저 테스트 모두 미실행**.
+  키보드/undo 테스트 코드를 추가했더라도 실제 검증은 아직 없다.
+  본문 한 곳의 키보드 테스트가 주석/figure 개별 명령, OS IME,
+  이미지/폰트/스크린샷 수락을 대체하지 않는다.
   P2.2.e.1–4 및 M116 참조. 실패의 존재/수정 완료는 실행 후 판정한다.
