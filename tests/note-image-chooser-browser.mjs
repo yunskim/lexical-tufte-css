@@ -39,6 +39,7 @@ try{
  assert.equal(await chooserButton.getAttribute('aria-expanded'),'true');
  const choices=page.getByRole('group',{name:'현재 노트의 이미지 선택'});
  await choices.waitFor();
+ await page.waitForFunction(()=>document.activeElement?.textContent?.includes('이미지 1:'));
  assert.equal(await choices.locator('li').count(),2);
  const bounds=await choices.boundingBox();
  assert.ok(bounds&&bounds.x>=0&&bounds.x+bounds.width<=375,

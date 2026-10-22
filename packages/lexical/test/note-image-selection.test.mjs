@@ -50,7 +50,7 @@ test('enumerate exact images in the note, select second, edit only second and pu
   ]);
   const second=available[1];
   assert.equal(editor.dispatchCommand(SELECT_TUFTE_NOTE_IMAGE_COMMAND,{
-   noteId:second.noteId,nodeKey:second.nodeKey
+   noteId:second.noteId,noteKey:second.noteKey,nodeKey:second.nodeKey
   }),true);
   editor.update(()=>{},{discrete:true});
   editor.getEditorState().read(()=>{
@@ -80,7 +80,7 @@ test('stale or cross-note target cannot change selection or content',()=>{
   const [first,second]=choices(editor);
   const snapshot=JSON.stringify(editor.getEditorState().toJSON().root);
   assert.equal(editor.dispatchCommand(SELECT_TUFTE_NOTE_IMAGE_COMMAND,{
-   noteId:'note-b',nodeKey:second.nodeKey
+   noteId:'note-b',noteKey:second.noteKey,nodeKey:second.nodeKey
   }),false,'same key with the wrong noteId is not accepted');
   assert.equal(JSON.stringify(editor.getEditorState().toJSON().root),snapshot);
   // Move the selection to the other note, then attempt to use an old chooser key.
@@ -88,7 +88,7 @@ test('stale or cross-note target cannot change selection or content',()=>{
    $getRoot().getFirstChild().getLastChild().getFirstChild().getFirstChild().selectEnd();
   },{discrete:true});
   assert.equal(editor.dispatchCommand(SELECT_TUFTE_NOTE_IMAGE_COMMAND,{
-   noteId:first.noteId,nodeKey:first.nodeKey
+   noteId:first.noteId,noteKey:first.noteKey,nodeKey:first.nodeKey
   }),false);
   editor.update(()=>{
    $getRoot().getFirstChild().getFirstChild().getChildAtIndex(1)
@@ -97,7 +97,7 @@ test('stale or cross-note target cannot change selection or content',()=>{
     .getFirstChild().selectEnd();
   },{discrete:true});
   assert.equal(editor.dispatchCommand(SELECT_TUFTE_NOTE_IMAGE_COMMAND,{
-   noteId:second.noteId,nodeKey:second.nodeKey
+   noteId:second.noteId,noteKey:second.noteKey,nodeKey:second.nodeKey
   }),false,'removed image key must not resolve');
   assert.equal(JSON.stringify(editor.getEditorState().toJSON().root)
    .includes('"src":"/second.png"'),false);
@@ -110,8 +110,8 @@ test('chooser refuses malformed targets and text outside notes',()=>{
  const {editor,diagnostics,dispose}=setup();
  try{
   const [first]=choices(editor);
-  for(const payload of [null,{}, {noteId:'bad note',nodeKey:first.nodeKey},
-   {noteId:first.noteId,nodeKey:42}, {...first,unexpected:true}
+  for(const payload of [null,{}, {noteId:'bad note',noteKey:first.noteKey,nodeKey:first.nodeKey},
+   {noteId:first.noteId,noteKey:first.noteKey,nodeKey:42}, {...first,unexpected:true}
   ]){
    assert.equal(editor.dispatchCommand(SELECT_TUFTE_NOTE_IMAGE_COMMAND,payload),false);
   }
@@ -120,7 +120,7 @@ test('chooser refuses malformed targets and text outside notes',()=>{
   },{discrete:true});
   assert.deepEqual(choices(editor),[],'outside a note has no editable candidates');
   assert.equal(editor.dispatchCommand(SELECT_TUFTE_NOTE_IMAGE_COMMAND,{
-   noteId:first.noteId,nodeKey:first.nodeKey
+   noteId:first.noteId,noteKey:first.noteKey,nodeKey:first.nodeKey
   }),false);
   assert.deepEqual(diagnostics.map(d=>d.code),[
    'INVALID_NOTE_IMAGE_TARGET','INVALID_NOTE_IMAGE_TARGET',
