@@ -10,3 +10,7 @@ __pycache__/
 packages/*/LICENSE
 packages/*/THIRD_PARTY_NOTICES.md
 packages/*/licenses/
+
+# Downloaded, integrity-checked upstream visual test assets (not redistributed).
+fixtures/tufte/upstream/img/
+fixtures/tufte/upstream/et-book/
