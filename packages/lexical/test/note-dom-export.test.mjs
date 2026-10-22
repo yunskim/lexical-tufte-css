@@ -14,7 +14,11 @@ class FakeNode {
  get nextElementSibling(){if(!this.parentNode)return null;const siblings=this.parentNode.children;return siblings[siblings.indexOf(this)+1]??null;}
  get classList(){return {contains:name=>this.className.split(' ').includes(name)};}
 }
-class FakeElement extends FakeNode {constructor(tag){super(1,tag.toUpperCase());}}
+class FakeElement extends FakeNode {
+ constructor(tag){super(1,tag.toUpperCase());this.attributes=new Map();}
+ setAttribute(name,value){this.attributes.set(name,String(value));}
+ getAttribute(name){return this.attributes.get(name)??null;}
+}
 function makeDocument(){return {
  createElement:tag=>new FakeElement(tag),
  createDocumentFragment:()=>new FakeNode(11),
@@ -45,6 +49,8 @@ for(const [name,Node] of [['sidenote',SidenoteNode],['marginnote',MarginnoteNode
    assert.equal(span.tagName,'SPAN');
    assert.equal(label.htmlFor,input.id);
    assert.equal(input.nextElementSibling,span);
+   assert.equal(input.getAttribute('aria-label'),
+    name==='sidenote'?'Toggle sidenote':'Toggle margin note');
    assert.equal(span.className,name);
    assert.equal(span.firstChild.textContent,'Rich note body');
    assert.equal(label.classList.contains('sidenote-number'),name==='sidenote');
