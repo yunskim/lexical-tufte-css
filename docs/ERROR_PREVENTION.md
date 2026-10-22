@@ -708,3 +708,31 @@ E059/M052 및 E067/M060의 선행 대책을 그림 주석 명령·회귀 테스�
 - 업그레이드 때 **과거 golden은 불변으로 보관**하고 모든 이전 문서에 대해 parser→정본 비교→migration→새 parser→발행 HTML/DOM을 검사한다. 손실 탐지는 계속 실패 처리한다.
 - 이력이 없는 새 필드/타입을 조용히 버리는 migration이나 `UNKNOWN_FIELD` 완화로 통과시켜서는 안 된다. 릴리스 호환 matrix와 백업/복원·rollback이 준비되기 전 버전 올림을 승인하지 않는다.
 - 적용: `docs/LEXICAL_UPGRADE_POLICY.ko.md`, `packages/lexical/test/upgrade-compatibility.test.mjs`. 실행 대기.
+
+## M116 — 섹션별 DOM oracle과 전체 Lexical 저장·재발행 oracle을 별도 수락
+
+- E126: upstream 9개 섹션을 테스트 파일들에서 생성한 독립 문서의
+  렌더링 결과만으로 전체 글의 동일성을 주장하지 않는다.
+  `tests/helpers/pinned-upstream-article.mjs`는 기준 HTML 전체를 읽고
+  9섹션/60블록/7노트 inventory·본문·속성·중첩을 고정한다.
+  재구성 불가능한 DOM·미지원 속성은 **명시적 실패** 처리한다.
+- `tests/upstream-full-document-roundtrip-browser.mjs`에서 v1 문서 검증,
+  envelope-only v2 migration, headless Lexical 실제 parse/export,
+  JSON 저장 후 새 editor 재열기, 순수 HTML 발행을 연속 확인한다.
+  텍스트 수정은 저장본의 독립 복제본에서 한 문장만 바꾼 후 다시
+  import/export/publish하고, 다른 섹션과 전역 note/figure/iframe 구조가
+  그대로인지를 전체 DOM 오라클로 검사한다. Editor keyboard/undo는 별도.
+- DOM 차이는 각기 별도 검사로 고정한다: `article` namespace/class/lang,
+  원본의 `h1#tufte-css`가 제품 schema에서 표현되지 않는 문제,
+  note ID/aria-label, Figures의 현대화 iframe 속성 전체와 설명 pre/code
+  한 곳만 허용한다. 인라인 공백·caption/figure/note 부모·형제 관계를
+  대충 `textContent`로 비교하거나 모든 iframe attrs를 버리는 방식을 금지한다.
+  원본 fixture는 변경하지 않는다.
+- Responsive 375/759/760/761/1024/1440px의 iframe-wrapper geometry
+  정합성을 별도로 검사하지만, 페이지 전체 이미지·폰트 로드·screenshot/
+  pixel parity와 스크린리더/OS IME는 해당 환경에서 추가 수락해야 한다.
+  없는 증거를 통합 테스트라는 이름으로 통과 처리하지 않는다.
+- 적용: `docs/PLAN.ko.md` P2.2.e.1–4,
+  `docs/UPSTREAM_PAGE_PARITY_MATRIX.ko.md`, 원본 전체 문서 회귀,
+  `pnpm test:upstream-same-content` 및 `pnpm verify:batch`.
+  **코드 작성 상태, 사용자 요청에 따라 일괄 실행 대기; CI 생략**.
