@@ -1,4 +1,4 @@
-import {isIdentifier} from '@lexical-tufte/document';
+import {isIdentifier,NOTE_TOGGLE_ACCESSIBLE_NAME} from '@lexical-tufte/document';
 import {ElementNode,isHTMLElement,type EditorConfig,type LexicalEditor,type NodeKey,type SerializedElementNode,type DOMExportOutput} from 'lexical';
 import {TufteSpanNode} from './TufteSpanNode.js';
 
@@ -51,6 +51,7 @@ export abstract class NoteNode extends ElementNode {
    label.className=kind==='sidenote'?'margin-toggle sidenote-number':'margin-toggle';
    label.textContent=kind==='marginnote'?'⊕':'';
    const input=document.createElement('input');input.id=id;input.type='checkbox';input.className='margin-toggle';
+   input.setAttribute('aria-label',NOTE_TOGGLE_ACCESSIBLE_NAME[kind]);
    const fragment=document.createDocumentFragment();
    // Keep the Lexical tree as newthought/sidenote siblings. Only exported HTML
    // pairs their DOM: upstream puts the label inside the preceding newthought
