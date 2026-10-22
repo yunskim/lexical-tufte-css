@@ -40,8 +40,11 @@ try {
    quilt:(()=>{const e=document.querySelector('img.imagequilt'),r=e.getBoundingClientRect();return {naturalWidth:e.naturalWidth,ratio:r.width/r.height,width:r.width,parent:e.parentElement.getBoundingClientRect().width};})(),
    embeds:[...document.querySelectorAll('.iframe-wrapper > iframe')].map(e=>{
     const r=e.getBoundingClientRect();return {
-     cssRatio:r.width/r.height,
      intrinsicRatio:Number(e.getAttribute('width'))/Number(e.getAttribute('height')),
+     wrapperSize:[e.parentElement.getBoundingClientRect().width,e.parentElement.getBoundingClientRect().height],
+     iframeSize:[r.width,r.height],
+     wrapperPosition:getComputedStyle(e.parentElement).position,
+     framePosition:getComputedStyle(e).position,
      sandbox:e.getAttribute('sandbox'),title:e.title,width:r.width,
      parentChildren:e.parentElement.children.length,
      loading:e.getAttribute('loading'),referrerpolicy:e.getAttribute('referrerpolicy')
@@ -53,9 +56,14 @@ try {
   assert.equal(measured.code,'  <code>&\t\n    preserved');assert.ok(Math.abs(measured.quilt.ratio-2.5)<0.01,JSON.stringify({width,measured}));assert.equal(measured.quilt.naturalWidth,120);assert.ok(measured.quilt.width<=measured.quilt.parent+1);
   assert.equal(measured.embeds.length,5,'Existing two embeds and three ratio fixtures remain published');
   for(const frame of measured.embeds){
-   // Original Tufte CSS reserves a 16:9 iframe-wrapper regardless of the
-   // embed's intrinsic width/height metadata. No injected SVG/CSP inline CSS.
-   assert.ok(Math.abs(frame.cssRatio-16/9)<0.02,JSON.stringify({width,frame}));
+   // Official Tufte CSS uses padding-bottom:56.25% plus 25px padding-top
+   // on .iframe-wrapper. The iframe must fill that reserved box; its own
+   // intrinsic width/height do not drive computed layout.
+   assert.equal(frame.wrapperPosition,'relative');
+   assert.equal(frame.framePosition,'absolute');
+   for(let axis=0;axis<2;axis++)
+    assert.ok(Math.abs(frame.wrapperSize[axis]-frame.iframeSize[axis])<=1,
+     JSON.stringify({width,frame,axis}));
    assert.equal(frame.parentChildren,1,'iframe must be only direct child');
    assert.match(frame.sandbox,/allow-scripts/);
    assert.ok(frame.title);
