@@ -51,9 +51,10 @@ export function loadMigratedDocumentIntoEditor(editor:LexicalEditor,input:unknow
  const migrated=migrateStoredDocument(input);
  if(!migrated.ok)return migrated;
  // Project only the fields understood by the legacy strict bridge.
- const {id,locale,title,subtitle,lexicalState,assets}=migrated.document;
+ const {id,locale,title,titleId,subtitle,lexicalState,assets}=migrated.document;
  const legacy:TufteDocument={schemaVersion:1,id,locale,title,lexicalState,assets};
  if(subtitle!==undefined)legacy.subtitle=subtitle;
+ if(titleId!==undefined)legacy.titleId=titleId;
  const imported=loadDocumentIntoEditor(editor,legacy);
  if(!imported.ok)return imported;
  // The strict loader applies the shared document replacement/history policy.
@@ -78,11 +79,12 @@ export function exportEditorToDocument(editor:LexicalEditor,base:unknown):Failur
 export function exportEditorToDocumentV2(editor:LexicalEditor,base:unknown):Failure|Success<TufteDocumentV2>{
  const checked=validateDocumentV2(base);
  if(!checked.ok)return checked;
- const {id,locale,title,subtitle,assets}=checked.document;
+ const {id,locale,title,titleId,subtitle,assets}=checked.document;
  const legacy:TufteDocument={
   schemaVersion:1,id,locale,title,assets:structuredClone(assets),
   lexicalState:structuredClone(checked.document.lexicalState),
   ...(subtitle===undefined?{}:{subtitle}),
+  ...(titleId===undefined?{}:{titleId}),
  };
  const exported=exportEditorToDocument(editor,legacy);
  if(!exported.ok)return exported;

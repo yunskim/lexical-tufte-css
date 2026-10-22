@@ -27,7 +27,7 @@ export type JsonNode=
  | ({type:'tufte-inline-image'|'tufte-imagequilt';version:1}&ImageFields)
  | {type:'tufte-embed';version:1;provider:'youtube'|'vimeo';src:string;title:string;wrapper:'figure'|'div';width:'body'|'fullwidth';aspectRatio:number};
 export type AssetRef={id:string;src:string;mimeType:string;alt?:string;width?:number;height?:number;byteLength?:number;sha256?:string};
-export type TufteDocument={schemaVersion:1;id:string;locale:string;title:string;subtitle?:string;lexicalState:{root:Element<'root'>};assets:AssetRef[]};
+export type TufteDocument={schemaVersion:1;id:string;locale:string;title:string;titleId?:string;subtitle?:string;lexicalState:{root:Element<'root'>};assets:AssetRef[]};
 export type PostMetadata={slug:string;summary:string;tags:string[];authors:string[];status:'draft'|'published'|'archived';createdAt:string;updatedAt:string;publishedAt?:string;revision:number};
 export type PostRecord={document:TufteDocument;metadata:PostMetadata};
 export type ValidationResult={ok:true;document:TufteDocument;diagnostics:Diagnostic[]}|{ok:false;diagnostics:Diagnostic[]};

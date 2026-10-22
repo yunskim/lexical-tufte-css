@@ -58,6 +58,7 @@ try{
  assert.equal(source.inventory.length,9);
  assert.deepEqual(source.headingIds,expectedHeadings);
  assert.equal(source.notes.length,7);
+ assert.equal(source.document.titleId,'tufte-css');
  assert.equal(source.inventory.reduce((sum,section)=>sum+section.types.length,0),60,
   'Pinned full-page section/block inventory changed');
  const input=source.document;
@@ -119,11 +120,11 @@ try{
    const toSubtitle=published.querySelector(':scope > p.subtitle');
    if(!fromTitle||!toTitle||!fromSubtitle||!toSubtitle||
     normalized(attrs(fromTitle))!=='[["id","tufte-css"]]'||
-    normalized(attrs(toTitle))!=='{}'||
+    normalized(attrs(toTitle))!=='[["id","tufte-css"]]'||
     fromTitle.textContent!==toTitle.textContent||
     fromSubtitle.textContent!==toSubtitle.textContent||
     normalized(attrs(fromSubtitle))!==normalized(attrs(toSubtitle)))
-    throw Error('Title/subtitle parity changed beyond explicit upstream h1#tufte-css exception');
+    throw Error('Title/subtitle parity changed, including h1#tufte-css');
    const fromSections=[...official.children].filter(n=>n.tagName==='SECTION');
    const toSections=[...published.children].filter(n=>n.tagName==='SECTION');
    if(fromSections.length!==9||toSections.length!==9)
@@ -134,8 +135,7 @@ try{
     JSON.stringify(resultHeadings)!==JSON.stringify(expectedHeadings))
     throw Error('Section heading IDs changed during Lexical persistence');
 
-   // The official title ID is not part of the project document schema.
-   // This exception is checked above, not silently stripped from article DOM.
+   // The official title ID must survive the versioned Lexical roundtrip.
    const originalInputs=[...official.querySelectorAll('input.margin-toggle')];
    const resultInputs=[...published.querySelectorAll('input.margin-toggle')];
    if(originalInputs.length!==7||resultInputs.length!==7)

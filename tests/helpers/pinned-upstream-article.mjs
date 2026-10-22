@@ -282,7 +282,7 @@ export function reconstructPinnedArticle({html,modernFrame,modernCode}){
  ]))throw Error('Upstream section headings changed');
  const result={
   schemaVersion:1,id:'upstream-complete-demo',
-  locale:'en-US',title:title.textContent,subtitle:subtitle.textContent,
+  locale:'en-US',title:title.textContent,titleId:title.id,subtitle:subtitle.textContent,
   assets:[],
   lexicalState:{root:{
    ...element('root',parsedSections),textFormat:0,textStyle:''

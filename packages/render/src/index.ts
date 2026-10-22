@@ -11,6 +11,21 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
  const capabilities=validateRenderProfile(result.document);if(capabilities.length)return {ok:false,html:null,diagnostics:capabilities};
  const doc=result.document,prefix=options.idPrefix??doc.id;
  if(typeof prefix!=='string'||!/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(prefix))return {ok:false,html:null,diagnostics:[{code:'INVALID_ID_PREFIX',path:'options.idPrefix',message:'Invalid article namespace'}]};
+ // The h1 anchor must stay stable when idPrefix changes. Do not silently
+ // rewrite links; reject collisions with generated article or note IDs.
+ if(doc.titleId!==undefined){
+  if(doc.titleId===`${prefix}-article`)
+   return {ok:false,html:null,diagnostics:[{code:'DUPLICATE_TITLE_ID',path:'$.titleId',message:'Title ID conflicts with article ID'}]};
+  const noteIDs=new Set<string>();
+  const visitNotes=(n:JsonNode):void=>{
+   if(n.type==='tufte-sidenote'||n.type==='tufte-marginnote')
+    noteIDs.add(`tufte-${prefix.length}-${prefix}-${n.noteId}`);
+   if('children'in n)for(const child of n.children)visitNotes(child);
+  };
+  visitNotes(doc.lexicalState.root);
+  if(noteIDs.has(doc.titleId))
+   return {ok:false,html:null,diagnostics:[{code:'DUPLICATE_TITLE_ID',path:'$.titleId',message:'Title ID conflicts with generated note ID'}]};
+ }
  const attrs=(n:ElementFields):Record<string,string>=>({
   ...(n.direction?{dir:String(n.direction)}:{}),
   ...(n.format&&typeof n.format==='string'?{class:`tufte-align-${n.format}`}:{}),
@@ -149,7 +164,7 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
  const article=element('article',{
   id:`${prefix}-article`,lang:doc.locale,class:rootClass,
   ...(root.direction?{dir:String(root.direction)}:{}),
- },[element('h1',{},[doc.title]),
+ },[element('h1',doc.titleId?{id:doc.titleId}:{},[doc.title]),
  ...(doc.subtitle!==undefined?[element('p',{class:'subtitle'},[doc.subtitle])]:[]),
  ...render(root)]);
  return {ok:true,html:serializeHTML(article),diagnostics:[]};

@@ -10,12 +10,14 @@ export function validateDocument(input:unknown):ValidationResult{
  const add=(code:string,path:string,message:string)=>{if(diagnostics.length<L.diagnostics)diagnostics.push({code,path,message});};
  const unknownFields=(obj:Record<string,unknown>,keys:readonly string[],path:string)=>{for(const key of Object.keys(obj))if(!keys.includes(key))add('UNKNOWN_FIELD',`${path}.${key}`,'Unrecognized field');};
  if(!plain(input))return {ok:false,diagnostics:[{code:'INVALID_DOCUMENT',path:'$',message:'Expected plain document object without accessors'}]};
- unknownFields(input,['schemaVersion','id','locale','title','subtitle','lexicalState','assets'],'$');
+ unknownFields(input,['schemaVersion','id','locale','title','titleId','subtitle','lexicalState','assets'],'$');
  if(input.schemaVersion!==1)add('UNSUPPORTED_VERSION','$.schemaVersion','Only schemaVersion 1 is supported');
  if(!isIdentifier(input.id))add('INVALID_ID','$.id','Invalid document identifier');
  let locale=false;if(typeof input.locale==='string'&&input.locale.length<=64)try{locale=Intl.getCanonicalLocales(input.locale).length===1;}catch{}
  if(!locale)add('INVALID_LOCALE','$.locale','Expected BCP 47 locale');
  if(!nonempty(input.title,1000))add('INVALID_TITLE','$.title','Expected title up to 1000 characters');
+ if(input.titleId!==undefined&&!isIdentifier(input.titleId))
+  add('INVALID_TITLE_ID','$.titleId','Title anchor must be a safe HTML identifier');
  if(input.subtitle!==undefined&&(typeof input.subtitle!=='string'||input.subtitle.length>2000))add('INVALID_SUBTITLE','$.subtitle','Invalid subtitle');
  const assets=new Map<string,AssetRef>();
  if(!Array.isArray(input.assets)||input.assets.length>L.assets)add('INVALID_ASSETS','$.assets','Expected at most 1000 assets');
@@ -84,6 +86,8 @@ export function validateDocument(input:unknown):ValidationResult{
   if(type==='quote'&&raw.cite!==undefined&&!isSafeURL(raw.cite,'link'))add('INVALID_QUOTE_CITE',path+'.cite','Quote cite must be a safe URL');
   if(type==='heading'&&!enumeration(raw.tag,['h2','h3']))add('INVALID_HEADING',path+'.tag','Only h2/h3 supported');
   if(type==='heading'&&raw.id!==undefined&&!isIdentifier(raw.id))add('INVALID_HEADING_ID',path+'.id','Heading ID must be a safe identifier');
+  if(type==='heading'&&input.titleId!==undefined&&raw.id===input.titleId)
+   add('DUPLICATE_TITLE_ID',path+'.id','Heading ID conflicts with document title anchor');
   if(type==='list'&&(!enumeration(raw.listType,['bullet','number'])||raw.tag!==(raw.listType==='bullet'?'ul':'ol')||!integer(raw.start,1,Number.MAX_SAFE_INTEGER)))add('INVALID_LIST',path,'Invalid list kind/tag/start');
   if(type==='listitem'&&raw.checked!==undefined)add('UNSUPPORTED_PROPERTY',path+'.checked','Checklist semantics are outside this schema');
   if(type==='listitem'&&!integer(raw.value,1,Number.MAX_SAFE_INTEGER))add('INVALID_LIST_VALUE',path+'.value','Invalid list value');
