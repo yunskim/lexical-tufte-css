@@ -10,6 +10,27 @@
 
 기능 구현 순서는 **예제 DOM 대응 확인 → schema 계약 → Lexical 편집/경계 → 순수 renderer HTML → fixture 작성 → 누적 실행 검증**으로 한다. 기본 Lexical 키 입력을 재구현하기보다 문서 schema를 위반할 수 있는 경계에서만 가로채고, 붙여넣기·IME·undo/redo·저장/발행은 동일 불변식을 검사한다. 사용자 요청에 따라 현재 테스트는 작성·누적하고 일괄 실행하기 전까지 관련 체크박스를 완료 처리하지 않는다. 공식 예제의 지원 범위와 제3자 임의 HTML의 지원 범위는 구분한다.
 
+## 2026-10-22 실제 코드 리뷰 보완 체크리스트
+
+[**CR01–CR08 — 현재 코드 리뷰 후속 수정 및 누적 검증**](CODE_REVIEW_REMEDIATION_2026-10-22.ko.md)를
+독립 체크리스트로 관리한다. 해당 문서의 체크박스는 **맨 끝**에 있으며
+실제 검사 통과 전에는 완료 표시하지 않는다.
+
+- 코드 수정: node registry freeze, renderer/asset/SQLite 발행 오류 분류,
+  schema↔render switch/profile 정합성, React-free HorizontalRule 및
+  의존성/lockfile, 모바일 note의 이름/키보드 접근성, Lexical 버전별 golden
+  보전 및 회귀를 포함한다.
+- 공식 원본과 구조적 동일성 목표는 유지한다. 현대화는 기존 Figures iframe 및
+  note input `aria-label`의 **명시적 예외**로 제한하며 원본 fixture를 바꾸지 않는다.
+- Lexical 업그레이드 수락 조건은
+  [호환성/마이그레이션 정책](LEXICAL_UPGRADE_POLICY.ko.md)을 따른다.
+  `UNKNOWN_FIELD`와 `LEXICAL_IMPORT_LOSSY` 실패 경계는 유지한다.
+- 상태: 코드/테스트/문서 커밋 중, **신규 일괄 검증 미실행**. 기존 Work 통과를
+  최신 변경의 통과 증거로 사용하지 않는다. CI 생략.
+- 우선순위: 이 보완점은 새 기능을 넓히기 위한 것이 아니라 기존 P2의
+  안전성·확장성 전제이며, 이후 9개 섹션 단일 문서 통합으로 돌아간다.
+  Recovery host(P5) 및 Wagtail asset 구현은 별도 후순위다.
+
 ## 고정 upstream 9개 섹션 동일 콘텐츠 진행표 (2026-10-22)
 
 [섹션별 동일 콘텐츠 DOM 추적표](UPSTREAM_PAGE_PARITY_MATRIX.ko.md)를 기준으로 진행한다.
