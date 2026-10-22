@@ -60,6 +60,24 @@ try{
   for(const child of node.children??[])restoreIds(child);
  };
  restoreIds(dom.published);
- assert.deepEqual(dom.published,dom.original,'upstream newthought note DOM must match exactly except documented ID namespace');
- console.log('Newthought/sidenote split-parent DOM matches upstream reference.');
+ assert.deepEqual(dom.published,dom.original,
+  'upstream newthought note DOM must match except named toggle and ID namespace');
+ const css=readFileSync(new URL('../fixtures/tufte/upstream/tufte.css',import.meta.url),'utf8');
+ const scoped=readFileSync(new URL('../packages/render/styles.css',import.meta.url),'utf8');
+ await page.setViewportSize({width:375,height:900});
+ await page.setContent('<!doctype html><style>'+css+'\n'+scoped+'</style>'+result.html);
+ const control=page.getByRole('checkbox',{name:'Toggle sidenote',exact:true});
+ assert.equal(await control.count(),1,'Split-parent checkbox has an accessible name');
+ await control.focus();
+ assert.equal(await control.evaluate(e=>document.activeElement===e),true);
+ const label=page.locator('span.newthought > label.margin-toggle.sidenote-number');
+ const focusStyle=await label.evaluate(e=>getComputedStyle(e).outlineStyle);
+ assert.notEqual(focusStyle,'none','Keyboard focus must be visible on split-parent label');
+ const payload=page.locator('span.newthought + input.margin-toggle + span.sidenote');
+ assert.equal(await payload.evaluate(e=>getComputedStyle(e).display),'none');
+ await control.press('Space');
+ assert.equal(await payload.evaluate(e=>getComputedStyle(e).display),'block');
+ await control.press('Space');
+ assert.equal(await payload.evaluate(e=>getComputedStyle(e).display),'none');
+ console.log('Newthought/sidenote split-parent DOM and focusable mobile checkbox preserve Tufte CSS adjacency.');
 }finally{await browser.close();}
