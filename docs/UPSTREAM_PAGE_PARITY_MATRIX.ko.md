@@ -16,15 +16,15 @@
 | 3 | Fundamentals | `upstream-same-content-fundamentals-browser.mjs`: **코드 추가, 실행 대기** | 기존 `paragraph`에 선택적 `tufteClass:'sans'`, `quote`에 안전한 `cite`를 추가. 14개 원본 블록·실제 3개 주석·newthought 결합·인라인 링크/강조, 전체 DOM을 비교. Lexical factory/저장 왕복 테스트도 작성, 실제 검증 대기 |
 | 4 | Epigraphs | `upstream-same-content-epigraphs-browser.mjs`: **코드 추가, 실행 대기** | 세 인용문, 문단 있는/없는 블록, footer·cite·강조를 원본과 비교; 검증 후 편집 경로 연결 |
 | 5 | Sidenotes: Footnotes and Marginal Notes | `upstream-same-content-sidenotes-browser.mjs`: **코드 추가, 실행 대기** | 12개 원본 블록·2개 실제 note·pre/code 및 인라인 강조·ID 참조·375/760/761/1440px 모바일 토글; 실행 후 검증 판정 |
-| 6 | Figures | 미작성 | figure 내부/문단 내부 marginnote의 이미지·링크·강조; `figure.iframe-wrapper`와 원본 YouTube iframe 속성/URL 정책은 현재 렌더러와 **구조적으로 불일치** |
+| 6 | Figures | `upstream-same-content-figures-browser.mjs`: **코드 추가, 실행 대기** | 원본 11블록·2개 풍부한 marginnote·이미지·코드·일반/fullwidth figure 엄격 대조. iframe은 `figure.iframe-wrapper > iframe` 직접 자식과 CSS 계층 유지, URL·접근성·보안 속성 및 **설명 코드 한 곳**만 명시적 현대화 예외. 375/759/760/761/1024/1440px iframe geometry 비교 |
 | 7 | Code | `upstream-same-content-final-sections-browser.mjs`: **코드 추가, 실행 대기** | 긴 pre/code의 줄바꿈·들여쓰기·표시 영역 geometry |
 | 8 | ImageQuilts | 같은 파일: **코드 추가, 실행 대기** | 공식 예제 `figure > img`의 원래 HTML 속성·상대 URL 및 이미지 실제 로딩/geometry. 원본에 별도 ImageQuilt class 없음 |
 | 9 | Epilogue | 같은 파일: **코드 추가, 실행 대기** | 실제 편집 후 전체 문서 저장·발행 경로 |
 
 현재 **검증 완료된 섹션은 2/9**, 새로 작성된 동일 콘텐츠 테스트 대상은
-6개 섹션(Fundamentals, Epigraphs, Sidenotes, Code, ImageQuilts, Epilogue)이며,
-**Figures**만 아직 전체 동일 콘텐츠 재구성 검사가 없다.
-새로운 6개가 모두 통과하면 섹션 단위 DOM 대응 범위는 **8/9**가 된다.
+7개 섹션(Fundamentals, Epigraphs, Sidenotes, Figures, Code, ImageQuilts, Epilogue)이다.
+**9개 섹션 모두 단독 동일 콘텐츠 비교 테스트가 작성되었으나**
+새로운 7개는 실행 검증 전이다. 모두 통과해야 섹션 단위 DOM 대응을 **9/9**로 판정할 수 있다.
 부분 섹션 테스트를 전체 문서 동등성으로 해석하지 않는다.
 
 ## 엄격한 비교 계약
@@ -47,6 +47,14 @@
   텍스트 코드 서식을 이용한다. 공식 ImageQuilt 샘플 HTML은 일반 img를
   사용하므로 이 정밀 DOM 테스트에서 별도의 `tufte-imagequilt` class를
   강제로 붙이지 않는다.
+- Figures iframe은 **정해진 현대화 예외**만 허용한다. 원본 `figure.iframe-wrapper > iframe`의
+  직접 자식 관계·태그·class·형제 순서는 원본과 정확히 비교한다.
+  원본 `youtube.com` → 허용된 `youtube-nocookie.com`, 오래된 `frameborder` 삭제,
+  `title`·`loading`·`referrerpolicy`·`sandbox` 및 intrinsic width/height는
+  새 **고정 속성 집합 전체**를 검증한다. SVG spacer·`tufte-embed` wrapper는 금지한다.
+  설명용 `pre > code`의 구형 iframe HTML은 현대화된 예제 문자열로 교체하며,
+  이를 제외한 모든 본문·이미지·노트 payload·코드는 원본과 완전 비교한다.
+  `iframe-wrapper`의 공식 16:9 CSS padding 예약 규칙은 원형 유지한다.
 - 공식 페이지 이미지 `img/...` 상대 URL을 원형 보존하기 위해
   document URL 정책에 제한된 bare-relative path 형식을 추가했다.
   URI scheme, authority, 물음표/fragment, 위험한 공백·역슬래시는 기존
@@ -54,9 +62,12 @@
 
 ## 다음 작업 순서
 
-1. 새 `Epigraphs`·`Sidenotes` 및 마지막 세 섹션 테스트를 Work에서 **일괄 실행**하고 진단·재발 대책을 기록한다. CI는 생략한다.
-2. Fundamentals의 `blockquote[cite]`와 `p.sans` 속성은 기존 wire type을 유지한 선택적 속성으로 추가했고, Lexical node replacement 및 renderer 비교 코드를 작성했다. **일괄 실행 후** 이행 결과를 판정한다.
-3. Figures의 일반 margin image와 독립 embed 보안/DOM 정책을 구분한다. 원본 iframe으로 되돌리는 방식의 안전성 약화는 별도 검토 없이 하지 않는다.
-4. 9개 섹션을 **하나의 Lexical 문서**로 묶어 정본 저장·재열기, 전체 원본 대비 DOM·viewport별 geometry/실제 이미지·폰트/스크린샷을 확인한다.
+1. 9개 섹션의 단독 동일 콘텐츠 비교 테스트와 Lexical/document/render 회귀를 **한 번에 실행**해
+   추가 실패를 해결하고 오류·재발 방지·검증 결과를 기록한다. CI는 생략한다.
+2. Figures의 현대화된 임베드 예외는 정확히 고정된 소스 코드/속성에만 적용하고,
+   `figure.iframe-wrapper > iframe` 및 모든 일반 그림/주석 DOM의 동등성을 확인한다.
+   `aspectRatio` 메타데이터와 공식 CSS의 고정 16:9 컨테이너 정책 차이도 후속 제품 계약에서 별도 검토한다.
+3. 9개 섹션을 **하나의 Lexical 문서**로 묶어 정본 저장·재열기,
+   전체 원본 대비 DOM·viewport별 geometry/실제 이미지·폰트/스크린샷을 확인한다.
 
 임시 완화나 보이지 않는 노드 삭제로 테스트를 통과시키지 않는다.
