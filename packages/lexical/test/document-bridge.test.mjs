@@ -9,7 +9,7 @@ import {$getRoot,$createParagraphNode,$createTextNode,CLEAR_HISTORY_COMMAND,COMM
 import {TUFTE_NODES,TUFTE_NODE_TYPES,SectionNode,SidenoteNode,MarginnoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,$createTableLayoutNode,$createFigureNode,$createCaptionNode,$createInlineImageNode,$createSectionNode,$createSidenoteNode,$createMarginnoteNode,$createTufteHeadingNode,$createTufteSpanNode,loadDocumentIntoEditor,loadMigratedDocumentIntoEditor,exportEditorToDocument,exportEditorToDocumentV2,DefinitionListNode,DefinitionTermNode,DefinitionDescriptionNode,$createDefinitionListNode,$createDefinitionTermNode,$createDefinitionDescriptionNode,EpigraphNode,AttributionNode,CiteNode,$createEpigraphNode,$createAttributionNode,$createCiteNode,SectionFooterNode,$createSectionFooterNode,FullwidthNode,$createFullwidthNode,TufteCodeNode,$createTufteCodeNode,ImageQuiltNode,$createImageQuiltNode,EmbedNode,$createEmbedNode} from '../dist/index.js';
 import {LinkNode} from '@lexical/link';
 import {QuoteNode,$createQuoteNode} from '@lexical/rich-text';
-import {HorizontalRuleNode,$createHorizontalRuleNode} from '@lexical/react/LexicalHorizontalRuleNode';
+import {HorizontalRuleNode,$createHorizontalRuleNode} from '@lexical/extension/HorizontalRuleExtension';
 import {createEmptyHistoryState,registerHistory} from '@lexical/history';
 import {NODE_SCHEMA,validateDocument} from '@lexical-tufte/document';
 import {ListNode,ListItemNode,$createListNode,$createListItemNode} from '@lexical/list';
