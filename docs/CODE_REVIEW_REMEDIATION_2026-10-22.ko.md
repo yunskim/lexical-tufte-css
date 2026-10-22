@@ -34,6 +34,23 @@
 오류 등록은 `docs/ERROR_LOG.md`, 예방책은 `docs/ERROR_PREVENTION.md`에서
 ID를 연결한다.
 
+## 구현 진행 기록 — 실행 대기
+
+| ID | 코드·테스트 작성 현황 | 실행 수락 |
+| --- | --- | --- |
+| CR01 | `nodes.ts`의 replacement registry를 freeze, 기존 `all-nodes.test.mjs` R02 불변성 계약 복구 | 대기 |
+| CR02 | `publication.ts` renderer/asset/storage 예외 진단 분리, `publication.test.mjs`의 snapshot/안전 오류 assertions 보강 | 대기 |
+| CR03 | `RENDER_SUPPORTED_NODE_TYPES` immutable profile과 source switch/schema 집합 일치 검사 추가 | 대기 |
+| CR04 | React-free `@lexical/extension/HorizontalRuleExtension`로 3개 import 교체, manifest/lockfile peers 수정, 별도 HR 호환 검사 작성 | 대기 |
+| CR05 | 공유 `NOTE_TOGGLE_ACCESSIBLE_NAME`, pure/Lexical aria-label, 모바일 focusable CSS 및 공식 페이지 속성-only oracle/Space 조작 작성. **실제 스크린리더는 별도 수락 대기** | 대기 |
+| CR06 | 구버전 golden과 v1→v2/미지원 format의 fail-closed 테스트, `LEXICAL_UPGRADE_POLICY.ko.md` 작성 | 대기 |
+| CR07 | 과거 wrapper/newthought 문서를 역사 기록으로 명시, `tufte-pre-wrap` CSS·테스트 묵인 제거, E120–E125/M110–M115 기록 | 대기 |
+| CR08 | 누적 일괄 실행은 사용자 요청에 따라 수행하지 않음. `pnpm verify:batch`와 별도 Python pytest, CI 생략 | 미실행 |
+
+**코드가 존재하는 것과 테스트가 성공한 것은 다르다.** 위 표는 커밋된 구현의 범위를
+정리한 것이며 아래 체크리스트는 실제 수락 전까지 표시하지 않는다. 새로운
+Figures·Fundamentals 등 7개 단독 섹션 테스트와 함께 검사해야 한다.
+
 ## 변경 체크리스트 (문서 끝 유지)
 
 - [ ] CR01. Lexical registry의 `TUFTE_NODES` immutable 계약 복구, 기존 R02/golden 검사 및 회귀 추가 후 실행 통과.
