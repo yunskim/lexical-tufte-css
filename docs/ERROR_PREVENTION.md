@@ -1,3 +1,17 @@
+## M120 — 노트 이미지 수정은 정확한 대상 선택과 무손실 문서 경계 우선
+
+- 이미지 수정 대상을 임의 첫 항목으로 고르지 않는다. 한 노트에
+  이미지가 여러 개면 image node selection의 단일 노드만 수정한다.
+  중첩 link/span 이미지도 재귀 조회하되 inline 구조는 변형하지 않는다.
+- managed assetId·width·height는 몰래 제거하지 않는다. URL이
+  바뀔 때 기존 자산 참조/치수가 깨질 수 있으면 명시적으로 거부한다.
+  alt-only 수정은 자산 속성 그대로 보존한다.
+- 수정 전 불량 입력과 알 수 없는 payload는 거부하고,
+  `validateDocument` 및 pure renderer가 동일 noteId/URL/alt HTML,
+  이스케이프 및 남은 children을 확인하도록 테스트한다.
+- 실제 editor UI 선택·키보드/undo·IME·접근성 수락은 별도 실행
+  증거가 필요하다. **작성만 완료, 실행 미판정**. E130 연계.
+
 ## M119 — note 종류 전환·삭제는 concrete 노드와 부모 구조 계약을 함께 검증
 
 - document의 type 문자열만 바꾸는 편법을 사용하지 않는다.

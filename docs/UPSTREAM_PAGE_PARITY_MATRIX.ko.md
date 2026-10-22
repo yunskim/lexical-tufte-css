@@ -165,6 +165,21 @@
   headless/HTML/history 회귀 코드를 작성해 일괄 테스트 대상으로 추가했다.
   **P2.3.a 전체를 완료한 것은 아니다.**
 
+## P2.3.a.2 노트 이미지 필드 수정 (2026-10-22, 실행 대기)
+
+- 공식 figure 이미지 및 본문 노트 이미지의 다른 노드 타입/부모
+  관계를 구분한다. 노트의 `tufte-inline-image`는 기존 `noteId`/
+  sidenote 또는 marginnote 타입을 그대로 둔 채 src/alt만 변경한다.
+- 여러 이미지가 있는 노트의 caret에서는 수정하지 않고, 정확한
+  단일 image node selection만 수락한다. 관리 자산이나 크기가 명시된
+  이미지의 출처 URL 변경은 자동 참조 교체 없이 거부한다.
+- 렌더링은 원래 `label + input.margin-toggle + span.sidenote/
+  marginnote` 구조 및 image alt HTML escaping을 유지한다.
+  종류 전환 UI는 실제 사용 목적과 무관하여 제거하고 기본 편집을
+  우선한다. 내부 전환 명령은 코드 안정성을 위해 유지한다.
+- **명령 및 테스트 작성 상태, 실행 미판정**. 실제 이미지
+  노드 선택 UX, undo/redo, 스크린리더/모바일 수락은 남았다.
+
 ## 다음 작업 순서
 
 1. 9개 섹션의 단독 동일 콘텐츠 비교 테스트와 Lexical/document/render 회귀를 **한 번에 실행**해

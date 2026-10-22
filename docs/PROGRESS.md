@@ -1,3 +1,22 @@
+## 2026-10-22 — P2.3.a.2 노트 이미지 대체 텍스트·URL 편집 (실행 대기)
+
+- `UPDATE_TUFTE_NOTE_IMAGE_COMMAND` 추가: 기존 사이드노트/마진노트
+  안의 `tufte-inline-image`에서 `src`, `alt` 중 한 개 이상을
+  수정한다. 노트 하나에 이미지 하나라면 collapsed caret만으로,
+  이미지 여러 개면 정확한 image node selection에서만 수정할 수 있다.
+  본문 텍스트·link/span·noteId·서식은 그대로 보존한다.
+- 관리 자산(`assetId`)이 있는 이미지와 명시적 크기(`width/height`)가
+  있는 이미지의 `src` 변경은 자산/치수 재검증이 필요하므로 진단하고 거부한다.
+  둘 다 alt 변경은 가능하며 기존 자산 메타데이터를 유지한다.
+  잘못된 URL·알 수 없는 payload field·모호한 이미지 선택도 거부한다.
+- 편집기 prototype에는 이미지 설명/URL 수정 버튼을 추가했다.
+  이전 sidenote↔marginnote 전환은 비필수 편의 기능으로 UI에서 빼고
+  기존 내부 명령만 남겼다. 생성·수정·삭제·발행의 기본 경로를 우선한다.
+- Lexical 노트 이미지 업데이트·발행 escaping/URL·schema 정합성,
+  관리 자산/크기 제한, 중복 이미지 선택을 위한 회귀 테스트를 추가했다.
+  **lint/build/type/unit/browser/CI는 실행하지 않았다**.
+  실제 GUI/undo·IME·스크린리더 및 픽셀 회귀 수락은 미완료다.
+
 ## 2026-10-22 — P2.3.a.1 본문 노트 kind 변경·삭제 (코드 작성, 실행 보류)
 
 - `packages/lexical/src/noteCommands.ts`: Lexical range selection 한 곳이
