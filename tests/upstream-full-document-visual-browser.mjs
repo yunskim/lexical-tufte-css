@@ -1,16 +1,17 @@
 /**
  * P2.2.e.3 / P4.3.a — OFFLINE, same-content full-page visual geometry probe.
  * Run only after explicit pinned asset download. No automatic network fetch.
- * Screenshots are evidence to inspect; this test does not assert pixel parity.
+ * Screenshot RGBA comparison is exact outside the single validated iframe.
  * Note accessibility and modern iframe differences remain documented exceptions.
  */
 import assert from 'node:assert/strict';
-import {readFileSync,mkdirSync} from 'node:fs';
+import {readFileSync,mkdirSync,writeFileSync} from 'node:fs';
 import {createServer} from 'node:http';
 import {join} from 'node:path';
 import {chromium} from 'playwright';
 import {renderArticle} from '../packages/render/dist/index.js';
 import {reconstructPinnedArticle} from './helpers/pinned-upstream-article.mjs';
+import {compareFullPagePixels} from './helpers/full-page-pixel-parity.mjs';
 import {loadVerifiedUpstreamAssets,upstreamAssetManifest} from
  '../scripts/upstream-visual-assets.mjs';
 
@@ -30,6 +31,11 @@ const modernCode='<figure class="iframe-wrapper">\n'+
  '" loading="'+modernFrame.loading+'" referrerpolicy="'+modernFrame.referrerpolicy+
  '" sandbox="'+modernFrame.sandbox+'" width="'+modernFrame.width+
  '" height="'+modernFrame.height+'" allowfullscreen></iframe>\n</figure>';
+
+
+const legacyCode='<figure class="iframe-wrapper">\n'+
+ '  <iframe width="853" height="480" src="https://www.youtube.com/embed/YslQ2625TR4"'+
+ ' frameborder="0" allowfullscreen></iframe>\n</figure>';
 
 const browser=await chromium.launch({
  headless:true,
@@ -86,7 +92,8 @@ try{
  const address=server.address();
  assert.ok(address&&typeof address==='object');
  const origin='http://127.0.0.1:'+address.port;
- const context=await browser.newContext({colorScheme:'light'});
+ const context=await browser.newContext({colorScheme:'light',deviceScaleFactor:1,reducedMotion:'reduce'});
+ const comparator=await context.newPage();
  const screenshotDir=process.env.TUFTE_SCREENSHOT_DIR;
  if(screenshotDir)mkdirSync(screenshotDir,{recursive:true});
 
@@ -139,6 +146,8 @@ try{
    images:loadedImages,
    notes:[...article.querySelectorAll('.sidenote,.marginnote')].map(rect),
    iframeWrapper:rect(article.querySelector('figure.iframe-wrapper')),
+   iframe:rect(article.querySelector('figure.iframe-wrapper > iframe')),
+   iframeSrc:article.querySelector('figure.iframe-wrapper > iframe')?.getAttribute('src'),
    documentWidth:document.documentElement.scrollWidth,
    fonts:faces
   };
@@ -154,6 +163,7 @@ try{
  };
  for(const width of [375,759,760,761,1024,1440]){
   const pairs=[];
+  const shots=[];
   for(const scope of ['official','published']){
    const page=await context.newPage();
    const failed=[];
@@ -166,14 +176,47 @@ try{
    );
    await page.setViewportSize({width,height:1100});
    await page.goto(origin+'/'+scope+'/',{waitUntil:'load'});
+   if(scope==='official'){
+    // The official example's obsolete iframe CODE block differs intentionally.
+    // Keep the pristine screenshot for audit, then modify only a live DOM node,
+    // never the pinned index.html on disk. The full-page pixel gate compares
+    // the already-authorized instructional example update, not content drift.
+    await measure(page);
+    if(screenshotDir){
+     const pristine=await page.screenshot({fullPage:true,animations:'disabled'});
+     writeFileSync(join(screenshotDir,'official-pristine-'+width+'.png'),pristine);
+    }
+    await page.evaluate(({oldText,newText})=>{
+     const frame=document.querySelector(
+      'article > section:nth-of-type(6) > figure.iframe-wrapper > iframe');
+     if(!frame||frame.parentElement.children.length!==1||
+      frame.getAttribute('src')!=='https://www.youtube.com/embed/YslQ2625TR4')
+      throw Error('Official iframe structure or URL drifted');
+     const pre=frame.parentElement.previousElementSibling;
+     const code=pre?.tagName==='PRE'?pre.querySelector(':scope > code'):null;
+     const matches=[...document.querySelectorAll('article pre > code')]
+      .filter(node=>node.textContent.includes('frameborder="0"'));
+     if(!code||pre.children.length!==1||code.textContent!==oldText||
+      matches.length!==1||matches[0]!==code)
+      throw Error('Exact pinned legacy explanation code not found uniquely');
+     code.textContent=newText;
+    },{oldText:legacyCode,newText:modernCode});
+   }else{
+    await page.evaluate(({src,codeText})=>{
+     const frame=document.querySelector(
+      'article > section:nth-of-type(6) > figure.iframe-wrapper > iframe');
+     const pre=frame?.parentElement?.previousElementSibling;
+     if(!frame||frame.parentElement.children.length!==1||
+      frame.getAttribute('src')!==src||
+      pre?.tagName!=='PRE'||pre.querySelector(':scope > code')?.textContent!==codeText)
+      throw Error('Modernized published iframe/snippet changed');
+    },{src:modernFrame.src,codeText:modernCode});
+   }
    const measured=await measure(page);
    assert.deepEqual(failed,[],scope+' '+width+'px: missing local resources');
-   if(screenshotDir){
-    await page.screenshot({
-     path:join(screenshotDir,scope+'-'+width+'.png'),
-     fullPage:true,animations:'disabled'
-    });
-   }
+   const png=await page.screenshot({fullPage:true,animations:'disabled'});
+   if(screenshotDir)writeFileSync(join(screenshotDir,scope+'-'+width+'.png'),png);
+   shots.push(png);
    pairs.push(measured);
    await page.close();
   }
@@ -197,16 +240,41 @@ try{
   for(let i=0;i<5;i++)delta(source.images[i].geometry,publishedPage.images[i].geometry,
    width+'px image '+source.images[i].src);
   delta(source.iframeWrapper,publishedPage.iframeWrapper,width+'px iframe wrapper');
+  delta(source.iframe,publishedPage.iframe,width+'px iframe');
+  assert.equal(source.iframeSrc,'https://www.youtube.com/embed/YslQ2625TR4');
+  assert.equal(publishedPage.iframeSrc,modernFrame.src);
+  // No content masking beyond the intersection of the two iframe viewports.
+  // A shift at the iframe edge stays visible (and fails).
+  const mask={
+   x:Math.max(source.iframe.x,publishedPage.iframe.x),
+   y:Math.max(source.iframe.y,publishedPage.iframe.y),
+   width:Math.min(source.iframe.x+source.iframe.width,
+    publishedPage.iframe.x+publishedPage.iframe.width)-
+    Math.max(source.iframe.x,publishedPage.iframe.x),
+   height:Math.min(source.iframe.y+source.iframe.height,
+    publishedPage.iframe.y+publishedPage.iframe.height)-
+    Math.max(source.iframe.y,publishedPage.iframe.y)
+  };
+  assert.ok(mask.width>0&&mask.height>0,width+'px: empty iframe mask');
+  const diff=await compareFullPagePixels(comparator,shots[0],shots[1],[mask]);
+  assert.equal(diff.dimensionsMatch,true,width+'px: full-page screenshot size drift: '+
+   JSON.stringify(diff.dimensions));
+  assert.ok(diff.maskedPixels>0&&diff.maskedPixels/diff.totalPixels<0.25,
+   width+'px: pixel mask too large or missing');
+  if(screenshotDir)writeFileSync(join(screenshotDir,'pixel-report-'+width+'.json'),
+   JSON.stringify({width,mask,...diff},null,2)+'\n');
+  assert.equal(diff.unmaskedMismatchPixels,0,
+   width+'px: pixel changes outside pinned iframe: '+JSON.stringify(diff));
   // Note checkbox accessibility differs intentionally on mobile: compare
   // visible note position only on desktop, not hidden controls at <=760px.
   if(width>760)for(let i=0;i<7;i++)delta(source.notes[i],publishedPage.notes[i],
    width+'px note '+(i+1));
-  console.log('Pinned visual geometry '+width+'px: 9 sections, 5 decoded images, '+
-   '4 loaded ET Book faces, 7 notes, wrapper; all measured deltas <=2px');
+  console.log('Pinned full-page pixel parity '+width+'px: exact outside iframe, '+
+   '9 sections, 5 images, 4 ET Book faces, 7 notes.');
  }
+ await comparator.close();
  await context.close();
- console.log('Pixel parity NOT asserted. Inspect opt-in paired screenshots for '+
-  'iframe/accessible note exceptions and text rasterization differences.');
+ console.log('Full-page RGBA parity asserted beyond one verified iframe mask.');
 }finally{
  await browser.close();
  if(server)await new Promise((resolve,reject)=>
