@@ -18,7 +18,7 @@ import {
   SELECTION_INSERT_CLIPBOARD_NODES_COMMAND, COPY_COMMAND, CUT_COMMAND, PASTE_COMMAND, KEY_BACKSPACE_COMMAND, KEY_DELETE_COMMAND, HISTORY_PUSH_TAG, UNDO_COMMAND, REDO_COMMAND,
   COMMAND_PRIORITY_HIGH, type LexicalNode, type EditorState, type RangeSelection,
 } from 'lexical';
-import {registerNoteCommands,REMOVE_TUFTE_NOTE_COMMAND,UPDATE_TUFTE_NOTE_IMAGE_COMMAND,registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,registerQuotationCommands,INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_SECTION_CITE_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,registerListKeyboardCommands,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,SET_TUFTE_LIST_KIND_COMMAND,CHANGE_TUFTE_LIST_INDENT_COMMAND,UNWRAP_TUFTE_LIST_COMMAND,registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND,WRAP_TUFTE_SPAN_COMMAND,UNWRAP_TUFTE_SPAN_COMMAND,registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_PAIR_COMMAND,MOVE_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_LIST_COMMAND,registerSectionCommands,WRAP_TUFTE_ROOT_COMMAND,INSERT_TUFTE_SECTION_COMMAND,SPLIT_TUFTE_SECTION_COMMAND,MERGE_TUFTE_SECTION_COMMAND,SET_TUFTE_BLOCK_COMMAND,inspectEditorStructure,focusStructureIssue,type StructureIssue,replaceEditorDocumentState,TUFTE_NODES,NoteNode, $createSidenoteNode, $createMarginnoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, registerNoteEdgeTypingGuard} from '@lexical-tufte/lexical';
+import {registerNoteCommands,REMOVE_TUFTE_NOTE_COMMAND,UPDATE_TUFTE_NOTE_IMAGE_COMMAND,SELECT_TUFTE_NOTE_IMAGE_COMMAND,$listSelectedTufteNoteImages,type TufteNoteImageChoice,registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,registerQuotationCommands,INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_SECTION_CITE_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,registerListKeyboardCommands,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,SET_TUFTE_LIST_KIND_COMMAND,CHANGE_TUFTE_LIST_INDENT_COMMAND,UNWRAP_TUFTE_LIST_COMMAND,registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND,WRAP_TUFTE_SPAN_COMMAND,UNWRAP_TUFTE_SPAN_COMMAND,registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_PAIR_COMMAND,MOVE_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_LIST_COMMAND,registerSectionCommands,WRAP_TUFTE_ROOT_COMMAND,INSERT_TUFTE_SECTION_COMMAND,SPLIT_TUFTE_SECTION_COMMAND,MERGE_TUFTE_SECTION_COMMAND,SET_TUFTE_BLOCK_COMMAND,inspectEditorStructure,focusStructureIssue,type StructureIssue,replaceEditorDocumentState,TUFTE_NODES,NoteNode, $createSidenoteNode, $createMarginnoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, registerNoteEdgeTypingGuard} from '@lexical-tufte/lexical';
 import {NODE_SCHEMA} from '@lexical-tufte/document';
 import './style.css';
 
@@ -329,12 +329,13 @@ function EditorUI(){
   const [status,setStatus]=useState('본문을 선택하고 노트를 삽입하세요.');
   const [html,setHtml]=useState('');
   const [json,setJson]=useState('');
+  const [noteImageChoices,setNoteImageChoices]=useState<TufteNoteImageChoice[]|null>(null);
   useEffect(()=>registerSectionCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
   useEffect(()=>registerInlineCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
   useEffect(()=>registerDefinitionCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
   useEffect(()=>registerQuotationCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
   useEffect(()=>registerNoteCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
-   useEffect(()=>registerFigureCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
+  useEffect(()=>registerFigureCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
   useEffect(()=>registerListCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
   useEffect(()=>registerListKeyboardCommands(editor),[editor]);
   const [structureIssues,setStructureIssues]=useState<StructureIssue[]>([]);
@@ -602,6 +603,25 @@ function EditorUI(){
       setStatus(ok?'노트 구조를 변경했습니다.':'이 위치에서 노트 구조를 변경할 수 없습니다.');
     },{tag:HISTORY_PUSH_TAG});editor.focus();
   }
+  function openNoteImageChoices(){
+    const choices=editor.getEditorState().read(()=>$listSelectedTufteNoteImages());
+    if(choices.length===0){
+      setNoteImageChoices(null);
+      setStatus('먼저 이미지가 있는 노트 안에 커서를 두세요.');
+      return;
+    }
+    setNoteImageChoices(choices);
+    setStatus('노트의 이미지를 선택하세요. 여러 이미지가 있어도 하나만 수정합니다.');
+  }
+  function selectNoteImage(choice:TufteNoteImageChoice,number:number){
+    const ok=editor.dispatchCommand(SELECT_TUFTE_NOTE_IMAGE_COMMAND,{
+      noteId:choice.noteId,nodeKey:choice.nodeKey
+    });
+    if(ok){
+      setNoteImageChoices(null);
+      setStatus('노트 이미지 '+number+'번을 선택했습니다. 설명 또는 URL 수정 버튼을 사용하세요.');
+    }
+  }
   function insertPayload(kind:'link'|'image'){
     editor.update(()=>{
       const s=$getSelection();if(!$isRangeSelection(s))return;
@@ -692,6 +712,7 @@ function EditorUI(){
       {INLINE_ACTIONS.map(action=><IconButton key={action.id} name={action.icon} label={action.label} onMouseDown={preserve} onClick={()=>editor.update(()=>{editor.dispatchCommand(FORMAT_TEXT_COMMAND,action.id);},{tag:HISTORY_PUSH_TAG})}/>)}
       <button onMouseDown={preserve} onClick={()=>insertPayload('link')}>노트 링크 삽입</button>
       <button onMouseDown={preserve} onClick={()=>insertPayload('image')}>노트 이미지 삽입</button>
+      <button onMouseDown={preserve} aria-expanded={noteImageChoices!==null} aria-controls="tufte-note-image-choices" onClick={openNoteImageChoices}>노트 이미지 선택</button>
        <button onMouseDown={preserve} onClick={()=>{
         const alt=window.prompt('선택한 노트 이미지의 새 대체 텍스트');
         if(alt!==null)editor.dispatchCommand(UPDATE_TUFTE_NOTE_IMAGE_COMMAND,{alt});
@@ -707,6 +728,18 @@ function EditorUI(){
       <IconButton name="undo" label="실행 취소" onMouseDown={preserve} onClick={()=>editor.dispatchCommand(UNDO_COMMAND,undefined)}/>
       <IconButton name="redo" label="다시 실행" onMouseDown={preserve} onClick={()=>editor.dispatchCommand(REDO_COMMAND,undefined)}/>
     </div>
+    {noteImageChoices!==null&&<div id="tufte-note-image-choices" className="note-image-choices" role="group" aria-label="현재 노트의 이미지 선택" onKeyDown={event=>{
+      if(event.key==='Escape'){event.preventDefault();setNoteImageChoices(null);editor.focus();}
+    }}>
+      <p>현재 노트의 이미지 {noteImageChoices.length}개 — 수정할 이미지를 하나 선택하세요.</p>
+      <ol>{noteImageChoices.map((choice,i)=><li key={choice.nodeKey}>
+        <button type="button" onMouseDown={preserve} onClick={()=>selectNoteImage(choice,i+1)}>
+          이미지 {i+1}: {choice.alt||'대체 텍스트 없음'}
+        </button>
+        <code>{choice.src}</code>
+      </li>)}</ol>
+      <button type="button" onClick={()=>setNoteImageChoices(null)}>이미지 선택 취소</button>
+    </div>}
     <p id="help">본문에서 Alt+↓: 다음 노트로 이동 · 노트에서 Escape: 본문으로 이동</p>
     <main>
       <RichTextPlugin contentEditable={<ContentEditable className="editor" aria-label="본문과 사이드노트 편집" aria-describedby="help"/>} ErrorBoundary={LexicalErrorBoundary}/>
