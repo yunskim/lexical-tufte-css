@@ -330,6 +330,13 @@ function EditorUI(){
   const [html,setHtml]=useState('');
   const [json,setJson]=useState('');
   const [noteImageChoices,setNoteImageChoices]=useState<TufteNoteImageChoice[]|null>(null);
+  useEffect(()=>{
+    if(!noteImageChoices?.length)return;
+    const frame=requestAnimationFrame(()=>
+      document.querySelector<HTMLButtonElement>('#tufte-note-image-choices li button')?.focus()
+    );
+    return ()=>cancelAnimationFrame(frame);
+  },[noteImageChoices]);
   useEffect(()=>registerSectionCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
   useEffect(()=>registerInlineCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
   useEffect(()=>registerDefinitionCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
@@ -615,10 +622,11 @@ function EditorUI(){
   }
   function selectNoteImage(choice:TufteNoteImageChoice,number:number){
     const ok=editor.dispatchCommand(SELECT_TUFTE_NOTE_IMAGE_COMMAND,{
-      noteId:choice.noteId,nodeKey:choice.nodeKey
+      noteId:choice.noteId,noteKey:choice.noteKey,nodeKey:choice.nodeKey
     });
     if(ok){
       setNoteImageChoices(null);
+      editor.focus();
       setStatus('노트 이미지 '+number+'번을 선택했습니다. 설명 또는 URL 수정 버튼을 사용하세요.');
     }
   }
@@ -712,7 +720,7 @@ function EditorUI(){
       {INLINE_ACTIONS.map(action=><IconButton key={action.id} name={action.icon} label={action.label} onMouseDown={preserve} onClick={()=>editor.update(()=>{editor.dispatchCommand(FORMAT_TEXT_COMMAND,action.id);},{tag:HISTORY_PUSH_TAG})}/>)}
       <button onMouseDown={preserve} onClick={()=>insertPayload('link')}>노트 링크 삽입</button>
       <button onMouseDown={preserve} onClick={()=>insertPayload('image')}>노트 이미지 삽입</button>
-      <button onMouseDown={preserve} aria-expanded={noteImageChoices!==null} aria-controls="tufte-note-image-choices" onClick={openNoteImageChoices}>노트 이미지 선택</button>
+      <button onMouseDown={preserve} aria-expanded={noteImageChoices!==null} aria-controls={noteImageChoices!==null?'tufte-note-image-choices':undefined} onClick={openNoteImageChoices}>노트 이미지 선택</button>
        <button onMouseDown={preserve} onClick={()=>{
         const alt=window.prompt('선택한 노트 이미지의 새 대체 텍스트');
         if(alt!==null)editor.dispatchCommand(UPDATE_TUFTE_NOTE_IMAGE_COMMAND,{alt});
