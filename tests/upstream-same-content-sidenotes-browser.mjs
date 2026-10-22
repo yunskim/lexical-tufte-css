@@ -11,6 +11,7 @@ import {renderArticle,validateDocument} from '../packages/render/dist/index.js';
 // three controls. Text before/after the control and inside the note is exact.
 const upstream=readFileSync(new URL('../fixtures/tufte/upstream/index.html',import.meta.url),'utf8');
 const css=readFileSync(new URL('../fixtures/tufte/upstream/tufte.css',import.meta.url),'utf8');
+const scopedCSS=readFileSync(new URL('../packages/render/styles.css',import.meta.url),'utf8');
 
 const text=(value,format=0)=>({
  type:'text',version:1,detail:0,format,mode:'normal',style:'',text:value
@@ -174,6 +175,12 @@ try{
   if(sourceNotes.length!==2||publishedNotes.length!==2)
    throw Error('Note count changed');
   for(let i=0;i<sourceNotes.length;i++){
+   const kind=sourceNotes[i].nextElementSibling?.classList.contains('sidenote')
+    ?'sidenote':'marginnote';
+   const accessibleName=kind==='sidenote'?'Toggle sidenote':'Toggle margin note';
+   if(publishedNotes[i].getAttribute('aria-label')!==accessibleName)
+    throw Error('Published note missing its fixed accessible name');
+   sourceNotes[i].setAttribute('aria-label',accessibleName);
    const originalId=sourceNotes[i].id,outputId=publishedNotes[i].id;
    if(!outputId.endsWith(originalId)||outputId===originalId)
     throw Error('Publisher note ID namespace is not preserved');
@@ -227,7 +234,7 @@ try{
  ]){
   for(const width of [375,760,761,1440]){
    await page.setViewportSize({width,height:900});
-   await page.setContent('<style>'+css+'</style><article>'+markup+'</article>');
+   await page.setContent('<style>'+css+'\n'+scopedCSS+'</style><article class="tufte-article">'+markup+'</article>');
    const inputs=page.locator('input.margin-toggle');
    assert.equal(await inputs.count(),2,kind+': two margin toggles at '+width);
    for(let i=0;i<2;i++){
@@ -244,6 +251,19 @@ try{
      await label.click();
      assert.equal(await payload.evaluate(e=>getComputedStyle(e).display),'none',
       kind+': mobile label closes note');
+     const expectedName=i===0?'Toggle sidenote':'Toggle margin note';
+     const accessible=page.getByRole('checkbox',{name:expectedName,exact:true});
+     assert.equal(await accessible.count(),1,
+      kind+': mobile toggle has a unique discoverable accessible name');
+     await accessible.focus();
+     assert.equal(await accessible.evaluate(e=>document.activeElement===e),true,
+      kind+': mobile input is keyboard-focusable');
+     await accessible.press('Space');
+     assert.equal(await payload.evaluate(e=>getComputedStyle(e).display),'block',
+      kind+': Space opens the note');
+     await accessible.press('Space');
+     assert.equal(await payload.evaluate(e=>getComputedStyle(e).display),'none',
+      kind+': Space closes the note');
     }else{
      assert.notEqual(await payload.evaluate(e=>getComputedStyle(e).display),'none',
       kind+': desktop payload is visible');
