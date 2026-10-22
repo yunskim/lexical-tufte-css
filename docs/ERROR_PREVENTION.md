@@ -721,7 +721,10 @@ E059/M052 및 E067/M060의 선행 대책을 그림 주석 명령·회귀 테스�
   JSON 저장 후 새 editor 재열기, 순수 HTML 발행을 연속 확인한다.
   텍스트 수정은 저장본의 독립 복제본에서 한 문장만 바꾼 후 다시
   import/export/publish하고, 다른 섹션과 전역 note/figure/iframe 구조가
-  그대로인지를 전체 DOM 오라클로 검사한다. Editor keyboard/undo는 별도.
+  그대로인지를 전체 DOM 오라클로 검사한다.
+  **실제 editor 키보드/undo는** `tests/upstream-full-document-editor-browser.mjs`에서
+  같은 전체 원본-derived 상태를 React Lexical 편집기로 불러와 검증한다.
+  두 경로는 별개로 실패/성공을 추적해야 한다.
 - DOM 차이는 각기 별도 검사로 고정한다: `article` namespace/class/lang,
   원본의 `h1#tufte-css`가 제품 schema에서 표현되지 않는 문제,
   note ID/aria-label, Figures의 현대화 iframe 속성 전체와 설명 pre/code
@@ -733,6 +736,9 @@ E059/M052 및 E067/M060의 선행 대책을 그림 주석 명령·회귀 테스�
   pixel parity와 스크린리더/OS IME는 해당 환경에서 추가 수락해야 한다.
   없는 증거를 통합 테스트라는 이름으로 통과 처리하지 않는다.
 - 적용: `docs/PLAN.ko.md` P2.2.e.1–4,
-  `docs/UPSTREAM_PAGE_PARITY_MATRIX.ko.md`, 원본 전체 문서 회귀,
-  `pnpm test:upstream-same-content` 및 `pnpm verify:batch`.
+  `docs/UPSTREAM_PAGE_PARITY_MATRIX.ko.md`,
+  `tests/upstream-full-document-roundtrip-browser.mjs`,
+  `tests/upstream-full-document-editor-browser.mjs`,
+  `pnpm test:upstream-same-content`, `pnpm test:browser`,
+  `pnpm verify:batch`.
   **코드 작성 상태, 사용자 요청에 따라 일괄 실행 대기; CI 생략**.
