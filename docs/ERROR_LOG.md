@@ -837,7 +837,7 @@ E001–E049/M001–M042를 검토했다. E024의 경계 입력은 실제 Chromiu
 ## E123 — headless lexical 패키지에 React-only horizontal rule 의존
 
 - 발견: `nodes.ts`, `quotationCommands.ts`, all-node golden 생성기는 React 기반의 deprecated `LexicalHorizontalRuleNode`를 직접 import했다. `packages/lexical`의 peer dependencies react/react-dom/yjs까지 불필요하게 요구했다. Lexical 0.52.0은 React 없는 `@lexical/extension/HorizontalRuleExtension`을 제공한다.
-- 처리: 세 import를 React-free node/factory로 교체하고 `packages/lexical/package.json` 및 `pnpm-lock.yaml`의 direct dependency/peer/dev 기록을 정리했다. 같은 `horizontalrule` type/version/HTML, golden 왕복, HR 명령을 검증하는 테스트를 추가했다. Editor React 앱의 독립 의존성은 유지한다.
+- 처리: 초기 세 import(`nodes.ts`, `quotationCommands.ts`, all-node golden 생성기)를 React-free node/factory로 교체했고, 후속 정적 점검에서 발견한 **두 번째 누락 지점**(`document-bridge.test.mjs`, `publication-browser-harness.mjs`)도 교체했다. 총 다섯 진입점의 React-free import를 회귀 테스트로 강제한다. `packages/lexical/package.json` 및 `pnpm-lock.yaml`의 direct dependency/peer/dev 기록을 정리했다. 같은 `horizontalrule` type/version/HTML, golden 왕복, HR 명령을 검증하는 테스트를 추가했다. Editor React 앱의 독립 의존성은 유지한다.
 - 상태: **frozen install/빌드/타입/브라우저/packed 미실행**. M113 참조.
 
 ## E124 — 모바일 note toggle의 접근 가능한 이름/키보드 포커스 누락
