@@ -36,12 +36,12 @@ test('figure marginnote after image preserves source order and responsive contro
  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
  const html=result.html;
  assert.ok(html.indexOf('<img ')<html.indexOf('class="marginnote"'));
- assert.match(html,/<label for="([^"]+)" class="margin-toggle">⊕<\/label><input id="\1" type="checkbox" class="margin-toggle"><span class="marginnote">Additional context<\/span>/);
+ assert.match(html,/<label for="([^"]+)" class="margin-toggle">⊕<\/label><input id="\1" type="checkbox" class="margin-toggle" aria-label="Toggle margin note"><span class="marginnote">Additional context<\/span>/);
 });
 test('figure marginnote before image also preserves adjacent checkbox and span',()=>{
  const result=renderArticle(doc('tufte-marginnote','before-image'));
  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
- assert.match(result.html,/<label for="([^"]+)" class="margin-toggle">⊕<\/label><input id="\1" type="checkbox" class="margin-toggle"><span class="marginnote">Additional context<\/span><img /);
+ assert.match(result.html,/<label for="([^"]+)" class="margin-toggle">⊕<\/label><input id="\1" type="checkbox" class="margin-toggle" aria-label="Toggle margin note"><span class="marginnote">Additional context<\/span><img /);
 });
 
 test('upstream rhinoceros example: image and rich citation remain inside paragraph marginnote',()=>{
@@ -59,7 +59,7 @@ test('upstream rhinoceros example: image and rich citation remain inside paragra
  };
  const result=renderArticle(document);
  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
- assert.match(result.html,/<label for="([^"]+)" class="margin-toggle">⊕<\/label><input id="\1" type="checkbox" class="margin-toggle"><span class="marginnote"><img src="https:\/\/example.com\/rhino.png" alt="Image of a Rhinoceros">F\.J\. Cole, /);
+ assert.match(result.html,/<label for="([^"]+)" class="margin-toggle">⊕<\/label><input id="\1" type="checkbox" class="margin-toggle" aria-label="Toggle margin note"><span class="marginnote"><img src="https:\/\/example.com\/rhino.png" alt="Image of a Rhinoceros">F\.J\. Cole, /);
  assert.match(result.html,/<\/span> But tight integration of graphics with text is central\./);
  assert.ok(result.html.indexOf('<img ')<result.html.indexOf('F.J. Cole'));
  assert.match(result.html,/<a href="https:\/\/example.com\/book">Visual Explanations<\/a>/);
