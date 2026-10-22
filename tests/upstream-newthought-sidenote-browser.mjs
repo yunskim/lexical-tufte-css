@@ -40,8 +40,14 @@ try{
     attrs:[...node.attributes].map(a=>[a.name,a.value]).sort((a,b)=>a[0].localeCompare(b[0])),
     children:[...node.childNodes].map(canonical)};
   };
-  return {original:canonical(parse(original).querySelector('article > section > p')),
-   published:canonical(parse(published).querySelector('article > section > p'))};
+  const oldDoc=parse(original),newDoc=parse(published);
+  const sourceInput=oldDoc.querySelector('article > section > p > input.margin-toggle');
+  const resultInput=newDoc.querySelector('article > section > p > input.margin-toggle');
+  if(!sourceInput||resultInput?.getAttribute('aria-label')!=='Toggle sidenote')
+   throw Error('Split-parent note lost its modern accessible name');
+  sourceInput.setAttribute('aria-label','Toggle sidenote');
+  return {original:canonical(oldDoc.querySelector('article > section > p')),
+   published:canonical(newDoc.querySelector('article > section > p'))};
  },{original:reference,published:result.html});
  // The renderer namespaces note IDs; compare only after replacing the two
  // generated IDs with the original fixture ID. All DOM nodes remain untouched.
