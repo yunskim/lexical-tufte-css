@@ -38,15 +38,36 @@ try {
    definitions:document.querySelector('dl > dt').textContent,cite:document.querySelector('.epigraph cite').textContent,
    code:document.querySelector('pre > code').textContent,
    quilt:(()=>{const e=document.querySelector('img.imagequilt'),r=e.getBoundingClientRect();return {naturalWidth:e.naturalWidth,ratio:r.width/r.height,width:r.width,parent:e.parentElement.getBoundingClientRect().width};})(),
-   embeds:[...document.querySelectorAll('.tufte-embed iframe')].map(e=>{const r=e.getBoundingClientRect();return {ratio:r.width/r.height,expected:Number(e.parentElement.dataset.tufteRatio),sandbox:e.getAttribute('sandbox'),title:e.title,width:r.width};}),
+   embeds:[...document.querySelectorAll('.iframe-wrapper > iframe')].map(e=>{
+    const r=e.getBoundingClientRect();return {
+     cssRatio:r.width/r.height,
+     intrinsicRatio:Number(e.getAttribute('width'))/Number(e.getAttribute('height')),
+     sandbox:e.getAttribute('sandbox'),title:e.title,width:r.width,
+     parentChildren:e.parentElement.children.length,
+     loading:e.getAttribute('loading'),referrerpolicy:e.getAttribute('referrerpolicy')
+    };
+   }),
    inline:document.querySelectorAll('[style],script,[contenteditable]').length,overflow:document.documentElement.scrollWidth>innerWidth,
   }));
   assert.equal(measured.definitions,'검증 용어 편집');assert.equal(measured.cite,'출처 수정');
   assert.equal(measured.code,'  <code>&\t\n    preserved');assert.ok(Math.abs(measured.quilt.ratio-2.5)<0.01,JSON.stringify({width,measured}));assert.equal(measured.quilt.naturalWidth,120);assert.ok(measured.quilt.width<=measured.quilt.parent+1);
-  for(const frame of measured.embeds){assert.ok(Math.abs(frame.ratio-frame.expected)<0.02,JSON.stringify({width,frame}));assert.match(frame.sandbox,/allow-scripts/);assert.ok(frame.title);}
+  assert.equal(measured.embeds.length,5,'Existing two embeds and three ratio fixtures remain published');
+  for(const frame of measured.embeds){
+   // Original Tufte CSS reserves a 16:9 iframe-wrapper regardless of the
+   // embed's intrinsic width/height metadata. No injected SVG/CSP inline CSS.
+   assert.ok(Math.abs(frame.cssRatio-16/9)<0.02,JSON.stringify({width,frame}));
+   assert.equal(frame.parentChildren,1,'iframe must be only direct child');
+   assert.match(frame.sandbox,/allow-scripts/);
+   assert.ok(frame.title);
+   assert.equal(frame.loading,'lazy');
+   assert.equal(frame.referrerpolicy,'strict-origin-when-cross-origin');
+  }
+  for(const ratio of [0.1,1,10])
+   assert.ok(measured.embeds.some(frame=>Math.abs(frame.intrinsicRatio-ratio)<0.02),
+    width+'px intrinsic iframe dimensions lost for '+ratio);
   assert.equal(measured.inline,0);assert.equal(measured.overflow,false,`overflow ${width}`);
  }
- await staticPage.setContent(edited.html);assert.equal(await staticPage.locator('pre').getAttribute('dir'),'rtl');assert.match(await staticPage.locator('pre').getAttribute('class'),/tufte-align-right/);assert.equal(await staticPage.locator('.tufte-embed > svg[aria-hidden="true"]').count(),2);assert.equal(await staticPage.locator('pre > code').textContent(),'  <code>&\t\n    preserved');
+ await staticPage.setContent(edited.html);assert.equal(await staticPage.locator('pre').getAttribute('dir'),'rtl');assert.match(await staticPage.locator('pre').getAttribute('class'),/tufte-align-right/);assert.equal(await staticPage.locator('.iframe-wrapper > iframe').count(),2);assert.equal(await staticPage.locator('.iframe-wrapper > svg').count(),0);assert.equal(await staticPage.locator('pre > code').textContent(),'  <code>&\t\n    preserved');
  assert.doesNotMatch(edited.html,/contenteditable|data-lexical-/);
- console.log('Publication regression: real definition/cite editing, strict document export, code/ImageQuilt and 5 embed ratios at 5 widths under enforced CSP (no inline styles/scripts).' );
+ console.log('Publication regression: real definition/cite editing, strict export, code/ImageQuilt and 5 direct iframe-wrapper embeds (fixed Tufte CSS 16:9 display, intrinsic ratios preserved) at 5 widths under CSP.' );
 }finally{await browser.close();server?.kill();}
