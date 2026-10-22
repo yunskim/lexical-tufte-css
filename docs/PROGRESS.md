@@ -1,3 +1,25 @@
+## 2026-10-22 — CR 일괄 테스트 진입 점검: GitHub 코드 정합성 확인, 실행 환경 차단
+
+- 사용자 지시에 따라 다음 단계인 누적 일괄 검증을 시도했다. 현재 실행 컨테이너에는
+  저장소 체크아웃과 `pnpm`이 없고, GitHub DNS 접속이 차단되어
+  `pnpm install --frozen-lockfile` 및 `pnpm verify:batch`를 실행할 수 없었다.
+  Chromium 명령과 Node v22.16.0 존재만으로 브라우저 테스트가 수행된 것은 아니다.
+- 연결된 GitHub 소스 읽기로 정적 등록 계약을 대조한 결과,
+  NODE_SCHEMA/RENDER_SUPPORTED_NODE_TYPES/실제 renderer switch가 각각
+  34종으로 일치(누락 0/추가 0)했으며, registry freeze, manifest·lockfile
+  extension 명시, 발행 에러 분기 및 note 접근성 속성 경계가 확인됐다.
+  **정적 코드 대조이며 로컬 타입 검사/단위 테스트 실행 결과는 아니다.**
+- 테스트 소스의 deprecated React HorizontalRule 참조 두 곳
+  (`document-bridge.test.mjs`, `publication-browser-harness.mjs`)을
+  React-free extension으로 교체하고 다섯 import 경로 전체를 강제하는
+  테스트로 강화했다.
+- [CR01–CR08 체크리스트](CODE_REVIEW_REMEDIATION_2026-10-22.ko.md)는
+  완료 표시하지 않았다. 빌드/type/lint/unit/browser/package/HTTP/Python
+  모두 **실행 불가·미판정**. CI는 실행하지 않았다.
+- 다음 실행: 로컬 Work의 정상 checkout에서 frozen install, `pnpm check`,
+  `pnpm verify:batch`, 별도 Python pytest 순으로 수행해 실패 수정·재실행하고,
+  본문 기록과 오류 로그/예방 대책에 실제 근거를 연결한다. 원본 upstream fixture는 고정한다.
+
 ## 2026-10-22 — 실제 코드 리뷰 CR01–CR08: 주요 수정 커밋, 전체 실행 검증 대기
 
 - [**수정 체크리스트**](CODE_REVIEW_REMEDIATION_2026-10-22.ko.md)에서
