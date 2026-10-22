@@ -3,7 +3,7 @@ import {createEditor,$getRoot,$createParagraphNode,$createTextNode,$createLineBr
 import {registerRichText,HeadingNode,QuoteNode,$createQuoteNode} from '@lexical/rich-text';
 import {LinkNode} from '@lexical/link';
 import {ListNode,ListItemNode} from '@lexical/list';
-import {HorizontalRuleNode} from '@lexical/react/LexicalHorizontalRuleNode';
+import {HorizontalRuleNode} from '@lexical/extension/HorizontalRuleExtension';
 import {$generateHtmlFromNodes} from '@lexical/html';
 import {
  TUFTE_NODES,loadDocumentIntoEditor,SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,
