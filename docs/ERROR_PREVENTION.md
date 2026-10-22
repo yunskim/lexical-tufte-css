@@ -659,3 +659,11 @@ E059/M052 및 E067/M060의 선행 대책을 그림 주석 명령·회귀 테스�
 - 새 block 속성은 `JsonNode` 타입·`NODE_SCHEMA` 허용 필드·정확한 값 검증·순수 발행 렌더러·HTML 속성 whitelist·Lexical 노드 create/export/update/import/clone의 모든 계층에서 동일하게 정의한다. 임의 class/style 주입과 비안전 cite URL은 거부한다. `src`/외부 URL과 구분되는 인용 `cite`는 링크 URL 정책을 따른다.
 - Lexical 0.52.0 기본 `ParagraphNode`/`QuoteNode`를 subclass로 바꿀 때 `$createParagraphNode`/`$createQuoteNode`의 replace/withKlass, 원본 factory의 importJSON이 subclass `updateFromJSON`으로 dispatch하는 경로를 모두 확인한다. 기본 속성 미지정 JSON과 Tufte 전용 속성 JSON의 roundtrip을 각각 확인한다. 다른 node type·기존 golden fixture에 없는 필드를 임의로 쓰지 않는다.
 - 적용: `packages/lexical/src/TufteBlockNodes.ts`, `packages/lexical/src/nodes.ts`, document schema/validator, render tree/profile, 단위 테스트 `fundamentals-attributes.test.mjs` 두 파일, strict DOM `tests/upstream-same-content-fundamentals-browser.mjs`. 실제 테스트 재실행 전에는 완료 판정하지 않는다.
+
+## M109 — 외부 iframe 현대화는 CSS DOM 계층과 콘텐츠 예제의 동시 계약으로 검증
+
+- E119: 원본 CSS의 선택자 `.iframe-wrapper iframe`와 원본의 `figure.iframe-wrapper > iframe`을 기준으로, pure renderer와 Lexical export가 wrapper 자식으로 iframe **한 개만** 생성하는지 검사한다. 숨겨진 SVG, 외부 wrapper, `data-tufte-ratio`, 인라인 style 등은 허용하지 않는다. `div.iframe-wrapper`도 동일한 직접 자식 계약을 따른다.
+- 기존 iframe의 `frameborder` 및 `youtube.com` 호스트를 자동 유지하지 않는다. HTTPS/hostname/path/query/hash/credential allowlist, `title`, lazy loading, strict referrer, sandbox, fullscreen, HTML escape와 CSP의 frame-src를 각각 검사한다. iframe 속성을 통째로 무시하는 DOM 정규화 금지.
+- 설명용 코드 블록 `pre > code`도 실제 현대 출력과 맞아야 한다. 원본 fixture는 고정·불변으로 유지하고 비교 오라클에서는 **공식 Figures의 iframe 한 곳과 예제 코드 문자열 한 곳**만 정확히 기대된 값으로 치환한 뒤 원본 전체 DOM을 대조한다. Figure/marginnote 이미지·강조·본문은 치환하지 않는다.
+- Tufte의 `padding-bottom:56.25%`와 `padding-top:25px` 예약 박스는 computed iframe 가로세로 비율과 단순하게 같은 16:9가 아니다. viewport별 원본/출력 wrapper·iframe의 실제 geometry를 비교하고, 저장된 intrinsic `aspectRatio`는 width/height 속성으로 따로 검증한다. 동적 비율 CSS는 현재 지원된 것으로 주장하지 않는다.
+- 적용: `packages/render/src/index.ts`, `packages/lexical/src/EmbedNode.ts`, `packages/render/styles.css`, renderer/lexical 단위, `tests/publication-browser.mjs`, `tests/upstream-same-content-figures-browser.mjs`, ADR 0003. 실패 원인은 테스트만 완화해 숨기지 않는다. **Work 일괄 실행 대기; CI 생략**.
