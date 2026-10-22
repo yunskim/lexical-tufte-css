@@ -1,3 +1,12 @@
+## 2026-10-22 — 전체 화면 RGBA 픽셀 수락 비교기 작성 (실행 대기)
+
+- tests/helpers/full-page-pixel-parity.mjs: PNG를 Canvas에서 decode하고 RGBA 픽셀을 정확 비교한다. 화면 크기 차이, 불일치 픽셀 수, 최대 채널 차이, 최초 좌표 및 bounding box를 추적한다.
+- tests/full-page-pixel-parity-browser.mjs: 동일 이미지, 완전 차이, 부분 마스킹, 복수 마스크 거부, PNG 크기 차이 반례를 추가했다.
+- tests/upstream-full-document-visual-browser.mjs: 전체 공식 9섹션 원본/발행본을 375/759/760/761/1024/1440px에서 비교하도록 작성했다. 원본 파일은 수정하지 않는다. 고정된 구형 iframe 설명 코드 한 노드를 정확히 확인한 뒤 브라우저 DOM에서만 최신 코드로 변환한다.
+- 실제 iframe viewport의 원본/발행 교집합 한 곳만 픽셀 마스크로 허용한다. 원본/발행 iframe URL·직접 자식 구조·geometry를 따로 확인하고 마스크는 화면의 25% 미만이다. 마스크 밖 RGBA 불일치 허용량은 0개다.
+- TUFTE_SCREENSHOT_DIR 환경변수로 원형 원본 PNG, 비교용 PNG 쌍, 폭별 픽셀 보고서를 선택 저장할 수 있다. 한글 Source Han 및 스크린리더/OS IME는 별도 단계다.
+- **코드/오라클 작성 및 커밋만 수행**. 설치·빌드·테스트·CI 전부 미실행. 다음 일괄 검증 결과를 성공으로 선인정하지 않는다. E127/M117 참조.
+
 ## 2026-10-22 — 9섹션 원본 이미지·ET Book 폰트 오프라인 시각 비교 하네스 (작성, 실행 대기)
 
 - 고정 upstream `b5d7b7b` Git tree에서 참조되는 실제 이미지 **5개**와
@@ -15,7 +24,7 @@
   iframe·모바일 주석 접근성의 의도적 차이는 기존 ADR 범위에 따른다.
 - `pnpm assets:upstream-visual`로 자료를 명시적으로 준비하고
   `pnpm test:upstream-visual`로 단독 수락 가능하다.
-  `pnpm verify:batch`는 파일이 없거나 해시가 틀리면 해당 시각
+  `pnpm verify:batch`는 파일이 없으면 해당 시각
   브라우저 테스트만 **SKIP 사유와 함께 기록**한다. 파일이 모두 있지만 해시가
   틀리거나 원본 인벤토리가 바뀌었으면 **FAIL**로 보고한다.
 - 테스트·빌드·설치·CI **전부 실행하지 않았다**. 전 9섹션 DOM/실제 editor

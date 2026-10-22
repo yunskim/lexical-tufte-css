@@ -260,7 +260,11 @@ P1 gate: 완료. 노트 편집 회귀와 SSR 출력의 실제 브라우저 비�
     `tests/upstream-full-document-visual-browser.mjs`를 작성했다.
     동일한 9섹션 원본/발행본에 로컬 파일을 제공하여 이미지 decode·
     FontFace 로드·6폭 geometry를 비교하고, 선택적으로 screenshot 쌍을 남긴다.
-    pixel diff·스크린리더·한글 Source Han 비교는 **별도 미완료**다.
+    RGBA pixel diff(마스크 밖 불일치 0개) 및 비교기 자체 반례 코드를
+    추가했다. 공식 iframe 예제 설명 코드 1곳만 원문을 확인한 뒤 비교용
+    브라우저 DOM에서 현대화하며 원본 파일은 그대로 둔다. iframe viewport
+    교집합 하나만 마스킹하고 면적은 전체 화면의 25% 미만이다.
+    **코드 작성 후 실행 대기**. 스크린리더·Source Han 검증은 별도다.
     batch에서는 미설치 자산만 SKIP으로 보고하며, 존재하는 자산의 손상/해시 불일치는 FAIL로 보고한다.
   - [ ] P2.2.e.4 **발행 제목 앵커 계약**: 공식 `h1#tufte-css`와
     현재 발행의 ID 없는 h1, article의 제품 고유 namespace/class/lang
