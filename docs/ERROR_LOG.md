@@ -815,3 +815,39 @@ E001–E049/M001–M042를 검토했다. E024의 경계 입력은 실제 Chromiu
 - 처리: 문서 wire model과 HTTPS 제공자 allowlist/제목/지연 로딩/referrerpolicy/sandbox는 유지하고, 두 HTML 출력 경로를 `(figure|div).iframe-wrapper > iframe`으로 통일했다. SVG·추가 data 속성 및 오래된 frameborder는 발행 HTML에서 제거한다. 기존 HTML 코드 스니펫도 게시 예제에서 현대식으로 설명한다. `packages/render/styles.css`는 Tufte의 16:9 padding-bottom/25px padding-top 계층을 미러링한다.
 - 회귀 계약: `tests/upstream-same-content-figures-browser.mjs`는 원본 11블록·rich note 2개를 정확히 재구성한다. iframe **전체 속성 집합**과 이 iframe을 보여주는 `pre > code` 한 곳만 현대화 예외로 허용하며, 다른 DOM은 tag/attrs/order/텍스트를 엄격 비교한다. 6개 폭에서 기존/현대 구조의 CSS 위치·크기를 비교한다. renderer/Lexical 두 HTML 경로·CSP/비율 메타데이터 회귀도 추가/수정했다. ADR 0003 참고.
 - 제한/상태: 사용자 선택에 따라 CSS 표시는 공식 iframe-wrapper의 **16:9 예약 공간**을 따른다. 기존 임의 `aspectRatio` 메타데이터는 iframe intrinsic `width/height`에 반영되지만 실제 CSS 표시 비율을 바꾸지 않는다. 필요 시 별도 비율별 CSS 정책을 도입할 것. 코드·테스트 작성, 실제 build/type/unit/browser/packed 검사 **미실행·대기**. M109 참조. 이 단계는 9개 섹션 전체 발행/저장 및 pixel parity 검증 완료가 아니다.
+
+## E120 — 노드 교체 후 Lexical registry 배열의 freeze 계약 누락
+
+- 발견: `packages/lexical/src/nodes.ts`의 `TUFTE_NODE_CLASSES`는 frozen이지만 `TUFTE_NODES`는 일반 배열이었다. 기존 `all-nodes.test.mjs` R02는 `Object.isFrozen(TUFTE_NODES)===true`를 요구하므로 현행 소스와 검사가 불일치한다.
+- 처리: node replacement 배열을 `Object.freeze([...])`로 감쌌다. 실제 런타임 전체 노드 등록·editor import/format 검증은 기존 R02와 새 일괄 실행에서 확인한다.
+- 상태: 정적 계약 수정 커밋, **실제 테스트 미실행**. M110 참조.
+
+## E121 — 발행 예외가 renderer/asset/SQLite를 동일한 저장 오류로 표현
+
+- 발견: `SqlitePublicationStore.publish`는 renderer 내부 throw, 외부 `assetExists` reject, SQLite 트랜잭션 실패를 `PUBLICATION_STORAGE_ERROR`로 합쳐 원인 분류를 잃는다. renderer가 구조화된 실패를 반환하는 정상 경로는 이미 원본 diagnostics를 반환한다.
+- 처리: renderer의 *예상 밖 예외*에는 `PUBLICATION_RENDER_ERROR`/`$.publication.render`, asset checker 예외에는 `PUBLICATION_ASSET_CHECK_ERROR`/`$.publication.assets`, DB 예외에는 `PUBLICATION_STORAGE_ERROR`/`$.publication.storage`를 반환한다. 객체 원본 오류 문자열이나 민감한 외부 URL은 공개하지 않고 기존 트랜잭션 경계와 rollback, CAS를 보존했다. 거부 결과와 이전 snapshot 보호 테스트를 갱신했다.
+- 상태: 코드·테스트 작성, **실행 미검증**. M111 참조.
+
+## E122 — validator/profile/실제 render 분기 일치가 전체로 검증되지 않음
+
+- 발견: `NODE_SCHEMA`, `validateRenderProfile`의 지원 목록, `renderArticle`의 `switch`가 따로 관리돼 새 타입을 한 군데 누락할 위험이 있다. 기존 R02는 `NODE_SCHEMA` ↔ Lexical registry는 검사하나 renderer의 실제 구현 분기는 대조하지 않는다.
+- 처리: immutable `RENDER_SUPPORTED_NODE_TYPES`를 정의해 profile에서 사용하고, 테스트에서 Schema keys/profile 목록/실제 렌더러 `case` 집합을 정확히 비교하며 중복·obsolete case도 거부한다. 실패 시 문서에 추가된 노드의 발행을 조용히 생략하지 않는 원칙 유지.
+- 상태: 코드·테스트 작성, **실행 미검증**. M112 참조.
+
+## E123 — headless lexical 패키지에 React-only horizontal rule 의존
+
+- 발견: `nodes.ts`, `quotationCommands.ts`, all-node golden 생성기는 React 기반의 deprecated `LexicalHorizontalRuleNode`를 직접 import했다. `packages/lexical`의 peer dependencies react/react-dom/yjs까지 불필요하게 요구했다. Lexical 0.52.0은 React 없는 `@lexical/extension/HorizontalRuleExtension`을 제공한다.
+- 처리: 세 import를 React-free node/factory로 교체하고 `packages/lexical/package.json` 및 `pnpm-lock.yaml`의 direct dependency/peer/dev 기록을 정리했다. 같은 `horizontalrule` type/version/HTML, golden 왕복, HR 명령을 검증하는 테스트를 추가했다. Editor React 앱의 독립 의존성은 유지한다.
+- 상태: **frozen install/빌드/타입/브라우저/packed 미실행**. M113 참조.
+
+## E124 — 모바일 note toggle의 접근 가능한 이름/키보드 포커스 누락
+
+- 발견: Tufte CSS 공식 예제의 빈 sidenote label과 `input.margin-toggle {display:none}`를 발행에 그대로 재현하면 모바일 체크박스가 키보드 탭 대상이 되지 않고 스크린리더 이름도 없다.
+- 처리: document 공유 상수로 `Toggle sidenote`/`Toggle margin note` 이름을 정의하고 pure render와 Lexical HTML export의 `input`에 정확한 `aria-label` 한 속성을 추가했다. 발행 scoped CSS에서 **모바일에 한해** checkbox를 visual-hide/keyboard-focusable로 바꾸고 label focus cue를 명시했으며 CSS sibling 구조는 바꾸지 않았다. 공식 예제 오라클은 파싱된 원본 INPUT에만 동일 속성을 채우는 한정된 예외를 사용한다. Playwright의 이름/Space 토글 및 split-parent focus 표시 검사를 추가했다.
+- 제한/상태: 코드와 브라우저 회귀 **실행 대기**. 실제 스크린리더, OS/브라우저/터치 지원 수동 수락은 미실행. M114 참조.
+
+## E125 — Lexical 업그레이드 시 과거 JSON의 무손실 수락 절차가 부족
+
+- 발견: v1→v2 `migrateStoredDocument`는 envelope만 전환한다. `LEXICAL_IMPORT_LOSSY` 및 `UNKNOWN_FIELD`는 안전한 fail-closed 동작이지만, Lexical 런타임을 업그레이드할 때 옛 golden·node type·실제 저장/발행 비교가 누락되면 이전 데이터를 열 수 없을 수 있다.
+- 처리: 현재 pin된 v0.52.0 golden/manifest/frozen lock 일치, v1→v2 저장→열기→다시 export, 미래의 미지원 editorFormat/미지 필드 거부를 별도 회귀로 작성했다. `docs/LEXICAL_UPGRADE_POLICY.ko.md`에서 업그레이드 수락 절차와 구 버전 보존·migration·거부 경계를 정의했다.
+- 상태: 정책·회귀 작성, **실제 검증/미래 runtime upgrade는 하지 않음**. M115 참조.
