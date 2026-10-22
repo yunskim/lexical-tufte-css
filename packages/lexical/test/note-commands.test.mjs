@@ -1,14 +1,14 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createHeadlessEditor} from '@lexical/headless';
-import {$getRoot,$createParagraphNode,$createTextNode,UNDO_COMMAND,REDO_COMMAND} from 'lexical';
+import {$getRoot,$createParagraphNode,$createTextNode,$createNodeSelection,$setSelection,UNDO_COMMAND,REDO_COMMAND} from 'lexical';
 import {$createLinkNode} from '@lexical/link';
 import {createEmptyHistoryState,registerHistory} from '@lexical/history';
 import {validateDocument} from '@lexical-tufte/document';
 import {renderArticle} from '../../render/dist/index.js';
 import {TUFTE_NODES,$createSectionNode,$createFigureNode,$createInlineImageNode,
  $createSidenoteNode,$createMarginnoteNode,registerNoteCommands,
- SET_TUFTE_NOTE_KIND_COMMAND,REMOVE_TUFTE_NOTE_COMMAND} from '../dist/index.js';
+ SET_TUFTE_NOTE_KIND_COMMAND,REMOVE_TUFTE_NOTE_COMMAND,UPDATE_TUFTE_NOTE_IMAGE_COMMAND} from '../dist/index.js';
 
 const flush=()=>new Promise(resolve=>setImmediate(resolve));
 function setup(){
@@ -131,4 +131,120 @@ test('separate command updates are undoable and redoable with real HistoryPlugin
   editor.dispatchCommand(UNDO_COMMAND,undefined);await flush();
   assert.equal(noteFrom(editor).type,'tufte-marginnote');
  }finally{unregister();dispose();}
+});
+
+test('note image alt is edited without changing its URL, note ID, sibling link or format',()=>{
+ const {editor,diagnostics,dispose}=setup();
+ try{
+  build(editor);
+  const before=noteFrom(editor);
+  editor.dispatchCommand(UPDATE_TUFTE_NOTE_IMAGE_COMMAND,{alt:'a "quoted" & descriptive image'});
+  editor.update(()=>{},{discrete:true});
+  const after=noteFrom(editor);
+  assert.equal(after.noteId,before.noteId);
+  assert.deepEqual(after.children.slice(0,-1),before.children.slice(0,-1));
+  assert.equal(after.children.at(-1).src,'/note.png');
+  assert.equal(after.children.at(-1).alt,'a "quoted" & descriptive image');
+  const doc=documentFrom(editor);
+  assert.equal(validateDocument(doc).ok,true);
+  const published=renderArticle(doc);
+  assert.equal(published.ok,true,JSON.stringify(published.diagnostics));
+  assert.match(published.html,/alt="a &quot;quoted&quot; &amp; descriptive image"/);
+  assert.deepEqual(diagnostics,[]);
+ }finally{dispose();}
+});
+test('unmanaged note image URL update is published and does not affect note identity',()=>{
+ const {editor,diagnostics,dispose}=setup();
+ try{
+  build(editor);
+  const before=noteFrom(editor);
+  editor.dispatchCommand(UPDATE_TUFTE_NOTE_IMAGE_COMMAND,{src:'/new-image.png'});
+  editor.update(()=>{},{discrete:true});
+  const after=noteFrom(editor);
+  assert.equal(after.noteId,before.noteId);
+  assert.deepEqual(after.children.slice(0,-1),before.children.slice(0,-1));
+  assert.equal(after.children.at(-1).src,'/new-image.png');
+  assert.equal(after.children.at(-1).alt,'an image');
+  assert.equal(validateDocument(documentFrom(editor)).ok,true);
+  const result=renderArticle(documentFrom(editor));
+  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+  assert.match(result.html,/src="\/new-image.png" alt="an image"/);
+  assert.deepEqual(diagnostics,[]);
+ }finally{dispose();}
+});
+test('unsafe URL and malformed payload do not mutate note contents',()=>{
+ const {editor,diagnostics,dispose}=setup();
+ try{
+  build(editor);
+  const before=JSON.stringify(editor.getEditorState().toJSON().root);
+  for(const payload of [
+   {src:'javascript:alert(1)'},{src:'//bad.example/image.png'},
+   {alt:42},{src:'/ok.png',unrecognized:'discarded'},{}
+  ]){
+   editor.dispatchCommand(UPDATE_TUFTE_NOTE_IMAGE_COMMAND,payload);
+   editor.update(()=>{},{discrete:true});
+   assert.equal(JSON.stringify(editor.getEditorState().toJSON().root),before);
+  }
+  assert.deepEqual(diagnostics.map(d=>d.code),[
+   'INVALID_NOTE_IMAGE_PAYLOAD','INVALID_NOTE_IMAGE_PAYLOAD',
+   'INVALID_NOTE_IMAGE_PAYLOAD','INVALID_NOTE_IMAGE_PAYLOAD',
+   'INVALID_NOTE_IMAGE_PAYLOAD'
+  ]);
+ }finally{dispose();}
+});
+test('multiple note images require an explicit image selection',()=>{
+ const {editor,diagnostics,dispose}=setup();
+ try{
+  build(editor);
+  editor.update(()=>{
+   const note=$getRoot().getFirstChild().getFirstChild().getChildAtIndex(1);
+   note.append($createInlineImageNode('/second.png','second'));
+   note.getFirstChild().select(2,2);
+  },{discrete:true});
+  const before=JSON.stringify(editor.getEditorState().toJSON().root);
+  editor.dispatchCommand(UPDATE_TUFTE_NOTE_IMAGE_COMMAND,{alt:'only second'});
+  editor.update(()=>{},{discrete:true});
+  assert.equal(JSON.stringify(editor.getEditorState().toJSON().root),before);
+  editor.update(()=>{
+   const note=$getRoot().getFirstChild().getFirstChild().getChildAtIndex(1);
+   const image=note.getLastChild(),selection=$createNodeSelection();
+   selection.add(image.getKey());$setSelection(selection);
+  },{discrete:true});
+  editor.dispatchCommand(UPDATE_TUFTE_NOTE_IMAGE_COMMAND,{alt:'only second'});
+  editor.update(()=>{},{discrete:true});
+  const after=noteFrom(editor);
+  assert.equal(after.children.at(-2).alt,'an image');
+  assert.equal(after.children.at(-1).alt,'only second');
+  assert.equal(after.noteId,'same-id');
+  assert.equal(validateDocument(documentFrom(editor)).ok,true);
+  assert.deepEqual(diagnostics.map(d=>d.code),['INVALID_NOTE_IMAGE_SELECTION']);
+ }finally{dispose();}
+});
+test('managed and intrinsic-sized note images reject source changes but accept alt updates',()=>{
+ for(const variant of ['managed','sized']){
+  const {editor,diagnostics,dispose}=setup();
+  try{
+   build(editor);
+   editor.update(()=>{
+    const note=$getRoot().getFirstChild().getFirstChild().getChildAtIndex(1);
+    const original=note.getLastChild();
+    original.replace(variant==='managed'
+     ?$createInlineImageNode('/note.png','original','image-1')
+     :$createInlineImageNode('/note.png','original',undefined,640,480));
+    note.getFirstChild().select(2,2);
+   },{discrete:true});
+   const before=JSON.stringify(editor.getEditorState().toJSON().root);
+   editor.dispatchCommand(UPDATE_TUFTE_NOTE_IMAGE_COMMAND,{src:'/new.png'});
+   editor.update(()=>{},{discrete:true});
+   assert.equal(JSON.stringify(editor.getEditorState().toJSON().root),before);
+   editor.dispatchCommand(UPDATE_TUFTE_NOTE_IMAGE_COMMAND,{alt:'edited'});
+   editor.update(()=>{},{discrete:true});
+   const image=noteFrom(editor).children.at(-1);
+   assert.equal(image.src,'/note.png');
+   assert.equal(image.alt,'edited');
+   assert.deepEqual(diagnostics.map(d=>d.code),[
+    variant==='managed'?'MANAGED_NOTE_IMAGE_SOURCE':'SIZED_NOTE_IMAGE_SOURCE'
+   ]);
+  }finally{dispose();}
+ }
 });
