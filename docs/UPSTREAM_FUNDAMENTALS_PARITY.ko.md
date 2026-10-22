@@ -1,4 +1,16 @@
-# P2.2.e — Fundamentals 동일 콘텐츠 비교의 선행 계약
+# P2.2.e — Fundamentals 동일 콘텐츠 비교의 선행 계약 (역사적 문제 기술)
+
+> **현행 구현 보정 (2026-10-22)**: 아래 초기 `tufte-note` wrapper
+> 관련 미지원 설명은 과거 스키마 기준이며 지금은 해결됐다.
+> 현행 JSON은 구체 `tufte-sidenote` 및 `tufte-marginnote`를 사용한다.
+> 발행은 직접 `label + input + span`이며 `newthought + sidenote`
+> 인접 결합은 newthought 내부 label 및 외부 input/payload로 분할 출력한다.
+> `p.sans`/`blockquote[cite]` 구현·오라클도 작성되었고,
+> 3번째 공식 섹션 14개 블록 비교는
+> `tests/upstream-same-content-fundamentals-browser.mjs`에서 추적한다.
+> **새 테스트 실행은 보류 상태**이며 완료 선언이 아니다.
+> 접근성을 위해 input `aria-label`만 추가 허용한다.
+> 정본 진행 상황은 [전체 parity 매트릭스](UPSTREAM_PAGE_PARITY_MATRIX.ko.md).
 
 기준: `fixtures/tufte/upstream/index.html` (고정 upstream commit).
 
