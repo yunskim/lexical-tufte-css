@@ -101,6 +101,7 @@ try{
      labelClass:label?.className,
      glyph:label?.textContent,
      checkbox:input?.tagName==='INPUT'&&input.type==='checkbox',
+     accessibleName:input?.getAttribute('aria-label'),
      paired:!!input?.id&&label?.htmlFor===input.id,
      adjacent:input?.nextElementSibling===payload&&
       (splitParent?preceding?.nextElementSibling===input:label?.nextElementSibling===input),
@@ -133,6 +134,9 @@ try{
   for(let i=0;i<notes.length;i++){
    assert.ok(notes[i].id?.endsWith(expectedIds[i]),route+': stable note identity '+expectedIds[i]);
    assert.equal(notes[i].checkbox,true);
+   assert.equal(notes[i].accessibleName,
+    notes[i].kind==='sidenote'?'Toggle sidenote':'Toggle margin note',
+    route+': note has an explicit accessible name');
    assert.equal(notes[i].paired,true);
    assert.equal(notes[i].adjacent,true);
    assert.equal(notes[i].sharedParent,true);
