@@ -3,7 +3,7 @@ import {validateRenderProfile} from './profile.js';
 import {element,serializeHTML,type RenderChild,type RenderElement} from './tree.js';
 export {element,serializeHTML,type RenderElement,type RenderChild} from './tree.js';
 export {parseDocument,validateDocument,isSafeURL,type TufteDocument,type JsonNode,type Diagnostic,type AssetRef} from '@lexical-tufte/document';
-export {RENDER_PROFILE} from './profile.js';
+export {RENDER_PROFILE,RENDER_SUPPORTED_NODE_TYPES} from './profile.js';
 export {escapeHTML} from './tree.js';
 export type RenderResult={ok:true;html:string;diagnostics:Diagnostic[]}|{ok:false;html:null;diagnostics:Diagnostic[]};
 export function renderArticle(input:unknown,options:{idPrefix?:string}={}):RenderResult{
