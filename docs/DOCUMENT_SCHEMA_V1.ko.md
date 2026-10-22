@@ -10,6 +10,7 @@ type TufteDocument = {
   id: string;
   locale: string;
   title: string;
+  titleId?: string; // optional stable HTML h1 anchor
   subtitle?: string;
   lexicalState: {root: RootNode};
   assets: AssetRef[];
@@ -26,7 +27,7 @@ type PostMetadata = {
 };
 ```
 
-ID는 영숫자로 시작하는 영숫자/밑줄/하이픈 1–128자다. title은 공백만 아닌 최대 1000자, subtitle은 최대 2000자, locale은 유효한 BCP 47 문자열(최대64자)이다. 입력을 정규화·변경하거나 알 수 없는 필드를 삭제하지 않는다.
+ID는 영숫자로 시작하는 영숫자/밑줄/하이픈 1–128자다. `titleId`는 선택적 `h1` 앵커로 같은 규칙을 따르며, 다른 heading ID와 충돌하면 진단한다. 값이 없을 때에는 제목의 ID를 생성하지 않는다. title은 공백만 아닌 최대 1000자, subtitle은 최대 2000자, locale은 유효한 BCP 47 문자열(최대64자)이다. 입력을 정규화·변경하거나 알 수 없는 필드를 삭제하지 않는다.
 
 slug는 NFC 한글 등 유니코드 문자/숫자를 하이픈으로 구분하고 최대160자다. 경로 구분자·점 경로는 허용하지 않는다. summary는 최대2000자, tags는 중복 없는 NFC 문자열 0–50개(각64자), authors는 1–20개(각200자)다. revision은 1 이상의 safe integer다. slug 중복/저장 충돌은 P5의 저장소 책임이다.
 
@@ -93,4 +94,4 @@ validatePostRecord(input: unknown): Result<PostRecord>
 
 현재 p1-v1은 기존 paragraph/note/link/image/figure/caption/section/table 조합만 지원한다. 새 노드, managed/sized image, figure 직접 note, indent, 명시적 표 크기/striping/frozen/alignment를 출력하지 않는다. 새 지원은 P2.2/P2.3에서 구현과 차등 검증 후 profile을 갱신한다.
 
-출력은 article+h1+선택적 subtitle+section이다. body/fullwidth table-layout은 table로 unwrap하고 scroll만 table-wrapper를 유지한다. label/input/payload 인접성을 유지한다. ID는 `{prefix}-note-{noteId}` 및 `{prefix}-article`, 기본 prefix는 문서 ID다. 같은 문서 반복 표시는 호출자가 고유 prefix를 제공한다. article별 CSS counter reset, text/attribute escape, _blank noopener/noreferrer, script/편집 속성 미포함을 유지한다. CSS/폰트는 호스트가 제공하며 한글 본명조/본고딕 binary는 P4에 남는다.
+출력은 article+h1+선택적 subtitle+section이다. `titleId`가 있으면 `h1 id`로 출력하며, 호스트 namespace로 생성되는 article/note ID와 충돌하면 발행을 거부한다. body/fullwidth table-layout은 table로 unwrap하고 scroll만 table-wrapper를 유지한다. label/input/payload 인접성을 유지한다. ID는 `{prefix}-note-{noteId}` 및 `{prefix}-article`, 기본 prefix는 문서 ID다. 같은 문서 반복 표시는 호출자가 고유 prefix를 제공한다. article별 CSS counter reset, text/attribute escape, _blank noopener/noreferrer, script/편집 속성 미포함을 유지한다. CSS/폰트는 호스트가 제공하며 한글 본명조/본고딕 binary는 P4에 남는다.

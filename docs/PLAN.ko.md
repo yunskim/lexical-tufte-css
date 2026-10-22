@@ -270,6 +270,13 @@ P1 gate: 완료. 노트 편집 회귀와 SSR 출력의 실제 브라우저 비�
     현재 발행의 ID 없는 h1, article의 제품 고유 namespace/class/lang
     차이를 설계 결정으로 확정하거나 schema에 ID를 보존하도록 확장한다.
     이 차이를 DOM 비교에서 무조건 무시하지 않는다.
+    **2026-10-22 코드 추가/실행 대기:** 정본에 선택적
+    `TufteDocument.titleId?:string`을 추가했다. 공식 `tufte-css` ID를
+    원본 재구성→v1/v2 migration→실제 Lexical import/export→HTML 발행에
+    전달한다. 부적절한 ID·heading ID·발행 namespace에서 생성하는 ID와
+    충돌하면 거부한다. 기존 titleId 없는 문서는 출력 불변.
+    신규 문서/렌더/bridge 회귀와 통합 DOM 오라클은 작성했으나 미실행.
+
 - [ ] P2.3 F10–F19 노트·그림·표·코드·embed 구현.
   - [ ] P2.3.a 노트 F10–F12: note 종류 전환/텍스트·이미지 편집/삭제/이동, anchor/ID 일체성, copy/paste/undo/redo, 복수 article 번호와 모바일 fallback.
   - [ ] P2.3.b 그림·ImageQuilts F13/F14/F19: src/alt/caption/asset ID 수정 및 body/fullwidth/여백 변환, 자산 유실·삭제 시 진단, schema 유효성 보존.

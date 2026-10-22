@@ -1,3 +1,15 @@
+## 2026-10-22 — P2.2.e.4 공식 h1 제목 앵커 보존 (작성·실행 대기)
+
+- `titleId?:string`을 문서 envelope의 선택 필드로 추가했다.
+  v1 및 v2 검증, Lexical bridge, pure renderer, upstream 9섹션
+  재구성기/DOM 비교를 갱신했다. 공식 `h1#tufte-css`가 제목에서
+  발행까지 지속되며 과거 ID 소실 허용 오라클은 제거했다.
+- 기존 문서는 `titleId`가 없다면 h1 출력이 종전과 같다.
+  잘못된/중복 ID는 경로와 진단으로 거부하고 입력 문서를 바꾸지 않는다.
+- 별도 document/lexical/render 회귀 테스트 3개 파일을 추가했다.
+  설치·빌드·단위 테스트·브라우저 테스트·CI **모두 실행하지 않았다**.
+  P2.2.e.4 체크박스는 검증 전까지 미완료다.
+
 ## 2026-10-22 — 전체 화면 RGBA 픽셀 수락 비교기 작성 (실행 대기)
 
 - tests/helpers/full-page-pixel-parity.mjs: PNG를 Canvas에서 decode하고 RGBA 픽셀을 정확 비교한다. 화면 크기 차이, 불일치 픽셀 수, 최대 채널 차이, 최초 좌표 및 bounding box를 추적한다.

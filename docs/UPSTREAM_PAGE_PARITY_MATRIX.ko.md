@@ -136,6 +136,20 @@
 - 원형 공식 화면: official-pristine-{폭}.png. 코드 현대화 비교 기준: official-{폭}.png. 발행 화면: published-{폭}.png. 차이 기록: pixel-report-{폭}.json. 파일 저장은 TUFTE_SCREENSHOT_DIR 지정 시에만 실행된다.
 - 비교기 자체의 실패/성공 반례를 별도 브라우저 테스트에 추가했다. **테스트/CI 미실행이며 완료 판정 전**이다.
 
+## P2.2.e.4 제목 h1 앵커 계약 (2026-10-22, 검증 대기)
+
+- 공식 `h1#tufte-css`는 선택적 `TufteDocument.titleId`로 보존한다.
+  Lexical 편집 본문에는 제목 h1을 복제하지 않고 문서 envelope 메타데이터로
+  저장한다. 기존 문서의 h1은 이전처럼 ID가 없다.
+- 고정 upstream 원본에서 `titleId:'tufte-css'`를 추출하고
+  v1→v2→Lexical 저장/재열기→순수 renderer의 h1 ID까지 확인하는
+  브라우저 회귀를 수정했다. 과거 ID 누락 예외는 제거했다.
+- ID 문법과 heading ID 충돌은 정본 검증기에서, 발행의 article/note
+  namespace ID와 충돌은 renderer에서 거부한다.
+  제품이 추가하는 `article`의 id/class/lang는 여전히 명시적 차이다.
+- `packages/{document,lexical,render}/test/title-anchor.test.mjs` 등
+  회귀 코드는 추가되었지만 실제 실행/합격 판정은 아직 없다.
+
 ## 다음 작업 순서
 
 1. 9개 섹션의 단독 동일 콘텐츠 비교 테스트와 Lexical/document/render 회귀를 **한 번에 실행**해
