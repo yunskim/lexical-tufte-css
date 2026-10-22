@@ -74,7 +74,9 @@ try{
  assert.equal(await page.locator('.editor .epigraph > blockquote').count(),3);
  assert.equal(await page.locator('.editor figure').count(),4,
   'Two regular/fullwidth demo figures plus two ImageQuilts figures');
- assert.equal(await page.locator('.editor iframe').count(),1);
+ // The editing decorator intentionally uses a non-iframe placeholder;
+ // the published renderer, checked below, owns the real iframe.
+ assert.equal(await page.locator('.editor [data-embed-provider="youtube"]').count(),1);
  assert.equal(errors.length,0,errors.join('\n'));
 
  const paragraph=page.locator('.editor > section').first().locator('p').first();
