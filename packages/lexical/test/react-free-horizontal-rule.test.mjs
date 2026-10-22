@@ -13,10 +13,18 @@ test('headless node package imports no React HorizontalRule module or React/Yjs 
  assert.equal(pkg.dependencies['@lexical/extension'],'0.52.0');
  assert.equal(pkg.dependencies['@lexical/react'],undefined);
  assert.equal(pkg.peerDependencies,undefined);
- for(const filename of ['nodes.ts','quotationCommands.ts']){
-  const source=readFileSync(new URL('../src/'+filename,import.meta.url),'utf8');
-  assert.doesNotMatch(source,/from ['"]@lexical\/react\//);
-  assert.match(source,/from ['"]@lexical\/extension\/HorizontalRuleExtension['"]/);
+ for(const filename of [
+  '../src/nodes.ts',
+  '../src/quotationCommands.ts',
+  './all-nodes-fixture.mjs',
+  './document-bridge.test.mjs',
+  './publication-browser-harness.mjs'
+ ]){
+  const source=readFileSync(new URL(filename,import.meta.url),'utf8');
+  assert.doesNotMatch(source,/from ['"]@lexical\/react\/LexicalHorizontalRuleNode['"]/,
+   filename+' must not pull the deprecated React HorizontalRule into headless code');
+  assert.match(source,/from ['"]@lexical\/extension\/HorizontalRuleExtension['"]/,
+   filename+' must use the same React-free horizontal-rule registry');
  }
  const lock=readFileSync(new URL('../../../pnpm-lock.yaml',import.meta.url),'utf8');
  const lexicalImporter=lock.split('  packages/lexical:\n')[1]?.split('\n  packages/render:')[0];
