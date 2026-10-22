@@ -8,7 +8,7 @@ export {SidenoteNode,$createSidenoteNode} from './SidenoteNode.js';
 export {MarginnoteNode,$createMarginnoteNode} from './MarginnoteNode.js';
 export {$createInlineImageNode, InlineImageNode} from './InlineImageNode.js';
 export {$getContainingNote,$splitNoteAtSelection,$mergeNoteWithNext,$moveNote,$insertNotePhrasing} from './noteOperations.js';
-export {registerNoteCommands,SET_TUFTE_NOTE_KIND_COMMAND,REMOVE_TUFTE_NOTE_COMMAND,UPDATE_TUFTE_NOTE_IMAGE_COMMAND,type TufteNoteKind,type UpdateTufteNoteImage} from './noteCommands.js';
+export {registerNoteCommands,SET_TUFTE_NOTE_KIND_COMMAND,REMOVE_TUFTE_NOTE_COMMAND,UPDATE_TUFTE_NOTE_IMAGE_COMMAND,SELECT_TUFTE_NOTE_IMAGE_COMMAND,$listSelectedTufteNoteImages,type TufteNoteImageChoice,type SelectTufteNoteImage,type TufteNoteKind,type UpdateTufteNoteImage} from './noteCommands.js';
 export {SectionNode,FigureNode,CaptionNode,TableLayoutNode,$createSectionNode,$createFigureNode,$createCaptionNode,$createTableLayoutNode,type FigureWidth,type TableLayout} from './LayoutNodes.js';
 export {$collectNoteIds,$reidentifyPastedNotes} from './clipboardNotes.js';
 export {$prepareNoteComposition,registerNoteCompositionGuard} from './noteComposition.js';

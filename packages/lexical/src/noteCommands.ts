@@ -1,5 +1,5 @@
-import {$addUpdateTag,$getSelection,$isRangeSelection,$isNodeSelection,$isElementNode,createCommand,COMMAND_PRIORITY_EDITOR,HISTORY_PUSH_TAG,type LexicalCommand,type LexicalEditor,type LexicalNode} from 'lexical';
-import {isSafeURL,type Diagnostic} from '@lexical-tufte/document';
+import {$addUpdateTag,$getSelection,$isRangeSelection,$isNodeSelection,$isElementNode,$getNodeByKey,$createNodeSelection,$setSelection,createCommand,COMMAND_PRIORITY_EDITOR,HISTORY_PUSH_TAG,type LexicalCommand,type LexicalEditor,type LexicalNode} from 'lexical';
+import {isIdentifier,isSafeURL,type Diagnostic} from '@lexical-tufte/document';
 import {InlineImageNode,$createInlineImageNode} from './InlineImageNode.js';
 import {NoteNode} from './NoteNode.js';
 import {SidenoteNode,$createSidenoteNode} from './SidenoteNode.js';
@@ -14,6 +14,40 @@ export const REMOVE_TUFTE_NOTE_COMMAND:LexicalCommand<void>=createCommand('REMOV
 export type UpdateTufteNoteImage={src?:string;alt?:string};
 export const UPDATE_TUFTE_NOTE_IMAGE_COMMAND:LexicalCommand<UpdateTufteNoteImage>=
  createCommand('UPDATE_TUFTE_NOTE_IMAGE');
+
+/** Read-only choices for an explicitly selected note, not all document images. */
+export type TufteNoteImageChoice={
+ noteId:string;nodeKey:string;src:string;alt:string;
+};
+export type SelectTufteNoteImage={noteId:string;nodeKey:string};
+export const SELECT_TUFTE_NOTE_IMAGE_COMMAND:LexicalCommand<SelectTufteNoteImage>=
+ createCommand('SELECT_TUFTE_NOTE_IMAGE');
+
+/** Call in editorState.read/editor.update. Never change state to enumerate images. */
+export function $listSelectedTufteNoteImages():TufteNoteImageChoice[]{
+ const selection=$getSelection();
+ let anchor:LexicalNode|null=null;
+ if($isRangeSelection(selection)&&selection.isCollapsed())
+  anchor=selection.anchor.getNode();
+ else if($isNodeSelection(selection)){
+  const nodes=selection.getNodes();
+  if(nodes.length===1&&nodes[0] instanceof InlineImageNode)anchor=nodes[0];
+ }
+ const note=$getContainingNote(anchor);
+ if(!note)return [];
+ const choices:TufteNoteImageChoice[]=[];
+ const visit=(node:LexicalNode):void=>{
+  if(node instanceof InlineImageNode){
+   const image=node.exportJSON();
+   choices.push({noteId:note.getNoteId(),nodeKey:node.getKey(),
+    src:image.src,alt:image.alt});
+  }else if($isElementNode(node))
+   for(const child of node.getChildren())visit(child);
+ };
+ visit(note);
+ return choices;
+}
+
 
 export function registerNoteCommands(editor:LexicalEditor,onDiagnostic?:(diagnostic:Diagnostic)=>void):()=>void{
  if(!editor.hasNodes([SidenoteNode,MarginnoteNode]))throw Error('Note commands require concrete sidenote/marginnote nodes');
@@ -50,6 +84,27 @@ export function registerNoteCommands(editor:LexicalEditor,onDiagnostic?:(diagnos
   return images.length===1?{image:images[0]!,note}:null;
  };
  const registrations=[
+  editor.registerCommand(SELECT_TUFTE_NOTE_IMAGE_COMMAND,payload=>{
+   if(!payload||typeof payload!=='object'||Array.isArray(payload)||
+      !isIdentifier(payload.noteId)||typeof payload.nodeKey!=='string'||
+      Object.keys(payload).some(key=>key!=='noteId'&&key!=='nodeKey'))
+    return reject('INVALID_NOTE_IMAGE_TARGET','이미지 선택 대상이 올바르지 않습니다.');
+   if(editor.isComposing())return reject('INVALID_NOTE_IMAGE_SELECTION',
+    '한글 입력 조합 중에는 이미지를 선택할 수 없습니다.');
+   // Re-enumerate at the moment of the command. A detached/stale key, another
+   // note's key or a focus moved into the body must not be accepted.
+   const available=$listSelectedTufteNoteImages();
+   if(!available.some(item=>item.noteId===payload.noteId&&item.nodeKey===payload.nodeKey))
+    return reject('INVALID_NOTE_IMAGE_TARGET',
+     '이미지가 이동했거나 현재 선택한 노트에 속하지 않습니다.');
+   const image=$getNodeByKey(payload.nodeKey);
+   if(!(image instanceof InlineImageNode))
+    return reject('INVALID_NOTE_IMAGE_TARGET','이미지 노드를 찾을 수 없습니다.');
+   const selection=$createNodeSelection();
+   selection.add(image.getKey());
+   $setSelection(selection);
+   return true;
+  },COMMAND_PRIORITY_EDITOR),
   editor.registerCommand(SET_TUFTE_NOTE_KIND_COMMAND,kind=>{
    if(kind!=='sidenote'&&kind!=='marginnote')return reject('INVALID_NOTE_KIND','지원하지 않는 주석 종류입니다.');
    const note=selectedNote();
