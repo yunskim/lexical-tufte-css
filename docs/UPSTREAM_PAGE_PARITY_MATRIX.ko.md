@@ -27,6 +27,42 @@
 새로운 7개는 실행 검증 전이다. 모두 통과해야 섹션 단위 DOM 대응을 **9/9**로 판정할 수 있다.
 부분 섹션 테스트를 전체 문서 동등성으로 해석하지 않는다.
 
+## 하나의 Lexical 문서: 전체 페이지 왕복 회귀 (2026-10-22, 실행 대기)
+
+- 빌더: `tests/helpers/pinned-upstream-article.mjs`.
+  9개 섹션 **60개 직접 블록**, 실제 note **7개**, 제목·부제·링크·quote·
+  epigraph·코드·fullwidth figure·margin image·iframe을
+  고정 upstream **전체**에서 재구성한다.
+  지원하지 않는 DOM 태그·속성·구조/노트 조합, 섹션별 block type 목록이
+  달라지면 실패한다. 원본을 변경하거나 기존의 부분 fixture를 이어 붙이지 않는다.
+- 통합 테스트: `tests/upstream-full-document-roundtrip-browser.mjs`.
+  `validateDocument` → v1→v2 envelope migration →
+  실제 Headless Lexical **import** → v2 **export** → JSON 저장·재열기 →
+  전 9개 섹션 **단일** `renderArticle` → 전체 DOM 대조를 검사한다.
+  별도 저장본의 첫 문장 한 곳을 수정한 후 **재열기/재발행**하여
+  그 문장 외의 모든 콘텐츠와 노트·iframe이 그대로인 것도 검사한다.
+  JSON 문장 변경은 실제 키보드 편집/undo 검증을 대신하지 않는다.
+- 전체 페이지 상단의 `article`은 제품 발행이
+  `id="upstream-complete-demo-article" class="tufte-article" lang="en-US"`
+  를 추가한다. 원본 `h1 id="tufte-css"`는 현행 document envelope에
+  제목 앵커 필드가 없으므로 **현재는 보존되지 않는 차이**다.
+  통합 오라클은 이 차이를 묵인하지 않고 원본/출력의 정확한 값과
+  h1 텍스트/부제 DOM을 각각 검증한다.
+  제목 앵커를 완전 보존할지는 별도의 schema/편집 계약 결정이 필요하다.
+- 기존의 정확한 note ID namespace와 모든 note `aria-label`,
+  Figures의 **한 iframe 전체 속성 집합과 한 설명 코드 블록**만
+  의도적으로 현대화한다. 태그·중첩·순서·일반 텍스트는 정밀 비교하며,
+  SECTION/FIGURE/epigraph/BLOCKQUOTE의 소스 들여쓰기와
+  공식 Sidenotes의 note 컨트롤 사이 공백 두 곳만 무시한다.
+- 375/759/760/761/1024/1440px의 iframe-wrapper 원본/발행
+  CSS 위치·크기를 비교하는 코드를 포함한다.
+  **실제 이미지/폰트 파일 로드, 전체 페이지 pixel/screenshot parity,
+  브라우저 editor UI 키 입력**은 아직 수락되지 않은 별도 단계다.
+- `pnpm test:upstream-same-content` 마지막에 등록하고,
+  `pnpm verify:batch`의 browser-file 자동 발견에도 포함된다.
+  **빌드/타입/브라우저 등 실행은 사용자 지시에 따라 모아서 진행**한다.
+  코드가 추가된 사실은 수락 완료나 오라클 통과가 아니다. CI 생략.
+
 ## 엄격한 비교 계약
 
 - 각 테스트는 고정된 원본을 `DOMParser`로 읽고, 이해하지 못하는 노드·속성을
@@ -77,7 +113,9 @@
 2. Figures의 현대화된 임베드 예외는 정확히 고정된 소스 코드/속성에만 적용하고,
    `figure.iframe-wrapper > iframe` 및 모든 일반 그림/주석 DOM의 동등성을 확인한다.
    `aspectRatio` 메타데이터와 공식 CSS의 고정 16:9 컨테이너 정책 차이도 후속 제품 계약에서 별도 검토한다.
-3. 9개 섹션을 **하나의 Lexical 문서**로 묶어 정본 저장·재열기,
-   전체 원본 대비 DOM·viewport별 geometry/실제 이미지·폰트/스크린샷을 확인한다.
+3. **작성된** 전체 9섹션 단일 Lexical 문서 왕복 테스트를 누적 batch에서 실행하여,
+   저장·재열기·수정본/발행 DOM의 실패 원인을 수정한다.
+   이후 실제 editor 키보드 수정·undo/redo 및 전체 페이지 이미지·폰트·스크린샷 parity를 진행한다.
+   제목 `h1#tufte-css`의 원본 앵커 ID 보존 여부는 별도 schema 결정으로 추적한다.
 
 임시 완화나 보이지 않는 노드 삭제로 테스트를 통과시키지 않는다.
