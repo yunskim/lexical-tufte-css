@@ -1,9 +1,25 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {renderArticle,validateDocument} from '../dist/index.js';
+import {renderArticle,validateDocument,RENDER_SUPPORTED_NODE_TYPES} from '../dist/index.js';
+import {NODE_SCHEMA} from '@lexical-tufte/document';
 const fixture=()=>JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document.json',import.meta.url),'utf8'));
 const note=d=>d.lexicalState.root.children[0].children[0].children[1];
+test('schema, render profile and actual render switch handle the same exact node types',()=>{
+ const schemaTypes=Object.keys(NODE_SCHEMA).sort();
+ assert.equal(Object.isFrozen(RENDER_SUPPORTED_NODE_TYPES),true);
+ assert.deepEqual([...RENDER_SUPPORTED_NODE_TYPES].sort(),schemaTypes,
+  'Shared validator and capability profile have drifted');
+ const source=readFileSync(new URL('../src/index.ts',import.meta.url),'utf8');
+ const actualCases=[...source.matchAll(/^\s*case '([^']+)':/gm)].map(match=>match[1]);
+ assert.equal(new Set(actualCases).size,actualCases.length,
+  'Renderer contains duplicate cases');
+ assert.deepEqual(actualCases.slice().sort(),schemaTypes,
+  'A schema-valid node has no renderer branch, or an obsolete branch remains');
+ assert.match(source,/default:throw Error\('Validated node has no renderer'\)/,
+  'Unknown runtime paths must fail closed');
+});
+
 test('pure renderer works without browser/editor globals and is deterministic without mutation',()=>{
  assert.equal(typeof document,'undefined');assert.equal(typeof window,'undefined');
  const d=fixture(),before=JSON.stringify(d);const a=renderArticle(d),b=renderArticle(d);
