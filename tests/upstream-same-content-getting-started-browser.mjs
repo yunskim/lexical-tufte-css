@@ -53,14 +53,14 @@ try{
    if(e.tagName==='H2')return {type:'heading',text:e.textContent,id:e.id};
    if(e.tagName==='PRE')return {type:'pre',text:e.querySelector('code')?.textContent};
    if(e.tagName==='P'){
-    // Renderer uses tufte-pre-wrap spans around text and formatted code.
+    // The pure renderer must emit ordinary text directly, without wrappers.
     const parts=[];
     for(const node of e.childNodes){
      if(node.nodeType===Node.TEXT_NODE){parts.push({type:'text',value:node.textContent});continue;}
      if(node.nodeType!==Node.ELEMENT_NODE)throw Error('unexpected published node');
      if(node.matches('a'))parts.push({type:'link',href:node.getAttribute('href'),value:node.textContent});
      else if(node.matches('code'))parts.push({type:'code',value:node.textContent});
-     else if(node.matches('span.tufte-pre-wrap'))parts.push({type:'text',value:node.textContent});
+     else if(node.matches('span.tufte-pre-wrap'))throw Error('Obsolete text wrapper leaked into published HTML');
      else throw Error('unexpected published inline: '+node.tagName);
     }
     return {type:'paragraph',parts};
