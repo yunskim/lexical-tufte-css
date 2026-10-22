@@ -363,6 +363,6 @@ test('F07 section footer citation publishes semantic footer and cite in order',(
  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
  const footer=result.html.match(/<footer>(.*?)<\/footer>/s)?.[1];
  assert.ok(footer);
- assert.equal(footer.replace(/<span class="tufte-pre-wrap">(.*?)<\/span>/gs,'$1'),'References: <cite>A published source</cite>');
+ assert.equal(footer,'References: <cite>A published source</cite>');
  assert.equal(JSON.stringify(d),original);
 });
