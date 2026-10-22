@@ -255,6 +255,13 @@ P1 gate: 완료. 노트 편집 회귀와 SSR 출력의 실제 브라우저 비�
   - [ ] P2.2.e.3 **완전 시각 비교**: 공식 이미지·폰트 파일을 재현성 있게 제공한
     환경에서 모든 섹션의 geometry·이미지 로딩·Source Han/ET Book 폰트·
     screenshot pixel 결과를 폭별 비교하고 P4.3에 증거를 남긴다.
+    **준비 코드(미검증, 2026-10-22):** `assets-manifest.json`에 5 PNG/4 WOFF
+    원본 blob을 고정하고 `scripts/sync-upstream-visual-assets.mjs` 및
+    `tests/upstream-full-document-visual-browser.mjs`를 작성했다.
+    동일한 9섹션 원본/발행본에 로컬 파일을 제공하여 이미지 decode·
+    FontFace 로드·6폭 geometry를 비교하고, 선택적으로 screenshot 쌍을 남긴다.
+    pixel diff·스크린리더·한글 Source Han 비교는 **별도 미완료**다.
+    batch에서는 미설치/손상 원본 자산을 성공으로 세지 않고 SKIP으로 보고한다.
   - [ ] P2.2.e.4 **발행 제목 앵커 계약**: 공식 `h1#tufte-css`와
     현재 발행의 ID 없는 h1, article의 제품 고유 namespace/class/lang
     차이를 설계 결정으로 확정하거나 schema에 ID를 보존하도록 확장한다.

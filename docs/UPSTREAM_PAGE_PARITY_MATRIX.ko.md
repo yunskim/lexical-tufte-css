@@ -113,6 +113,21 @@
   URI scheme, authority, 물음표/fragment, 위험한 공백·역슬래시는 기존
   보안 정책에 따라 허용하지 않는다.
 
+## 시각 자산/레이아웃 회귀 준비 (2026-10-22, 실행 대기)
+
+- `fixtures/tufte/upstream/assets-manifest.json`: 공식 샘플의 PNG 5개와
+  `tufte.css`에서 사용하는 ET Book WOFF 4개의 크기·Git blob SHA-1을 고정한다.
+  파일 자체는 Git에 올리지 않고 `pnpm assets:upstream-visual` 명령으로
+  명시적으로 다운로드하여 검증한다. 실행 중 누락 자산의 외부 자동 대체는 금지한다.
+- `tests/upstream-full-document-visual-browser.mjs`: 같은 9섹션 Lexical
+  발행본과 고정 원본을 같은 HTTP 호스트의 독립 경로에 배치하여
+  CSS/이미지/font 로딩 상태를 확인하고 6폭에서 섹션·이미지·
+  iframe wrapper·데스크톱 note geometry를 비교한다.
+  선택적 screenshot 쌍 저장은 시각 판독 자료이며 **픽셀 동일성 검사가 아니다**.
+- batch는 자산 준비가 안 되었거나 해시가 다르면 시각 테스트를 SKIP으로
+  명시하며, 기존 DOM/JSON/editor 테스트는 영향 없이 진행한다.
+  빌드·타입·브라우저 테스트·CI는 모두 아직 실행하지 않았다.
+
 ## 다음 작업 순서
 
 1. 9개 섹션의 단독 동일 콘텐츠 비교 테스트와 Lexical/document/render 회귀를 **한 번에 실행**해

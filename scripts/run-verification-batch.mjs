@@ -8,6 +8,7 @@
 import {readdirSync} from 'node:fs';
 import {spawnSync} from 'node:child_process';
 import {setTimeout} from 'node:timers/promises';
+import {loadVerifiedUpstreamAssets} from './upstream-visual-assets.mjs';
 
 const packageCommand=process.platform==='win32'?'pnpm.cmd':'pnpm';
 const results=[];
@@ -55,6 +56,15 @@ const browsers=readdirSync('tests')
  .filter(name=>name.endsWith('-browser.mjs'))
  .sort();
 for(const name of browsers){
+ if(name==='upstream-full-document-visual-browser.mjs'){
+  try{loadVerifiedUpstreamAssets();}
+  catch(error){
+   const reason=error instanceof Error?error.message:String(error);
+   results.push({label:'tests/'+name,skipped:true,reason});
+   console.log('=== SKIP tests/'+name+': '+reason+' ===');
+   continue;
+  }
+ }
  run('tests/'+name,process.execPath,['tests/'+name]);
  // Browser test files may release their own Vite child process in finally.
  // Let the port close before starting a different independent browser test.
@@ -65,9 +75,10 @@ run('Packed package consumption',packageCommand,['package:check']);
 run('Python HTTP/SQLite integration',packageCommand,['test:recovery-python']);
 
 const passed=results.filter(item=>item.ok).length;
-const failed=results.filter(item=>!item.ok);
+const skipped=results.filter(item=>item.skipped).length;
+const failed=results.filter(item=>!item.ok&&!item.skipped);
 console.log('\nVERIFICATION_SUMMARY='+JSON.stringify({
- passed,failed:failed.length,total:results.length,results
+ passed,failed:failed.length,skipped,total:results.length,results
 }));
 if(failed.length){
  console.error('Failed steps: '+failed.map(item=>item.label).join(', '));

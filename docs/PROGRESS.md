@@ -1,3 +1,26 @@
+## 2026-10-22 — 9섹션 원본 이미지·ET Book 폰트 오프라인 시각 비교 하네스 (작성, 실행 대기)
+
+- 고정 upstream `b5d7b7b` Git tree에서 참조되는 실제 이미지 **5개**와
+  CSS WOFF **4개**의 blob SHA-1·크기를 `assets-manifest.json`에 고정했다.
+  다운로드 스크립트는 다운로드 **후** Git blob SHA-1을 검증하고 저장한다.
+  바이너리는 Git에 포함하지 않으며 브라우저 테스트가 자동 다운로드하지 않는다.
+- `tests/upstream-full-document-visual-browser.mjs`는 이전의 **동일 9섹션
+  단일 Lexical 문서**를 발행하고 HTTP 서버에서 공식/발행 HTML에 동일한
+  공식 CSS·로컬 이미지·폰트를 제공한다. 375/759/760/761/1024/1440px에서
+  이미지 5개 실제 decode/natural dimension, ET Book 4개 FontFace 로드,
+  article/9섹션/5이미지/iframe wrapper, 데스크톱 7주석 geometry를
+  2px 오차 내 비교하도록 **테스트 코드를 추가했다**.
+- `TUFTE_SCREENSHOT_DIR`를 지정하면 폭별 원본/발행 full-page screenshot
+  쌍을 남긴다. **스크린샷 pixel 동등성은 판정하지 않는다**. 현대화된
+  iframe·모바일 주석 접근성의 의도적 차이는 기존 ADR 범위에 따른다.
+- `pnpm assets:upstream-visual`로 자료를 명시적으로 준비하고
+  `pnpm test:upstream-visual`로 단독 수락 가능하다.
+  `pnpm verify:batch`는 파일이 없거나 해시가 틀리면 해당 시각
+  브라우저 테스트만 **SKIP 사유와 함께 기록**, 있으면 실행한다.
+- 테스트·빌드·설치·CI **전부 실행하지 않았다**. 전 9섹션 DOM/실제 editor
+  및 6폭 자산 geometry는 아직 합격 판정할 수 없다. 이미지/font geometry
+  비교 실패가 발견되면 CSS·정규화 범위를 넓혀 통과시키지 않고 원인 기록 후 수정한다.
+
 ## 2026-10-22 — 공식 9섹션 단일 문서 및 실제 React 편집 통합 오라클 추가 (실행 대기)
 
 - 사용자 요청: **테스트는 나중에 한 번에 실행**. 이번 단계에서는 빌드·lint·
