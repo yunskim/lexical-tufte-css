@@ -100,9 +100,9 @@ importers:
       '@lexical/list':
         specifier: 0.52.0
         version: 0.52.0(typescript@6.0.2)
-      '@lexical/react':
+      '@lexical/extension':
         specifier: 0.52.0
-        version: 0.52.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@6.0.2)(yjs@13.6.27)
+        version: 0.52.0(typescript@6.0.2)
       '@lexical/rich-text':
         specifier: 0.52.0
         version: 0.52.0(typescript@6.0.2)
@@ -113,21 +113,9 @@ importers:
         specifier: 0.52.0
         version: 0.52.0(typescript@6.0.2)
     devDependencies:
-      '@types/react':
-        specifier: 19.2.2
-        version: 19.2.2
-      react:
-        specifier: 19.2.0
-        version: 19.2.0
-      react-dom:
-        specifier: 19.2.0
-        version: 19.2.0(react@19.2.0)
       typescript:
         specifier: 6.0.2
         version: 6.0.2
-      yjs:
-        specifier: 13.6.27
-        version: 13.6.27
 
   packages/render:
     dependencies:
