@@ -36,6 +36,7 @@ try {
     sharedParent:label?.parentElement===input.parentElement&&payload?.parentElement===input.parentElement,
     adjacent:label?.nextElementSibling===input&&input?.nextElementSibling===payload,
     reference:label?.htmlFor===input?.id,checked:input?.checked,kind:payload?.className,
+    accessibleName:input?.getAttribute('aria-label'),
     numbered:label?.classList.contains('sidenote-number'),symbol:label?.textContent,
     blockChildren:payload?.querySelectorAll('p,div,section,figure,table').length};
   });
@@ -43,8 +44,8 @@ try {
  assert.equal(structure.length,2);
  assert.equal(new Set(structure.map(n=>n.id)).size,2,'note toggle IDs are unique');
  for(const n of structure){assert.ok(n.id);assert.equal(n.sharedParent,true);assert.equal(n.label,'LABEL');assert.equal(n.input,'INPUT');assert.equal(n.type,'checkbox');assert.equal(n.adjacent,true);assert.equal(n.reference,true);assert.equal(n.checked,false);assert.equal(n.blockChildren,0);}
- assert.equal(structure[0].kind,'sidenote');assert.equal(structure[0].numbered,true);
- assert.equal(structure[1].kind,'marginnote');assert.equal(structure[1].numbered,false);assert.equal(structure[1].symbol,'⊕');
+ assert.equal(structure[0].kind,'sidenote');assert.equal(structure[0].numbered,true);assert.equal(structure[0].accessibleName,'Toggle sidenote');
+ assert.equal(structure[1].kind,'marginnote');assert.equal(structure[1].numbered,false);assert.equal(structure[1].accessibleName,'Toggle margin note');assert.equal(structure[1].symbol,'⊕');
  await page.getByRole('button',{name:'JSON·HTML 확인',exact:true}).click();
  assert.equal(await page.getByRole('textbox',{name:'문서 JSON',exact:true}).inputValue(),before,'export does not mutate canonical JSON');
  const {readFile}=await import('node:fs/promises');const css=await readFile('fixtures/tufte/upstream/tufte.css','utf8');
