@@ -667,3 +667,44 @@ E059/M052 및 E067/M060의 선행 대책을 그림 주석 명령·회귀 테스�
 - 설명용 코드 블록 `pre > code`도 실제 현대 출력과 맞아야 한다. 원본 fixture는 고정·불변으로 유지하고 비교 오라클에서는 **공식 Figures의 iframe 한 곳과 예제 코드 문자열 한 곳**만 정확히 기대된 값으로 치환한 뒤 원본 전체 DOM을 대조한다. Figure/marginnote 이미지·강조·본문은 치환하지 않는다.
 - Tufte의 `padding-bottom:56.25%`와 `padding-top:25px` 예약 박스는 computed iframe 가로세로 비율과 단순하게 같은 16:9가 아니다. viewport별 원본/출력 wrapper·iframe의 실제 geometry를 비교하고, 저장된 intrinsic `aspectRatio`는 width/height 속성으로 따로 검증한다. 동적 비율 CSS는 현재 지원된 것으로 주장하지 않는다.
 - 적용: `packages/render/src/index.ts`, `packages/lexical/src/EmbedNode.ts`, `packages/render/styles.css`, renderer/lexical 단위, `tests/publication-browser.mjs`, `tests/upstream-same-content-figures-browser.mjs`, ADR 0003. 실패 원인은 테스트만 완화해 숨기지 않는다. **Work 일괄 실행 대기; CI 생략**.
+
+## M110 — 모든 Lexical 교체 registry 변형에서 immutable 계약을 유지
+
+- E120: `TUFTE_NODE_CLASSES`/replace 규칙을 포함하는 `TUFTE_NODES`/wire type 집합을 각각 frozen으로 보존한다.
+- R02 golden과 `TUFTE_NODE_TYPES===Object.keys(NODE_SCHEMA).sort()`, 중복 없는 registry, 실제 Lexical parse/save/reopen을 동시에 확인한다. 단순 JS 배열 구성 가능 여부로 완료 처리하지 않는다.
+- 적용: `packages/lexical/src/nodes.ts`, `all-nodes.test.mjs`. 실행 대기.
+
+## M111 — 발행 오류의 단계·사용자 진단·원본 예외를 분리
+
+- E121: 반환된 renderer `diagnostics`는 원형 유지하고 예상 밖 throw는 `PUBLICATION_RENDER_ERROR`와 제한된 `$.publication.render`로 처리한다. 외부 asset checker의 throw/reject는 저장소/SQLite 오류로 가장하지 않고 `PUBLICATION_ASSET_CHECK_ERROR`로 분류한다. DB transaction 에러는 기존 storage failure와 안전한 rollback을 보존한다.
+- 외부 사용자에게 provider error 객체/내부 파일명/보안 토큰/SQL 내용을 인라인으로 유출하지 않는다. 오류 원본은 미래 운영 호스트의 서버 로그 상관 ID에만 연결할 수 있으며 현재 기능은 별도 작업이다.
+- 실패별 `generation`/snapshot ID와 기존 공개 HTML이 변하지 않음을 검사한다. DB 실패/asset/checker 실패와 정상 구조 진단을 한 테스트로 뭉뚱그리지 않는다.
+- 적용: `packages/blog/src/publication.ts`, `publication.test.mjs`. 실행 대기.
+
+## M112 — 새 node type은 Schema + Lexical + render profile + switch 네 겹 계약을 동시 확인
+
+- E122: `all-nodes.test.mjs`의 Schema ↔ Lexical 검사에 더해 `render.test.mjs`에서 Schema 타입 목록, immutable profile 목록, 실제 pure renderer의 `case` 목록을 정확히 비교한다.
+- 중복 case 및 죽은 분기도 실패한다. 지원 속성은 profile로 명시적으로 거부하는 범위가 있을 수 있으므로 `모든 속성 발행 가능`을 뜻하는 테스트로 오해하지 않는다. 향후 switch를 다른 dispatcher로 변경하면 테스트 추출 로직도 명시적으로 업데이트한다.
+- 적용: `packages/render/src/profile.ts`, `render.test.mjs`. 실행 대기.
+
+## M113 — headless 패키지의 UI 의존은 직접/peer/import 3곳에서 함께 제거
+
+- E123: React-free `@lexical/extension` HR 클래스 사용 시 현재 node type, JSON version, HTML hr, selection/insert command, all-node golden을 비교한다.
+- package manifest와 pnpm frozen lock importer를 같은 commit 시퀀스에서 맞추고, browser/editor 쪽 React dependency를 다른 package와 혼동하지 않는다. @lexical/react peer 제거는 실제 headless 패키지에서 해당 import를 쓰지 않을 때만 완료된다.
+- 배포 packed JS/d.ts 소비에서 React/yjs가 필요 없는지 독립적으로 검증한다. lockfile mismatch 또는 브라우저 선택 동작 실패면 완료 처리하지 않는다.
+- 적용: `nodes.ts`, `quotationCommands.ts`, `all-nodes-fixture.mjs`, `react-free-horizontal-rule.test.mjs`. 실행 대기.
+
+## M114 — 공식 Tufte note의 CSS 구조를 유지하면서 접근성 속성만 현대화
+
+- E124: 본문 note는 `label + input + span`, newthought note는 `span.newthought > label` 후 `input + span`을 보존한다.
+- 추가 `aria-label`은 note 종류별 고정된 하나의 값만 검사한다. 원본 오라클에서 source INPUT의 그 속성만 보정하고 태그·다른 속성·순서·문자열을 절대로 느슨하게 비교하지 않는다.
+- 모바일 original CSS `display:none`은 배포 scoped CSS에서만 focusable visual-hide로 덮는다. 숨겨진 컨트롤을 키보드로 찾을 수 있어야 하고 Space로 열고 닫아야 하며 :focus-visible 시 label에 눈에 띄는 표시가 있어야 한다. Desktop에서 이미 공개된 payload를 이 접근성 개선 때문에 숨기지 않는다.
+- 자동화 Playwright는 역할·접근 이름·focus·Space·CSS 동작을 검사할 수 있지만, 실제 OS/스크린리더/터치 수락을 대신하지 않는다. 수동 미검증은 별도 체크 항목으로 유지한다.
+- 적용: `schema.ts`, `NoteNode.ts`, `render/index.ts`, `render/styles.css`, strict DOM/모바일 회귀. 실행 대기.
+
+## M115 — Lexical 버전 변경은 이전 정본으로부터의 명시적 migration 승인과 묶는다
+
+- E125: npm 버전 pin, golden 이름, 문서 envelope 버전, editorFormat 버전, node type/version의 차이를 한 범주로 혼동하지 않는다.
+- 업그레이드 때 **과거 golden은 불변으로 보관**하고 모든 이전 문서에 대해 parser→정본 비교→migration→새 parser→발행 HTML/DOM을 검사한다. 손실 탐지는 계속 실패 처리한다.
+- 이력이 없는 새 필드/타입을 조용히 버리는 migration이나 `UNKNOWN_FIELD` 완화로 통과시켜서는 안 된다. 릴리스 호환 matrix와 백업/복원·rollback이 준비되기 전 버전 올림을 승인하지 않는다.
+- 적용: `docs/LEXICAL_UPGRADE_POLICY.ko.md`, `packages/lexical/test/upgrade-compatibility.test.mjs`. 실행 대기.
