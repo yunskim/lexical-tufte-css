@@ -97,6 +97,9 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
    }
    case 'tufte-embed':{
     const wrapper=n.wrapper==='figure'?'figure':'div';
+    // Keep the official Tufte CSS direct-child selector intact:
+    // .iframe-wrapper > iframe. Modern attributes are intentional
+    // exceptions to the pinned upstream example; extra SVG wrappers are not.
     const frame=element('iframe',{
      src:String(n.src),title:String(n.title),loading:'lazy',
      referrerpolicy:'strict-origin-when-cross-origin',
@@ -105,9 +108,8 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
      allowfullscreen:''
     },[]);
     return [element(wrapper,{
-     class:[n.width==='fullwidth'?'fullwidth':'','tufte-embed'].filter(Boolean).join(' '),
-     'data-tufte-ratio':String(n.aspectRatio)
-    },[element('svg',{'viewBox':`0 0 960 ${960/Number(n.aspectRatio)}`,width:'960',height:String(960/Number(n.aspectRatio)),'aria-hidden':'true',focusable:'false'},[]),frame])];
+     class:[n.width==='fullwidth'?'fullwidth':'','iframe-wrapper'].filter(Boolean).join(' ')
+    },[frame])];
    }
    case 'tufte-fullwidth':return [element('div',withClass(n,'fullwidth'),inner())];
    case 'tufte-figure':return [element('figure',n.width==='fullwidth'?withClass(n,'fullwidth'):attrs(n),inner())];
