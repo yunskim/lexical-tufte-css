@@ -1,4 +1,4 @@
-import {HorizontalRuleNode,$createHorizontalRuleNode} from '@lexical/react/LexicalHorizontalRuleNode';
+import {HorizontalRuleNode,$createHorizontalRuleNode} from '@lexical/extension/HorizontalRuleExtension';
 import {$addUpdateTag,$createTextNode,$getSelection,$isRangeSelection,createCommand,COMMAND_PRIORITY_EDITOR,HISTORY_PUSH_TAG,type LexicalCommand,type LexicalEditor,type LexicalNode} from 'lexical';
 import {QuoteNode,$createQuoteNode} from '@lexical/rich-text';
 import {NODE_SCHEMA,type Diagnostic} from '@lexical-tufte/document';
