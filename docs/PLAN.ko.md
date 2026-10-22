@@ -10,18 +10,25 @@
 
 기능 구현 순서는 **예제 DOM 대응 확인 → schema 계약 → Lexical 편집/경계 → 순수 renderer HTML → fixture 작성 → 누적 실행 검증**으로 한다. 기본 Lexical 키 입력을 재구현하기보다 문서 schema를 위반할 수 있는 경계에서만 가로채고, 붙여넣기·IME·undo/redo·저장/발행은 동일 불변식을 검사한다. 사용자 요청에 따라 현재 테스트는 작성·누적하고 일괄 실행하기 전까지 관련 체크박스를 완료 처리하지 않는다. 공식 예제의 지원 범위와 제3자 임의 HTML의 지원 범위는 구분한다.
 
-## 고정 upstream 9개 섹션 동일 콘텐츠 진행표 (2026-10-20)
+## 고정 upstream 9개 섹션 동일 콘텐츠 진행표 (2026-10-22)
 
 [섹션별 동일 콘텐츠 DOM 추적표](UPSTREAM_PAGE_PARITY_MATRIX.ko.md)를 기준으로 진행한다.
 2026-10-19 Work 결과는 기존 두 섹션(Opening, Getting Started)과 독립
 newthought 샘플에 한해 동일 콘텐츠 DOM 검증을 완료했다.
-Epigraphs 및 Code·ImageQuilts·Epilogue의 4개 섹션 비교와 bare-relative
-이미지 URL 정책 수정은 **코드 작성 상태이며 새 Work 검증은 미실행**이다.
-모두 통과하면 섹션 단위 DOM 비교 범위가 2/9→6/9로 넓어진다.
+이후 **Fundamentals, Epigraphs, Sidenotes, Figures, Code, ImageQuilts, Epilogue**
+총 7개 섹션의 동일 콘텐츠 비교 테스트를 추가했다.
+즉 **9/9 섹션의 단독 오라클 코드가 작성**되었으나, 새 7개 테스트의
+실제 Work 실행·검증은 아직 대기 상태다. 코드 작성을 DOM parity 통과로 표시하지 않는다.
 
-`pnpm test:upstream-same-content`가 위 신규 검사를 포함한다. `pnpm verify:batch`
-또한 전체 브라우저 파일을 자동 발견한다. 기존 69/69 검증은
-신규 코드 이전의 결과이므로 재실행 전 상태를 혼동하지 않는다.
+Figures의 iframe은 사용자 결정에 따라 **현대적인 접근성/보안 속성은 유지하면서
+`figure.iframe-wrapper > iframe` CSS 계층을 보존**한다. 원본의 오래된
+`frameborder`·YouTube 호스트 및 설명용 코드 한 곳만 엄격한 현대화 예외로
+허용한다([ADR 0003](adr/0003-modern-iframe-upstream-parity.ko.md)).
+원본 CSS의 16:9 예약 공간과 임의 저장 intrinsic 비율은 구별한다.
+
+`pnpm test:upstream-same-content`가 9개 섹션의 비교 파일을 실행하고,
+`pnpm verify:batch` 또한 전체 브라우저 파일을 자동 발견한다.
+기존 69/69 검증은 신규 코드 이전의 결과이므로 재실행 전 상태를 혼동하지 않는다.
 원본 9개 섹션을 하나의 Lexical 문서로 묶은 발행·저장·수정 후
 전체 DOM, geometry 및 이미지·폰트 parity는 아직 미완료다. CI 생략.
 
