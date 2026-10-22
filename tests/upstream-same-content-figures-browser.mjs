@@ -8,6 +8,7 @@ import {renderArticle,validateDocument} from '../packages/render/dist/index.js';
 // Figure hierarchy, note payload, body text and whitespace are not relaxed.
 const upstream=readFileSync(new URL('../fixtures/tufte/upstream/index.html',import.meta.url),'utf8');
 const css=readFileSync(new URL('../fixtures/tufte/upstream/tufte.css',import.meta.url),'utf8');
+const scopedCSS=readFileSync(new URL('../packages/render/styles.css',import.meta.url),'utf8');
 const modernFrame=Object.freeze({
  src:'https://www.youtube-nocookie.com/embed/YslQ2625TR4',
  title:'YouTube video: Tufte CSS example',
@@ -261,8 +262,8 @@ try{
   const snapshots=[];
   for(const sectionHTML of [compared.originalHTML,compared.outputHTML]){
    await page.setViewportSize({width,height:900});
-   await page.setContent('<!doctype html><style>'+css+
-    '</style><article>'+sectionHTML+'</article>');
+   await page.setContent('<!doctype html><style>'+css+'\n'+scopedCSS+
+    '</style><article class="tufte-article">'+sectionHTML+'</article>');
    snapshots.push(await page.evaluate(()=>{
     const wrapper=document.querySelector('section > figure.iframe-wrapper');
     const frame=wrapper?.querySelector(':scope > iframe');
