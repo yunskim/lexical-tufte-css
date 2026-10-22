@@ -149,6 +149,22 @@
 - `packages/{document,lexical,render}/test/title-anchor.test.mjs` 등
   회귀 코드는 추가되었지만 실제 실행/합격 판정은 아직 없다.
 
+## P2.3.a.1 — 선택한 본문 주석 전환·삭제 (2026-10-22, 실행 대기)
+
+- 노트는 Lexical 본문 paragraph 안의 concrete sidenote/
+  marginnote 한 노드이며 `type` 직접 수정이 아니다.
+  `registerNoteCommands`의 두 명령으로 **종류 변경 시 동일 noteId와
+  실제 rich child nodes**를 유지하고, 삭제 시 주위 문단을 유지한다.
+- 발행에서는 같은 ID namespace에 대해 `label.margin-toggle >
+  [없음]`과 실제 형제 `label + input.margin-toggle + span.sidenote/
+  marginnote`의 기존 CSS 규칙을 사용한다. 노트 종류별 aria-label은
+  공유 renderer/document 계약을 따른다. 임의 wrapper를 추가하지 않는다.
+- 그림 내부 marginnote는 본문 명령으로 종류를 바꾸거나 삭제하지
+  않는다. 그림 전용 명령 및 선택 경계가 별도로 존재한다.
+- 실제 React UI 버튼과 연결했으나 브라우저 검증 전이며, 현재
+  headless/HTML/history 회귀 코드를 작성해 일괄 테스트 대상으로 추가했다.
+  **P2.3.a 전체를 완료한 것은 아니다.**
+
 ## 다음 작업 순서
 
 1. 9개 섹션의 단독 동일 콘텐츠 비교 테스트와 Lexical/document/render 회귀를 **한 번에 실행**해

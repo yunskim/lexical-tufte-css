@@ -1,3 +1,23 @@
+## 2026-10-22 — P2.3.a.1 본문 노트 kind 변경·삭제 (코드 작성, 실행 보류)
+
+- `packages/lexical/src/noteCommands.ts`: Lexical range selection 한 곳이
+  본문 paragraph의 기존 노트 안에 있을 때 sidenote↔marginnote 전환
+  및 해당 노트 삭제 명령을 구현. 전환 시 원래 noteId와 실제 rich
+  child node(텍스트 format/link/inline image)를 이동하므로 손실
+  변환을 하지 않는다. 그림 안의 marginnote는 전용 figure command
+  경계이므로 종류 전환/본문 삭제 명령에서 거부한다.
+- `examples/editor/src/main.tsx`: 전환 버튼 두 개·삭제 버튼 하나 및
+  진단 상태 연결. 명령은 `HISTORY_PUSH_TAG`를 사용하며 undo/redo
+  경계는 실제 history 테스트 코드에서 검증하도록 준비했다.
+- `packages/lexical/test/note-commands.test.mjs`: 종류 전환과 원본
+  child JSON·ID 유지, 저장 schema/HTML 발행, 노트 삭제 시 본문
+  보존, 거부 시 불변성, 실제 Lexical history undo/redo 검사 코드.
+  `packages/render/test/note-command-parity.test.mjs` 추가.
+  인접 text 병합 허용은 의미·문자열 정합성을 그대로 검사한다.
+- 실제 브라우저에서 UI 클릭·키보드/IME/모바일, 스크린리더 수락
+  및 P2.3.a 나머지 범위는 **미완료**. 설치/타입/빌드/단위/
+  브라우저/CI **전부 실행하지 않았다**. 완료 체크하지 않는다.
+
 ## 2026-10-22 — P2.2.e.4 공식 h1 제목 앵커 보존 (작성·실행 대기)
 
 - `titleId?:string`을 문서 envelope의 선택 필드로 추가했다.

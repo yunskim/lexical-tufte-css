@@ -279,6 +279,16 @@ P1 gate: 완료. 노트 편집 회귀와 SSR 출력의 실제 브라우저 비�
 
 - [ ] P2.3 F10–F19 노트·그림·표·코드·embed 구현.
   - [ ] P2.3.a 노트 F10–F12: note 종류 전환/텍스트·이미지 편집/삭제/이동, anchor/ID 일체성, copy/paste/undo/redo, 복수 article 번호와 모바일 fallback.
+    - [ ] P2.3.a.1 **본문 노트 종류 전환·삭제**: `registerNoteCommands`와
+      `SET_TUFTE_NOTE_KIND_COMMAND` / `REMOVE_TUFTE_NOTE_COMMAND`를
+      추가했다. 문단 안에 선택된 하나의 노트만 대상으로 하며,
+      전환 시 noteId·서식/링크/이미지 자식 Lexical 노드를 이동해 유지한다.
+      그림 내부 주석, 본문 밖 선택, IME 조합 시 요청은 거부한다.
+      예제 편집기에 버튼 3개 연결, headless/document/render/history
+      회귀 코드 작성. **빌드/테스트 전이므로 수락 미완료**.
+    - [ ] P2.3.a.2 **후속 미구현**: 노트 전체 선택/비선택 영역의
+      명시적 수정, 이미지 속성 편집, 특정 주석 ID 선택·이동 UI,
+      모바일 상호작용·스크린리더·복수 article 번호/IME 수락.
   - [ ] P2.3.b 그림·ImageQuilts F13/F14/F19: src/alt/caption/asset ID 수정 및 body/fullwidth/여백 변환, 자산 유실·삭제 시 진단, schema 유효성 보존.
   - [ ] P2.3.c 표/전체 폭 F15/F16: 셀·헤더·행/열 편집, 스크롤/폭 전환, 병합 거부와 접근 가능한 설명, 좁은 화면 overflow.
   - [ ] P2.3.d 코드/embed F17/F18: code block·language·fullwidth·공백/탭 및 embed의 provider allowlist/title/aspect ratio/서식 편집. 외부 HTML/sanitization 정책과 통합.

@@ -1,3 +1,18 @@
+## M119 — note 종류 전환·삭제는 concrete 노드와 부모 구조 계약을 함께 검증
+
+- document의 type 문자열만 바꾸는 편법을 사용하지 않는다.
+  해당 sidenote/marginnote 생성자를 쓰고 ID·rich children을
+  이전하며 노트/링크/이미지 payload를 평탄화하지 않는다.
+- paragraph 직속인지 확인하고 그림 marginnote 등 구조적으로
+  다른 부모의 노트는 본문 노트 명령에서 거부한다.
+  IME 조합과 비collapsed selection에서는 구조 변경을 차단한다.
+- headless Lexical의 구조/수락거부/undo·redo뿐 아니라
+  `validateDocument`와 순수 renderer에서 label/input/span·
+  aria-label·namespace ID 일치가 유지되는지 검사한다.
+  실패 시 범위를 무단 확대하거나 JSON 수정으로 통과시키지 않는다.
+- 이 검증은 아직 **작성만 완료**. 사용자 지시에 따라 전체 테스트
+  일괄 실행 시 판정하고 P2.3.a.1 체크박스를 갱신한다.
+
 ## M118 — 발행 제목 앵커 보존과 ID 충돌 검증
 
 - 제목 문자열에서 slug를 임의 생성하거나 h1을 Lexical 본문에
