@@ -851,3 +851,27 @@ E001–E049/M001–M042를 검토했다. E024의 경계 입력은 실제 Chromiu
 - 발견: v1→v2 `migrateStoredDocument`는 envelope만 전환한다. `LEXICAL_IMPORT_LOSSY` 및 `UNKNOWN_FIELD`는 안전한 fail-closed 동작이지만, Lexical 런타임을 업그레이드할 때 옛 golden·node type·실제 저장/발행 비교가 누락되면 이전 데이터를 열 수 없을 수 있다.
 - 처리: 현재 pin된 v0.52.0 golden/manifest/frozen lock 일치, v1→v2 저장→열기→다시 export, 미래의 미지원 editorFormat/미지 필드 거부를 별도 회귀로 작성했다. `docs/LEXICAL_UPGRADE_POLICY.ko.md`에서 업그레이드 수락 절차와 구 버전 보존·migration·거부 경계를 정의했다.
 - 상태: 정책·회귀 작성, **실제 검증/미래 runtime upgrade는 하지 않음**. M115 참조.
+
+## E126 — 섹션별 동일 콘텐츠 검사만으로 9개 섹션의 단일 저장·발행 왕복은 보장되지 않음
+
+- 발견: 기존 9개 섹션은 여러 파일의 독립 HTML/JSON fixture로 재구성된다. 각각의
+  순수 renderer DOM 대조가 성공하더라도 **공식 9섹션 전체가 들어간 한 문서**를
+  `validateDocument` → v2 migration → 실제 Lexical parse/export → JSON 저장·재열기 →
+  전체 순수 발행 HTML로 되돌리는 경계는 별도의 검증이 필요하다.
+  특히 전역 note ID 7개와 newthought split-parent·여백 그림·epigraph·
+  Figures 현대화 iframe/예제 코드가 한 문서 안에서 상호작용한다.
+- 처리: `tests/helpers/pinned-upstream-article.mjs`에 공식 pinned
+  `index.html`만으로 9섹션·60직접 블록·7노트를 재구성하는 fail-closed
+  브라우저 fixture 변환기를 추가했다. 지원하지 않는 태그/속성/임베드 호스트/
+  예제 코드 구조를 임의 생략하지 않고 실패시킨다.
+  `tests/upstream-full-document-roundtrip-browser.mjs`에 v1→v2 migration,
+  전체 Lexical 저장·재열기, 한 곳의 문장 변경 후 재발행, 9섹션 DOM 대조와
+  6개 viewport의 iframe-wrapper geometry를 추가했다.
+  `pnpm test:upstream-same-content` 및 batch auto-discovery에 등록했다.
+- 의도적 차이: 원본 `article` 무속성 ↔ 발행 `article#upstream-complete-demo-article.tufte-article[lang]`,
+  원본 `h1#tufte-css` ↔ 현재 발행 h1 ID 없음. 이를 명시적으로 고정 검사한다.
+  실제 7개 노트의 네임스페이스 ID/접근성 aria-label 및 Figures iframe
+  한 곳/설명 코드 한 곳을 제외하고 의미 있는 DOM을 느슨하게 정규화하지 않는다.
+- 상태: **코드 작성·커밋, 테스트 미실행**. JSON 객체의 한 문장 편집 테스트는
+  실제 editor 키보드/undo·이미지/폰트/스크린샷 검사를 대체하지 않는다.
+  P2.2.e.1–4 및 M116 참조. 실패의 존재/수정 완료는 실행 후 판정한다.
