@@ -1,4 +1,4 @@
-import {validateDocument,type JsonNode,type Diagnostic,type ElementFields} from '@lexical-tufte/document';
+import {validateDocument,NOTE_TOGGLE_ACCESSIBLE_NAME,type JsonNode,type Diagnostic,type ElementFields} from '@lexical-tufte/document';
 import {validateRenderProfile} from './profile.js';
 import {element,serializeHTML,type RenderChild,type RenderElement} from './tree.js';
 export {element,serializeHTML,type RenderElement,type RenderChild} from './tree.js';
@@ -91,7 +91,7 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
     const id=`tufte-${prefix.length}-${prefix}-${n.noteId}`,kind=n.type==='tufte-sidenote'?'sidenote':'marginnote';
     return [
      element('label',{for:id,class:`margin-toggle${kind==='sidenote'?' sidenote-number':''}`},kind==='marginnote'?['⊕']:[]),
-     element('input',{id,type:'checkbox',class:'margin-toggle'},[],true),
+     element('input',{id,type:'checkbox',class:'margin-toggle','aria-label':NOTE_TOGGLE_ACCESSIBLE_NAME[kind]},[],true),
      element('span',withClass(n,kind),inner()),
     ];
    }
