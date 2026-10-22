@@ -50,8 +50,14 @@ Figures의 iframe은 사용자 결정에 따라 **현대적인 접근성/보안 
 `pnpm test:upstream-same-content`가 9개 섹션의 비교 파일을 실행하고,
 `pnpm verify:batch` 또한 전체 브라우저 파일을 자동 발견한다.
 기존 69/69 검증은 신규 코드 이전의 결과이므로 재실행 전 상태를 혼동하지 않는다.
-원본 9개 섹션을 하나의 Lexical 문서로 묶은 발행·저장·수정 후
-전체 DOM, geometry 및 이미지·폰트 parity는 아직 미완료다. CI 생략.
+원본 9개 섹션을 하나의 Lexical 문서로 묶는
+`tests/helpers/pinned-upstream-article.mjs` 재구성기와
+`tests/upstream-full-document-roundtrip-browser.mjs`의
+**60블록/7노트 전체 문서 v1→v2·Lexical 저장→재열기→발행·문장 수정 후 재발행 오라클 코드를 추가했다.**
+이 코드는 `pnpm test:upstream-same-content`와 batch에 등록됐으나 **실행되지 않았다**.
+실제 편집기 키 입력/undo, 전체 페이지 이미지·폰트·스크린샷 parity도 아직 미완료다.
+공식 `h1#tufte-css`가 발행 HTML에서는 ID 없는 h1이 되는 현재 한계는
+섹션 대응표에 명시적 차이로 기록한다. CI 생략.
 
 ## Wagtail 참고 범용 에셋 라이브러리 (2026-10-20)
 
@@ -233,6 +239,22 @@ P1 gate: 완료. 노트 편집 회귀와 SSR 출력의 실제 브라우저 비�
     - [ ] P2.2.d.1 `NODE_SCHEMA`에서 허용되는 타입/속성과 editor import/export 및 순수 renderer capability를 기능별 매트릭스로 대조한다. 구현하지 않은 속성은 침묵 변환 대신 진단·발행 차단.
     - [ ] P2.2.d.2 F01–F09 대표/거부 fixture에 대해 편집→JSON 저장→재열기→HTML 발행→semantic DOM 비교를 실행하고 명령별 history/IME/접근성 증거를 남긴다.
   - [ ] P2.2.e 공식 Tufte CSS 1.9.0 고정 예제 `index.html`의 의미 있는 DOM 요소·부모/자식·순서·CSS direct-child 관계를 전수 대조한다. `fixtures/tufte/inventory.json`의 selector 목록과 별개로 예제 DOM → F01–F22 → 문서 schema → Lexical node/command → 순수 renderer HTML의 대응표와 대표/거부 fixture를 작성한다. 한 논리 노드가 여러 HTML 요소로 출력되는 note처럼 1:n 관계를 명시하고, 비지원·의도적 차이는 진단/ADR에 남긴다. **P2.2의 기능별 수락 전에 대응표의 관련 행을 먼저 확인한다.**
+  - [ ] P2.2.e.1 **전체 9섹션 단일 문서 동일 콘텐츠 오라클**: upstream 고정 HTML에서
+    9섹션·60블록·7노트를 무손실 구성하고 v1→v2·Lexical 저장·재열기,
+    전체 렌더링 DOM·문장 단일 수정 후 재발행·6폭 iframe CSS geometry를
+    비교한다. [재구성/전체 DOM 추적표](UPSTREAM_PAGE_PARITY_MATRIX.ko.md).
+    **테스트 작성 및 명령 등록, 일괄 실행 전 미완료**.
+  - [ ] P2.2.e.2 **실제 편집 동작 수락**: 같은 전체 샘플 문서를
+    React editor UI에서 로드해 본문·주석·figures를 키보드로 수정하고
+    undo/redo→저장/재열기→순수 HTML이 일치하는지 검사한다.
+    JSON 필드 1개를 직접 바꾸는 통합 fixture 테스트는 실제 키보드 검증이 아니다.
+  - [ ] P2.2.e.3 **완전 시각 비교**: 공식 이미지·폰트 파일을 재현성 있게 제공한
+    환경에서 모든 섹션의 geometry·이미지 로딩·Source Han/ET Book 폰트·
+    screenshot pixel 결과를 폭별 비교하고 P4.3에 증거를 남긴다.
+  - [ ] P2.2.e.4 **발행 제목 앵커 계약**: 공식 `h1#tufte-css`와
+    현재 발행의 ID 없는 h1, article의 제품 고유 namespace/class/lang
+    차이를 설계 결정으로 확정하거나 schema에 ID를 보존하도록 확장한다.
+    이 차이를 DOM 비교에서 무조건 무시하지 않는다.
 - [ ] P2.3 F10–F19 노트·그림·표·코드·embed 구현.
   - [ ] P2.3.a 노트 F10–F12: note 종류 전환/텍스트·이미지 편집/삭제/이동, anchor/ID 일체성, copy/paste/undo/redo, 복수 article 번호와 모바일 fallback.
   - [ ] P2.3.b 그림·ImageQuilts F13/F14/F19: src/alt/caption/asset ID 수정 및 body/fullwidth/여백 변환, 자산 유실·삭제 시 진단, schema 유효성 보존.
