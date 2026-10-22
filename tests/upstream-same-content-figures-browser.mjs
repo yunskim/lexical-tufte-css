@@ -222,6 +222,12 @@ try{
   const after=[...output.querySelectorAll('input.margin-toggle')];
   if(before.length!==2||after.length!==2)throw Error('Note count mismatch');
   for(let i=0;i<before.length;i++){
+   const kind=before[i].nextElementSibling?.classList.contains('sidenote')
+    ?'sidenote':'marginnote';
+   const accessibleName=kind==='sidenote'?'Toggle sidenote':'Toggle margin note';
+   if(after[i].getAttribute('aria-label')!==accessibleName)
+    throw Error('Modern note accessibility contract changed');
+   before[i].setAttribute('aria-label',accessibleName);
    const oldID=before[i].id,newID=after[i].id;
    if(oldID===newID||!newID.endsWith(oldID))throw Error('Note namespace mismatch');
    const label=output.querySelector('label[for="'+newID+'"]');
