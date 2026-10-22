@@ -28,5 +28,29 @@
  border: 0;
 }
 
+/* Original Tufte CSS hides these checkbox inputs with display:none.
+   On mobile they must instead be visually hidden but keyboard-focusable;
+   the exact label + input + span hierarchy and :checked + note CSS stay intact.
+   Desktop note payloads are already visible, so the source policy is retained. */
+@media (max-width: 760px) {
+ .tufte-article input.margin-toggle {
+  display: block;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+ }
+ .tufte-article label.margin-toggle:has(+ input.margin-toggle:focus-visible),
+ .tufte-article span.newthought:has(+ input.margin-toggle:focus-visible) > label.margin-toggle {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+ }
+}
+
 /* Composed ImageQuilt: retain its intrinsic ratio within a Tufte figure. */
 .tufte-article figure img.imagequilt { display: block; max-width: 100%; height: auto; }
