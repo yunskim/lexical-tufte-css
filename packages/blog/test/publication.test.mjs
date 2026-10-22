@@ -40,9 +40,18 @@ test('R11 render/missing asset/asset checker failure retain the previous public 
  const {db,drafts,post,store,id}=await setup();try{
   const first=ok(await store.publish(id,options()));
   error(await store.publish(id,{...options(1,1,'2026-10-16T02:00:00Z'),assetExists:async()=>false}),'MISSING_PUBLICATION_ASSET');
-  error(await store.publish(id,{...options(1,1,'2026-10-16T02:00:00Z'),assetExists:async()=>{throw Error('asset failure');}}),'PUBLICATION_STORAGE_ERROR');
+  const failedAsset=await store.publish(id,{
+   ...options(1,1,'2026-10-16T02:00:00Z'),
+   assetExists:async()=>{throw Error('secret storage endpoint unavailable');}
+  });
+  error(failedAsset,'PUBLICATION_ASSET_CHECK_ERROR');
+  assert.deepEqual(failedAsset.diagnostics.map(d=>d.path),['$.publication.assets']);
+  assert.doesNotMatch(JSON.stringify(failedAsset.diagnostics),/secret storage endpoint/);
   const next=structuredClone(post);next.metadata.revision=2;next.document.lexicalState.root.children[0].children.push({type:'tufte-code',version:1,width:'body',language:'js',children:[]});ok(await drafts.compareAndSwap(next,1));
-  error(await store.publish(id,options(2,1,'2026-10-16T02:00:00Z')),'UNSUPPORTED_RENDER_PROPERTY');
+  const rejectedRender=await store.publish(id,options(2,1,'2026-10-16T02:00:00Z'));
+  error(rejectedRender,'UNSUPPORTED_RENDER_PROPERTY');
+  assert.ok(rejectedRender.diagnostics.some(d=>d.path.includes('language')),
+   'Renderer rejection retains the original document property path');
   assert.equal(ok(await store.readPublic(id)).snapshotId,first.snapshotId);assert.equal(ok(store.readState(id)).generation,1);assert.equal(db.prepare('SELECT count(*) AS n FROM publication_snapshots_v1').get().n,1);
  }finally{db.close();}
 });
@@ -50,7 +59,9 @@ test('R11 pointer write failure rolls back the new snapshot and preserves the pr
  const {db,store,id}=await setup();try{
   const first=ok(await store.publish(id,options()));
   db.exec("CREATE TRIGGER inject_pointer_failure BEFORE UPDATE ON publication_heads_v1 BEGIN SELECT RAISE(ABORT,'injected pointer failure'); END");
-  error(await store.publish(id,options(1,1,'2026-10-16T02:00:00Z')),'PUBLICATION_STORAGE_ERROR');
+  const failedWrite=await store.publish(id,options(1,1,'2026-10-16T02:00:00Z'));
+  error(failedWrite,'PUBLICATION_STORAGE_ERROR');
+  assert.deepEqual(failedWrite.diagnostics.map(d=>d.path),['$.publication.storage']);
   assert.equal(ok(await store.readPublic(id)).snapshotId,first.snapshotId);assert.equal(db.prepare('SELECT count(*) AS n FROM publication_snapshots_v1').get().n,1);
   error(store.unpublish(id,1),'PUBLICATION_STORAGE_ERROR');assert.equal(ok(await store.readPublic(id)).snapshotId,first.snapshotId);
  }finally{db.close();}
