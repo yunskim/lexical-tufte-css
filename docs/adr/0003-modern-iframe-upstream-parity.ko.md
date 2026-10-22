@@ -41,6 +41,9 @@
 - `title`, `loading='lazy'`, `referrerpolicy`, `sandbox`,
   `allowfullscreen`을 유지한다. CSP에서 iframe src를 별도로 허용해야 한다.
 - 원본 `.iframe-wrapper`의 위치 지정 및 **16:9 padding-bottom**을 그대로 사용한다.
+  과거 `frameborder="0"`이 하던 테두리 제거는 별도 배포용 `packages/render/styles.css`의
+  `.tufte-article .iframe-wrapper > iframe { border:0; }`로 구현한다. 공식 pinned CSS는 수정하지 않으며
+  실제 비교 환경에서는 **공식 CSS + scoped CSS**를 함께 사용한다.
   임의의 저장 `aspectRatio`는 iframe의 `width/height` *속성*으로 보존하되
   실제 표시 비율은 CSS의 16:9이다. 이는 SVG 기반 가변 표시 비율과의 **의도된
   동작 차이**이며, 동적 비율 표시가 필수인 제품 확장은 별도 디자인/수락 조건으로 다룬다.
