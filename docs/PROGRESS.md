@@ -1,3 +1,35 @@
+## 2026-10-22 — 실제 코드 리뷰 CR01–CR08: 주요 수정 커밋, 전체 실행 검증 대기
+
+- [**수정 체크리스트**](CODE_REVIEW_REMEDIATION_2026-10-22.ko.md)에서
+  구현 경로와 최종 수락 조건을 분리해 추적한다. 체크박스는 실행 검증 전에는
+  완료 표시하지 않는다. 이번 변경에서는 frozen install, 빌드, lint,
+  단위/브라우저/packed/HTTP/Python 및 CI를 실행하지 않았다.
+- **CR01**: Lexical `TUFTE_NODES` 배열 freeze 누락을 수정하여 기존 R02
+  불변성 기대를 맞췄다. 직접 실행 확인은 보류다.
+- **CR02–03**: `publish()`의 예상 밖 renderer 오류,
+  asset availability 예외, SQLite 오류를 각각 경로/오류 코드로 분리하고,
+  원본 renderer의 구조화된 진단은 그대로 전달하도록 했다.
+  Schema/Profile/실제 switch의 node type 정확한 집합 대조를 추가했다.
+- **CR04**: React 기반 HorizontalRule import를 Lexical 0.52.0의 React-free
+  `@lexical/extension`으로 교체하고 `packages/lexical`의
+  React/react-dom/yjs peer 의존성 및 관련 lock importer를 정리했다.
+  all-node golden·horizontalrule JSON/HTML·명령, packed 소비 검증은 대기다.
+- **CR05**: note input의 고정 접근 가능한 이름과 모바일 visually hidden
+  checkbox/visible keyboard focus를 도입했다. 공식 원본 fixture는 그대로 두고
+  INPUT aria-label만 오라클에서 명시적으로 허용한다.
+  Sidenotes/newthought Space 토글 브라우저 회귀 코드를 작성했으나
+  실제 모바일 OS·스크린리더 수락은 아직 없다.
+- **CR06**: 저장 JSON fail-closed는 그대로 유지하며
+  [Lexical upgrade 정책](LEXICAL_UPGRADE_POLICY.ko.md)과 기존 golden/v1→v2
+  수락 검사를 추가했다. migration 경계를 무단 완화하지 않았다.
+- **CR07**: 역사적 note wrapper 문서를 현재 구현과 구분해 갱신했고
+  미사용 pre-wrap CSS·오래된 테스트 예외를 제거했다.
+  E120–E125 및 예방 M110–M115를 기록했다.
+- **현행 우선순위**: 새 코드 + 기존 9개 섹션 테스트를 하나의 Work 일괄
+  실행에서 검증/수정하고 결과 보고서에 통과·실패·건너뜀을 남긴다.
+  이후 전체 9섹션의 한 Lexical 문서 저장·재열기·발행 integration으로 돌아간다.
+  Wagtail 에셋 설계와 Python Recovery 운영 연결은 계속 별도 보류.
+
 ## 2026-10-22 — Figures 동일 콘텐츠 오라클·현대식 iframe 계층 (구현 및 테스트 작성, 실행 대기)
 
 - 기준 브랜치 `test/upstream-full-page-baseline-20261019`. 사용자 결정에 따라 원본의 `figure.iframe-wrapper > iframe` DOM/CSS hierarchy는 유지하고, `youtube-nocookie.com`, title, lazy/referrer/sandbox/fullscreen을 유지했다. renderer/Lexical export 양쪽에서 SVG spacer·기존 `tufte-embed` class·`data-tufte-ratio` 발행을 제거하고, scoped CSS는 공식 Tufte의 16:9/25px iframe-wrapper 규칙과 같은 값을 사용한다. 기존 JSON `tufte-embed` 계약은 변경하지 않았다.
