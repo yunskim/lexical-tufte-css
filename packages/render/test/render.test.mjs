@@ -216,22 +216,43 @@ test('F17 code language and highlight metadata fail closed until publishing sema
  assert.ok(highlighted.diagnostics.some(x=>x.path.endsWith('.highlightType')));
 });
 
-test('F18 embeds publish escaped sandboxed iframe with responsive dimensions',()=>{
+test('F18 preserves Tufte iframe-wrapper > iframe and modern accessible sandbox policy',()=>{
  const d=fixture(),section=d.lexicalState.root.children[0];
  section.children.push({type:'tufte-embed',version:1,provider:'youtube',
   src:'https://www.youtube-nocookie.com/embed/abcdefghijk',
   title:'Tutorial "quoted" & explained',wrapper:'figure',width:'fullwidth',aspectRatio:16/9});
- const result=renderArticle(d);
+ const before=JSON.stringify(d),result=renderArticle(d);
  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
- assert.match(result.html,/<figure class="fullwidth tufte-embed" data-tufte-ratio="1\.777/);
+ assert.match(result.html,/<figure class="fullwidth iframe-wrapper"><iframe/);
  assert.match(result.html,/<iframe src="https:\/\/www\.youtube-nocookie\.com\/embed\/abcdefghijk"/);
  assert.match(result.html,/title="Tutorial &quot;quoted&quot; &amp; explained"/);
+ assert.match(result.html,/loading="lazy"/);
+ assert.match(result.html,/referrerpolicy="strict-origin-when-cross-origin"/);
  assert.match(result.html,/sandbox="allow-scripts allow-same-origin allow-presentation"/);
- assert.match(result.html,/width="960" height="540" allowfullscreen=""/);
- assert.match(result.html,/<svg viewBox="0 0 960 540" width="960" height="540" aria-hidden="true" focusable="false"><\/svg><iframe/);
- assert.doesNotMatch(result.html,/style=|<script/);
+ assert.match(result.html,/width="960" height="540" allowfullscreen=""><\/iframe><\/figure>/);
+ assert.doesNotMatch(result.html,/<svg|<script|frameborder=|data-tufte-ratio=|class="[^"]*tufte-embed|style=/);
+ assert.equal(JSON.stringify(d),before,'Render must not mutate embed metadata');
+
  const css=readFileSync(new URL('../styles.css',import.meta.url),'utf8');
- assert.match(css,/\.tufte-embed iframe/);
+ assert.match(css,/\.iframe-wrapper\s*>\s*iframe/);
+ assert.doesNotMatch(css,/\.tufte-embed/);
+ const upstreamCSS=readFileSync(new URL('../../../fixtures/tufte/upstream/tufte.css',import.meta.url),'utf8');
+ assert.match(upstreamCSS,/\.iframe-wrapper iframe/);
+});
+
+test('F18 body div wrapper keeps the same direct CSS hierarchy without rewriting ratio metadata',()=>{
+ const d=fixture(),section=d.lexicalState.root.children[0];
+ section.children.push({type:'tufte-embed',version:1,provider:'vimeo',
+  src:'https://player.vimeo.com/video/12345',title:'Vimeo tutorial',
+  wrapper:'div',width:'body',aspectRatio:4/3});
+ const before=JSON.stringify(d),result=renderArticle(d);
+ assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+ assert.match(result.html,/<div class="iframe-wrapper"><iframe/);
+ assert.match(result.html,/width="960" height="720" allowfullscreen=""><\/iframe><\/div>/);
+ assert.doesNotMatch(result.html,/<svg|data-tufte-ratio=|tufte-embed/);
+ assert.equal(JSON.stringify(d),before);
+ // The upstream CSS wrapper always reserves 16:9 space. Intrinsic dimensions
+ // are serialized but do not override that original CSS layout.
 });
 test('F18 rejects unsafe provider URL before iframe rendering',()=>{
  const d=fixture(),section=d.lexicalState.root.children[0];
