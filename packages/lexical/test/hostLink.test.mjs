@@ -162,3 +162,36 @@ test('host link command rejects invalid reference without mutation',async()=>{
  assert.equal(diagnostics[0]?.code,'INVALID_REFERENCE');
  unregister();
 });
+
+test('host link DOM exports a non-navigable span with complete reference identity',async()=>{
+ const e=editor();
+ e.update(()=>{
+  const p=$createParagraphNode();
+  const link=$createHostLinkNode(reference);
+  link.append($createTextNode('Read note'));
+  p.append(link);$getRoot().append(p);
+ });
+ await flush(e);
+ const previousDocument=globalThis.document;
+ const elements=[];
+ globalThis.document={createElement:tag=>{
+  const element={tagName:tag.toUpperCase(),dataset:{},className:''};
+  elements.push(element);
+  return element;
+ }};
+ try{
+  e.getEditorState().read(()=>{
+   const link=$getRoot().getFirstChild().getFirstChild();
+   assert.ok(link instanceof HostLinkNode);
+   const {element}=link.exportDOM();
+   assert.equal(element.tagName,'SPAN');
+   assert.equal(element.dataset.hostNamespace,reference.namespace);
+   assert.equal(element.dataset.hostKind,reference.kind);
+   assert.equal(element.dataset.hostReference,reference.id);
+   assert.equal(Object.hasOwn(element,'href'),false);
+  });
+ }finally{
+  if(previousDocument===undefined)delete globalThis.document;
+  else globalThis.document=previousDocument;
+ }
+});
