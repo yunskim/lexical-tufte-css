@@ -1,7 +1,8 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createHeadlessEditor,HostLinkNode,TUFTE_NODES,$createHostLinkNode,INSERT_HOST_LINK_COMMAND,registerHostLinkCommands,hasDocumentChanged} from '../dist/index.js';
-import {$getRoot,$createParagraphNode,$createTextNode} from 'lexical';
+import {$getRoot,$createParagraphNode,$createTextNode,ElementNode} from 'lexical';
+import {LinkNode} from '@lexical/link';
 
 const reference={namespace:'magnolia',kind:'note',id:'note-123'};
 const editor=()=>createHeadlessEditor({nodes:TUFTE_NODES,onError:error=>{throw error;}});
@@ -194,4 +195,15 @@ test('host link DOM exports a non-navigable span with complete reference identit
   if(previousDocument===undefined)delete globalThis.document;
   else globalThis.document=previousDocument;
  }
+});
+
+test('host reference is an inline ElementNode, not a URL LinkNode',async()=>{
+ const e=editor();
+ e.update(()=>{
+  const node=$createHostLinkNode(reference);
+  assert.ok(node instanceof ElementNode);
+  assert.equal(node instanceof LinkNode,false);
+  assert.equal(node.isInline(),true);
+ });
+ await flush(e);
 });
