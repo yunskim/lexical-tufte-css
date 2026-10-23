@@ -32,8 +32,17 @@ export class HostLinkNode extends LinkNode {
  createDOM(config:Parameters<LinkNode['createDOM']>[0]):HTMLElement{
   const span=document.createElement('span');
   span.dataset.hostReference=this.__reference.id;
+  span.dataset.hostNamespace=this.__reference.namespace;
+  span.dataset.hostKind=this.__reference.kind;
   span.className='tufte-host-link';
   return span;
+ }
+ updateDOM(previous:HostLinkNode,dom:HTMLElement):boolean{
+  const reference=this.getReference();
+  dom.dataset.hostReference=reference.id;
+  dom.dataset.hostNamespace=reference.namespace;
+  dom.dataset.hostKind=reference.kind;
+  return false;
  }
  exportJSON():ReturnType<LinkNode['exportJSON']>{
   const base=super.exportJSON();
