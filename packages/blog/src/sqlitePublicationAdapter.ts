@@ -80,8 +80,8 @@ export class SqlitePublicationAdapter implements PublicationStore{
    if(row.id!==postId||row.slug!==current.value.metadata.slug||row.revision!==current.value.metadata.revision||current.value.metadata.revision!==command.expectedDraftRevision||JSON.stringify(current.value)!==JSON.stringify(command.expectedDraft)||JSON.stringify(current.value)!==JSON.stringify(snapshot.post)){
     this.db.exec('ROLLBACK');started=false;return fail('REVISION_CONFLICT','Draft changed before commit');
    }
-   const state=this.readState(postId);if(!state.ok){this.db.exec('ROLLBACK');started=false;return state;}
-   const head=state.value;
+   // Keep the locked precondition read synchronous; readState is the async public API.
+   const head=this.head(postId);
    if(head.generation!==command.expectedGeneration){this.db.exec('ROLLBACK');started=false;return fail('PUBLICATION_CONFLICT','Publication generation changed');}
    if(head.generation===Number.MAX_SAFE_INTEGER){this.db.exec('ROLLBACK');started=false;return fail('PUBLICATION_GENERATION_EXHAUSTED','Publication generation exhausted');}
    if(head.firstPublishedAt!==null&&head.firstPublishedAt!==snapshot.firstPublishedAt){this.db.exec('ROLLBACK');started=false;return fail('PUBLICATION_CONFLICT','First publication timestamp changed');}

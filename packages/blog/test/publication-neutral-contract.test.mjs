@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {PublicationService} from '../src/publicationService.ts';
+import {PublicationService} from '../dist/publicationService.js';
 
 const ok=value=>({ok:true,value,diagnostics:[]});
 const state={generation:2,snapshotId:null,lastSnapshotId:'a'.repeat(64),firstPublishedAt:'2026-10-01T00:00:00Z',publishedAt:'2026-10-02T00:00:00Z',publishedRevision:1};

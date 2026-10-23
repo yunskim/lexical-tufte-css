@@ -34,7 +34,14 @@ export class InlineImageNode extends DecoratorNode<null> {
   }
   updateDOM(previous: InlineImageNode): boolean { return previous.__src!==this.__src || previous.__alt!==this.__alt || previous.__width!==this.__width || previous.__height!==this.__height; }
   exportDOM(): DOMExportOutput { return {element:this.createImageElement()}; }
-  exportJSON(): SerializedInlineImage { return {...super.exportJSON(),type:'tufte-inline-image',version:1,src:this.getLatest().__src,alt:this.getLatest().__alt,...(this.getLatest().__assetId===undefined?{}:{assetId:this.getLatest().__assetId}),...(this.getLatest().__hostAsset===undefined?{}:{hostAsset:{...this.getLatest().__hostAsset}}),...(this.getLatest().__width===undefined?{}:{width:this.getLatest().__width}),...(this.getLatest().__height===undefined?{}:{height:this.getLatest().__height})}; }
+  exportJSON(): SerializedInlineImage {
+    const node=this.getLatest();
+    return {...super.exportJSON(),type:'tufte-inline-image',version:1,src:node.__src,alt:node.__alt,
+      ...(node.__assetId===undefined?{}:{assetId:node.__assetId}),
+      ...(node.__hostAsset===undefined?{}:{hostAsset:{...node.__hostAsset}}),
+      ...(node.__width===undefined?{}:{width:node.__width}),
+      ...(node.__height===undefined?{}:{height:node.__height})};
+  }
   static importJSON(value: SerializedInlineImage): InlineImageNode {
     if(value.version!==1) throw Error('Unsupported image version');
     assertImageProperties(value.src,value.alt,value.assetId,value.width,value.height,value.hostAsset);

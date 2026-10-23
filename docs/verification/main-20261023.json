@@ -1,0 +1,224 @@
+{
+  "date": "2026-10-23",
+  "repository": "yunskim/lexical-tufte-css",
+  "baseRef": "main",
+  "baseCommit": "c081546ee4275129b9f41a1a3012e61371d57271",
+  "resultBranch": "test/main-verification-20261023",
+  "scope": "base commit plus accompanying fixes; not a clean main pass",
+  "commands": {
+    "frozenInstall": "pass after lockfile reconciliation",
+    "check": "pass",
+    "packageCheck": "pass: five actual tarball consumers, JS and declarations",
+    "pythonPytest": "pass",
+    "pythonHttpSqlite": "pass"
+  },
+  "unitCounts": {
+    "document": {
+      "tests": 56,
+      "pass": 56,
+      "fail": 0,
+      "skipped": 0
+    },
+    "render": {
+      "tests": 44,
+      "pass": 44,
+      "fail": 0,
+      "skipped": 0
+    },
+    "blog": {
+      "tests": 77,
+      "pass": 77,
+      "fail": 0,
+      "skipped": 0
+    },
+    "lexical": {
+      "tests": 224,
+      "pass": 224,
+      "fail": 0,
+      "skipped": 0
+    },
+    "editor-ports": {
+      "tests": 2,
+      "pass": 2,
+      "fail": 0,
+      "skipped": 0
+    }
+  },
+  "unitTotal": {
+    "tests": 403,
+    "pass": 403,
+    "fail": 0,
+    "skipped": 0
+  },
+  "browserTotal": {
+    "files": 34,
+    "pass": 19,
+    "fail": 15,
+    "skippedFiles": 0
+  },
+  "browserResults": [
+    {
+      "file": "tests/all-nodes-browser.mjs",
+      "status": "pass"
+    },
+    {
+      "file": "tests/contextual-ui-browser.mjs",
+      "status": "pass"
+    },
+    {
+      "file": "tests/definition-pairs-browser.mjs",
+      "status": "pass"
+    },
+    {
+      "file": "tests/font-proof-browser.mjs",
+      "status": "pass"
+    },
+    {
+      "file": "tests/full-page-pixel-parity-browser.mjs",
+      "status": "pass"
+    },
+    {
+      "file": "tests/inline-span-browser.mjs",
+      "status": "pass"
+    },
+    {
+      "file": "tests/layout-browser.mjs",
+      "status": "pass"
+    },
+    {
+      "file": "tests/list-kind-browser.mjs",
+      "status": "pass"
+    },
+    {
+      "file": "tests/managed-note-assets-browser.mjs",
+      "status": "fail",
+      "reason": "main has no document asset registration UI"
+    },
+    {
+      "file": "tests/note-browser.mjs",
+      "status": "pass"
+    },
+    {
+      "file": "tests/note-dom-browser.mjs",
+      "status": "pass"
+    },
+    {
+      "file": "tests/note-editing-browser.mjs",
+      "status": "pass"
+    },
+    {
+      "file": "tests/note-export-parity-browser.mjs",
+      "status": "fail",
+      "reason": "publisher does not emit the required newthought split-parent layout"
+    },
+    {
+      "file": "tests/note-image-chooser-browser.mjs",
+      "status": "fail",
+      "reason": "main has no note image chooser UI"
+    },
+    {
+      "file": "tests/note-image-dimensions-browser.mjs",
+      "status": "fail",
+      "reason": "main has no note image dimension editor UI"
+    },
+    {
+      "file": "tests/publication-browser.mjs",
+      "status": "pass"
+    },
+    {
+      "file": "tests/recovery-browser.mjs",
+      "status": "pass"
+    },
+    {
+      "file": "tests/section-commands-browser.mjs",
+      "status": "pass"
+    },
+    {
+      "file": "tests/server-browser.mjs",
+      "status": "pass"
+    },
+    {
+      "file": "tests/text-format-browser.mjs",
+      "status": "pass"
+    },
+    {
+      "file": "tests/upstream-dom-browser.mjs",
+      "status": "pass"
+    },
+    {
+      "file": "tests/upstream-full-document-editor-browser.mjs",
+      "status": "fail",
+      "reason": "canonical upstream document cannot be loaded under the current main schema"
+    },
+    {
+      "file": "tests/upstream-full-document-roundtrip-browser.mjs",
+      "status": "fail",
+      "reason": "unsupported titleId/heading.id/quote.cite/tufteClass, figure order and relative image URLs"
+    },
+    {
+      "file": "tests/upstream-full-document-visual-browser.mjs",
+      "status": "fail",
+      "reason": "missing scripts/upstream-visual-assets.mjs and acquisition/manifest dependencies"
+    },
+    {
+      "file": "tests/upstream-full-page-baseline-browser.mjs",
+      "status": "pass"
+    },
+    {
+      "file": "tests/upstream-geometry-browser.mjs",
+      "status": "pass"
+    },
+    {
+      "file": "tests/upstream-newthought-sidenote-browser.mjs",
+      "status": "fail",
+      "reason": "publisher output does not meet direct split-parent checkbox/name selector"
+    },
+    {
+      "file": "tests/upstream-same-content-epigraphs-browser.mjs",
+      "status": "fail",
+      "reason": "heading.id rejected"
+    },
+    {
+      "file": "tests/upstream-same-content-figures-browser.mjs",
+      "status": "fail",
+      "reason": "heading.id, leading-image rule and relative image URLs rejected"
+    },
+    {
+      "file": "tests/upstream-same-content-final-sections-browser.mjs",
+      "status": "fail",
+      "reason": "heading.id and relative image URLs rejected"
+    },
+    {
+      "file": "tests/upstream-same-content-fundamentals-browser.mjs",
+      "status": "fail",
+      "reason": "heading.id/quote.cite/tufteClass rejected"
+    },
+    {
+      "file": "tests/upstream-same-content-getting-started-browser.mjs",
+      "status": "fail",
+      "reason": "heading.id rejected"
+    },
+    {
+      "file": "tests/upstream-same-content-opening-browser.mjs",
+      "status": "fail",
+      "reason": "extra tufte-pre-wrap text wrappers change DOM"
+    },
+    {
+      "file": "tests/upstream-same-content-sidenotes-browser.mjs",
+      "status": "fail",
+      "reason": "heading.id rejected"
+    }
+  ],
+  "python": {
+    "pass": 16,
+    "fail": 0,
+    "skipped": 0,
+    "warnings": 1
+  },
+  "limitations": [
+    "failed browser files may not reach later assertions",
+    "visual test blocked at import; no full upstream pixel parity established",
+    "font proof does not imply production Korean glyph coverage or system fallback readability"
+  ],
+  "ci": "omitted by user instruction"
+}

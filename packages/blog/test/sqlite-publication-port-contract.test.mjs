@@ -5,8 +5,8 @@ import {readFileSync,mkdtempSync,rmSync} from 'node:fs';
 import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {SqlitePostRevisionStoreV2} from '@lexical-tufte/document';
-import {PublicationService} from '../src/publicationService.ts';
-import {SqlitePublicationAdapter} from '../src/sqlitePublicationAdapter.ts';
+import {PublicationService} from '../dist/publicationService.js';
+import {SqlitePublicationAdapter} from '../dist/sqlitePublicationAdapter.js';
 
 const ok=result=>{assert.equal(result.ok,true,JSON.stringify(result.diagnostics));return result.value;};
 const notOk=(result,code)=>{assert.equal(result.ok,false);assert.ok(result.diagnostics.some(d=>d.code===code),JSON.stringify(result.diagnostics));};
@@ -89,12 +89,14 @@ test('neutral service + SQLite adapter: stale restore and unpublish are rejected
  const {db,store,service,id}=await integrated();
  try{
   const first=ok(await service.publish(id,publishOptions(1,0,'2026-10-16T01:00:00Z')));
-  const staleRestore=await service.restore(id,first.snapshotId,{expectedGeneration:0,authorize:async()=>true,assetExists:async()=>true});
+  const second=ok(await service.publish(id,publishOptions(1,1,'2026-10-16T02:00:00Z')));
+  notOk(await service.restore(id,first.snapshotId,{expectedGeneration:0,authorize:async()=>true,assetExists:async()=>true}),'INVALID_PUBLICATION_INPUT');
+  const staleRestore=await service.restore(id,first.snapshotId,{expectedGeneration:1,authorize:async()=>true,assetExists:async()=>true});
   notOk(staleRestore,'PUBLICATION_CONFLICT');
-  const staleUnpublish=await service.unpublish(id,{expectedGeneration:0,authorize:async()=>true});
+  const staleUnpublish=await service.unpublish(id,{expectedGeneration:1,authorize:async()=>true});
   notOk(staleUnpublish,'PUBLICATION_CONFLICT');
-  assert.equal(ok(await store.readState(id)).generation,1);
-  assert.equal(ok(await store.readPublic(id)).snapshotId,first.snapshotId);
+  assert.equal(ok(await store.readState(id)).generation,2);
+  assert.equal(ok(await store.readPublic(id)).snapshotId,second.snapshotId);
  }finally{db.close();}
 });
 test('neutral service + SQLite adapter: draft update during asset preflight rejects publication',async()=>{
@@ -152,6 +154,10 @@ test('SQLite adapter: snapshot payload tampering fails checksum and cannot resto
  const {db,store,service,id}=await integrated();
  try{
   const first=ok(await service.publish(id,publishOptions(1,0,'2026-10-16T01:00:00Z')));
+  const corrupt=()=>db.prepare('UPDATE publication_snapshots_v1 SET payload=? WHERE snapshot_id=?').run('{"tampered":true}',first.snapshotId);
+  assert.throws(corrupt,/Publication snapshots are immutable/);
+  // Simulate at-rest corruption only in this disposable test DB after checking the guard.
+  db.exec('DROP TRIGGER publication_snapshot_no_update');
   db.prepare('UPDATE publication_snapshots_v1 SET payload=? WHERE snapshot_id=?').run('{"tampered":true}',first.snapshotId);
   notOk(await store.readSnapshot(first.snapshotId),'SNAPSHOT_INTEGRITY_ERROR');
   notOk(await store.readPublic(id),'SNAPSHOT_INTEGRITY_ERROR');

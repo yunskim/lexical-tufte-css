@@ -184,13 +184,13 @@ test('host link DOM exports a non-navigable span with complete reference identit
   e.getEditorState().read(()=>{
    const link=$getRoot().getFirstChild().getFirstChild();
    assert.ok(link instanceof HostLinkNode);
-   const {element}=link.exportDOM();
+   const {element}=link.exportDOM(e);
    assert.equal(element.tagName,'SPAN');
    assert.equal(element.dataset.hostNamespace,reference.namespace);
    assert.equal(element.dataset.hostKind,reference.kind);
    assert.equal(element.dataset.hostReference,reference.id);
    assert.equal(Object.hasOwn(element,'href'),false);
-  });
+  },{editor:e});
  }finally{
   if(previousDocument===undefined)delete globalThis.document;
   else globalThis.document=previousDocument;

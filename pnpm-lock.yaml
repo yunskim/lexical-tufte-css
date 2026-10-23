@@ -77,11 +77,20 @@ importers:
         specifier: 6.0.2
         version: 6.0.2
 
+  packages/editor-ports:
+    devDependencies:
+      typescript:
+        specifier: 6.0.2
+        version: 6.0.2
+
   packages/lexical:
     dependencies:
       '@lexical-tufte/document':
         specifier: workspace:*
         version: link:../document
+      '@lexical-tufte/editor-ports':
+        specifier: workspace:*
+        version: link:../editor-ports
       '@lexical/code':
         specifier: 0.52.0
         version: 0.52.0(typescript@6.0.2)

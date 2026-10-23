@@ -7,7 +7,7 @@ import {fileURLToPath} from 'node:url';
 const root=fileURLToPath(new URL('../',import.meta.url)),directory=resolve(process.argv[2]??'/tmp/lexical-tufte-packs'),temp=mkdtempSync(join(tmpdir(),'tufte-package-consumer-'));
 try{
  const scope=join(temp,'node_modules','@lexical-tufte');mkdirSync(scope,{recursive:true});
- for(const name of ['document','lexical','render','blog']){
+ for(const name of ['document','editor-ports','lexical','render','blog']){
   const version=JSON.parse(readFileSync(join(root,'packages',name,'package.json'),'utf8')).version;
   const tarball=join(directory,`lexical-tufte-${name}-${version}.tgz`),list=execFileSync('tar',['-tzf',tarball],{encoding:'utf8'});
   for(const required of ['LICENSE','THIRD_PARTY_NOTICES.md','licenses/source-han-serif-OFL.txt','licenses/source-han-sans-OFL.txt'])assert.ok(list.includes('package/'+required),name+': '+required);
@@ -30,5 +30,5 @@ try{
  execFileSync(process.execPath,[join(temp,'consumer.mjs')],{cwd:temp,stdio:'pipe'});
  writeFileSync(join(temp,'consumer.ts'),`import {SqlitePublicationStore,type PublicationDatabase,type PublicationSnapshot} from '@lexical-tufte/blog';import {TUFTE_NODES,createHeadlessEditor,registerSectionCommands,SET_TUFTE_BLOCK_COMMAND} from '@lexical-tufte/lexical';declare const db:PublicationDatabase;const store=new SqlitePublicationStore(db);store.readState('post');const editor=createHeadlessEditor({nodes:TUFTE_NODES});registerSectionCommands(editor);editor.dispatchCommand(SET_TUFTE_BLOCK_COMMAND,'h2');declare const snapshot:PublicationSnapshot;const revision:number=snapshot.publishedRevision;`);
  execFileSync(join(root,'packages/lexical/node_modules/.bin/tsc'),['--noEmit','--module','NodeNext','--moduleResolution','NodeNext','--target','ES2022','--skipLibCheck',join(temp,'consumer.ts')],{cwd:temp,stdio:'pipe'});
- console.log('R13 four tarballs: full LICENSE/notices/OFL, packed JS imports, fresh declarations, strict editor roundtrip, renderer/blog and SQL exports PASS. No publishing.');
+ console.log('R13 five tarballs: full LICENSE/notices/OFL, packed JS imports, fresh declarations, strict editor roundtrip, renderer/blog and SQL exports PASS. No publishing.');
 }finally{rmSync(temp,{recursive:true,force:true});}

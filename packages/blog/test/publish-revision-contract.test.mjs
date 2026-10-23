@@ -171,7 +171,7 @@ test('restore reactivates historical snapshot without modifying draft or creatin
   assert.equal(ok(await store.readSnapshot(p2.snapshotId)).snapshotId,p2.snapshotId);
  }finally{db.close();}
 });
-test('restore rejects unauthorized, missing assets and stale generation',async()=>{
+test('restore rejects unauthorized, missing assets and invalid or mismatched generation',async()=>{
  const {db,store,id}=await setup();
  try{
   const p1=ok(await store.publish(id,opts(1,0,'2026-10-16T01:00:00Z')));
@@ -179,7 +179,8 @@ test('restore rejects unauthorized, missing assets and stale generation',async()
   for(const [override,code] of [
    [{authorize:async()=>false},'PUBLICATION_FORBIDDEN'],
    [{assetExists:async()=>false},'MISSING_PUBLICATION_ASSET'],
-   [{expectedGeneration:0},'PUBLICATION_CONFLICT'],
+   [{expectedGeneration:0},'INVALID_PUBLICATION_INPUT'],
+   [{expectedGeneration:2},'PUBLICATION_CONFLICT'],
   ]){
    const result=await store.restorePublishedSnapshot(id,p1.snapshotId,{...options,...override});
    assert.equal(result.ok,false);

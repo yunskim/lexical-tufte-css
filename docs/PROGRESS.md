@@ -1,3 +1,11 @@
+## 2026-10-23 main 실제 검증 — browser 통합 미완료
+
+- main `c081546` 기준 별도 worktree에서 설치/빌드/단위/브라우저/package/Python 검사를 실행했다. 수정·증거는 `test/main-verification-20261023`에 보존한다. CI 생략.
+- lockfile·HostAsset export 타입·SQLite async state 사용 오류, 테스트의 오래된 API/부정 fixture/TS 원본 import/DB guard 설정, editor-ports tarball 소비 누락을 수정했다.
+- 최종 `pnpm check`: unit403/403, `package:check`: 실제5개 소비, Python16개 및 HTTP/SQLite 통과. browser34개는 19통과/15실패이며 전체 통과가 아니다.
+- 미해결: 관리 자산/이미지 UI 부재, 원본 fixture 필드·figure 순서·상대 URL의 schema 불일치, pre-wrap/note/newthought 발행 차이, visual helper 누락. E105–E110/M097–M101 반영.
+- [최신 실행 보고서](VERIFICATION_MAIN_2026-10-23.ko.md)와 [파일별 결과](verification/main-20261023.json) 참조. 기존 브랜치의 과거 통과 수와 혼합하지 않는다.
+
 ## 2026-10-19 DOMParser 대조 포함 실행 완료
 
 - mainaa7cb0a 및 정규식 수정 tree에서 frozen/check318개(실패·skip0)/Python16개/browser16개/package4개/실제TS→Python HTTP 왕복 통과. CI 없음.

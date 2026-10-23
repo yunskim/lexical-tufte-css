@@ -389,7 +389,9 @@ test('host reference rejects missing, non-object and unexpected identity fields'
   {namespace:' ',kind:'note',id:'note-123'},
   {namespace:'workspace',kind:'note',id:' '}
  ]){
-  const d=withHostLink(hostLink(reference));
+  // Set undefined explicitly: hostLink(undefined) would activate its valid default.
+  const link=hostLink();link.reference=reference;
+  const d=withHostLink(link);
   const result=renderArticle(d);
   assert.equal(result.ok,false,JSON.stringify(reference));
   assert.equal(result.html,null);

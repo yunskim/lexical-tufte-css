@@ -1,6 +1,6 @@
 # Publication / Restore 사전 정합성 점검
 
-상태: 정적 검토만 수행. **빌드·테스트·CI 미실행**.
+상태: main c081546과 후속 수정에서 build/typecheck 및 blog77개·SQLite port/service 계약을 실제 실행해 통과했다. [실행 결과](VERIFICATION_MAIN_2026-10-23.ko.md) 참조. 아래는 처음 작성한 사전 검토 이력이며 전체 브라우저 통합은 15개 실패로 별도 미완료다. CI 생략.
 
 ## 확인한 경계
 
@@ -13,14 +13,14 @@
 
 ## 실행 전 검증 체크리스트
 
-- [ ] TypeScript 빌드: `packages/blog/src/publication.ts` export 및 타입 검증
-- [ ] SQLite: 변경 없는 PublishIfChanged, Draft CAS 변경, 자산 포함 보수적 발행
-- [ ] SQLite: Restore 후 신규 Publish, Unpublish 후 Restore, 반복 Restore
-- [ ] SQLite: Restore 비동기 자산 검사 도중 head 변경, Draft 식별자 변경
-- [ ] SQLite: 권한 거부, 에셋 누락, 타 문서 스냅샷, 체크섬 손상
-- [ ] SQLite: Restore 트랜잭션 실패 시 원복, stale generation 재시도
-- [ ] 기존 `publication.test.mjs`와 회귀 호환성 확인
-- [ ] 테스트 실행 결과 및 오류 기록 문서 반영
+- [x] TypeScript 빌드: `packages/blog/src/publication.ts` export 및 타입 검증
+- [x] SQLite: 변경 없는 PublishIfChanged, Draft CAS 변경, 자산 포함 보수적 발행
+- [x] SQLite: Restore 후 신규 Publish, Unpublish 후 Restore, 반복 Restore
+- [x] SQLite: Restore 비동기 자산 검사 도중 head 변경, Draft 식별자 변경
+- [x] SQLite: 권한 거부, 에셋 누락, 타 문서 스냅샷, 체크섬 손상
+- [x] SQLite: Restore 트랜잭션 실패 시 원복, stale generation 재시도
+- [x] 기존 `publication.test.mjs`와 회귀 호환성 확인
+- [x] 테스트 실행 결과 및 오류 기록 문서 반영
 
 ## 발견한 추가 위험
 

@@ -1,16 +1,59 @@
 # 에러 기록
 
+## 2026-10-23 main 실행 검증
+
+기준 `c081546ee4275129b9f41a1a3012e61371d57271`과 후속 수정. 최종 check403개·package5개 소비·Python16개·HTTP 통과, browser34개 중 19통과/15실패. CI 생략. 이전 작업 브랜치의 실행 결과와 혼합하지 않는다. [검증 보고서](VERIFICATION_MAIN_2026-10-23.ko.md) 및 파일별 결과가 현재 판정이다.
+
+## E105 — editor-ports 의존성의 lockfile·tarball 소비 누락
+
+- 최초 frozen install이 editor-ports의 TypeScript specifier 누락으로 실패했다. 설치 정합성 보정 후 lockfile diff는 editor-ports importer와 lexical→editor-ports workspace link 추가뿐임을 확인하고 frozen 재실행 통과했다.
+- package consumer는 lexical이 import하는 editor-ports를 임시 소비 환경에 설치하지 않아 ERR_MODULE_NOT_FOUND로 실패했다. pack/check 대상에 editor-ports를 포함하고 LICENSE/notices/OFL 및 prepack 정책을 동일 적용했다.
+- 상태: frozen install 및 실제 5개 tarball JS/선언/SQL/왕복 소비 검사 통과. M097.
+
+## E106 — HostAsset 타입 좁히기와 async publication state 사용 오류
+
+- 빌드에서 InlineImageNode.exportJSON의 반복 getLatest 호출 때문에 hostAsset 필수 필드가 optional로 추론됐다. 한 번 얻은 최신 node로 분기·복제하여 타입과 detached JSON을 유지했다.
+- SqlitePublicationAdapter.commitPublication이 Promise인 readState를 Result처럼 읽었다. 잠금 안의 조회를 기존 동기 private head로 통일해 await 없는 CAS 트랜잭션 경계를 유지했다.
+- 상태: 전체 build/typecheck, 관련 host-link/image·publication unit 회귀 및 pnpm check 통과. M098.
+
+## E107 — 실행 테스트의 오래된 API·불명확한 fixture 입력
+
+- note.kind, 과거 import 오류 문자열 기대가 남았고 host-link exportDOM 테스트가 active editor와 editor 인자를 제공하지 않았다. 두 blog 테스트는 parameter property가 있는 TS 원본을 Node strip-only 모드로 import했다.
+- concrete type/실제 버전 거부를 검사하고 active EditorState.read 및 exportDOM(editor)를 사용한다. blog 테스트는 빌드된 JS를 소비한다.
+- hostLink(undefined) fixture helper의 기본값이 유효한 reference를 만들어 잘못된 입력 거부 테스트가 실패했다. 필드를 직접 undefined로 지정하여 실제 부정 입력을 검사한다.
+- 상태: package unit 전부 실행, 403통과/실패·skip0. M099.
+
+## E108 — generation 0과 stale CAS 혼동, 손상 fixture를 막는 immutable trigger
+
+- Restore expectedGeneration:0은 유효한 오래된 generation이 아니라 INVALID_PUBLICATION_INPUT이다. 두 번째 발행으로 실제 generation2를 만든 뒤 generation1의 stale Restore/Unpublish를 검사하고, 0의 입력 거부도 별도 확인한다.
+- snapshot 손상 테스트가 immutable SQL trigger에 먼저 막혀 checksum 검증에 도달하지 못했다. 운영 guard 거부를 먼저 assert한 다음 일회용 테스트 DB에서만 update trigger를 제거해 at-rest 손상을 주입한다. 운영 SQL/trigger는 변경하지 않았다.
+- 상태: blog77개 및 SQLite adapter/service CAS·rollback·checksum 회귀 통과. M099.
+
+## E109 — 형제 HTML 출력에 남은 wrapper selector 및 accessible-name 기대
+
+- note-dom-browser가 제거된 data-tufte-note wrapper를 조회해 0개를 반환했다. 실제 input 기준 label/payload 부모·인접성·ID·종류·모바일 열기/닫기를 검사하도록 수정했다.
+- note-export-parity는 main의 공통 accessible name인 Toggle marginnote를 과거 Toggle margin note로 기대했다. 이름 기대만 현재 계약에 맞췄다.
+- 상태: note-dom 재실행 통과. export-parity는 이름 검사를 지난 뒤 실제 publication split-parent 차이(E110)에서 여전히 실패한다. M100.
+
+## E110 — main 런타임과 이관된 브라우저 수락 계약 불일치 (미해결)
+
+- 실제 browser34개 전수 실행 및 변경한 두 파일 재실행 후 15개 실패가 남았다. main에는 관리 자산 등록/노트 이미지 선택/크기 수정 UI가 없으며 테스트는 해당 버튼에서 timeout으로 실패한다.
+- 전체/섹션 fixture는 titleId·heading.id·quote.cite·tufteClass, note-first figure 및 img/... 상대 URL을 요구하지만 main schema/validator는 지원하지 않는다. 전체 editor 로드는 같은 fixture를 받아들이지 못해 완료 상태를 얻지 못한다.
+- 발행 renderer는 pre-wrap 및 note wrapper를 유지하고 newthought split-parent 처리를 하지 않아 opening DOM, Lexical/publication note parity 및 원본 newthought 대조가 실패한다. Lexical 쪽 이름/selector 기대만 고쳐 이 제품 차이를 숨기지 않았다.
+- visual 테스트는 scripts/upstream-visual-assets.mjs 및 그 manifest/download 경로가 main에 없어 import 단계에서 실패한다. pixel comparator self-test의 통과는 공식 페이지 시각 비교 성공이 아니다.
+- 상태: 미해결이며 기능 완료·원본 parity·전체 통과로 표시하지 않는다. main의 HostLink/HostAsset 계약을 보존하는 선별 구현/이관과 전체 재실행이 필요하다. M100/M101.
+
 ## E103 — concrete note 전환 후 테스트 코드와 golden fixture에 구형 API 잔류
 
 - 발견(2026-10-23): 실행 전 정적 점검에서 Lexical 단위 테스트 다수가 제거된 `$createNoteNode()`를 호출하고, v2 서버 fixture와 all-node golden이 `tufte-note` + `kind`를 유지함. 이 상태에서 테스트 실행 시 가져오기/스키마 불일치가 발생할 수 있음.
 - 처리: 실제 `SidenoteNode`/`MarginnoteNode` 팩터리, 직렬화 기대값, 서버 v1/v2 fixture, host-link all-node fixture를 갱신. 정적 검출용 `pnpm audit:notes`를 `pnpm check` 선행 단계에 추가.
-- 상태: 코드 수정, **실행 검증 전**. M095 참조.
+- 상태: 2026-10-23 audit:notes/check 및 현행 fixture/golden 회귀 실행 통과. 추가 브라우저 통합 차이는 E110으로 분리한다. M095 참조.
 
 ## E104 — 발행 note 토글의 aria-label이 HTML 허용 목록에서 거부됨
 
 - 발견(2026-10-23): `packages/render/src/index.ts`는 note checkbox에 `aria-label`을 발행하지만 `packages/render/src/tree.ts` 허용 속성에 없어 렌더 과정에서 예외가 발생할 수 있음.
 - 처리: 허용 속성에 정확히 `aria-label`을 추가하고, 접근 가능한 input 직렬화 및 그림 마진노트 구조 회귀 테스트를 추가.
-- 상태: 코드 수정, **실행 검증 전**. M096 참조.
+- 상태: 2026-10-23 render44개 및 관련 unit 직렬화 검사 통과. split-parent 구조 차이는 별도 미해결이다. M096 참조.
 
 
 2026-10-19 완료 판정: E102 수정 후 check318개/browser16개/package4개/실제HTTP와 Python16개 통과. [실행 보고서](VERIFICATION_DOMPARSER_2026-10-19.ko.md)의 범위에서 검증했다. 전체 원본 fidelity 차이는 해결 처리하지 않는다.

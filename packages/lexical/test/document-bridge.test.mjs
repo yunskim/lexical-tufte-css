@@ -573,7 +573,7 @@ test('R02 all supported Tufte span kinds and both note kinds roundtrip',()=>{
  assert.deepEqual(saved.value.lexicalState,document.lexicalState);
  const children=saved.value.lexicalState.root.children[0].children[0].children;
  assert.deepEqual(children.slice(0,4).map(node=>node.kind),['sans','newthought','numeral','danger']);
- assert.deepEqual(children.slice(4).map(node=>[node.noteId,node.kind]),[['note-left','sidenote'],['note-right','marginnote']]);
+ assert.deepEqual(children.slice(4).map(node=>[node.noteId,node.type]),[['note-left','tufte-sidenote'],['note-right','tufte-marginnote']]);
 });
 
 test('R02 figure body width and table fullwidth layout roundtrip',()=>{

@@ -26,7 +26,7 @@ test('future note schema and active image URL are rejected',()=>{
  const e=editor();
  e.update(()=>{$getRoot().append($createParagraphNode().append($createSidenoteNode('n').append($createTextNode('내용'))));},{discrete:true});
  const json=e.getEditorState().toJSON();json.root.children[0].children[0].version=2;
- assert.throws(()=>e.parseEditorState(JSON.stringify(json)),/Unsupported/);
+ assert.throws(()=>e.parseEditorState(JSON.stringify(json)),/Invalid sidenote/);
  e.update(()=>assert.throws(()=>InlineImageNode.importJSON({version:1,src:'javascript:alert(1)',alt:''}),/Unsupported|Invalid/),{discrete:true});
 });
 

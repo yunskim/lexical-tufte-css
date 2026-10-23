@@ -1,5 +1,32 @@
 # 재발 방지 대책 및 정기 점검
 
+## 2026-10-23 main 시작·완료 점검
+
+AGENTS, E103/E104·M095/M096 및 기존 active-editor/fixture/타입 좁히기/출력 구조 대책을 확인했다. 시작 기준은 main c081546이며 기존 작업 브랜치와 분리된 worktree에서 실행했다. E105–E110/M097–M101을 설치·코드·테스트·결과 기록에 반영했다. check403/Python16/package5/HTTP 통과, browser19통과/15실패이며 E110을 유지한다. 다음 점검은 main의 schema/renderer/UI/asset helper 선별 통합 시작·완료 시 수행한다. CI 없음.
+
+## M097 — workspace 패키지 추가는 설치와 독립 소비까지 검증
+
+- E105: package manifest, lockfile importer/link, 패킹 대상 및 소비 환경의 workspace 의존성을 함께 확인한다. 새 package에도 LICENSE/notices/prepack을 적용한다. workspace 내부 실행 성공을 tarball 소비 성공으로 대신하지 않는다.
+
+## M098 — 최신 노드 상태와 동기 트랜잭션 경계
+
+- E106: optional 메타데이터의 타입을 좁힐 때 동일한 node snapshot을 재사용하고 내보내는 중첩 객체는 복제한다. Promise API를 동기 Result로 다루지 않는다. SQL 잠금 안에는 기존 동기 head 조회를 쓰고 async 검사와 원자적 commit을 분리한다.
+
+## M099 — 실제 오류 경계까지 도달하는 테스트 fixture
+
+- E107/E108: concrete wire type과 실제 거부 오류를 사용한다. default parameter가 부정 입력 undefined를 유효값으로 바꾸지 않는지 확인한다. Lexical exportDOM은 active editor와 editor 인자를 모두 전달한다. TS parameter property는 compiled JS 소비로 검사한다.
+- invalid generation0과 유효한 stale generation을 구별한다. SQL immutable guard와 at-rest corruption 검사는 별개로 확인한다. 손상 주입은 일회용 테스트 DB에만 수행하고 운영 guard를 완화하지 않는다.
+
+## M100 — 이관한 테스트가 현재 제품에 도달하는 경로 확인
+
+- E109/E110: UI 버튼·저장 envelope·schema 필드·renderer output·필수 helper를 현재 main 소스와 대조한다. 편집 HTML과 순수 발행 HTML을 구별한다. 이름/selector만 고친 후에도 엄격한 구조 검사를 유지한다.
+- 첫 실패 후 다른 파일도 독립 실행하여 누락을 드러낸다. wrapper 없는 입력/노트의 개수·부모·ID·모바일 왕복을 확인하며 없는 대상을 every로 허위 통과시키지 않는다.
+
+## M101 — 실행 실패와 시각 검증 범위 구분
+
+- E110: helper import 실패는 visual 검사 미도달로 기록한다. 원본 binary는 고정 출처·manifest·무결성 검사와 acquisition 경로를 함께 이관한 후 준비한다. 단색 pixel 비교기 자체 통과나 원본 inventory를 동일 콘텐츠 전체 시각 parity로 확대하지 않는다.
+- 다른 브랜치의 pass 수와 main의 결과를 합치지 않는다. 최신 보고서에 시작 SHA, 수정 범위, 파일별 실패 원인·차단된 후속 assertion을 기록한다.
+
 ## M095 — node type 전환은 active fixture/golden/test까지 동시 감사
 
 - E103: 팩터리와 스키마를 바꾼 경우 호출부, 렌더러, 생성 스크립트, 저장 v1/v2 fixture, Lexical golden, 브라우저 assertion을 하나의 변경 단위로 점검한다.
