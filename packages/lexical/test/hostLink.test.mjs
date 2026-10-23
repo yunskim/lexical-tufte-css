@@ -44,3 +44,33 @@ test('host link insertion wraps selected text and preserves reference',async()=>
  assert.deepEqual(link.reference,reference);
  unregister();
 });
+
+test('host link rejects malformed references without creating a node',async()=>{
+ const e=editor();
+ e.update(()=>{
+  assert.throws(()=>$createHostLinkNode({...reference,id:''}),/Invalid host reference/);
+  assert.throws(()=>$createHostLinkNode({...reference,kind:'external'}),/Invalid host reference/);
+  assert.throws(()=>$createHostLinkNode({...reference,namespace:'',id:'note-123'}),/Invalid host reference/);
+ });
+ await flush(e);
+});
+
+test('host link JSON reopen preserves two distinct namespaces',async()=>{
+ const e=editor();
+ e.update(()=>{
+  const p=$createParagraphNode();
+  for(const namespace of ['magnolia','commonplace']){
+   const link=$createHostLinkNode({...reference,namespace});
+   link.append($createTextNode(namespace));
+   p.append(link);
+  }
+  $getRoot().append(p);
+ });
+ await flush(e);
+ const serialized=e.getEditorState().toJSON();
+ const reopened=editor();
+ reopened.setEditorState(reopened.parseEditorState(JSON.stringify(serialized)));
+ const links=reopened.getEditorState().toJSON().root.children[0].children;
+ assert.deepEqual(links.map(link=>link.reference.namespace),['magnolia','commonplace']);
+ assert.ok(links.every(link=>!Object.hasOwn(link,'url')));
+});
