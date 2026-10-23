@@ -84,7 +84,16 @@ export function validateDocument(input:unknown):ValidationResult{
   if(type==='tufte-span'&&!enumeration(raw.kind,['sans','newthought','numeral','danger']))add('INVALID_SPAN_KIND',path+'.kind','Unsupported Tufte inline class');
   if(type==='link'){
    if(inLink)add('NESTED_LINK',path,'Links cannot be nested through inline wrappers');
-   if(!isSafeURL(raw.url,'link'))add('UNSAFE_URL',path+'.url','Unsupported link URL');
+   const hasUrl=raw.url!==undefined,hasReference=raw.reference!==undefined;
+   if(hasUrl===hasReference)add('INVALID_LINK_TARGET',path,'Exactly one of url or reference is required');
+   if(hasUrl&&!isSafeURL(raw.url,'link'))add('UNSAFE_URL',path+'.url','Unsupported link URL');
+   if(hasReference){
+    const ref=raw.reference;
+    if(!plain(ref)||Object.keys(ref).some(k=>!['namespace','kind','id'].includes(k))||
+       !nonempty(ref.namespace,128)||!nonempty(ref.id,256)||
+       !enumeration(ref.kind,['document','note','task','asset']))
+     add('INVALID_REFERENCE',path+'.reference','Invalid host reference');
+   }
    if(raw.target!==undefined&&!enumeration(raw.target,[null,'_blank','_self']))add('INVALID_TARGET',path+'.target','Invalid link target');
    for(const key of ['rel','title'])if(raw[key]!==undefined&&raw[key]!==null&&typeof raw[key]!=='string')add('INVALID_LINK',path+'.'+key,'Expected string or null');
   }
@@ -93,6 +102,13 @@ export function validateDocument(input:unknown):ValidationResult{
    if(typeof raw.alt!=='string')add('INVALID_ALT',path+'.alt','Image alt string required');
    for(const key of ['width','height'])if(raw[key]!==undefined&&!integer(raw[key],1,Number.MAX_SAFE_INTEGER))add('INVALID_IMAGE_SIZE',path+'.'+key,'Expected positive integer');
    if(type==='tufte-imagequilt'&&(raw.width===undefined||raw.height===undefined))add('INVALID_IMAGE_SIZE',path,'ImageQuilt requires intrinsic dimensions');
+   if(raw.hostAsset!==undefined){
+    const host=raw.hostAsset;
+    if(!plain(host)||Object.keys(host).some(k=>!['namespace','assetId','revisionId'].includes(k))||
+       !nonempty(host.namespace,128)||!nonempty(host.assetId,256)||
+       (host.revisionId!==undefined&&!nonempty(host.revisionId,256)))
+      add('INVALID_HOST_ASSET',path+'.hostAsset','Invalid host asset locator');
+   }
    if(raw.assetId!==undefined){
     const a=typeof raw.assetId==='string'?assets.get(raw.assetId):undefined;
     if(!a)add('MISSING_ASSET',path+'.assetId','Asset reference does not exist');
