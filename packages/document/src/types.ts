@@ -15,7 +15,7 @@ export type JsonNode=
  | Element<'listitem',{value:number;checked?:undefined}>
  | Element<'link',{url:string;rel?:string|null;target?:'_blank'|'_self'|null;title?:string|null}>
  | Element<'host-link',{reference:HostReference}>
- | Element<'tufte-note',{noteId:string;kind:'sidenote'|'marginnote'}>
+ | Element<'tufte-sidenote'|'tufte-marginnote',{noteId:string}>
  | Element<'tufte-span',{kind:'sans'|'newthought'|'numeral'|'danger'}>
  | Element<'tufte-figure',{width:'body'|'fullwidth'}>
  | Element<'tufte-table-layout',{layout:'body'|'fullwidth'|'scroll'}>
