@@ -41,3 +41,5 @@ export {HostLinkNode,$createHostLinkNode,type SerializedHostLink} from './HostLi
 export {INSERT_HOST_LINK_COMMAND,registerHostLinkCommands} from './hostLinkCommands.js';
 
 export {mountHostLinkPicker,type HostLinkPickerOptions} from './hostLinkPicker.js';
+
+export {hasDocumentChanged} from './hostLinkPicker.js';
