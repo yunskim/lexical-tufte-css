@@ -1,3 +1,4 @@
+import {exportCanonicalEditorState} from '../dist/index.js';
 import {createHeadlessEditor} from '@lexical/headless';
 import {$getRoot,$createParagraphNode as p,$createTextNode as t,$createLineBreakNode as br,$createTabNode as tab} from 'lexical';
 import {$createQuoteNode as quote} from '@lexical/rich-text';
@@ -45,6 +46,6 @@ export function createAllNodesDocument(){
   }
   $getRoot().append(first,second);
  },{discrete:true});
- return JSON.parse(JSON.stringify({schemaVersion:1,id:'all-nodes',locale:'ko-KR',title:'전체 노드 저장 계약',subtitle:'Lexical 0.52.0',assets:[{id:'chart',src:'/fixture.svg',mimeType:'image/svg+xml',width:120,height:48}],lexicalState:e.getEditorState().toJSON()}));
+ return JSON.parse(JSON.stringify({schemaVersion:1,id:'all-nodes',locale:'ko-KR',title:'전체 노드 저장 계약',subtitle:'Lexical 0.52.0',assets:[{id:'chart',src:'/fixture.svg',mimeType:'image/svg+xml',width:120,height:48}],lexicalState:exportCanonicalEditorState(e.getEditorState())}));
 }
 export function collectNodes(root){const nodes=[];function walk(n,path){nodes.push({node:n,path});n.children?.forEach((child,i)=>walk(child,`${path}.children[${i}]`));}walk(root,'$.lexicalState.root');return nodes;}

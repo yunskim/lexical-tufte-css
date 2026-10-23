@@ -1,3 +1,4 @@
+import {exportCanonicalEditorState} from '../dist/index.js';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync,writeFileSync,existsSync,mkdirSync} from 'node:fs';
@@ -24,7 +25,7 @@ test('R02 strict Lexical bridge fails closed when a registered node is missing',
    $createParagraphNode().append($createTufteSpanNode('sans').append($createTextNode('등록 필요')))
   ));
  },{discrete:true});
- const base=fixture(),document={...base,lexicalState:source.getEditorState().toJSON()};
+ const base=fixture(),document={...base,lexicalState:exportCanonicalEditorState(source.getEditorState())};
  const withoutSpan=createHeadlessEditor({namespace:'bridge-missing-node',nodes:[SectionNode,SidenoteNode,MarginnoteNode,InlineImageNode,LinkNode],onError(e){throw e;}});
  const result=loadDocumentIntoEditor(withoutSpan,document);
  assert.equal(result.ok,false);
@@ -55,7 +56,7 @@ test('R02 valid document -> real Lexical -> validated document roundtrip',()=>{
   ));
  },{discrete:true});
  const base=fixture();
- const document={...base,lexicalState:source.getEditorState().toJSON()};
+ const document={...base,lexicalState:exportCanonicalEditorState(source.getEditorState())};
  const destination=editor();
  const imported=loadDocumentIntoEditor(destination,document);
  assert.equal(imported.ok,true,JSON.stringify(imported.diagnostics));
@@ -75,7 +76,7 @@ test('R02 figure and caption survive real Lexical document roundtrip',()=>{
    )
   ));
  },{discrete:true});
- const base=fixture(),document={...base,assets:[...base.assets,{id:'chart-1',src:'/figures/chart.svg',mimeType:'image/svg+xml',width:640,height:360}],lexicalState:source.getEditorState().toJSON()};
+ const base=fixture(),document={...base,assets:[...base.assets,{id:'chart-1',src:'/figures/chart.svg',mimeType:'image/svg+xml',width:640,height:360}],lexicalState:exportCanonicalEditorState(source.getEditorState())};
  const destination=editor(),loaded=loadDocumentIntoEditor(destination,document);
  assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
  const exported=exportEditorToDocument(destination,document);
@@ -126,7 +127,7 @@ test('R02 ordered list survives Lexical roundtrip',()=>{
    )
   ));
  },{discrete:true});
- const base=fixture(),document={...base,lexicalState:source.getEditorState().toJSON()};
+ const base=fixture(),document={...base,lexicalState:exportCanonicalEditorState(source.getEditorState())};
  const destination=editor(),loaded=loadDocumentIntoEditor(destination,document);
  assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
  const exported=exportEditorToDocument(destination,document);
@@ -151,7 +152,7 @@ test('R02 scroll table preserves cell headers and layout in Lexical roundtrip',(
   );
   $getRoot().append($createSectionNode().append($createTableLayoutNode('scroll').append(table)));
  },{discrete:true});
- const base=fixture(),document={...base,lexicalState:source.getEditorState().toJSON()};
+ const base=fixture(),document={...base,lexicalState:exportCanonicalEditorState(source.getEditorState())};
  const destination=editor(),loaded=loadDocumentIntoEditor(destination,document);
  assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
  const exported=exportEditorToDocument(destination,document);
@@ -183,7 +184,7 @@ test('R03 document schema rejects a future table cell field without silent clean
    )
   ));
  },{discrete:true});
- const base=fixture(),document={...base,lexicalState:source.getEditorState().toJSON()};
+ const base=fixture(),document={...base,lexicalState:exportCanonicalEditorState(source.getEditorState())};
  const cell=document.lexicalState.root.children[0].children[0].children[0].children[0].children[0];
  cell.futureTableField='unrecognized';
  const result=validateDocument(document);
@@ -199,7 +200,7 @@ test('R02 Lexical 0.52.0 generated golden snapshot is required',()=>{
    $createListNode('number',3).append($createListItemNode().append($createTextNode('항목')))
   ));
  },{discrete:true});
- const state=source.getEditorState().toJSON();
+ const state=exportCanonicalEditorState(source.getEditorState());
  const snapshot=new URL('./golden/lexical-0.52.0-document.json',import.meta.url);
  const actual=JSON.stringify(state,null,2)+'\n';
  if(process.env.UPDATE_LEXICAL_GOLDEN==='1'){
@@ -238,7 +239,7 @@ test('R02 missing referenced asset fails before editor mutation',()=>{
    )
   ));
  },{discrete:true});
- const base=fixture(),document={...base,lexicalState:source.getEditorState().toJSON()};
+ const base=fixture(),document={...base,lexicalState:exportCanonicalEditorState(source.getEditorState())};
  let parses=0,sets=0;
  const fake={parseEditorState(){parses++;throw Error('unexpected parse');},dispatchCommand(){return true;},setEditorState(){sets++;}};
  const result=loadDocumentIntoEditor(fake,document);
@@ -338,7 +339,7 @@ test('R01 image factory preserves optional asset metadata through real Lexical J
    $createParagraphNode().append($createInlineImageNode('/figures/chart.svg','차트','chart-1',640,360))
   ));
  },{discrete:true});
- const image=e.getEditorState().toJSON().root.children[0].children[0].children[0];
+ const image=exportCanonicalEditorState(e.getEditorState()).root.children[0].children[0].children[0];
  assert.equal(image.type,'tufte-inline-image');
  assert.equal(image.src,'/figures/chart.svg');
  assert.equal(image.alt,'차트');
@@ -346,7 +347,7 @@ test('R01 image factory preserves optional asset metadata through real Lexical J
  assert.equal(image.width,640);
  assert.equal(image.height,360);
  const base=fixture();
- const document={...base,assets:[...base.assets,{id:'chart-1',src:'/figures/chart.svg',mimeType:'image/svg+xml',width:640,height:360}],lexicalState:e.getEditorState().toJSON()};
+ const document={...base,assets:[...base.assets,{id:'chart-1',src:'/figures/chart.svg',mimeType:'image/svg+xml',width:640,height:360}],lexicalState:exportCanonicalEditorState(e.getEditorState())};
  const valid=validateDocument(document);
  assert.equal(valid.ok,true,JSON.stringify(valid.diagnostics));
 });
@@ -359,10 +360,10 @@ test('R01 image asset mismatch fails before editor state is installed',()=>{
   ));
  },{discrete:true});
  const base=fixture();
- const state=source.getEditorState().toJSON();
+ const state=exportCanonicalEditorState(source.getEditorState());
  const validAsset={id:'chart-1',src:'/figures/chart.svg',mimeType:'image/svg+xml',width:640,height:360};
  const destination=editor();
- const before=JSON.stringify(destination.getEditorState().toJSON());
+ const before=JSON.stringify(exportCanonicalEditorState(destination.getEditorState()));
  for(const asset of [
   undefined,
   {...validAsset,src:'/figures/other.svg'},
@@ -373,7 +374,7 @@ test('R01 image asset mismatch fails before editor state is installed',()=>{
   const result=loadDocumentIntoEditor(destination,document);
   assert.equal(result.ok,false);
   assert.ok(result.diagnostics.some(d=>['MISSING_ASSET','ASSET_MISMATCH'].includes(d.code)),JSON.stringify(result.diagnostics));
-  assert.equal(JSON.stringify(destination.getEditorState().toJSON()),before);
+  assert.equal(JSON.stringify(exportCanonicalEditorState(destination.getEditorState())),before);
  }
 });
 
@@ -384,7 +385,7 @@ test('P2 concrete note types preserve identity and payload through export',()=>{
   const margin=$createMarginnoteNode('editable-margin').append($createTextNode('여백주석'));
   $getRoot().append($createSectionNode().append($createParagraphNode().append(side,margin)));
  },{discrete:true});
- const notes=e.getEditorState().toJSON().root.children[0].children[0].children;
+ const notes=exportCanonicalEditorState(e.getEditorState()).root.children[0].children[0].children;
  assert.deepEqual(notes.map(n=>n.type),['tufte-sidenote','tufte-marginnote']);
  assert.deepEqual(notes.map(n=>n.noteId),['editable-side','editable-margin']);
  assert.deepEqual(notes.map(n=>n.children[0].text),['사이드 노트','여백주석']);
@@ -396,25 +397,25 @@ test('R03 migrated loader imports compatible v1 and preserves v2 snapshot',()=>{
  source.update(()=>$getRoot().append($createSectionNode().append(
   $createParagraphNode().append($createTextNode('migrated'))
  )),{discrete:true});
- const legacy={...fixture(),lexicalState:source.getEditorState().toJSON()};
+ const legacy={...fixture(),lexicalState:exportCanonicalEditorState(source.getEditorState())};
  const original=JSON.stringify(legacy);
  const destination=editor();
  const imported=loadMigratedDocumentIntoEditor(destination,legacy);
  assert.equal(imported.ok,true,JSON.stringify(imported.diagnostics));
  assert.equal(imported.value.schemaVersion,2);
  assert.deepEqual(imported.value.editorFormat,{engine:'lexical',formatVersion:1});
- assert.deepEqual(destination.getEditorState().toJSON(),legacy.lexicalState);
+ assert.deepEqual(exportCanonicalEditorState(destination.getEditorState()),legacy.lexicalState);
  assert.equal(JSON.stringify(legacy),original);
  const second=loadMigratedDocumentIntoEditor(editor(),imported.value);
  assert.equal(second.ok,true,JSON.stringify(second.diagnostics));
 });
 test('R03 migrated loader refuses unsupported format before editor replacement',()=>{
- const destination=editor(),before=destination.getEditorState().toJSON();
+ const destination=editor(),before=exportCanonicalEditorState(destination.getEditorState());
  const invalid={...fixture(),schemaVersion:2,editorFormat:{engine:'lexical',formatVersion:999}};
  const result=loadMigratedDocumentIntoEditor(destination,invalid);
  assert.equal(result.ok,false);
  assert.ok(result.diagnostics.some(d=>d.code==='UNSUPPORTED_EDITOR_FORMAT'));
- assert.deepEqual(destination.getEditorState().toJSON(),before);
+ assert.deepEqual(exportCanonicalEditorState(destination.getEditorState()),before);
 });
 
 test('R03 migrated document replacement dispatches history reset only on success',()=>{
@@ -431,7 +432,7 @@ test('R03 migrated document replacement dispatches history reset only on success
  source.update(()=>$getRoot().append($createSectionNode().append(
   $createParagraphNode().append($createTextNode('history boundary'))
  )),{discrete:true});
- const valid={...fixture(),lexicalState:source.getEditorState().toJSON()};
+ const valid={...fixture(),lexicalState:exportCanonicalEditorState(source.getEditorState())};
  const result=loadMigratedDocumentIntoEditor(destination,valid);
  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
  assert.equal(cleared,1);
@@ -449,14 +450,14 @@ test('R03 malformed migrated import leaves editor state and history untouched',(
  source.update(()=>$getRoot().append($createSectionNode().append(
   $createParagraphNode().append($createTextNode('loss detection'))
  )),{discrete:true});
- const valid={...fixture(),lexicalState:source.getEditorState().toJSON()};
+ const valid={...fixture(),lexicalState:exportCanonicalEditorState(source.getEditorState())};
  // Unknown serialized node must be rejected without touching state/history.
  const malformed=structuredClone(valid);
  malformed.lexicalState.root.children[0].children[0].children[0].type='future-text';
- const before=destination.getEditorState().toJSON();
+ const before=exportCanonicalEditorState(destination.getEditorState());
  const result=loadMigratedDocumentIntoEditor(destination,malformed);
  assert.equal(result.ok,false,JSON.stringify(result.diagnostics));
- assert.deepEqual(destination.getEditorState().toJSON(),before);
+ assert.deepEqual(exportCanonicalEditorState(destination.getEditorState()),before);
  assert.equal(clearCount,0);
  unregister();
 });
@@ -469,7 +470,7 @@ test('R03 actual HistoryPlugin state is cleared after document replacement',()=>
  source.update(()=>$getRoot().append($createSectionNode().append(
   $createParagraphNode().append($createTextNode('replacement'))
  )),{discrete:true});
- const document={...fixture(),lexicalState:source.getEditorState().toJSON()};
+ const document={...fixture(),lexicalState:exportCanonicalEditorState(source.getEditorState())};
  // Seed an old-document undo/redo stack. A successful replacement must clear both.
  history.undoStack.push({editor:destination,editorState:destination.getEditorState()});
  history.redoStack.push({editor:destination,editorState:destination.getEditorState()});
@@ -489,7 +490,7 @@ test('R03 v2 export preserves editor format after migrated import',()=>{
  source.update(()=>$getRoot().append($createSectionNode().append(
   $createParagraphNode().append($createTextNode('v2 export'))
  )),{discrete:true});
- const legacy={...fixture(),lexicalState:source.getEditorState().toJSON()};
+ const legacy={...fixture(),lexicalState:exportCanonicalEditorState(source.getEditorState())};
  const destination=editor();
  const loaded=loadMigratedDocumentIntoEditor(destination,legacy);
  assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
@@ -509,7 +510,7 @@ test('E1 versioned import/export preserves upstream title anchor without mutatin
  source.update(()=>$getRoot().append($createSectionNode().append(
   $createParagraphNode().append($createTextNode('Nine-section document title'))
  )),{discrete:true});
- const input={...fixture(),titleId:'tufte-css',lexicalState:source.getEditorState().toJSON()};
+ const input={...fixture(),titleId:'tufte-css',lexicalState:exportCanonicalEditorState(source.getEditorState())};
  const original=JSON.stringify(input);
  const first=editor();
  const migrated=loadMigratedDocumentIntoEditor(first,input);
@@ -536,7 +537,7 @@ test('R03 checked-in v2 golden survives real Lexical import and export',()=>{
  const loaded=loadMigratedDocumentIntoEditor(destination,golden);
  assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
  assert.deepEqual(loaded.value,golden);
- assert.deepEqual(JSON.parse(JSON.stringify(destination.getEditorState().toJSON())),golden.lexicalState);
+ assert.deepEqual(JSON.parse(JSON.stringify(exportCanonicalEditorState(destination.getEditorState()))),golden.lexicalState);
  const exported=exportEditorToDocumentV2(destination,loaded.value);
  assert.equal(exported.ok,true,JSON.stringify(exported.diagnostics));
  assert.deepEqual(JSON.parse(JSON.stringify(exported.value)),golden);
@@ -545,12 +546,12 @@ test('R03 checked-in v2 golden survives real Lexical import and export',()=>{
 test('R03 checked-in v2 golden rejects unknown editor format without mutation',()=>{
  const golden=JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document-v2.json',import.meta.url),'utf8'));
  const destination=editor();
- const before=destination.getEditorState().toJSON();
+ const before=exportCanonicalEditorState(destination.getEditorState());
  golden.editorFormat.formatVersion=2;
  const result=loadMigratedDocumentIntoEditor(destination,golden);
  assert.equal(result.ok,false);
  assert.ok(result.diagnostics.some(d=>d.code==='UNSUPPORTED_EDITOR_FORMAT'));
- assert.deepEqual(destination.getEditorState().toJSON(),before);
+ assert.deepEqual(exportCanonicalEditorState(destination.getEditorState()),before);
 });
 
 
@@ -569,7 +570,7 @@ test('R01 image export preserves validated asset and dimensions',()=>{
    $createParagraphNode().append($createInlineImageNode('/assets/chart.png','chart','chart_1',640,360))
   ));
  },{discrete:true});
- const node=source.getEditorState().toJSON().root.children[0].children[0].children[0];
+ const node=exportCanonicalEditorState(source.getEditorState()).root.children[0].children[0].children[0];
  assert.equal(node.src,'/assets/chart.png');
  assert.equal(node.assetId,'chart_1');
  assert.equal(node.width,640);
@@ -590,7 +591,7 @@ test('R02 all supported Tufte span kinds and both note kinds roundtrip',()=>{
   );
   $getRoot().append($createSectionNode().append(paragraph));
  },{discrete:true});
- const base=fixture(),document={...base,lexicalState:source.getEditorState().toJSON()};
+ const base=fixture(),document={...base,lexicalState:exportCanonicalEditorState(source.getEditorState())};
  const target=editor(),loaded=loadDocumentIntoEditor(target,document);
  assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
  const saved=exportEditorToDocument(target,document);
@@ -618,7 +619,7 @@ test('R02 figure body width and table fullwidth layout roundtrip',()=>{
   ));
  },{discrete:true});
  const base=fixture();
- const document={...base,assets:[...base.assets,{id:'plot-asset',src:'/images/plot.png',mimeType:'image/png',width:320,height:200}],lexicalState:source.getEditorState().toJSON()};
+ const document={...base,assets:[...base.assets,{id:'plot-asset',src:'/images/plot.png',mimeType:'image/png',width:320,height:200}],lexicalState:exportCanonicalEditorState(source.getEditorState())};
  const target=editor(),loaded=loadDocumentIntoEditor(target,document);
  assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
  const saved=exportEditorToDocument(target,document);
@@ -637,7 +638,7 @@ test('P2.2 heading h2/h3 and quote roundtrip through real Lexical',()=>{
    $createQuoteNode().append($createTextNode('인용문'))
   ));
  },{discrete:true});
- const base=fixture(),document={...base,lexicalState:source.getEditorState().toJSON()};
+ const base=fixture(),document={...base,lexicalState:exportCanonicalEditorState(source.getEditorState())};
  const target=editor(),loaded=loadDocumentIntoEditor(target,document);
  assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
  const saved=exportEditorToDocument(target,document);
@@ -657,7 +658,7 @@ test('P2.2 horizontal rule retains node type and position across editor roundtri
    $createParagraphNode().append($createTextNode('after'))
   ));
  },{discrete:true});
- const base=fixture(),document={...base,lexicalState:source.getEditorState().toJSON()};
+ const base=fixture(),document={...base,lexicalState:exportCanonicalEditorState(source.getEditorState())};
  const target=editor(),loaded=loadDocumentIntoEditor(target,document);
  assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
  const saved=exportEditorToDocument(target,document);
@@ -679,7 +680,7 @@ test('F06 definition list with multiple descriptions roundtrips without flatteni
    )
   ));
  },{discrete:true});
- const base=fixture(),document={...base,lexicalState:source.getEditorState().toJSON()};
+ const base=fixture(),document={...base,lexicalState:exportCanonicalEditorState(source.getEditorState())};
  const target=editor(),loaded=loadDocumentIntoEditor(target,document);
  assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
  const saved=exportEditorToDocument(target,document);
@@ -697,12 +698,12 @@ test('F06 malformed definition list is rejected before editor installation',()=>
    )
   ));
  },{discrete:true});
- const document={...fixture(),lexicalState:source.getEditorState().toJSON()};
- const target=editor(),before=target.getEditorState().toJSON();
+ const document={...fixture(),lexicalState:exportCanonicalEditorState(source.getEditorState())};
+ const target=editor(),before=exportCanonicalEditorState(target.getEditorState());
  const loaded=loadDocumentIntoEditor(target,document);
  assert.equal(loaded.ok,false);
  assert.ok(loaded.diagnostics.some(d=>d.code==='INVALID_DEFINITION_LIST'),JSON.stringify(loaded.diagnostics));
- assert.deepEqual(target.getEditorState().toJSON(),before);
+ assert.deepEqual(exportCanonicalEditorState(target.getEditorState()),before);
 });
 
 test('F08 F09 epigraph quotation and attribution cite survive document roundtrip',()=>{
@@ -720,7 +721,7 @@ test('F08 F09 epigraph quotation and attribution cite survive document roundtrip
    )
   ));
  },{discrete:true});
- const base=fixture(),document={...base,lexicalState:source.getEditorState().toJSON()};
+ const base=fixture(),document={...base,lexicalState:exportCanonicalEditorState(source.getEditorState())};
  const target=editor(),loaded=loadDocumentIntoEditor(target,document);
  assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
  const saved=exportEditorToDocument(target,document);
@@ -742,7 +743,7 @@ test('F08 quotation rejects attribution before quoted content',()=>{
    )
   ));
  },{discrete:true});
- const document={...fixture(),lexicalState:source.getEditorState().toJSON()};
+ const document={...fixture(),lexicalState:exportCanonicalEditorState(source.getEditorState())};
  const result=loadDocumentIntoEditor(editor(),document);
  assert.equal(result.ok,false);
  assert.ok(result.diagnostics.some(d=>d.code==='INVALID_QUOTE'),JSON.stringify(result.diagnostics));
@@ -759,7 +760,7 @@ test('F07 section footer with cite survives strict document roundtrip',()=>{
    )
   ));
  },{discrete:true});
- const document={...fixture(),lexicalState:source.getEditorState().toJSON()};
+ const document={...fixture(),lexicalState:exportCanonicalEditorState(source.getEditorState())};
  const target=editor(),loaded=loadDocumentIntoEditor(target,document);
  assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
  const saved=exportEditorToDocument(target,document);
@@ -777,7 +778,7 @@ test('F07 validator rejects footer nested inside a paragraph without Lexical nor
    $createSectionFooterNode().append($createTextNode('Invalid placement'))
   ));
  },{discrete:true});
- const document={...fixture(),lexicalState:source.getEditorState().toJSON()};
+ const document={...fixture(),lexicalState:exportCanonicalEditorState(source.getEditorState())};
  const section=document.lexicalState.root.children[0];
  const footer=section.children.pop();
  section.children[0].children.push(footer);
@@ -800,7 +801,7 @@ test('F15 fullwidth block preserves nested block structure through strict roundt
    )
   ));
  },{discrete:true});
- const document={...fixture(),lexicalState:source.getEditorState().toJSON()};
+ const document={...fixture(),lexicalState:exportCanonicalEditorState(source.getEditorState())};
  const target=editor(),loaded=loadDocumentIntoEditor(target,document);
  assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
  const saved=exportEditorToDocument(target,document);
@@ -821,7 +822,7 @@ test('F17 code block retains leading spaces, tabs, line breaks and language',()=
    )
   ));
  },{discrete:true});
- const document={...fixture(),lexicalState:source.getEditorState().toJSON()};
+ const document={...fixture(),lexicalState:exportCanonicalEditorState(source.getEditorState())};
  const target=editor(),loaded=loadDocumentIntoEditor(target,document);
  assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
  const saved=exportEditorToDocument(target,document);
@@ -843,7 +844,7 @@ test('F19 ImageQuilt retains src alt assetId dimensions and figure width',()=>{
    )
   ));
  },{discrete:true});
- const base=fixture(),document={...base,lexicalState:source.getEditorState().toJSON(),
+ const base=fixture(),document={...base,lexicalState:exportCanonicalEditorState(source.getEditorState()),
   assets:[...base.assets,{id:'quiltAsset',src:'/assets/quilt.png',mimeType:'image/png',width:1200,height:720,byteLength:4096}]};
  const target=editor(),loaded=loadDocumentIntoEditor(target,document);
  assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
@@ -867,7 +868,7 @@ test('F18 embed retains provider title wrapper width and ratio through document 
    $createEmbedNode('youtube','https://www.youtube-nocookie.com/embed/abcdefghijk','Demonstration','figure','fullwidth',16/9)
   ));
  },{discrete:true});
- const document={...fixture(),lexicalState:source.getEditorState().toJSON()};
+ const document={...fixture(),lexicalState:exportCanonicalEditorState(source.getEditorState())};
  const target=editor(),loaded=loadDocumentIntoEditor(target,document);
  assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
  const saved=exportEditorToDocument(target,document);
@@ -923,7 +924,7 @@ for(const [name,load] of [['strict',loadDocumentIntoEditor],['migrated',loadMigr
   try{
    const source=editor();
    source.update(()=>$getRoot().append($createSectionNode().append($createParagraphNode().append($createTextNode('A')))),{discrete:true});
-   const document={...fixture(),lexicalState:source.getEditorState().toJSON()};
+   const document={...fixture(),lexicalState:exportCanonicalEditorState(source.getEditorState())};
    assert.equal(load(destination,document).ok,true);await flush();
    edit('A1');await flush();edit('A2');await flush();
    destination.dispatchCommand(UNDO_COMMAND,undefined);await flush();assert.equal(text(),'A1');

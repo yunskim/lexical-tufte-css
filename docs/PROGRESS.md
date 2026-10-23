@@ -1,3 +1,11 @@
+## 2026-10-23 E117 등록 충돌 수정 — browser29/34
+
+- `be2317d` 후속 수정: core paragraph/quote/heading factory와 metadata 전용 runtime class를 분리하고 canonical 저장 경계·예제 저장/복구·schema 기반 명령/메뉴 검사를 연결했다. 저장 schema/golden은 변경하지 않았다.
+- 최종 `pnpm check`418개(실패·취소·skip0), package5개 실제 JS/선언/왕복 소비, Python16개 및 실제 HTTP/SQLite 통과. CI 생략.
+- browser34파일 최종29통과/5실패, timeout·skip0. note-dom·note-export-parity·기본 편집/복구/발행 UI가 통과했다.
+- 잔여: E120 iframe 구조 차이3파일, E123 React 전체 문서 restore 시 sidenote textFormat:2 추가1파일, 보류 중인 자산 등록1파일. 전체 원본 편집/시각 parity는 미완료.
+- [보고서](VERIFICATION_NODE_REGISTRY_2026-10-23.ko.md), [저장 경계 계약](LEXICAL_BLOCK_SERIALIZATION.ko.md). 다음 작업은 E123 최소 React 재현과 E120 iframe DOM 정리다.
+
 ## 2026-10-23 remediation 재검증 — 편집기 등록 충돌 미해결
 
 - `fix/main-browser-parity-20261023`의 `383d25c`를 기준으로 frozen 설치·build/typecheck·단위·34개 browser·공식 원본 비교·package·Python/HTTP 실행. CI 생략.

@@ -1,5 +1,6 @@
 import {documentToEditorJSON,editorJSONToDocument,migrateStoredDocument,validateDocumentV2,type TufteDocumentV2,type Diagnostic,type TufteDocument} from '@lexical-tufte/document';
 import {CLEAR_HISTORY_COMMAND,HISTORY_MERGE_TAG,type EditorState,type LexicalEditor} from 'lexical';
+import {exportCanonicalEditorState,parseCanonicalEditorState} from './blockSerialization.js';
 
 type Failure={ok:false;diagnostics:Diagnostic[]};
 type Success<T>={ok:true;value:T;diagnostics:Diagnostic[]};
@@ -25,10 +26,10 @@ export function loadDocumentIntoEditor(editor:LexicalEditor,input:unknown):Failu
  const checked=documentToEditorJSON(input);
  if(!checked.ok)return checked;
  try{
-  const state=editor.parseEditorState(JSON.stringify(checked.state));
+  const state=parseCanonicalEditorState(editor,checked.state);
   // Lexical may normalize, discard or rewrite fields while importing.
   // Reject that conversion rather than claiming a lossless document roundtrip.
-  const parsed=state.toJSON();
+  const parsed=exportCanonicalEditorState(state);
   if(JSON.stringify(sortJSON(parsed))!==JSON.stringify(sortJSON(checked.state))){
    return failure('LEXICAL_IMPORT_LOSSY','Lexical import changed the serialized document state');
   }
@@ -63,7 +64,7 @@ export function loadMigratedDocumentIntoEditor(editor:LexicalEditor,input:unknow
 /** Export is checked against the document schema; no unknown Lexical keys are removed. */
 export function exportEditorToDocument(editor:LexicalEditor,base:unknown):Failure|Success<TufteDocument>{
  try{
-  const state=editor.getEditorState().toJSON();
+  const state=exportCanonicalEditorState(editor.getEditorState());
   const checked=editorJSONToDocument(base,state);
   return checked.ok?{ok:true,value:checked.document,diagnostics:[]}:{ok:false,diagnostics:checked.diagnostics};
  }catch(error){

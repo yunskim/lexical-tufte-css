@@ -6,7 +6,7 @@ import {
 } from '../packages/document/dist/index.js';
 import {renderArticle} from '../packages/render/dist/index.js';
 import {
- createHeadlessEditor,TUFTE_NODES,
+ createHeadlessEditor,TUFTE_NODES,exportCanonicalEditorState,
  loadMigratedDocumentIntoEditor,exportEditorToDocumentV2
 } from '../packages/lexical/dist/index.js';
 import {reconstructPinnedArticle} from './helpers/pinned-upstream-article.mjs';
@@ -74,7 +74,7 @@ try{
  const initialEditor=makeEditor();
  const loaded=loadMigratedDocumentIntoEditor(initialEditor,input);
  assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
- assert.deepEqual(initialEditor.getEditorState().toJSON(),input.lexicalState,
+ assert.deepEqual(exportCanonicalEditorState(initialEditor.getEditorState()),input.lexicalState,
   'Lexical must not normalize away any pinned demo node');
  const saved=exportEditorToDocumentV2(initialEditor,loaded.value);
  assert.equal(saved.ok,true,JSON.stringify(saved.diagnostics));

@@ -1,5 +1,15 @@
 # main 브라우저 불일치 보완 — 2026-10-23
 
+## 최신 실행 판정 — E117 수정 후
+
+- [보고서](VERIFICATION_NODE_REGISTRY_2026-10-23.ko.md)가 최신 증거다. 아래 이전12/20/2는 이력으로 보존한다.
+- [x] E117 core factory/metadata runtime type 등록 분리, canonical 저장/복구 경계 연결 및 회귀 검증.
+- [x] E114 titleId v1/v2 저장/재열기 회귀 실제 실행 통과. 기존 golden 변경 없음.
+- [x] check418개·package5개 소비·Python16/HTTP 통과. browser34파일 재실행29통과/5실패, timeout·skip0. CI 생략.
+- [ ] E123 React 전체9섹션 restore에서 sidenote textFormat:2 추가 원인 분석·원자적 저장 동등성/Undo/Redo 검증.
+- [ ] E120 iframe DOM 정리 후 Figures/전체 roundtrip/시각 pixel 검사 재검증.
+- [ ] 보류 자산 등록 기능은 미완료 유지. E1/E2/E3 전체 완료 아님.
+
 ## 최신 실행 판정 — 383d25c 기준 재검증
 
 - [실행 보고서](VERIFICATION_BROWSER_REMEDIATION_2026-10-23.ko.md), [파일별 JSON](verification/browser-remediation-20261023.json)이 현재 증거다. 아래 작성/미실행 표시는 과거 이력으로 보존한다.

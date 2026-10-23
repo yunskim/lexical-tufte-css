@@ -7,6 +7,7 @@ Lexical 기반 Tufte CSS 편집기와 블로그 운영용 TypeScript 라이브�
 - [구현 계획 및 실행 체크리스트](docs/PLAN.ko.md)
 - [2026-10-17 구현 계획 독립 재점검과 남은 게이트](docs/PLAN_AUDIT_2026-10-17.ko.md)
 - [작업 규약](AGENTS.md)
+- [Lexical 블록 등록 및 canonical 저장 경계](docs/LEXICAL_BLOCK_SERIALIZATION.ko.md): 메타데이터 블록의 저장/복구에는 canonical export/parse 또는 문서 bridge를 사용합니다. 원시 EditorState.toJSON은 내부 snapshot입니다.
 
 저장소: https://github.com/yunskim/lexical-tufte-css
 

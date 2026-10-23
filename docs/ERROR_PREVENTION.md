@@ -1,5 +1,26 @@
 # 재발 방지 대책 및 정기 점검
 
+## 2026-10-23 E117 수정 종료 점검
+
+E117/M108과 E114/M105 실행 회귀 통과, M109 시간 제한 유지·package 소비 완료. E120 및 새 E123은 미해결이다. 기존 오류와 대책을 대조해 M111–M113을 추가하고 저장 경계·브라우저 selector·Python 실행 절차에 반영했다. 다음 점검은 E123 최소 React 재현 또는 iframe DOM 수정의 시작/완료 시점이다. CI 생략.
+
+## M111 — runtime registry와 canonical wire를 별도 검증
+
+- E117/E121: runtime type당 klass 하나를 유지하고 core factory와 metadata factory를 각각 실행한다. canonical type 목록만 중복 제거해 registry 안전성을 증명하지 않는다. 새 회귀는 실제 TUFTE_NODES 클래스 type의 고유성도 검사한다.
+- 저장 schema/golden을 바꾸지 않는 명시적 adapter를 사용한다. raw runtime snapshot과 canonical 문서를 혼동하지 않도록 README·호스트 계약을 제공하고 저장/복구/JSON 출력 호출부를 검색한다.
+- 내부 타입 이름만 변환하며 unknown field/HostAsset/HostLink payload를 삭제·rewrite하지 않는다. bridge의 전체 필드 손실 비교, 입력 불변성, v1/v2 왕복 및 tarball 선언 소비를 함께 검증한다.
+
+## M112 — 테스트 준비 가정과 실제 상태 drift를 구분
+
+- E122/E123: 반복 이름은 exact role로 지정한다. 닫힌 details 안의 폼은 summary를 연 뒤 읽는다. HTML boolean attribute는 truthiness가 아니라 존재 여부로 검사한다.
+- fixture에는 실제 원본에서 읽은 속성과 현재 Lexical의 필수 기본값만 넣는다. 공식 내용과 무관한 root 기본값 제거를 이유로 다른 필드/원본 DOM/픽셀 수락을 완화하지 않는다.
+- React가 추가한 서식 상태는 headless 성공만으로 정상 처리하지 않는다. raw/inspect/save 단계의 최초 drift를 좁히고, 원인이 확인될 때까지 실패를 유지한다.
+
+## M113 — 같은 실행 환경과 검증된 patch 컨텍스트
+
+- E121/E124: pytest와 HTTP child의 Python interpreter를 명시적으로 맞춘다(RECOVERY_PYTHON). venv 설치 성공을 시스템 Python의 패키지 존재로 해석하지 않는다.
+- patch는 현재 파일의 실제 헤더/내용과 절대 경로를 확인해 적용한다. 거부된 patch는 미적용으로 기록하고 상태를 확인한 뒤 재적용한다. build 실패 시 후속 browser를 실행하지 않는다.
+
 ## 2026-10-23 remediation 실행 종료 점검
 
 E109/M100의 오래된 accessible-name 오류가 섹션 테스트에 재발해 E119/M110을 추가했다. E114는 bridge timeout으로 미검증, E115/E116은 document57개와 build/typecheck로 검증했다. E117/E120 및 자산 미구현은 미해결로 유지한다. 다음 점검은 노드 등록 설계 수정 직후이며, 기본 paragraph 생성→command→v1/v2 왕복→React mount→전체 브라우저 순서다. CI는 실행하지 않는다.

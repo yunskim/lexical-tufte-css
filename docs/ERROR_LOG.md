@@ -1,5 +1,39 @@
 # 에러 기록
 
+## 2026-10-23 E117 수정 및 재검증
+
+기준 `be2317d` 후속 수정. **check418개·package5개·Python16개·HTTP 통과, browser29통과/5실패/timeout·skip0**. [최신 보고서](VERIFICATION_NODE_REGISTRY_2026-10-23.ko.md). 아래12/20/2는 이전 tree의 이력이다.
+
+- E117: base factory를 유지하고 metadata 블록은 고유 runtime type으로 등록, canonical 저장 경계에서 기존 paragraph/quote/heading을 보존. heading 기본 factory 충돌도 함께 해결. 기본 factory/transform·v1/v2 메타데이터·기존 golden·HostLink/HostAsset·React 기본 편집 회귀 통과. 상세 [계약](LEXICAL_BLOCK_SERIALIZATION.ko.md). 전체 원본 편집 parity까지 해결했다는 뜻은 아니다.
+- E114: bridge 파일 timeout 해소, titleId v1→v2→저장→재열기 회귀 통과.
+- E118: packed JS/선언 검사 통과, 파일 시간 초과 없음. 실행 제한은 유지한다.
+- E120: roundtrip이 이제9개 섹션의 저장/재열기 후 iframe-wrapper 검사까지 도달해 실패. Figures와 full visual도 같은 구조 차이로 계속 실패. 미해결.
+
+## E121 — 내부 runtime JSON과 canonical 저장 JSON의 경계 미분리
+
+- 원인: registry 충돌을 피하려고 고유 내부 type을 도입하면 raw toJSON을 기존 문서로 직접 저장하는 경로가 호환되지 않는다. root/section의 own undefined는 JSON 저장 전후 deep equality에도 차이를 만들었다.
+- 조치: blockSerialization에 명시적 canonical export/parse를 구현하고 bridge·예제 저장/복구/검사·관련 테스트를 연결했다. type 변환은 노드 children 위치에 한정, 저장 schema/golden은 유지. JSON에 없는 undefined는 export에서 제외한다. parser 입력 unknown의 root 검사를 추가해 TS2345와 잘못된 호출 경계를 해결했다.
+- 검증: 전체418개 및 패키지 소비 통과. 단위 기본factory/transform·metadata 고유 type·v1/v2 동등성·detached export·원자적 거부 회귀 포함. M111.
+- 작업 절차 오류: 초안 patch에서 잘못된 헤더/상대 경로로 적용이 거부됐다. 파일은 변경되지 않았으며 실제 현재 컨텍스트/절대 경로를 확인해 재적용했다. M113.
+
+## E122 — 브라우저 선택자·재구성 fixture에 오래된 실행 가정
+
+- dimensions의 부분일치 불러오기 selector가 두 버튼에 일치해 strict mode 실패. exact:true 적용 후 실제 크기 수정/저장/재로드 테스트 통과.
+- 전체 editor의 JSON textarea는 닫힌 details 내부인데 열지 않고 읽었다. summary를 열고 읽도록 수정. closed details 안의 role locator로 부모를 찾을 수 없었던 초안도 textarea 속성 selector로 교정. HTML open 속성의 빈 문자열을 false로 취급하지 않고 존재 여부로 검사.
+- upstream 재구성 helper는 원본 HTML에서 읽지 않은 root textFormat:0/textStyle:''를 추가했다. Lexical0.52는 이 기본값을 생략하므로 strict bridge가 손실로 거부했다. helper에서 **추가한 기본값 두 개만** 제거하고9섹션/60블록/7노트·콘텐츠·metadata 검사는 유지. validator나 손실 거부를 완화하지 않았다.
+- 재검증: dimensions 통과. 전체 roundtrip은 저장/재열기·titleId 보존을 통과하고 E120 iframe 검사에서 실패. 전체 editor는 실제 JSON 비교에 도달해 E123을 발견. M112.
+
+## E123 — React 전체 문서 재열기에서 노트 textFormat 추가 (미해결)
+
+- 실제9섹션 restore 후 첫 JSON 비교에서 sn-in-his-later-books sidenote에 원본 상태에 없는 textFormat:2가 추가됐다. DOM 또는 콘텐츠 삭제를 확인한 것은 아니지만 **정확한 저장 동등성 실패**다.
+- headless 왕복은 통과하므로 React 갱신/정규화 경로를 별도 분석해야 한다. 정확한 쓰기 지점/원인은 아직 확정하지 않았다. 서식 필드를 무조건 삭제하거나 수락 비교에서 제외하지 않았다.
+- 다음: 해당 노트의 rich child 구성을 작은 React 회귀로 축소, load→reconcile→inspect 단계의 상태 변경을 확인하고 명시적 서식 보존·Undo/Redo·재로드까지 재검증. M112.
+
+## E124 — HTTP 회귀가 테스트 venv 대신 시스템 Python을 사용
+
+- 최초 실행은 시스템 Python에 uvicorn이 없어 ModuleNotFoundError. pytest 실행 venv와 HTTP subprocess의 interpreter가 달랐다.
+- RECOVERY_PYTHON=/tmp/tufte-recheck-python/bin/python으로 기존 의존성 설치 환경을 명시해 재실행 통과. 전역 설치나 의존성 변경 없음. M113.
+
 ## 2026-10-23 remediation 브랜치 재검증
 
 기준 `383d25c`, 현재 판정은 [재검증 보고서](VERIFICATION_BROWSER_REMEDIATION_2026-10-23.ko.md). browser **12통과/20실패/2시간초과**, 전체 통과 아님. 아래 main의 19/15는 과거 별도 tree 결과다. E115 문서 회귀는 57개 패키지 테스트에서 통과했지만 E114 bridge 회귀는 파일 시간 초과로 미검증이다.

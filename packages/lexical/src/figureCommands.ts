@@ -1,3 +1,4 @@
+import {canonicalBlockType} from './blockSerialization.js';
 import {$addUpdateTag,$createTextNode,$getSelection,$isRangeSelection,$isNodeSelection,createCommand,COMMAND_PRIORITY_EDITOR,HISTORY_PUSH_TAG,type LexicalCommand,type LexicalEditor,type LexicalNode} from 'lexical';
 import {NODE_SCHEMA,isSafeURL,isIdentifier,type Diagnostic} from '@lexical-tufte/document';
 import {SectionNode,FigureNode,CaptionNode,$createFigureNode,$createCaptionNode,type FigureWidth} from './LayoutNodes.js';
@@ -19,7 +20,7 @@ export function registerFigureCommands(editor:LexicalEditor,onDiagnostic?:(diagn
  if(!editor.hasNodes([SectionNode,FigureNode,CaptionNode]))throw Error('Figure commands require TUFTE_NODES');
  const reject=(code:string,message:string)=>{onDiagnostic?.({code,path:'$.selection',message});return true;};
  const ancestor=(node:LexicalNode,type:string):LexicalNode|null=>{
-  for(let n:LexicalNode|null=node;n;n=n.getParent())if(n.getType()===type)return n;
+  for(let n:LexicalNode|null=node;n;n=n.getParent())if(canonicalBlockType(n.getType())===type)return n;
   return null;
  };
  const selection=()=>{
@@ -60,7 +61,7 @@ export function registerFigureCommands(editor:LexicalEditor,onDiagnostic?:(diagn
    if(!(section instanceof SectionNode)||section.getParent()?.getType()!=='root')return reject('INVALID_FIGURE_SELECTION','최상위 섹션 안에서만 그림을 삽입할 수 있습니다.');
    let block:LexicalNode=s.anchor.getNode();
    while(block.getParent()&&!block.getParent()!.is(section))block=block.getParent()!;
-   if(!block.getParent()?.is(section)||!NODE_SCHEMA['tufte-section']!.children!.includes(block.getType()))
+   if(!block.getParent()?.is(section)||!NODE_SCHEMA['tufte-section']!.children!.includes(canonicalBlockType(block.getType())))
     return reject('INVALID_FIGURE_SELECTION','유효한 섹션 블록을 선택하세요.');
    $addUpdateTag(HISTORY_PUSH_TAG);
    const figure=$createFigureNode(payload.width??'body').append($createInlineImageNode(payload.src,payload.alt,payload.assetId,payload.imageWidth,payload.imageHeight));

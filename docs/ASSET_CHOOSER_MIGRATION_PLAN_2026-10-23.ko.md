@@ -9,6 +9,8 @@
 
 ## 2026-10-23 우선순위 변경 — 편집기 먼저, 자산 기능 보류
 
+**최신 실행 업데이트:** E117 등록 충돌 및 E114 회귀 검증 완료. check418개·package5개 소비·Python16/HTTP 통과, browser29통과/5실패(timeout·skip0). E123 React note 서식 drift와 E120 iframe 차이가 남아 E1/E2/E3 전체 완료는 아니다. A0–A8 보류 유지. [최신 보고서](VERIFICATION_NODE_REGISTRY_2026-10-23.ko.md). 바로 아래 수치는 이전 tree의 실행 이력이다.
+
 **실행 업데이트:** `383d25c` 재검증에서 build/typecheck·비-Lexical185개·Python16/HTTP 통과, Lexical62통과/77실패/2취소, browser12통과/20실패/2시간초과. E117 교체 registry 충돌과 E120 iframe 원본 구조 차이 미해결. E114 bridge는 파일 timeout으로 미검증, E115 문서 회귀는 통과. E1/E2/E3 완료로 체크하지 않는다. [재검증 보고서](VERIFICATION_BROWSER_REMEDIATION_2026-10-23.ko.md) 참조. A0–A8 보류는 변경하지 않는다.
 
 **이 결정이 아래 과거 A0~A8 단계의 우선순위·착수 지시보다 우선한다.** AssetProvider는 호스트 중립 **인터페이스만 유지**하고, 현재 브랜치에서 자산 관리 기능을 더 확장하지 않는다. 이전에 작성된 노트 이미지 chooser·imageCatalog 초안은 삭제하지 않되, 구현 완료 또는 검증 통과로 해석하지 않는다. 새로운 작업은 공식 Tufte CSS 편집기·발행 구조 완성과 미해결 브라우저 테스트를 우선한다.

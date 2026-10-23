@@ -65,7 +65,7 @@ try{
  await page.getByRole('button',{name:'저장'}).click();
  await page.reload();
  await editor.waitFor();
- await page.getByRole('button',{name:'불러오기'}).click();
+ await page.getByRole('button',{name:'불러오기',exact:true}).click();
  assert.equal(await image.getAttribute('width'),'320');
  assert.equal(await image.getAttribute('height'),'240');
 

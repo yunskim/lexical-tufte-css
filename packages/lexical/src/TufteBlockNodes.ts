@@ -10,7 +10,7 @@ import {isSafeURL} from '@lexical-tufte/document';
 export type SerializedTufteParagraph=SerializedParagraphNode&{tufteClass?:'sans'};
 export class TufteParagraphNode extends ParagraphNode {
  __tufteClass?:'sans';
- static getType():string{return 'paragraph';}
+ static getType():string{return 'tufte-paragraph';}
  static clone(node:TufteParagraphNode):TufteParagraphNode{
   const copy=new TufteParagraphNode(node.__key);
   copy.__tufteClass=node.__tufteClass;
@@ -38,8 +38,7 @@ export class TufteParagraphNode extends ParagraphNode {
    result.element.classList.add('sans');
   return result;
  }
- // Built-in ParagraphNode.importJSON uses $createParagraphNode (which is
- // replaced by this class), so its virtual updater must restore our field.
+ // The document boundary dispatches metadata-bearing paragraphs to this type.
  updateFromJSON(value:LexicalUpdateJSON<SerializedTufteParagraph>):this{
   return super.updateFromJSON(value).setTufteClass(value.tufteClass);
  }
@@ -58,11 +57,11 @@ export function $createTufteParagraphNode(tufteClass?:'sans'):TufteParagraphNode
  return $applyNodeReplacement(new TufteParagraphNode()).setTufteClass(tufteClass);
 }
 
-/** Preserves an original blockquote[cite] URL on the existing quote wire type. */
+/** Distinct runtime type; the document boundary preserves the quote wire type. */
 export type SerializedTufteQuote=SerializedQuoteNode&{cite?:string};
 export class TufteQuoteNode extends QuoteNode {
  __cite?:string;
- static getType():string{return 'quote';}
+ static getType():string{return 'tufte-quote';}
  static clone(node:TufteQuoteNode):TufteQuoteNode{
   const copy=new TufteQuoteNode(node.__key);
   copy.__cite=node.__cite;
@@ -93,8 +92,7 @@ export class TufteQuoteNode extends QuoteNode {
    result.element.setAttribute('cite',this.getCite()!);
   return result;
  }
- // Built-in QuoteNode.importJSON creates the replacement subclass.
- // Preserve cite when the base parser dispatches through updateFromJSON.
+ // Preserve cite through edits and explicit boundary import.
  updateFromJSON(value:LexicalUpdateJSON<SerializedTufteQuote>):this{
   return super.updateFromJSON(value).setCite(value.cite);
  }

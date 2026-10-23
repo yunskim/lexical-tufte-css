@@ -6,7 +6,7 @@ export type SerializedTufteHeadingNode=SerializedHeadingNode&{id?:string};
 const safeId=(id:string)=>/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(id);
 export class TufteHeadingNode extends HeadingNode{
  __id?:string;
- static getType():string{return 'heading';}
+ static getType():string{return 'tufte-heading';}
  static clone(node:TufteHeadingNode):TufteHeadingNode{
   const copy=new TufteHeadingNode(node.getTag(),node.__key);
   copy.__id=node.__id;

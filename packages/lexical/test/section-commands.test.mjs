@@ -1,4 +1,5 @@
 import {test} from 'node:test';
+import {exportCanonicalEditorState} from '../dist/index.js';
 import assert from 'node:assert/strict';
 import {$getRoot,$createParagraphNode,$createTextNode,$getSelection,UNDO_COMMAND,REDO_COMMAND} from 'lexical';
 import {$createTableNode,$createTableRowNode,$createTableCellNode} from '@lexical/table';
@@ -6,7 +7,7 @@ import {$createLinkNode} from '@lexical/link';
 import {createFixtureEditor} from './all-nodes-fixture.mjs';
 import {registerSectionCommands,WRAP_TUFTE_ROOT_COMMAND,INSERT_TUFTE_SECTION_COMMAND,SPLIT_TUFTE_SECTION_COMMAND,MERGE_TUFTE_SECTION_COMMAND,SET_TUFTE_BLOCK_COMMAND,$createSectionNode,$createSidenoteNode,$createInlineImageNode,$createTufteSpanNode,$createTableLayoutNode} from '../dist/index.js';
 import {registerHistory,createEmptyHistoryState} from '@lexical/history';
-const json=editor=>JSON.parse(JSON.stringify(editor.getEditorState().toJSON()));
+const json=editor=>exportCanonicalEditorState(editor.getEditorState());
 const run=(editor,command,payload)=>editor.update(()=>editor.dispatchCommand(command,payload),{discrete:true});
 function setup(seed){const editor=createFixtureEditor(),diagnostics=[],unregister=registerSectionCommands(editor,d=>diagnostics.push(d));editor.update(seed,{discrete:true});return {editor,diagnostics,unregister};}
 test('P2.2.a explicit root wrap preserves rich payload/identities and creates a valid section',()=>{

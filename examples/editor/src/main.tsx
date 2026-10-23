@@ -18,7 +18,7 @@ import {
   SELECTION_INSERT_CLIPBOARD_NODES_COMMAND, COPY_COMMAND, CUT_COMMAND, PASTE_COMMAND, KEY_BACKSPACE_COMMAND, KEY_DELETE_COMMAND, HISTORY_PUSH_TAG, UNDO_COMMAND, REDO_COMMAND,
   COMMAND_PRIORITY_HIGH, type LexicalNode, type EditorState, type RangeSelection,
 } from 'lexical';
-import {registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,registerQuotationCommands,INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_SECTION_CITE_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,registerListKeyboardCommands,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,SET_TUFTE_LIST_KIND_COMMAND,CHANGE_TUFTE_LIST_INDENT_COMMAND,UNWRAP_TUFTE_LIST_COMMAND,registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND,WRAP_TUFTE_SPAN_COMMAND,UNWRAP_TUFTE_SPAN_COMMAND,registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_PAIR_COMMAND,MOVE_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_LIST_COMMAND,registerSectionCommands,WRAP_TUFTE_ROOT_COMMAND,INSERT_TUFTE_SECTION_COMMAND,SPLIT_TUFTE_SECTION_COMMAND,MERGE_TUFTE_SECTION_COMMAND,SET_TUFTE_BLOCK_COMMAND,inspectEditorStructure,focusStructureIssue,type StructureIssue,replaceEditorDocumentState,TUFTE_NODES,NoteNode, InlineImageNode, $createSidenoteNode, $createMarginnoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, registerNoteEdgeTypingGuard} from '@lexical-tufte/lexical';
+import {canonicalBlockType,exportCanonicalEditorState,parseCanonicalEditorState,registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,registerQuotationCommands,INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_SECTION_CITE_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,registerListKeyboardCommands,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,SET_TUFTE_LIST_KIND_COMMAND,CHANGE_TUFTE_LIST_INDENT_COMMAND,UNWRAP_TUFTE_LIST_COMMAND,registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND,WRAP_TUFTE_SPAN_COMMAND,UNWRAP_TUFTE_SPAN_COMMAND,registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_PAIR_COMMAND,MOVE_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_LIST_COMMAND,registerSectionCommands,WRAP_TUFTE_ROOT_COMMAND,INSERT_TUFTE_SECTION_COMMAND,SPLIT_TUFTE_SECTION_COMMAND,MERGE_TUFTE_SECTION_COMMAND,SET_TUFTE_BLOCK_COMMAND,inspectEditorStructure,focusStructureIssue,type StructureIssue,replaceEditorDocumentState,TUFTE_NODES,NoteNode, InlineImageNode, $createSidenoteNode, $createMarginnoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, registerNoteEdgeTypingGuard} from '@lexical-tufte/lexical';
 import {NODE_SCHEMA} from '@lexical-tufte/document';
 import {NoteImagePanel,type NoteImageChoice,type ImagePresentation} from './NoteImagePanel.js';
 import './style.css';
@@ -115,7 +115,7 @@ function canOpenBlockMenu(node:LexicalNode):boolean{
  let hasEditableBlock=false;
  for(let current:LexicalNode|null=node;current;current=current.getParent()){
   if(current instanceof NoteNode)return false;
-  const type=current.getType();
+  const type=canonicalBlockType(current.getType());
   if(['table','tablerow','tablecell','figure','image'].includes(type))return false;
   if(['paragraph','heading','quote'].includes(type))hasEditableBlock=true;
   if(type==='root')break;
@@ -128,23 +128,23 @@ const NO_BLOCK_MENU_ACTIONS:BlockMenuCapabilities={paragraph:false,heading:false
 function blockMenuCapabilities(node:LexicalNode):BlockMenuCapabilities{
  if(!canOpenBlockMenu(node))return NO_BLOCK_MENU_ACTIONS;
  let selected:LexicalNode|null=node;
- while(selected&&!['paragraph','heading','quote'].includes(selected.getType()))selected=selected.getParent();
+ while(selected&&!['paragraph','heading','quote'].includes(canonicalBlockType(selected.getType())))selected=selected.getParent();
  if(!selected)return NO_BLOCK_MENU_ACTIONS;
  const selectedBlock=selected;
  const parent=selectedBlock.getParent();
  const children=$isElementNode(selectedBlock)?selectedBlock.getChildren():[];
  const canConvert=(target:'paragraph'|'heading')=>
-  (selectedBlock.getType()==='paragraph'||selectedBlock.getType()==='heading')&&
-  Boolean(parent&&NODE_SCHEMA[parent.getType()]?.children?.includes(target))&&
-  children.every(child=>NODE_SCHEMA[target]?.children?.includes(child.getType()));
+  (canonicalBlockType(selectedBlock.getType())==='paragraph'||canonicalBlockType(selectedBlock.getType())==='heading')&&
+  Boolean(parent&&NODE_SCHEMA[canonicalBlockType(parent.getType())]?.children?.includes(target))&&
+  children.every(child=>NODE_SCHEMA[target]?.children?.includes(canonicalBlockType(child.getType())));
  let section:LexicalNode|null=node;
- while(section&&section.getType()!=='tufte-section')section=section.getParent();
+ while(section&&canonicalBlockType(section.getType())!=='tufte-section')section=section.getParent();
  let direct:LexicalNode=node;
  if(section){
   while(direct.getParent()&&!direct.getParent()!.is(section))direct=direct.getParent()!;
  }
  const insert=Boolean(section&&section.getParent()?.getType()==='root'&&
-  direct.getParent()?.is(section)&&NODE_SCHEMA['tufte-section']?.children?.includes(direct.getType()));
+  direct.getParent()?.is(section)&&NODE_SCHEMA['tufte-section']?.children?.includes(canonicalBlockType(direct.getType())));
  return {paragraph:canConvert('paragraph'),heading:canConvert('heading'),insert};
 }
 function BlockContextMenu(){
@@ -161,8 +161,8 @@ function BlockContextMenu(){
   targetSelectionRef.current=selection.clone();
   setCapabilities(blockMenuCapabilities(selection.anchor.getNode()));
   let node:LexicalNode=selection.anchor.getNode();
-  while(node.getParent()&&node.getParent()?.getKey()!=='root'&&!['paragraph','heading','quote'].includes(node.getType()))node=node.getParent()!;
-  setBlockType($isHeadingNode(node)?(node.getTag()==='h3'?'제목 h3':'제목 h2'):node.getType()==='quote'?'인용문':'본문');
+  while(node.getParent()&&node.getParent()?.getKey()!=='root'&&!['paragraph','heading','quote'].includes(canonicalBlockType(node.getType())))node=node.getParent()!;
+  setBlockType($isHeadingNode(node)?(node.getTag()==='h3'?'제목 h3':'제목 h2'):canonicalBlockType(node.getType())==='quote'?'인용문':'본문');
   setAvailable(true);
  };
  const closeMenu=()=>{
@@ -350,7 +350,7 @@ function EditorUI(){
   function recoverStructure(){
     if(!checkpoint.current){setStatus('복구할 정상 구조가 없습니다. 문제 위치를 수정하거나 실행 취소하세요.');return;}
     try{
-      localStorage.setItem('lexical-tufte-recovery-v1',JSON.stringify(editor.getEditorState().toJSON()));
+      localStorage.setItem('lexical-tufte-recovery-v1',JSON.stringify(exportCanonicalEditorState(editor.getEditorState())));
       editor.setEditorState(checkpoint.current,{tag:HISTORY_PUSH_TAG});setStatus('복구용 사본을 보존하고 마지막 정상 구조로 돌아왔습니다.');
     }catch{setStatus('복구용 사본 저장에 실패했습니다. 현재 내용은 유지합니다.');}
   }
@@ -388,7 +388,7 @@ function EditorUI(){
       if(pending!==undefined){clearTimeout(pending);pending=undefined;}
       if(latest===null)return;
       try{
-        localStorage.setItem(sessionKey,JSON.stringify({savedAt:new Date().toISOString(),state:latest.toJSON()}));
+        localStorage.setItem(sessionKey,JSON.stringify({savedAt:new Date().toISOString(),state:exportCanonicalEditorState(latest)}));
         latest=null;refresh();setAutoSaveState('이 탭의 편집 상태를 복구용으로 저장했습니다.');
       }catch{
         // Quota pressure must not silently delete older recovery copies.
@@ -476,7 +476,7 @@ function EditorUI(){
       if(choice===null){setStatus('복구본 선택을 취소했습니다.');return;}
       const selected=/^(0|[1-9][0-9]*)$/.test(choice)?entries[Number(choice)]:undefined;
       if(!selected){setStatus('복구본 선택을 취소했습니다.');return;}
-      const state=editor.parseEditorState(JSON.stringify(selected.state));
+      const state=parseCanonicalEditorState(editor,selected.state);
       if(!window.confirm('현재 편집 상태를 선택한 복구본으로 바꾸시겠습니까?'))return;
       replaceEditorDocumentState(editor,state);
       setStatus('선택한 복구본을 열었습니다. 구조를 확인한 후 정상 저장하세요.');
@@ -657,18 +657,18 @@ function EditorUI(){
     return true;
   }
   function exportDocument(){
-    if(inspectEditorStructure(editor).length){setHtml('');setJson(JSON.stringify(editor.getEditorState().toJSON(),null,2));setStatus('구조를 수정해야 HTML을 생성할 수 있습니다. JSON은 복구용으로 보존합니다.');return;}
+    if(inspectEditorStructure(editor).length){setHtml('');setJson(JSON.stringify(exportCanonicalEditorState(editor.getEditorState()),null,2));setStatus('구조를 수정해야 HTML을 생성할 수 있습니다. JSON은 복구용으로 보존합니다.');return;}
     editor.getEditorState().read(()=>setHtml($generateHtmlFromNodes(editor)));
-    setJson(JSON.stringify(editor.getEditorState().toJSON(),null,2));setStatus('JSON과 HTML을 생성했습니다.');
+    setJson(JSON.stringify(exportCanonicalEditorState(editor.getEditorState()),null,2));setStatus('JSON과 HTML을 생성했습니다.');
   }
   function save(){
-    try{const invalid=inspectEditorStructure(editor).length>0;localStorage.setItem(invalid?'lexical-tufte-recovery-v1':'lexical-tufte-p1',JSON.stringify(editor.getEditorState().toJSON()));setStatus(invalid?'구조 오류가 있어 복구용 사본에만 저장했습니다. 마지막 저장 문서는 유지합니다.':'이 브라우저에 저장했습니다.');}
+    try{const invalid=inspectEditorStructure(editor).length>0;localStorage.setItem(invalid?'lexical-tufte-recovery-v1':'lexical-tufte-p1',JSON.stringify(exportCanonicalEditorState(editor.getEditorState())));setStatus(invalid?'구조 오류가 있어 복구용 사본에만 저장했습니다. 마지막 저장 문서는 유지합니다.':'이 브라우저에 저장했습니다.');}
     catch{setStatus('저장 실패: 저장 공간을 확인하세요.');}
   }
   function restore(){
     try{
       const raw=localStorage.getItem('lexical-tufte-p1');if(!raw){setStatus('저장한 문서가 없습니다.');return;}
-      replaceEditorDocumentState(editor,editor.parseEditorState(raw));setStatus('저장한 문서를 불러왔습니다.');
+      replaceEditorDocumentState(editor,parseCanonicalEditorState(editor,JSON.parse(raw)));setStatus('저장한 문서를 불러왔습니다.');
     }catch{setStatus('문서를 불러오지 못했습니다.');}
   }
   const preserve=(e:MouseEvent<HTMLButtonElement>)=>e.preventDefault();

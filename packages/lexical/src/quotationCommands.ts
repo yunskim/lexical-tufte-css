@@ -1,3 +1,4 @@
+import {canonicalBlockType} from './blockSerialization.js';
 import {HorizontalRuleNode,$createHorizontalRuleNode} from '@lexical/react/LexicalHorizontalRuleNode';
 import {$addUpdateTag,$createTextNode,$getSelection,$isRangeSelection,createCommand,COMMAND_PRIORITY_EDITOR,HISTORY_PUSH_TAG,type LexicalCommand,type LexicalEditor,type LexicalNode} from 'lexical';
 import {QuoteNode,$createQuoteNode} from '@lexical/rich-text';
@@ -18,7 +19,7 @@ export function registerQuotationCommands(editor:LexicalEditor,onDiagnostic?:(di
   throw Error('Quotation commands require TUFTE_NODES');
  const reject=(message:string)=>{onDiagnostic?.({code:'INVALID_QUOTATION_SELECTION',path:'$.selection',message});return true;};
  const ancestor=(node:LexicalNode,type:string):LexicalNode|null=>{
-  for(let n:LexicalNode|null=node;n;n=n.getParent())if(n.getType()===type)return n;
+  for(let n:LexicalNode|null=node;n;n=n.getParent())if(canonicalBlockType(n.getType())===type)return n;
   return null;
  };
  const selected=()=>{
@@ -34,7 +35,7 @@ export function registerQuotationCommands(editor:LexicalEditor,onDiagnostic?:(di
    if(!(section instanceof SectionNode)||section.getParent()?.getType()!=='root')return reject('최상위 섹션에서만 구분선을 삽입할 수 있습니다.');
    let block:LexicalNode=s.anchor.getNode();
    while(block.getParent()&&!block.getParent()!.is(section))block=block.getParent()!;
-   if(!block.getParent()?.is(section)||!NODE_SCHEMA['tufte-section']!.children!.includes(block.getType())||!NODE_SCHEMA['tufte-section']!.children!.includes('horizontalrule'))return reject('유효한 섹션 블록을 선택하세요.');
+   if(!block.getParent()?.is(section)||!NODE_SCHEMA['tufte-section']!.children!.includes(canonicalBlockType(block.getType()))||!NODE_SCHEMA['tufte-section']!.children!.includes('horizontalrule'))return reject('유효한 섹션 블록을 선택하세요.');
    $addUpdateTag(HISTORY_PUSH_TAG);
    const rule=$createHorizontalRuleNode();block.insertAfter(rule);rule.selectNext();return true;
   },COMMAND_PRIORITY_EDITOR),
@@ -45,7 +46,7 @@ export function registerQuotationCommands(editor:LexicalEditor,onDiagnostic?:(di
    if(!(section instanceof SectionNode)||section.getParent()?.getType()!=='root')return reject('최상위 섹션 안에서만 삽입할 수 있습니다.');
    let block:LexicalNode=s.anchor.getNode();
    while(block.getParent()&&!block.getParent()!.is(section))block=block.getParent()!;
-   if(!block.getParent()?.is(section)||!NODE_SCHEMA['tufte-section']!.children!.includes(block.getType()))return reject('유효한 섹션 블록을 선택하세요.');
+   if(!block.getParent()?.is(section)||!NODE_SCHEMA['tufte-section']!.children!.includes(canonicalBlockType(block.getType())))return reject('유효한 섹션 블록을 선택하세요.');
    const insertedType=kind==='quote'?'quote':kind==='epigraph'?'tufte-epigraph':'tufte-section-footer';
    if(!NODE_SCHEMA['tufte-section']!.children!.includes(insertedType))return reject('섹션에 허용되지 않는 인용 구조입니다.');
    $addUpdateTag(HISTORY_PUSH_TAG);
@@ -56,7 +57,7 @@ export function registerQuotationCommands(editor:LexicalEditor,onDiagnostic?:(di
    const s=selected();if(!s)return reject('섹션 출처 안의 한 위치를 선택하세요.');
    const footer=ancestor(s.anchor.getNode(),'tufte-section-footer');
    if(!(footer instanceof SectionFooterNode)||footer.getParent()?.getType()!=='tufte-section'||footer.getParent()?.getParent()?.getType()!=='root')return reject('최상위 섹션의 출처에서만 인용 출처를 추가할 수 있습니다.');
-   if(footer.getChildren().some(n=>n.getType()==='tufte-cite'))return reject('섹션 출처에 인용 출처가 이미 있습니다.');
+   if(footer.getChildren().some(n=>canonicalBlockType(n.getType())==='tufte-cite'))return reject('섹션 출처에 인용 출처가 이미 있습니다.');
    if(!NODE_SCHEMA['tufte-section-footer']!.children!.includes('tufte-cite'))return reject('섹션 출처에 인용 출처를 추가할 수 없습니다.');
    $addUpdateTag(HISTORY_PUSH_TAG);
    const cite=$createCiteNode().append($createTextNode('문헌'));
@@ -67,7 +68,7 @@ export function registerQuotationCommands(editor:LexicalEditor,onDiagnostic?:(di
    const q=ancestor(s.anchor.getNode(),'quote');
    if(!(q instanceof QuoteNode))return reject('인용문 안에서만 출처를 추가할 수 있습니다.');
    if(!q.getParent()||!NODE_SCHEMA[q.getParent()!.getType()]?.children?.includes('quote'))return reject('문서 스키마에 허용된 인용문에서만 출처를 추가할 수 있습니다.');
-   if(q.getChildren().some(n=>n.getType()==='tufte-attribution'))return reject('인용문에 출처가 이미 있습니다.');
+   if(q.getChildren().some(n=>canonicalBlockType(n.getType())==='tufte-attribution'))return reject('인용문에 출처가 이미 있습니다.');
    if(!NODE_SCHEMA.quote!.children!.includes('tufte-attribution'))return reject('인용문에 출처를 추가할 수 없습니다.');
    $addUpdateTag(HISTORY_PUSH_TAG);
    const cite=$createCiteNode().append($createTextNode('출처'));

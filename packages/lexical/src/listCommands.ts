@@ -1,3 +1,4 @@
+import {canonicalBlockType} from './blockSerialization.js';
 import {$addUpdateTag,$createParagraphNode,$getSelection,$isRangeSelection,createCommand,COMMAND_PRIORITY_EDITOR,COMMAND_PRIORITY_HIGH,KEY_ENTER_COMMAND,KEY_BACKSPACE_COMMAND,KEY_TAB_COMMAND,HISTORY_PUSH_TAG,type LexicalCommand,type LexicalEditor,type LexicalNode} from 'lexical';
 import {$createListNode,$createListItemNode,ListNode,ListItemNode} from '@lexical/list';
 import {SectionNode} from './LayoutNodes.js';
@@ -23,7 +24,7 @@ export function registerListCommands(editor:LexicalEditor,onDiagnostic?:(diagnos
   return $isRangeSelection(s)&&s.isCollapsed()&&!editor.isComposing()&&!$getContainingNote(s.anchor.getNode())?s:null;
  };
  const ancestor=(node:LexicalNode,type:string):LexicalNode|null=>{
-  for(let n:LexicalNode|null=node;n;n=n.getParent())if(n.getType()===type)return n;
+  for(let n:LexicalNode|null=node;n;n=n.getParent())if(canonicalBlockType(n.getType())===type)return n;
   return null;
  };
  const registrations=[
@@ -34,7 +35,7 @@ export function registerListCommands(editor:LexicalEditor,onDiagnostic?:(diagnos
    if(!(section instanceof SectionNode)||section.getParent()?.getType()!=='root')return reject('최상위 섹션에서만 목록을 삽입할 수 있습니다.');
    let block:LexicalNode=s.anchor.getNode();
    while(block.getParent()&&!block.getParent()!.is(section))block=block.getParent()!;
-   if(!block.getParent()?.is(section)||!NODE_SCHEMA['tufte-section']!.children!.includes(block.getType()))return reject('유효한 섹션 블록을 선택하세요.');
+   if(!block.getParent()?.is(section)||!NODE_SCHEMA['tufte-section']!.children!.includes(canonicalBlockType(block.getType())))return reject('유효한 섹션 블록을 선택하세요.');
    $addUpdateTag(HISTORY_PUSH_TAG);
    const item=$createListItemNode();
    const list=$createListNode(kind).append(item);
@@ -97,7 +98,7 @@ export function registerListCommands(editor:LexicalEditor,onDiagnostic?:(diagnos
    const items=list.getChildren();
    const allowed=NODE_SCHEMA.paragraph?.children;
    if(items.length===0||!items.every((item):item is ListItemNode=>item instanceof ListItemNode&&
-       item.getIndent()===0&&item.getChildren().every(child=>allowed?.includes(child.getType()))))
+       item.getIndent()===0&&item.getChildren().every(child=>allowed?.includes(canonicalBlockType(child.getType())))))
     return reject('중첩 목록·지원하지 않는 자식이 있는 항목은 내용 보존을 위해 해제하지 않습니다.');
    const selectedItem=ancestor(s.anchor.getNode(),'listitem');
    const selectedIndex=items.findIndex(item=>item.is(selectedItem));

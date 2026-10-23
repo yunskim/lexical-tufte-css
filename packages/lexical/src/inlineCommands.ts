@@ -1,3 +1,4 @@
+import {canonicalBlockType} from './blockSerialization.js';
 import {$getSelection,$isRangeSelection,$isTextNode,createCommand,COMMAND_PRIORITY_EDITOR,HISTORY_PUSH_TAG,$addUpdateTag,type LexicalCommand,type LexicalEditor,type LexicalNode} from 'lexical';
 import {NODE_SCHEMA,type Diagnostic} from '@lexical-tufte/document';
 import {TufteSpanNode,$createTufteSpanNode,type TufteSpanKind} from './TufteSpanNode.js';
@@ -45,7 +46,7 @@ export function registerInlineCommands(editor:LexicalEditor,onDiagnostic?:(diagn
      $getContainingNote(text)||nearest(text))
    return reject('INVALID_SPAN_SELECTION','노트·기존 span 안의 텍스트에는 새 span을 씌울 수 없습니다.');
   const parent=text.getParent();
-  if(!parent||!NODE_SCHEMA[parent.getType()]?.children?.includes('tufte-span'))
+  if(!parent||!NODE_SCHEMA[canonicalBlockType(parent.getType())]?.children?.includes('tufte-span'))
    return reject('INVALID_SPAN_PARENT','현재 부모 요소에는 Tufte 인라인 속성을 삽입할 수 없습니다.');
   // Validate before splitText: a rejected command must not modify the editor tree.
   $addUpdateTag(HISTORY_PUSH_TAG);
@@ -64,9 +65,9 @@ export function registerInlineCommands(editor:LexicalEditor,onDiagnostic?:(diagn
    return reject('INVALID_SPAN_SELECTION','기존 인라인 속성 내부의 한 위치를 선택하세요.');
   const span=nearest(selection.anchor.getNode()),parent=span?.getParent();
   if(!span)return reject('INVALID_SPAN_SELECTION','기존 인라인 속성 내부의 한 위치를 선택하세요.');
-  if(!parent||!NODE_SCHEMA[parent.getType()]?.children?.includes('text'))
+  if(!parent||!NODE_SCHEMA[canonicalBlockType(parent.getType())]?.children?.includes('text'))
    return reject('INVALID_SPAN_PARENT','현재 부모 요소에는 span의 텍스트를 직접 배치할 수 없습니다.');
-  if(span.getChildren().some(child=>!NODE_SCHEMA[parent.getType()]!.children!.includes(child.getType())))
+  if(span.getChildren().some(child=>!NODE_SCHEMA[canonicalBlockType(parent.getType())]!.children!.includes(canonicalBlockType(child.getType()))))
    return reject('INVALID_SPAN_PARENT','인라인 속성 해제로 현재 자식 구조를 보존할 수 없습니다.');
   // Preserve the logical caret inside the unwrapped text, not a potentially
   // stale selection clone pointing through a removed element.

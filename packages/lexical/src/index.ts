@@ -4,6 +4,7 @@ export {createHeadlessEditor} from "@lexical/headless";
 export {NoteNode, type SerializedNoteNode} from './NoteNode.js';
 export {TufteHeadingNode,$createTufteHeadingNode,type SerializedTufteHeadingNode} from './TufteHeadingNode.js';
 export {TufteParagraphNode,$createTufteParagraphNode,type SerializedTufteParagraph,TufteQuoteNode,$createTufteQuoteNode,type SerializedTufteQuote} from './TufteBlockNodes.js';
+export {canonicalBlockType,exportCanonicalEditorState,parseCanonicalEditorState} from './blockSerialization.js';
 export {SidenoteNode,$createSidenoteNode} from './SidenoteNode.js';
 export {MarginnoteNode,$createMarginnoteNode} from './MarginnoteNode.js';
 export {$createInlineImageNode, InlineImageNode} from './InlineImageNode.js';

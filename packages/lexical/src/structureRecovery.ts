@@ -1,3 +1,4 @@
+import {canonicalBlockType} from './blockSerialization.js';
 import {$getRoot,$getNodeByKey,$isElementNode,type LexicalEditor,type LexicalNode,type NodeKey} from 'lexical';
 import {NODE_SCHEMA} from '@lexical-tufte/document';
 
@@ -8,16 +9,16 @@ export function $inspectEditorStructure():StructureIssue[]{
  const add=(node:LexicalNode,path:string,code:string,message:string)=>issues.push({code,key:node.getKey(),path,message});
  function visit(node:LexicalNode,path:string){
   if(!$isElementNode(node))return;
-  const type=node.getType(),children=node.getChildren(),types=children.map(child=>child.getType());
+  const type=canonicalBlockType(node.getType()),children=node.getChildren(),types=children.map(child=>canonicalBlockType(child.getType()));
   if(['tufte-section','tufte-figure','tufte-table-layout'].includes(type)){
    const allowed=NODE_SCHEMA[type]?.children??[];
-   for(const [i,child]of children.entries())if(!allowed.includes(child.getType()))add(node,`${path}.children[${i}]`,'INVALID_CHILD','이 위치에 허용되지 않는 내용이 있습니다.');
+   for(const [i,child]of children.entries())if(!allowed.includes(canonicalBlockType(child.getType())))add(node,`${path}.children[${i}]`,'INVALID_CHILD','이 위치에 허용되지 않는 내용이 있습니다.');
    if(children.length===0)add(node,path,'EMPTY_NODE','비어 있는 구조입니다. 내용을 추가하거나 실행 취소하세요.');
   }
   if(type==='tufte-figure'){
    const images=types.filter(t=>t==='tufte-inline-image'||t==='tufte-imagequilt');
    if(images.length!==1||types.filter(t=>t==='tufte-caption').length>1||(types.indexOf('tufte-caption')!==-1&&types.indexOf('tufte-caption')<types.findIndex(t=>t==='tufte-inline-image'||t==='tufte-imagequilt')))add(node,path,'INVALID_FIGURE','그림은 이미지 하나와 이미지 뒤의 캡션 하나까지 허용하며 여백 주석을 포함할 수 있습니다.');
-   if(children.some(child=>child.getType()==='tufte-sidenote'))add(node,path,'INVALID_FIGURE_NOTE','그림에 직접 연결하는 주석은 여백 주석이어야 합니다.');
+   if(children.some(child=>canonicalBlockType(child.getType())==='tufte-sidenote'))add(node,path,'INVALID_FIGURE_NOTE','그림에 직접 연결하는 주석은 여백 주석이어야 합니다.');
   }
   if(type==='tufte-table-layout'&&(types.length!==1||types[0]!=='table'))add(node,path,'INVALID_TABLE_LAYOUT','표 영역에는 표 하나가 필요합니다.');
   children.forEach((child,i)=>visit(child,`${path}.children[${i}]`));

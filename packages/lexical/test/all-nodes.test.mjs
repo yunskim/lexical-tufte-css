@@ -1,3 +1,4 @@
+import {exportCanonicalEditorState} from '../dist/index.js';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
@@ -10,9 +11,9 @@ const saved=value=>JSON.parse(JSON.stringify(value));
 function assertRoundtrip(document){
  const before=JSON.stringify(document),editor=createFixtureEditor();
  const loaded=loadDocumentIntoEditor(editor,document);assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
- assert.deepEqual(saved(editor.getEditorState().toJSON()),document.lexicalState);
+ assert.deepEqual(saved(exportCanonicalEditorState(editor.getEditorState())),document.lexicalState);
  const exported=exportEditorToDocument(editor,loaded.value);assert.equal(exported.ok,true,JSON.stringify(exported.diagnostics));assert.deepEqual(saved(exported.value),document);
- const second=createFixtureEditor();assert.equal(loadDocumentIntoEditor(second,exported.value).ok,true);assert.deepEqual(saved(second.getEditorState().toJSON()),document.lexicalState);
+ const second=createFixtureEditor();assert.equal(loadDocumentIntoEditor(second,exported.value).ok,true);assert.deepEqual(saved(exportCanonicalEditorState(second.getEditorState())),document.lexicalState);
  assert.equal(JSON.stringify(document),before);assert.notStrictEqual(exported.value.assets,document.assets);
  return {editor,document:exported.value};
 }
@@ -41,17 +42,17 @@ test('R02 all-node v2 migration and actual editor storage export retain format a
 });
 for(const type of TUFTE_NODE_TYPES){
  test(`R02 ${type}: unknown field and future version reject before editor mutation`,()=>{
-  const {editor}=assertRoundtrip(golden()),before=JSON.stringify(editor.getEditorState().toJSON());
+  const {editor}=assertRoundtrip(golden()),before=JSON.stringify(exportCanonicalEditorState(editor.getEditorState()));
   for(const [field,value,code]of [['unrecognizedContractField',true,'UNKNOWN_FIELD'],['version',999,'UNSUPPORTED_NODE_VERSION']]){
    const doc=golden(),node=collectNodes(doc.lexicalState.root).find(x=>x.node.type===type).node;node[field]=value;
    const result=loadDocumentIntoEditor(editor,doc);assert.equal(result.ok,false);assert.ok(result.diagnostics.some(d=>d.code===code&&d.path.includes(field)),JSON.stringify(result.diagnostics));
-   assert.equal(JSON.stringify(editor.getEditorState().toJSON()),before,`${type} rejection must not install a partial document`);assert.equal(node[field],value);
+   assert.equal(JSON.stringify(exportCanonicalEditorState(editor.getEditorState())),before,`${type} rejection must not install a partial document`);assert.equal(node[field],value);
   }
  });
 }
 test('R02 all-node import snapshot cannot alias note identity or asset metadata',()=>{
  const source=golden(),e=createFixtureEditor(),loaded=loadDocumentIntoEditor(e,source);assert.equal(loaded.ok,true);
- const before=JSON.stringify(loaded.value),editorBefore=JSON.stringify(e.getEditorState().toJSON());
+ const before=JSON.stringify(loaded.value),editorBefore=JSON.stringify(exportCanonicalEditorState(e.getEditorState()));
  source.assets[0].src='/changed.svg';collectNodes(source.lexicalState.root).find(x=>(x.node.type==='tufte-sidenote'||x.node.type==='tufte-marginnote')).node.noteId='changed';
- assert.equal(JSON.stringify(loaded.value),before);assert.equal(JSON.stringify(e.getEditorState().toJSON()),editorBefore);
+ assert.equal(JSON.stringify(loaded.value),before);assert.equal(JSON.stringify(exportCanonicalEditorState(e.getEditorState())),editorBefore);
 });

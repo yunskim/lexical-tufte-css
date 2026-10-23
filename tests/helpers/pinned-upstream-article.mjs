@@ -284,9 +284,9 @@ export function reconstructPinnedArticle({html,modernFrame,modernCode}){
   schemaVersion:1,id:'upstream-complete-demo',
   locale:'en-US',title:title.textContent,titleId:title.id,subtitle:subtitle.textContent,
   assets:[],
-  lexicalState:{root:{
-   ...element('root',parsedSections),textFormat:0,textStyle:''
-  }}
+  // Lexical 0.52 omits root's default text style/format. These are fixture
+  // defaults, not properties read from the official HTML; do not invent them.
+  lexicalState:{root:element('root',parsedSections)}
  };
  return {
   document:result,

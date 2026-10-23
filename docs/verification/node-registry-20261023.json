@@ -1,0 +1,248 @@
+{
+  "date": "2026-10-23",
+  "branch": "fix/main-browser-parity-20261023",
+  "baseCommit": "be2317da4e8a4ef4dfa7df99e8a0c5f36cda64fd",
+  "ci": "not-run-by-request",
+  "check": {
+    "status": "pass",
+    "unit": {
+      "document": 57,
+      "render": 49,
+      "blog": 77,
+      "editorPorts": 2,
+      "lexical": 233,
+      "total": 418,
+      "fail": 0,
+      "cancelled": 0,
+      "skip": 0
+    },
+    "build": "pass",
+    "typecheck": "pass",
+    "auditLintInventoryFont": "pass"
+  },
+  "package": {
+    "status": "pass",
+    "tarballs": 5,
+    "js": "pass",
+    "declarations": "pass",
+    "strictRoundtrip": "pass",
+    "published": false
+  },
+  "browser": {
+    "total": 34,
+    "pass": 29,
+    "fail": 5,
+    "timeout": 0,
+    "skip": 0,
+    "fileLimitSeconds": 60,
+    "killGraceSeconds": 3,
+    "rows": [
+      {
+        "file": "all-nodes-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "contextual-ui-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "definition-pairs-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "font-proof-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "full-page-pixel-parity-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "inline-span-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "layout-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "list-kind-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "managed-note-assets-browser.mjs",
+        "exitCode": 1,
+        "status": "fail",
+        "reason": "문서 이미지 자산 등록 버튼 미구현(확장 보류)"
+      },
+      {
+        "file": "note-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "note-dom-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "note-editing-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "note-export-parity-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "note-image-chooser-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "note-image-dimensions-browser.mjs",
+        "exitCode": 0,
+        "status": "pass",
+        "initialExitCode": 1,
+        "rerun": true
+      },
+      {
+        "file": "publication-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "recovery-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "section-commands-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "server-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "text-format-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-dom-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-full-document-editor-browser.mjs",
+        "exitCode": 1,
+        "status": "fail",
+        "reason": "React restore 후 sn-in-his-later-books에 textFormat:2 추가(E123)"
+      },
+      {
+        "file": "upstream-full-document-roundtrip-browser.mjs",
+        "exitCode": 1,
+        "status": "fail",
+        "reason": "v1/v2 저장·재열기 통과 후 iframe-wrapper 개수0(E120)"
+      },
+      {
+        "file": "upstream-full-document-visual-browser.mjs",
+        "exitCode": 1,
+        "status": "fail",
+        "reason": "Modernized published iframe/snippet changed; pixel 미도달(E120)"
+      },
+      {
+        "file": "upstream-full-page-baseline-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-geometry-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-newthought-sidenote-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-same-content-epigraphs-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-same-content-figures-browser.mjs",
+        "exitCode": 1,
+        "status": "fail",
+        "reason": "발행 보조 svg가 공식 구조 수락과 불일치(E120)"
+      },
+      {
+        "file": "upstream-same-content-final-sections-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-same-content-fundamentals-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-same-content-getting-started-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-same-content-opening-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-same-content-sidenotes-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      }
+    ]
+  },
+  "python": {
+    "pass": 16,
+    "fail": 0,
+    "skip": 0,
+    "warnings": 1
+  },
+  "http": {
+    "initialFailure": "system interpreter lacked uvicorn",
+    "rerun": "pass",
+    "interpreter": "/tmp/tufte-recheck-python/bin/python"
+  },
+  "unchanged": [
+    "canonical document schema/version",
+    "checked-in golden files",
+    "pinned official HTML/CSS",
+    "HostLink/HostAsset schema",
+    "Korean font policy"
+  ],
+  "resolved": [
+    "E117 registry collisions including HeadingNode factory",
+    "E114 titleId bridge regression verified",
+    "E118 test/package stalls"
+  ],
+  "remaining": [
+    "E120 iframe DOM parity (three browser files)",
+    "E123 React note textFormat drift (one browser file)",
+    "deferred document asset registration (one browser file)"
+  ],
+  "runtimeBoundary": "docs/LEXICAL_BLOCK_SERIALIZATION.ko.md"
+}

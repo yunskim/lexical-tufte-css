@@ -1,3 +1,4 @@
+import {canonicalBlockType} from './blockSerialization.js';
 import {isIdentifier,NOTE_TOGGLE_ACCESSIBLE_NAME} from '@lexical-tufte/document';
 import {ElementNode,isHTMLElement,type EditorConfig,type LexicalEditor,type NodeKey,type SerializedElementNode,type DOMExportOutput} from 'lexical';
 import {TufteSpanNode} from './TufteSpanNode.js';
@@ -22,7 +23,7 @@ export abstract class NoteNode extends ElementNode {
   const span=document.createElement('span');
   span.className='tufte-note-editor';
   span.dataset.noteId=this.__noteId;
-  span.dataset.kind=this.getType()==='tufte-sidenote'?'sidenote':'marginnote';
+  span.dataset.kind=canonicalBlockType(this.getType())==='tufte-sidenote'?'sidenote':'marginnote';
   return span;
  }
  updateDOM(previous:NoteNode,dom:HTMLElement):false{
@@ -30,17 +31,17 @@ export abstract class NoteNode extends ElementNode {
   return false;
  }
  exportJSON():SerializedNoteNode{
-  const type=this.getType();
+  const type=canonicalBlockType(this.getType());
   if(type!=='tufte-sidenote'&&type!=='tufte-marginnote')throw Error('Unknown note node type');
   return {...super.exportJSON(),type,version:1,noteId:this.getNoteId()};
  }
  exportDOM(_editor:LexicalEditor):DOMExportOutput{
   const element=document.createElement('span');
   const id=`prototype-${this.getNoteId()}`;
-  const kind=this.getType()==='tufte-sidenote'?'sidenote':'marginnote';
+  const kind=canonicalBlockType(this.getType())==='tufte-sidenote'?'sidenote':'marginnote';
   const previous=this.getPreviousSibling();
   const pairedNewthought=kind==='sidenote'
-   &&this.getParent()?.getType()==='paragraph'
+   &&canonicalBlockType(this.getParent()?.getType()??'')==='paragraph'
    &&previous instanceof TufteSpanNode
    &&previous.getKind()==='newthought';
   return {element,after:(generated)=>{

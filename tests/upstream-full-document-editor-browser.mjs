@@ -64,6 +64,8 @@ try{
  }).waitFor();
  const readEditorJSON=async()=>{
   await page.getByRole('button',{name:'JSON·HTML 확인',exact:true}).click();
+  const inspection=page.locator('details').filter({has:page.locator('textarea[aria-label="문서 JSON"]')});
+  if(await inspection.getAttribute('open')===null)await inspection.locator('summary').click();
   return JSON.parse(await page.getByRole('textbox',{
    name:'문서 JSON',exact:true
   }).inputValue());
