@@ -49,10 +49,11 @@ try {
  // Cancellation must not change either the editor or the canonical save.
  page.once('dialog',dialog=>dialog.dismiss());
  await button.click();
+ await page.getByRole('status',{name:'편집 작업 상태'}).filter({hasText:'복구본 선택을 취소했습니다.'}).waitFor().catch(()=>{});
  assert.doesNotMatch(await editor.innerText(),/RECOVERY-ONLY/);
  assert.equal(await page.evaluate(()=>localStorage.getItem('lexical-tufte-p1')),canonical);
  // Confirmation opens the recovery copy but does not implicitly save it.
- page.once('dialog',dialog=>dialog.accept());
+ page.once('dialog',dialog=>dialog.accept(dialog.type()==='prompt'?'0':undefined));
  await button.click();
  await page.getByRole('status',{name:'편집 작업 상태'}).filter({
   hasText:'선택한 복구본을 열었습니다.'
@@ -67,6 +68,8 @@ try {
  assert.match(await editor.innerText(),/CANONICAL-BASELINE/);
  assert.doesNotMatch(await editor.innerText(),/RECOVERY-ONLY/);
  assert.equal(await page.evaluate(()=>localStorage.getItem('lexical-tufte-p1')),canonical);
+ assert.ok(await page.evaluate(key=>localStorage.getItem(key)!==null,recoveryKey),
+  'Reopening the canonical document must not delete the recovery source');
  assert.deepEqual(errors,[]);
  console.log('Recovery reopen: cancellation, explicit open, canonical isolation and canonical restore.');
 }finally{await browser?.close();server?.kill();}
