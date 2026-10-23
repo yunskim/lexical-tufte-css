@@ -75,3 +75,13 @@ test('publish contract: public visibility derives from publication head, not dra
   assert.ok(missing.diagnostics.some(x=>x.code==='NOT_PUBLISHED'));
  }finally{db.close();}
 });
+
+test('opt-in publishIfChanged conservatively republishes documents with unpinned assets',async()=>{
+ const {db,store,id}=await setup();
+ try{
+  const first=ok(await store.publishIfChanged(id,opts(1,0,'2026-10-16T01:00:00Z')));
+  const second=ok(await store.publishIfChanged(id,opts(1,1,'2026-10-16T02:00:00Z')));
+  assert.notEqual(first.snapshotId,second.snapshotId);
+  assert.equal(ok(store.readState(id)).generation,2);
+ }finally{db.close();}
+});
