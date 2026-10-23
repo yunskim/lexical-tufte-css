@@ -7,6 +7,20 @@
 .tufte-article.tufte-align-start, .tufte-article .tufte-align-start { text-align: start; }
 .tufte-article.tufte-align-end, .tufte-article .tufte-align-end { text-align: end; }
 
+/* The pinned upstream CSS uses display:none on checkbox controls, which
+   prevents keyboard focus. Restore focusability without visible layout shift. */
+.tufte-article input.margin-toggle {
+ display: block;
+ position: absolute;
+ width: 1px;
+ height: 1px;
+ margin: 0;
+ padding: 0;
+ border: 0;
+ opacity: 0;
+ clip-path: inset(50%);
+}
+
 /* Show keyboard focus even when the note label lives inside newthought.
    :has() selects only the actual preceding label; no script or inline CSS. */
 .tufte-article label.margin-toggle:has(+ input.margin-toggle:focus-visible),
