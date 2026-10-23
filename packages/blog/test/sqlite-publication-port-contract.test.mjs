@@ -111,3 +111,50 @@ test('neutral service + SQLite adapter: draft update during asset preflight reje
   assert.equal(db.prepare('SELECT count(*) AS n FROM publication_snapshots_v1').get().n,0);
  }finally{db.close();}
 });
+
+test('neutral service + SQLite adapter: competing publish attempts cannot both commit',async()=>{
+ const {db,store,service,id}=await integrated();
+ try{
+  const [first,second]=await Promise.all([
+   service.publish(id,publishOptions(1,0,'2026-10-16T01:00:00Z')),
+   service.publish(id,publishOptions(1,0,'2026-10-16T01:01:00Z'))
+  ]);
+  const outcomes=[first,second];
+  assert.equal(outcomes.filter(r=>r.ok).length,1);
+  assert.equal(outcomes.filter(r=>!r.ok).length,1);
+  assert.ok(outcomes.find(r=>!r.ok).diagnostics.some(d=>d.code==='PUBLICATION_CONFLICT'));
+  assert.equal(ok(await store.readState(id)).generation,1);
+  assert.equal(db.prepare('SELECT count(*) AS n FROM publication_snapshots_v1').get().n,1);
+ }finally{db.close();}
+});
+test('neutral service + SQLite adapter: restore rejects a changed head after async asset check',async()=>{
+ const {db,store,service,id}=await integrated();
+ try{
+  const first=ok(await service.publish(id,publishOptions(1,0,'2026-10-16T01:00:00Z')));
+  let changed=false;
+  const result=await service.restore(id,first.snapshotId,{
+   expectedGeneration:1,authorize:async()=>true,assetExists:async()=>{
+    if(!changed){changed=true;ok(await store.unpublishPublication({postId:id,expectedGeneration:1}));}
+    return true;
+   }
+  });
+  assert.equal(changed,true);
+  notOk(result,'PUBLICATION_CONFLICT');
+  const head=ok(await store.readState(id));
+  assert.equal(head.generation,2);
+  assert.equal(head.snapshotId,null);
+  assert.equal(ok(await store.readSnapshot(first.snapshotId)).snapshotId,first.snapshotId);
+ }finally{db.close();}
+});
+test('SQLite adapter: snapshot payload tampering fails checksum and cannot restore',async()=>{
+ const {db,store,service,id}=await integrated();
+ try{
+  const first=ok(await service.publish(id,publishOptions(1,0,'2026-10-16T01:00:00Z')));
+  db.prepare('UPDATE publication_snapshots_v1 SET payload=? WHERE snapshot_id=?').run('{"tampered":true}',first.snapshotId);
+  notOk(await store.readSnapshot(first.snapshotId),'SNAPSHOT_INTEGRITY_ERROR');
+  notOk(await store.readPublic(id),'SNAPSHOT_INTEGRITY_ERROR');
+  notOk(await service.restore(id,first.snapshotId,{expectedGeneration:1,authorize:async()=>true,assetExists:async()=>true}),'SNAPSHOT_INTEGRITY_ERROR');
+  assert.equal(ok(await store.readState(id)).generation,1);
+  assert.equal(ok(await store.readState(id)).snapshotId,first.snapshotId);
+ }finally{db.close();}
+});
