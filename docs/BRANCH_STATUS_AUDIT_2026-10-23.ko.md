@@ -111,6 +111,18 @@ GitHub의 **두 브랜치**와 커밋 비교, main의 현재 파일, 작업 브�
 - [ ] concrete note schema/renderer/runtime 통합.
 - [ ] 검증 실행. 테스트·빌드·CI 미실행.
 
+## Concrete note 계약 이관 준비
+
+기존 브랜치의 `packages/document/src/schema.ts`, `types.ts`, `validate.ts`, `packages/render/src/index.ts`를 각각 `integration/concrete-notes/reference/`에 원문 그대로 확보했다. main 현행 코드와 크기 및 note wire type 차이를 확인했다. 현행 런타임 파일은 **아직 변경하지 않았다**.
+
+이후 원자적으로 반영할 사항:
+1. document schema/type/validator에서 concrete note wire type 수용, 기존 저장본 이전 규칙 확정
+2. Lexical abstract NoteNode + 두 concrete node 등록, noteOperations/commands의 `getKind()` / `$createNoteNode()` 호출 교체
+3. renderer의 label/input/span, 접근성, ID 계약 맞춤
+4. 기존 테스트 수정본 선별 반영 및 회귀 실행
+
+원본 파일 보존은 런타임 연결이나 테스트 통과를 의미하지 않는다.
+
 ## 유의사항
 
 이 문서는 GitHub 원격 코드/기록을 근거로 한 **정적 감사**다. 테스트 실행 결과를 새로 생성하지 않았으며, 기록된 2026-10-19 실행 결과는 현재 브랜치 HEAD의 상태가 아니다.
