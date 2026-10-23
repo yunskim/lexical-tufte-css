@@ -281,3 +281,38 @@ test('host link DOM update keeps reference identity without creating a URL',asyn
   else globalThis.document=previousDocument;
  }
 });
+
+test('document validator accepts a saved host reference and rejects URL metadata',async()=>{
+ const {validateDocument}=await import('@lexical-tufte/document');
+ const e=editor();
+ e.update(()=>{
+  const section=$getRoot().getFirstChild();
+  const p=$createParagraphNode();
+  const link=$createHostLinkNode(reference);
+  link.append($createTextNode('Reference'));
+  p.append(link);
+  if(section?.getType()==='tufte-section')section.append(p);
+  else $getRoot().append(p);
+ });
+ await flush(e);
+ const lexicalState=e.getEditorState().toJSON();
+ // The document validator requires a section root; use the registered section factory.
+ const {$createSectionNode}=await import('../dist/index.js');
+ const valid=editor();
+ valid.update(()=>{
+  const section=$createSectionNode();
+  const p=$createParagraphNode();
+  const link=$createHostLinkNode(reference);
+  link.append($createTextNode('Reference'));
+  p.append(link);section.append(p);$getRoot().append(section);
+ });
+ await flush(valid);
+ const document={schemaVersion:1,id:'host_link_test',locale:'en-US',title:'Host link',assets:[],lexicalState:valid.getEditorState().toJSON()};
+ const result=validateDocument(document);
+ assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+ const invalid=structuredClone(document);
+ invalid.lexicalState.root.children[0].children[0].children[0].url='#';
+ const rejected=validateDocument(invalid);
+ assert.equal(rejected.ok,false);
+ assert.ok(rejected.diagnostics.some(d=>d.code==='UNKNOWN_FIELD'));
+});
