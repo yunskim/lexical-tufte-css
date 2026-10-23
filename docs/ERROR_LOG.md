@@ -1,5 +1,18 @@
 # 에러 기록
 
+## E103 — concrete note 전환 후 테스트 코드와 golden fixture에 구형 API 잔류
+
+- 발견(2026-10-23): 실행 전 정적 점검에서 Lexical 단위 테스트 다수가 제거된 `$createNoteNode()`를 호출하고, v2 서버 fixture와 all-node golden이 `tufte-note` + `kind`를 유지함. 이 상태에서 테스트 실행 시 가져오기/스키마 불일치가 발생할 수 있음.
+- 처리: 실제 `SidenoteNode`/`MarginnoteNode` 팩터리, 직렬화 기대값, 서버 v1/v2 fixture, host-link all-node fixture를 갱신. 정적 검출용 `pnpm audit:notes`를 `pnpm check` 선행 단계에 추가.
+- 상태: 코드 수정, **실행 검증 전**. M095 참조.
+
+## E104 — 발행 note 토글의 aria-label이 HTML 허용 목록에서 거부됨
+
+- 발견(2026-10-23): `packages/render/src/index.ts`는 note checkbox에 `aria-label`을 발행하지만 `packages/render/src/tree.ts` 허용 속성에 없어 렌더 과정에서 예외가 발생할 수 있음.
+- 처리: 허용 속성에 정확히 `aria-label`을 추가하고, 접근 가능한 input 직렬화 및 그림 마진노트 구조 회귀 테스트를 추가.
+- 상태: 코드 수정, **실행 검증 전**. M096 참조.
+
+
 2026-10-19 완료 판정: E102 수정 후 check318개/browser16개/package4개/실제HTTP와 Python16개 통과. [실행 보고서](VERIFICATION_DOMPARSER_2026-10-19.ko.md)의 범위에서 검증했다. 전체 원본 fidelity 차이는 해결 처리하지 않는다.
 
 ## E102 — 신규 upstream 정규식의 이중 escape 재발
