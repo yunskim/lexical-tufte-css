@@ -27,11 +27,11 @@ test('R02 every node, rich variant and asset survives two real editor storage ro
  const {document}=assertRoundtrip(golden()),nodes=collectNodes(document.lexicalState.root).map(x=>x.node);
  assert.deepEqual(new Set(nodes.filter(n=>n.type==='tufte-span').map(n=>n.kind)),new Set(['sans','newthought','numeral','danger']));
  assert.deepEqual(new Set(nodes.filter(n=>n.type==='tufte-table-layout').map(n=>n.layout)),new Set(['body','fullwidth','scroll']));
- assert.deepEqual(new Set(nodes.filter(n=>n.type==='tufte-note').map(n=>n.kind)),new Set(['sidenote','marginnote']));
+ assert.deepEqual(new Set(nodes.filter(n=>n.type==='tufte-sidenote'||n.type==='tufte-marginnote').map(n=>n.type)),new Set(['tufte-sidenote','tufte-marginnote']));
  assert.deepEqual(new Set(nodes.filter(n=>n.type==='tufte-embed').map(n=>n.provider)),new Set(['youtube','vimeo']));
  assert.deepEqual(nodes.filter(n=>n.type==='code-highlight').map(n=>n.highlightType),['keyword','number',null]);
  assert.ok(nodes.some(n=>n.type==='tab'&&n.text==='\t'));assert.ok(nodes.some(n=>n.type==='linebreak'));
- assert.equal(nodes.filter(n=>n.type==='tufte-note').length,new Set(nodes.filter(n=>n.type==='tufte-note').map(n=>n.noteId)).size);
+ assert.equal(nodes.filter(n=>(n.type==='tufte-sidenote'||n.type==='tufte-marginnote')).length,new Set(nodes.filter(n=>(n.type==='tufte-sidenote'||n.type==='tufte-marginnote')).map(n=>n.noteId)).size);
 });
 test('R02 all-node v2 migration and actual editor storage export retain format and values',()=>{
  const original=golden(),migrated=migrateStoredDocument(original);assert.equal(migrated.ok,true);
@@ -52,6 +52,6 @@ for(const type of TUFTE_NODE_TYPES){
 test('R02 all-node import snapshot cannot alias note identity or asset metadata',()=>{
  const source=golden(),e=createFixtureEditor(),loaded=loadDocumentIntoEditor(e,source);assert.equal(loaded.ok,true);
  const before=JSON.stringify(loaded.value),editorBefore=JSON.stringify(e.getEditorState().toJSON());
- source.assets[0].src='/changed.svg';collectNodes(source.lexicalState.root).find(x=>x.node.type==='tufte-note').node.noteId='changed';
+ source.assets[0].src='/changed.svg';collectNodes(source.lexicalState.root).find(x=>(x.node.type==='tufte-sidenote'||x.node.type==='tufte-marginnote')).node.noteId='changed';
  assert.equal(JSON.stringify(loaded.value),before);assert.equal(JSON.stringify(e.getEditorState().toJSON()),editorBefore);
 });
