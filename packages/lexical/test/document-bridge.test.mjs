@@ -6,7 +6,7 @@ import {dirname,join,parse} from 'node:path';
 import {createRequire} from 'node:module';
 import {createHeadlessEditor} from '@lexical/headless';
 import {$getRoot,$createParagraphNode,$createTextNode,CLEAR_HISTORY_COMMAND,COMMAND_PRIORITY_CRITICAL,UNDO_COMMAND,REDO_COMMAND,HISTORY_PUSH_TAG} from 'lexical';
-import {TUFTE_NODES,TUFTE_NODE_TYPES,SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,$createTableLayoutNode,$createFigureNode,$createCaptionNode,$createInlineImageNode,$createSectionNode,$createNoteNode,$createTufteSpanNode,loadDocumentIntoEditor,loadMigratedDocumentIntoEditor,exportEditorToDocument,exportEditorToDocumentV2,DefinitionListNode,DefinitionTermNode,DefinitionDescriptionNode,$createDefinitionListNode,$createDefinitionTermNode,$createDefinitionDescriptionNode,EpigraphNode,AttributionNode,CiteNode,$createEpigraphNode,$createAttributionNode,$createCiteNode,SectionFooterNode,$createSectionFooterNode,FullwidthNode,$createFullwidthNode,TufteCodeNode,$createTufteCodeNode,ImageQuiltNode,$createImageQuiltNode,EmbedNode,$createEmbedNode} from '../dist/index.js';
+import {TUFTE_NODES,TUFTE_NODE_TYPES,SectionNode,SidenoteNode,MarginnoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,$createTableLayoutNode,$createFigureNode,$createCaptionNode,$createInlineImageNode,$createSectionNode,$createSidenoteNode,$createMarginnoteNode,$createTufteSpanNode,loadDocumentIntoEditor,loadMigratedDocumentIntoEditor,exportEditorToDocument,exportEditorToDocumentV2,DefinitionListNode,DefinitionTermNode,DefinitionDescriptionNode,$createDefinitionListNode,$createDefinitionTermNode,$createDefinitionDescriptionNode,EpigraphNode,AttributionNode,CiteNode,$createEpigraphNode,$createAttributionNode,$createCiteNode,SectionFooterNode,$createSectionFooterNode,FullwidthNode,$createFullwidthNode,TufteCodeNode,$createTufteCodeNode,ImageQuiltNode,$createImageQuiltNode,EmbedNode,$createEmbedNode} from '../dist/index.js';
 import {LinkNode} from '@lexical/link';
 import {HeadingNode,QuoteNode,$createHeadingNode,$createQuoteNode} from '@lexical/rich-text';
 import {HorizontalRuleNode,$createHorizontalRuleNode} from '@lexical/react/LexicalHorizontalRuleNode';
@@ -25,7 +25,7 @@ test('R02 strict Lexical bridge fails closed when a registered node is missing',
   ));
  },{discrete:true});
  const base=fixture(),document={...base,lexicalState:source.getEditorState().toJSON()};
- const withoutSpan=createHeadlessEditor({namespace:'bridge-missing-node',nodes:[SectionNode,NoteNode,InlineImageNode,LinkNode],onError(e){throw e;}});
+ const withoutSpan=createHeadlessEditor({namespace:'bridge-missing-node',nodes:[SectionNode,SidenoteNode,MarginnoteNode,InlineImageNode,LinkNode],onError(e){throw e;}});
  const result=loadDocumentIntoEditor(withoutSpan,document);
  assert.equal(result.ok,false);
  assert.ok(result.diagnostics.some(x=>['LEXICAL_IMPORT_FAILED','LEXICAL_IMPORT_LOSSY'].includes(x.code)));
@@ -50,7 +50,7 @@ test('R02 valid document -> real Lexical -> validated document roundtrip',()=>{
    $createParagraphNode().append(
     $createTextNode('본문 '),
     $createTufteSpanNode('sans').append($createTextNode('Sans')),
-    $createNoteNode('roundtrip-note').append($createTextNode('여백주석'))
+    $createSidenoteNode('roundtrip-note').append($createTextNode('여백주석'))
    )
   ));
  },{discrete:true});
@@ -377,20 +377,18 @@ test('R01 image asset mismatch fails before editor state is installed',()=>{
  }
 });
 
-test('P2 note kind can change without losing note identity or content',()=>{
+test('P2 concrete note types preserve identity and payload through export',()=>{
  const e=editor();
  e.update(()=>{
-  const note=$createNoteNode('editable-note','sidenote');
-  note.append($createTextNode('변경해도 보존'));
-  note.setKind('marginnote');
-  assert.throws(()=>note.setKind('unknown'));
-  $getRoot().append($createSectionNode().append($createParagraphNode().append(note)));
+  const side=$createSidenoteNode('editable-side').append($createTextNode('사이드 노트'));
+  const margin=$createMarginnoteNode('editable-margin').append($createTextNode('여백주석'));
+  $getRoot().append($createSectionNode().append($createParagraphNode().append(side,margin)));
  },{discrete:true});
- const note=e.getEditorState().toJSON().root.children[0].children[0].children[0];
- assert.equal(note.type,'tufte-note');
- assert.equal(note.noteId,'editable-note');
- assert.equal(note.kind,'marginnote');
- assert.equal(note.children[0].text,'변경해도 보존');
+ const notes=e.getEditorState().toJSON().root.children[0].children[0].children;
+ assert.deepEqual(notes.map(n=>n.type),['tufte-sidenote','tufte-marginnote']);
+ assert.deepEqual(notes.map(n=>n.noteId),['editable-side','editable-margin']);
+ assert.deepEqual(notes.map(n=>n.children[0].text),['사이드 노트','여백주석']);
+ assert.ok(notes.every(n=>!Object.hasOwn(n,'kind')));
 });
 
 test('R03 migrated loader imports compatible v1 and preserves v2 snapshot',()=>{
@@ -562,8 +560,8 @@ test('R02 all supported Tufte span kinds and both note kinds roundtrip',()=>{
    paragraph.append($createTufteSpanNode(kind).append($createTextNode(kind)));
   }
   paragraph.append(
-   $createNoteNode('note-left','sidenote').append($createTextNode('left')),
-   $createNoteNode('note-right','marginnote').append($createTextNode('right'))
+   $createSidenoteNode('note-left').append($createTextNode('left')),
+   $createMarginnoteNode('note-right').append($createTextNode('right'))
   );
   $getRoot().append($createSectionNode().append(paragraph));
  },{discrete:true});
