@@ -20,6 +20,9 @@ importers:
       '@lexical-tufte/lexical':
         specifier: workspace:*
         version: link:../../packages/lexical
+      '@lexical-tufte/render':
+        specifier: workspace:*
+        version: link:../../packages/render
       '@lexical/html':
         specifier: 0.52.0
         version: 0.52.0(typescript@6.0.2)

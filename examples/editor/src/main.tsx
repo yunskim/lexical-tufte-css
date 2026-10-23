@@ -336,7 +336,7 @@ function EditorUI(){
   const [assets,setAssets]=useState<AssetRef[]>([]);
   const assetsRef=useRef<AssetRef[]>([]);
   function installAssets(next:readonly AssetRef[]){
-    const snapshot=structuredClone(next);
+    const snapshot=next.map(asset=>structuredClone(asset));
     assetsRef.current=snapshot;
     setAssets(snapshot);
   }
@@ -853,7 +853,7 @@ function EditorUI(){
       <IconButton name="redo" label="다시 실행" onMouseDown={preserve} onClick={()=>editor.dispatchCommand(REDO_COMMAND,undefined)}/>
     </div>
     <div className="managed-assets" role="group" aria-label="문서 이미지 자산">
-      <button type="button" onClick={addManagedAsset}>문서 이미지 자산 등록</button>
+      <button type="button" onMouseDown={preserve} onClick={addManagedAsset}>문서 이미지 자산 등록</button>
       <span>문서 자산 {assets.length}개 · URL 참조만 등록하며 파일은 업로드하지 않습니다.</span>
       {assets.length>0&&<ul>{assets.map(asset=><li key={asset.id}>
         <button type="button" onMouseDown={preserve} onClick={()=>
