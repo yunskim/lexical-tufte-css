@@ -770,6 +770,17 @@ function EditorUI(){
         localStorage.setItem(MANAGED_DOCUMENT_KEY,JSON.stringify(checked.document));
         setStatus('관리 자산과 본문을 한 문서로 저장했습니다.');
       }else{
+        // Never write a raw-only snapshot with unresolved managed references.
+        if(JSON.stringify(state).includes('"assetId":')){
+          setStatus('저장 거부: 문서에 관리 자산 참조가 있으나 자산 목록이 없습니다.');
+          return;
+        }
+        if(localStorage.getItem(MANAGED_DOCUMENT_KEY)!==null&&
+           !window.confirm('이전에 저장된 관리 문서를 자산 없는 Lexical 문서로 대체하시겠습니까?')){
+          setStatus('기존 관리 문서 저장본을 유지했습니다.');
+          return;
+        }
+        // Legacy path is only used when no asset references need a catalog.
         localStorage.setItem(LEGACY_LEXICAL_KEY,JSON.stringify(state));
         localStorage.removeItem(MANAGED_DOCUMENT_KEY);
         setStatus('이 브라우저에 저장했습니다.');
