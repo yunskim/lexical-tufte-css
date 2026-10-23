@@ -40,6 +40,12 @@ export class SqlitePublicationStore{
   }catch{return fail('INVALID_STORAGE_JSON','Invalid draft JSON');}
  }
  async publish(id:string,options:PublishOptions):Promise<Result<PublishedSnapshot>>{
+  return this.publishInternal(id,options,false);
+ }
+ async publishIfChanged(id:string,options:PublishIfChangedOptions):Promise<Result<PublishedSnapshot>>{
+  return this.publishInternal(id,options,true);
+ }
+ private async publishInternal(id:string,options:PublishOptions,allowNoOp:boolean):Promise<Result<PublishedSnapshot>>{
   if(!options||typeof options!=='object')return fail('INVALID_PUBLICATION_INPUT','Expected publication options');
   options=Object.freeze({...options});
   if(!isIdentifier(id)||!validCount(options.expectedRevision,1)||!validCount(options.expectedGeneration)||!isTimestamp(options.publishedAt)||typeof options.assetExists!=='function')return fail('INVALID_PUBLICATION_INPUT','Invalid identity, revision, generation, timestamp or asset checker');
@@ -51,6 +57,8 @@ export class SqlitePublicationStore{
    if(head.generation!==options.expectedGeneration)return fail('PUBLICATION_CONFLICT','Publication generation changed');
    if(head.generation===Number.MAX_SAFE_INTEGER)return fail('PUBLICATION_GENERATION_EXHAUSTED','Publication generation exhausted');
    if(Date.parse(options.publishedAt)<Date.parse(draft.value.metadata.updatedAt)||(head.publishedAt!==null&&Date.parse(options.publishedAt)<=Date.parse(head.publishedAt)))return fail('INVALID_PUBLICATION_TIME','Publication must follow draft update and previous publication');
+   // publishedRevision records the currently active source draft revision; restoring an older
+   // public snapshot must not prevent publishing the still-current newer draft.
    if(head.publishedRevision!==null&&options.expectedRevision<head.publishedRevision)return fail('REVISION_REGRESSION','Cannot publish an older draft revision');
    if(head.firstPublishedAt!==null&&Date.parse(draft.value.metadata.createdAt)>Date.parse(head.firstPublishedAt))return fail('INVALID_PUBLICATION_TIME','Creation cannot follow first publication');
    if(head.lastSnapshotId){
