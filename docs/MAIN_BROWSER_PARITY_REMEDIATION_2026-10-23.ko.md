@@ -32,3 +32,17 @@
 5. `pnpm test:browser`, `pnpm test:note-assets`, `pnpm test:upstream-sections`, `pnpm test:upstream-full-page` 및 보고서에 기록된 각 browser 파일을 독립 재실행. CI 실행하지 않음.
 
 원본 대조 실패를 줄이려고 validator를 일괄 완화하거나 수락 조건을 삭제하지 않는다. 새 테스트는 작성 상태이며 통과 여부는 아직 모른다.
+
+
+## 후속 구현 — 노트/newthought 발행 구조
+
+- [x] 발행 `tufte-sidenote`/`tufte-marginnote`는 `data-tufte-note` wrapper 없이 직접 **label + input + span** 형제를 출력. Lexical의 구체 노드 타입과 ID는 변경하지 않음.
+- [x] 문단에서 `newthought` 바로 뒤 `sidenote`가 올 때에만 label을 newthought 안으로 옮겨 원본 **split-parent** DOM 출력. 사이에 텍스트가 끼거나 다음 노트가 marginnote이면 일반 형제 출력.
+- [x] 일반 텍스트 노드에 추가되던 `tufte-pre-wrap` span 제거. Tufte CSS 원본의 기본 HTML 공백 처리와 DOM 구조 사용. JSON 텍스트 값 자체는 변경하지 않음.
+- [x] 고정 CSS의 `display:none`인 체크박스에 scoped visually-hidden/focusable override를 적용하고 키보드 `:focus-visible` 레이블 윤곽을 추가. 모바일 checked-sibling 표시는 기존 Tufte CSS 사용.
+- [x] 렌더러 단위/원본 구조/그림 노트 회귀 검사 갱신. `tests/server-browser.mjs`의 오래된 wrapper selector와 `tests/note-browser.mjs`의 빈 집합 `.every()` 허위 통과 조건 수정.
+- [x] 독립 서버 fixture의 노트 구성과 원본 전체 페이지의 newthought pairing을 구분하도록 DOM smoke 설명 수정.
+- [ ] 관련 `pnpm check` 및 `tests/upstream-newthought-sidenote-browser.mjs`, `tests/note-export-parity-browser.mjs`, `tests/note-browser.mjs`, `tests/server-browser.mjs` 실제 실행 검증.
+- [ ] 공식 같은 콘텐츠 전체 페이지의 시각/픽셀 동등성 검증, 다른 15개 브라우저 실패 및 잔여 UI 구현은 계속 미완료.
+
+**주의:** 이 업데이트는 실행 증거가 아닌 코드 수정이다. `2ec9b4e` 기준 19통과/15실패를 새로운 수치로 갱신하지 않는다.
