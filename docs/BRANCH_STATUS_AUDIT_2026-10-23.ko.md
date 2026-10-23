@@ -163,3 +163,10 @@ GitHub의 **두 브랜치**와 커밋 비교, main의 현재 파일, 작업 브�
 - [x] `tests/note-editing-browser.mjs` 상태 검사에서 두 concrete note type 인식.
 - [ ] 다른 예제/테스트의 `tufte-note`와 `$createNoteNode` 참조 전수 점검.
 - [ ] 빌드·타입 검사·브라우저 테스트 미실행. 통합 테스트 준비 완료 미선언.
+
+
+## 그림 마진노트 발행 프로파일
+
+- [x] 문서 스키마가 허용하고 렌더러가 처리하는 `tufte-figure`의 `tufte-marginnote`를 발행 프로파일에서 더 이상 일괄 거부하지 않음.
+- [ ] 그림 마진노트의 발행 HTML 및 실제 CSS 레이아웃 회귀 테스트 실행 전.
+- [ ] 전체 예제/브라우저 테스트의 구형 note API 잔여 참조 확인 필요.
