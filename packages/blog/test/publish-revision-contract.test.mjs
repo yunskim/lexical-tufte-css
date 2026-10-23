@@ -154,3 +154,37 @@ test('asset-free publishIfChanged returns same immutable snapshot and preserves 
   assert.equal(ok(store.readState(id)).publishedAt,first.snapshot.publishedAt);
  }finally{db.close();}
 });
+
+test('restore reactivates historical snapshot without modifying draft or creating snapshot',async()=>{
+ const {db,store,drafts,post,id}=await setup();
+ try{
+  const p1=ok(await store.publish(id,opts(1,0,'2026-10-16T01:00:00Z')));
+  const next=structuredClone(post);next.metadata.revision=2;next.metadata.updatedAt='2026-10-16T02:00:00Z';next.document.title='new draft';
+  ok(await drafts.compareAndSwap(next,1));
+  const p2=ok(await store.publish(id,opts(2,1,'2026-10-16T03:00:00Z')));
+  const restored=ok(await store.restorePublishedSnapshot(id,p1.snapshotId,{expectedGeneration:2,authorize:async()=>true,assetExists:async()=>true}));
+  assert.equal(restored.snapshotId,p1.snapshotId);
+  assert.equal(restored.generation,3);
+  assert.equal(ok(await store.readPublic(id)).snapshotId,p1.snapshotId);
+  assert.equal(db.prepare('SELECT revision FROM posts_v2 WHERE id=?').get(id).revision,2);
+  assert.equal(db.prepare('SELECT count(*) AS n FROM publication_snapshots_v1').get().n,2);
+  assert.equal(ok(await store.readSnapshot(p2.snapshotId)).snapshotId,p2.snapshotId);
+ }finally{db.close();}
+});
+test('restore rejects unauthorized, missing assets, wrong document and stale generation',async()=>{
+ const {db,store,id}=await setup();
+ try{
+  const p1=ok(await store.publish(id,opts(1,0,'2026-10-16T01:00:00Z')));
+  const options={expectedGeneration:1,authorize:async()=>true,assetExists:async()=>true};
+  for(const [override,code] of [
+   [{authorize:async()=>false},'PUBLICATION_FORBIDDEN'],
+   [{assetExists:async()=>false},'MISSING_PUBLICATION_ASSET'],
+   [{expectedGeneration:0},'PUBLICATION_CONFLICT'],
+  ]){
+   const result=await store.restorePublishedSnapshot(id,p1.snapshotId,{...options,...override});
+   assert.equal(result.ok,false);
+   assert.ok(result.diagnostics.some(d=>d.code===code),code);
+  }
+  assert.equal(ok(store.readState(id)).generation,1);
+ }finally{db.close();}
+});
