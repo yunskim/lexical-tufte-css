@@ -19,7 +19,8 @@ test('figure margin note publishes with its checkbox, label and payload',()=>{
  const result=renderArticle(figure('tufte-marginnote'));
  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
  assert.match(result.html,/<figure/);
- assert.match(result.html,/data-tufte-note="figure-margin"/);
+ assert.doesNotMatch(result.html,/data-tufte-note=/);
+ assert.match(result.html,/id="tufte-11-figure-note-figure-margin"/);
  assert.match(result.html,/class="margin-toggle"/);
  assert.match(result.html,/class="marginnote"/);
  assert.match(result.html,/Margin text/);
