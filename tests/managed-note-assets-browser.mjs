@@ -131,6 +131,17 @@ try{
   /기존 관리 문서 저장본을 유지/);
  assert.equal(await page.evaluate(()=>localStorage.getItem('lexical-tufte-p1-document')),
   originalSnapshot);
+ // A different valid managed document also needs explicit overwrite approval.
+ await registerAsset('unsaved-proposal','/fixture.svg','image/svg+xml','','');
+ page.once('dialog',dialog=>{
+  assert.equal(dialog.type(),'confirm');
+  void dialog.dismiss();
+ });
+ await button('저장').click();
+ assert.match(await page.getByRole('status',{name:'편집 작업 상태'}).innerText(),
+  /기존 관리 문서 저장본을 유지/);
+ assert.equal(await page.evaluate(()=>localStorage.getItem('lexical-tufte-p1-document')),
+  originalSnapshot);
  await button('불러오기').click();
  assert.match(await page.getByRole('status',{name:'편집 작업 상태'}).innerText(),/함께 불러왔습니다/);
  assert.match(await catalog.innerText(),/문서 자산 1개/);
