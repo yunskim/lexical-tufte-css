@@ -72,8 +72,11 @@ export class SqlitePublicationAdapter implements PublicationStore{
    const head=state.value;
    if(head.generation!==expectedGeneration){this.db.exec('ROLLBACK');started=false;return fail('PUBLICATION_CONFLICT','Publication generation changed');}
    if(head.generation===Number.MAX_SAFE_INTEGER){this.db.exec('ROLLBACK');started=false;return fail('PUBLICATION_GENERATION_EXHAUSTED','Publication generation exhausted');}
-   const draft=await this.readDraft(postId);
+   const draftRow=this.db.prepare('SELECT id,slug,revision,payload FROM posts_v2 WHERE id=?').get(postId) as Record<string,unknown>|undefined;
+   if(!draftRow){this.db.exec('ROLLBACK');started=false;return fail('POST_NOT_FOUND','Post not found');}
+   const draft=validatePostRecordV2(JSON.parse(String(draftRow.payload)));
    if(!draft.ok){this.db.exec('ROLLBACK');started=false;return draft;}
+   if(draft.value.document.id!==draftRow.id||draft.value.metadata.slug!==draftRow.slug||draft.value.metadata.revision!==draftRow.revision){this.db.exec('ROLLBACK');started=false;return fail('STORAGE_ROW_MISMATCH','Draft row does not match payload');}
    if(candidate.value.snapshot.post.metadata.createdAt!==draft.value.metadata.createdAt){this.db.exec('ROLLBACK');started=false;return fail('CREATED_AT_IMMUTABLE','Creation timestamp differs');}
    if(candidate.value.snapshot.post.metadata.slug!==draft.value.metadata.slug){this.db.exec('ROLLBACK');started=false;return fail('SLUG_RENAME_REQUIRED','Restoring a different slug requires redirect handling');}
    if(head.snapshotId===snapshotId){this.db.exec('COMMIT');started=false;return {ok:true,value:head,diagnostics:[]};}
