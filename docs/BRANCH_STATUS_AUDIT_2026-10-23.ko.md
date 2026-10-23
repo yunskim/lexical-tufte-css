@@ -95,6 +95,22 @@ GitHub의 **두 브랜치**와 커밋 비교, main의 현재 파일, 작업 브�
 - [ ] 현재 main의 generic note 런타임과 복원된 concrete note 기대치 불일치 해결.
 - [ ] 빌드·테스트·CI 미실행. 파일 복원과 스크립트 등록만 완료.
 
+## 기존 테스트 수정본 대조 및 보존
+
+기존 브랜치에서 수정된 브라우저 테스트 8개(`note-browser`, `note-dom-browser`, `note-editing-browser`, `publication-browser`, `upstream-dom-browser`, `all-nodes-browser`, `server-browser`, `text-format-browser`)를 main과 파일별 비교하고 **`integration/legacy-tests/`에 원본 보존**했다. 실제 `tests/`의 현재 버전은 덮어쓰지 않았다.
+
+| 테스트 | 주요 판단 |
+| --- | --- |
+| note-editing, all-nodes, text-format | 기존 브랜치는 concrete note wire type 사용. main의 generic note 계약 전환 이후 선별 병합 |
+| note-dom, note-browser | label/input/span 구조 및 노트 동작 회귀를 기존 main 기대치와 대조 필요 |
+| publication, server | renderer/document 차이 때문에 소스 단순 교체 금지 |
+| upstream-dom | main의 `UPSTREAM_FULL_DOCUMENT` 경로를 기존 브랜치 버전으로 덮어쓰면 기능 회귀 가능 |
+
+- [x] **신규 테스트 파일 복원** 및 기존 수정 테스트 원본 보존.
+- [ ] 실제 기존 테스트 파일에 유효한 변경을 선별 병합하고 불필요한 중복을 제거.
+- [ ] concrete note schema/renderer/runtime 통합.
+- [ ] 검증 실행. 테스트·빌드·CI 미실행.
+
 ## 유의사항
 
 이 문서는 GitHub 원격 코드/기록을 근거로 한 **정적 감사**다. 테스트 실행 결과를 새로 생성하지 않았으며, 기록된 2026-10-19 실행 결과는 현재 브랜치 HEAD의 상태가 아니다.
