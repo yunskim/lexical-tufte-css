@@ -1,5 +1,20 @@
 # 에러 기록
 
+## E114 — v2 문서 브리지에서 문서 제목 앵커(titleId) 소실 위험
+
+- 발견(2026-10-23, E1 정적 점검): `packages/lexical/src/documentBridge.ts`의 `loadMigratedDocumentIntoEditor` 및 `exportEditorToDocumentV2`가 문서 envelope의 `titleId`를 v1 strict bridge로 전달하지 않았다. 특히 v2 export는 `titleId`를 제거하므로 공식 Tufte CSS의 `h1#tufte-css` 앵커가 저장·재열기 후 사라질 수 있었다.
+- 수정: v1↔v2 투영 시 `titleId`를 선택적으로 전달한다. 검증은 원래 schema validator를 사용하고 `editorFormat`, `assets`, `lexicalState` 등 기존 계약을 유지한다.
+- 회귀 테스트 추가: `packages/lexical/test/document-bridge.test.mjs`의 v1→v2→JSON 저장→재열기→v2 export 동등성 및 입력 불변성 검사.
+- 판정: 코드·테스트 **작성**, 테스트·빌드·실제 브라우저 검증 **미실행**. M105 참조.
+
+## E115 — 서로 다른 섹션의 heading.id 중복으로 발행 앵커 충돌
+
+- 발견(2026-10-23, E1 정적 점검): `packages/document/src/validate.ts`는 제목 ID와 heading ID의 충돌은 검사하지만 **heading 사이**의 중복은 거부하지 않았다. 여러 섹션에서 동일한 `id`를 발행할 수 있었다.
+- 수정: 문서 전체 heading ID의 집합을 검증 순회에서 추적해 `DUPLICATE_HEADING_ID` 진단을 발생시킨다. 유효한 개별 섹션 ID 및 기존 `DUPLICATE_TITLE_ID` 계약을 유지한다.
+- 회귀 테스트 추가: `packages/document/test/document.test.mjs`에서 여러 섹션의 중복, 서로 다른 ID의 정상 수용, title ID와의 충돌 및 입력 불변성 확인.
+- 판정: 코드·테스트 **작성**, 실제 실행 **미완료**. M106 참조.
+
+
 ## E113 — 이미지 속성을 브라우저 prompt에 의존하고 대상 노드 정체성을 잃을 위험
 
 - 발견(2026-10-23): 노트 이미지 선택·설명·크기 기능이 메인 UI에 없고 기존 브라우저 테스트는 prompt 기반 UX를 요구했다. 이미지 교체로 구현하면 assetId/hostAsset 식별자와 선택 위치·저장 동등성 보존이 어려워진다.
