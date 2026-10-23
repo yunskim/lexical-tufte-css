@@ -176,7 +176,7 @@ test('host link DOM exports a non-navigable span with complete reference identit
  const previousDocument=globalThis.document;
  const elements=[];
  globalThis.document={createElement:tag=>{
-  const element={tagName:tag.toUpperCase(),dataset:{},className:''};
+  const element={tagName:tag.toUpperCase(),dataset:{},className:'',setAttribute(name,value){if(name.startsWith('data-'))this.dataset[name.slice(5).replace(/-([a-z])/g,(_,c)=>c.toUpperCase())]=value;else this[name]=value;}};
   elements.push(element);
   return element;
  }};
@@ -263,7 +263,7 @@ test('host link DOM update keeps reference identity without creating a URL',asyn
  });
  await flush(e);
  const previousDocument=globalThis.document;
- globalThis.document={createElement:tag=>({tagName:tag.toUpperCase(),dataset:{},className:''})};
+ globalThis.document={createElement:tag=>({tagName:tag.toUpperCase(),dataset:{},className:'',setAttribute(name,value){if(name.startsWith('data-'))this.dataset[name.slice(5).replace(/-([a-z])/g,(_,c)=>c.toUpperCase())]=value;else this[name]=value;}})};
  try{
   e.getEditorState().read(()=>{
    const link=$getRoot().getFirstChild().getFirstChild();
