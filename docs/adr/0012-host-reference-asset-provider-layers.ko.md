@@ -1,6 +1,6 @@
 # ADR-0012 — 편집기 Reference·Asset 포트와 호스트 어댑터
 
-상태: 채택(설계, 2026-10-23). 구현 및 테스트는 후속. ADR-0010 Publication 저장소 포트, ADR-0011 FastAPI HTTP 경계와 병행한다.
+상태: 채택. TypeScript 포트 타입은 부분 구현(2026-10-23), 실제 asset UI·호스트 연동·검증은 후속. ADR-0010 Publication 저장소 포트, ADR-0011 FastAPI HTTP 경계와 병행한다.
 
 ## 목적과 경계
 
@@ -19,40 +19,30 @@ Editor UI (Lexical commands, [[ autocomplete, asset picker)
 
 브라우저의 HTTP 경로는 기본 배포 선택이지 편집기 API의 필수 조건이 아니다. Magnolia Works처럼 로컬 호스트가 저장소를 직접 소유하면 같은 TypeScript 포트를 로컬 IPC/호스트 브리지로 구현할 수 있다. Python 포트와 TypeScript 포트는 서로 다른 런타임 계약이며 동일 객체를 공유하지 않는다.
 
-## TypeScript 포트 (설계 계약)
+## TypeScript 포트 (실제 공개 인터페이스)
+
+구현 정본은 `packages/editor-ports/src/index.ts`의 `ReferenceProvider`, `AssetProvider`, `EditorCapabilities`다. 기존 이 ADR에 있던 별도 초안 시그니처는 삭제하여 타입 선언과의 불일치를 피한다. 자세한 자산 경계는 [AssetProvider 계약](../asset-provider-boundary.md)을 따른다.
 
 ```ts
-type ReferenceKind = 'document' | 'note' | 'task' | 'asset' | 'external';
-type Reference = {
-  id: string; kind: ReferenceKind; title: string;
-  description?: string; // 표시용이며 정본 식별자가 아님
+type AssetIdentity = {namespace: string; assetId: string};
+type AssetLocator = AssetIdentity & {revisionId?: string};
+type AssetSummary = AssetIdentity & {
+  title: string; mediaType: string; size?: number; currentRevision?: string;
 };
-type SearchPage<T> = {items: T[]; nextCursor: string | null};
-type ReferenceQuery = {text: string; kinds?: ReferenceKind[]; limit?: number; cursor?: string};
-interface ReferenceProvider {
-  search(query: ReferenceQuery, signal?: AbortSignal): Promise<SearchPage<Reference>>;
-  resolve(id: string, signal?: AbortSignal): Promise<Reference | null>;
-  backlinks(id: string, query?: {limit?: number; cursor?: string}, signal?: AbortSignal): Promise<SearchPage<Reference>>;
-}
-type AssetSummary = {
-  id: string; title: string; mediaType: string; size?: number;
-  currentRevision?: string;
+type AssetRevision = AssetIdentity & {
+  id: string; createdAt?: string; checksum?: string;
 };
-type AssetRevision = {id: string; assetId: string; createdAt?: string; checksum?: string};
-type AssetLocator = {assetId: string; revisionId?: string};
-type ResolvedAsset = {
-  assetId: string; revisionId: string; mediaType: string;
-  url: string; expiresAt?: string; // 호스트가 발급한 권한 제한 URL
+type ResolvedAsset = AssetIdentity & {
+  revisionId: string; mediaType: string; url: string; expiresAt?: string;
 };
 interface AssetProvider {
   search(query: {text: string; mediaTypes?: string[]; limit?: number; cursor?: string}, signal?: AbortSignal): Promise<SearchPage<AssetSummary>>;
-  revisions(assetId: string, query?: {limit?: number; cursor?: string}, signal?: AbortSignal): Promise<SearchPage<AssetRevision>>;
+  revisions(asset: AssetIdentity, query?: {limit?: number; cursor?: string}, signal?: AbortSignal): Promise<SearchPage<AssetRevision>>;
   resolve(locator: AssetLocator, signal?: AbortSignal): Promise<ResolvedAsset | null>;
 }
-type EditorCapabilities = {references?: ReferenceProvider; assets?: AssetProvider};
 ```
 
-실제 패키지 공개 타입과 함수명은 구현 시 별도 커밋에서 확정한다. 비동기 요청 취소와 cursor 페이지네이션은 대규모 저장소 및 입력 중 검색을 고려한 기본 요구다. UI는 제공되지 않은 capability를 숨기거나 비활성화한다.
+자산 검색 결과와 resolved object 모두 namespace를 포함한다. `resolve`는 임시 미리보기/다운로드 URL을 제공할 뿐 문서 정본이나 불변 발행 아티팩트를 생성하지 않는다. 참조 검색과 UI는 별도 `ReferenceProvider`로 유지한다. 브라우저 HTTP 경로는 선택 사항이며, HTTP/FastAPI/Magnolia 어댑터는 구현되지 않았다.
 
 ## 식별자와 문서 직렬화
 
@@ -104,9 +94,9 @@ type EditorCapabilities = {references?: ReferenceProvider; assets?: AssetProvide
 - [x] Reference/Asset/Publication 책임과 HTTP·로컬 호스트 경계 결정
 - [x] 포트 DTO, 검색·해결·역참조·버전 조회 의미론 설계
 - [x] HTTP 경로 후보와 보안·일관성 불변 조건 문서화
-- [ ] 현행 문서 link/asset 노드 스키마 및 저장/재열기 호환성 조사
-- [ ] TypeScript `ReferenceProvider`/`AssetProvider` 포트 타입 추가
-- [ ] 편집기 capabilities 주입과 후보 UI 연결
+- [x] 현행 link/asset 노드와 `src` 필수 제약 조사 — [AssetProvider 계약](../asset-provider-boundary.md)의 제약·후속 작업 참고
+- [x] TypeScript `ReferenceProvider`/`AssetProvider` 포트 타입 추가 및 namespace 보완 — `packages/editor-ports/src/index.ts`
+- [ ] 에셋 capabilities 실제 주입과 chooser UI 연결 (reference picker는 별도 구현)
 - [ ] TypeScript HTTP 어댑터 및 FastAPI 라우터 구현
 - [ ] Python 호스트 포트 및 SQLite 참조 인덱스/에셋 카탈로그 어댑터
 - [ ] Magnolia 로컬 브리지 예제 (별도 저장소 변경 없이)
