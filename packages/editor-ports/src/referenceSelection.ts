@@ -26,8 +26,10 @@ export class ReferenceSelection {
  /** Resolve a selected item again: never trust stale search metadata as authority. */
  async choose(item:Reference):Promise<{namespace:string;kind:Exclude<ReferenceKind,'external'>;id:string}|null>{
   if(item.kind==='external')return null;
+  const generation=this.generation;
   const reference={namespace:item.namespace,kind:item.kind,id:item.id};
   const resolved=await this.provider.resolve(reference);
+  if(generation!==this.generation)return null;
   if(!resolved||resolved.namespace!==reference.namespace||resolved.kind!==reference.kind||resolved.id!==reference.id)return null;
   return reference;
  }
