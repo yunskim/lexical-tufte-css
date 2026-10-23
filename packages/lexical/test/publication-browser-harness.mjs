@@ -6,7 +6,7 @@ import {ListNode,ListItemNode} from '@lexical/list';
 import {HorizontalRuleNode} from '@lexical/react/LexicalHorizontalRuleNode';
 import {$generateHtmlFromNodes} from '@lexical/html';
 import {
- TUFTE_NODES,loadDocumentIntoEditor,SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,
+ TUFTE_NODES,loadDocumentIntoEditor,SectionNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,
  DefinitionListNode,DefinitionTermNode,DefinitionDescriptionNode,EpigraphNode,AttributionNode,CiteNode,SectionFooterNode,
  FullwidthNode,TufteCodeNode,ImageQuiltNode,EmbedNode,
  $createSectionNode,$createDefinitionListNode,$createDefinitionTermNode,$createDefinitionDescriptionNode,
