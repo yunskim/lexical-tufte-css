@@ -1,4 +1,4 @@
-import {validateDocument,type JsonNode,type Diagnostic,type ElementFields} from '@lexical-tufte/document';
+import {HOST_REFERENCE_CLASS,hostReferenceAttributes,validateDocument,type JsonNode,type Diagnostic,type ElementFields} from '@lexical-tufte/document';
 import {validateRenderProfile} from './profile.js';
 import {element,serializeHTML,type RenderChild,type RenderElement} from './tree.js';
 export {element,serializeHTML,type RenderElement,type RenderChild} from './tree.js';
@@ -67,10 +67,8 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
      ...(n.title?{title:String(n.title)}:{}),...(rel.size?{rel:[...rel].join(' ')}:{}),...attrs(n)},inner())];
    }
    case 'host-link':return [element('span',{
-    ...withClass(n,'tufte-host-link'),
-    'data-host-reference':n.reference.id,
-    'data-host-namespace':n.reference.namespace,
-    'data-host-kind':n.reference.kind
+    ...withClass(n,HOST_REFERENCE_CLASS),
+    ...hostReferenceAttributes(n.reference)
    },inner())];
    case 'tufte-imagequilt':return [element('img',{
     src:String(n.src),alt:String(n.alt),class:'imagequilt',
