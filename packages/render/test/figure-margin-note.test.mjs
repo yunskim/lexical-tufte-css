@@ -23,6 +23,8 @@ test('figure margin note publishes with its checkbox, label and payload',()=>{
  assert.match(result.html,/class="margin-toggle"/);
  assert.match(result.html,/class="marginnote"/);
  assert.match(result.html,/Margin text/);
+ assert.match(result.html,/<label[^>]+for="([^"]+)"[^>]*>⊕<\/label><input[^>]+id="\1"[^>]*type="checkbox"[^>]*><span class="marginnote">/);
+ assert.doesNotMatch(result.html,/tufte-note-editor|contenteditable|data-lexical-/);
  assert.match(result.html,/<figcaption/);
 });
 test('figure sidenote is rejected by the document schema',()=>{
