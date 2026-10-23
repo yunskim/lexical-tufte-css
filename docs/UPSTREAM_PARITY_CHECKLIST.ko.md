@@ -12,6 +12,7 @@
 - [x] 비교 스크립트는 원본과 **별도 server-document fixture**를 사용한다. 따라서 원본 전체 페이지와 동일 콘텐츠의 동등성 증거가 아니다.
 - [x] 비교 스크립트에 `newthought > sidenote label` 차이가 **known gap**으로 명시되어 있다.
 - [ ] 동일 콘텐츠의 전체 9개 섹션을 사용하는 Lexical 문서 fixture와 렌더 결과를 실제 비교 테스트로 검증한다.
+- [x] 동일 콘텐츠 fixture를 연결할 수 있는 선택적 `UPSTREAM_FULL_DOCUMENT` 입력과 섹션별 구조 비교 assertion을 작성했다. fixture 경로 미확정·테스트 미실행 상태다.
 - [x] 기존 브라우저 비교에 공식 upstream **9개 섹션**의 수와 섹션별 구조 수집 여부를 고정하는 assertion을 작성했다. 실행은 대기 중이다.
 - [ ] 기존 전체 페이지 fixture/테스트 구현의 정확한 위치와 중복 여부를 조사해 대응표에 연결한다.
 - [x] 기존 DOMParser 비교 코드에 섹션별 heading, 직계 자식 태그 순서, 노트·그림·표 개수를 수집하는 진단 정보를 추가했다. **실행 결과는 아직 없다.**
@@ -37,6 +38,10 @@
 | 9 | Epilogue | [ ] | [ ] |
 
 원본 제목과 순서는 `tests/upstream-dom-browser.mjs`의 assertion에도 고정했다. fixture 연결 후 같은 섹션 번호끼리 직계 자식 구조, note, figure, table을 비교한다.
+
+### 동일 콘텐츠 비교 연결 방법 (실행은 별도 승인 후)
+
+`UPSTREAM_FULL_DOCUMENT` 환경변수에 공식 9개 섹션을 담은 **TufteDocument JSON 파일 경로**를 지정하면 `tests/upstream-dom-browser.mjs`가 해당 문서를 `renderArticle`로 발행해 공식 원본과 섹션별 heading, 직계 자식 태그 순서, note/figure/table 개수를 비교한다. 변수를 지정하지 않으면 기존 독립 server fixture 비교만 수행한다. 이 옵션은 아직 fixture를 생성하거나 자동 발견하지 않으며, **동일 콘텐츠를 담은 유효한 문서인지 별도 확인이 필요하다.**
 
 ## 2. DOM 차이 분류 및 해결
 
