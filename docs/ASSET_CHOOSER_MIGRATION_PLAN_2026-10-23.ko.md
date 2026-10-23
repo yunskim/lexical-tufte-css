@@ -7,9 +7,36 @@
 - 관련 문서: [브라우저 패리티 보완](MAIN_BROWSER_PARITY_REMEDIATION_2026-10-23.ko.md), [실행 기준/실패 결과](VERIFICATION_MAIN_2026-10-23.ko.md), [오류 기록](ERROR_LOG.md), [재발 방지](ERROR_PREVENTION.md).
 - 참고 구현: [Wagtail 이미지 chooser](https://docs.wagtail.org/en/stable/topics/images.html), [torchbox/wagtail-bynder](https://github.com/torchbox/wagtail-bynder), 특히 `views/image.py`, `views/mixins.py`, `models.py`, `management/commands/base.py`.
 
-## 0. 목표와 불변 원칙
+## 2026-10-23 우선순위 변경 — 편집기 먼저, 자산 기능 보류
 
-**목표:** Wagtail처럼 한 이미지 선택 UI에서 문서 자산 검색·재사용·새 항목 등록·속성 편집을 제공한다. 라이브러리 UI는 호스트 저장소와 분리하고, 필요 시 Magnolia Works 등의 외부 Asset 제공자를 교체할 수 있게 한다.
+**이 결정이 아래 과거 A0~A8 단계의 우선순위·착수 지시보다 우선한다.** AssetProvider는 호스트 중립 **인터페이스만 유지**하고, 현재 브랜치에서 자산 관리 기능을 더 확장하지 않는다. 이전에 작성된 노트 이미지 chooser·imageCatalog 초안은 삭제하지 않되, 구현 완료 또는 검증 통과로 해석하지 않는다. 새로운 작업은 공식 Tufte CSS 편집기·발행 구조 완성과 미해결 브라우저 테스트를 우선한다.
+
+| 순서 | 현재 실제 작업 | 상태 |
+| --- | --- | --- |
+| E1 | 현행 브랜치 정적 코드 검토: Lexical 입력·저장·재열기, 발행 DOM, 실제 공식 Tufte CSS fixture와 테스트 계약 대조 | 진행 대기 · 최우선 |
+| E2 | 노트·newthought·heading·figure·quote 등 **편집기 고유** 기능의 미검증 수정 점검 및 실제 DOM/HTML 불일치 수정 | 진행 대기 · 최우선 |
+| E3 | 공식 Tufte CSS **9개 섹션 전체**의 동일 콘텐츠 저장→열기→발행→DOM·시각/픽셀 패리티 확보 | 진행 대기 · 최우선 |
+| E4 | 기존 작업 브랜치의 빌드·타입 검사·단위·브라우저 테스트를 한 번에 실행해 결과 보고, 실패 원인 수정·재검증 | 사용자 요청 시 일괄 실행; CI 미실행 |
+| A0~A5 | 문서 전체 자산 카탈로그, 이미지 등록·재사용·발행, canonical 저장·복구, Wagtail식 chooser 확대 | **보류** |
+| A6~A7 | AssetProvider 어댑터, Bynder식 외부 DAM, Magnolia Works 연결 | **후순위 보류** |
+| A8 자산 범위 | 자산 기능 확장 이후 별도 통합 검증·이관 | **보류** |
+
+**분리 원칙:** 기존 19/34 browser 통과·15실패는 이전 검증 브랜치의 수치이며 이후 코드의 재검증 결과가 아니다. 자산 기능 미구현으로 실패하는 테스트는 **알려진 미완료 기능**으로 유지한다. 테스트를 제거·무력화·skip하여 전체 통과로 보고하지 않는다. 편집기 패리티를 검증할 때는 실패를 “편집기 오류 / 자산 확장 미구현 / 환경·시각 helper”로 분류한다.
+
+**향후 자산 기능 재개를 위한 작은 설계 정리(코드 미수정)**
+
+- [ ] `packages/editor-ports/src/index.ts`의 `AssetRevision.id`를 `revisionId`로 명칭 통일. `AssetLocator.revisionId` / `ResolvedAsset.revisionId`와 동일 의미로 문서·타입 소비·계약 테스트를 같이 정렬.
+- [ ] **새 자산 선택 UI는 특정 revision 고정을 기본값**, 최신 버전 추적(floating)은 사용자가 별도로 명시적으로 선택하도록 설계. 기존 floating 값은 자동 변환 금지.
+- [ ] 잠정 썸네일은 검색 결과의 영구 URL이 아니라 선택적 임시 preview 기능으로 제공하는 방안을 구현 전에 확인.
+- [ ] `src` 필수인 현행 이미지 노드와 `TufteDocument.assets`를 재설계할 때, 외부 resolve URL을 문서 JSON에 영구 저장하지 않는 정본 계약을 별도 변경에서 적용.
+- [ ] `design/host-asset-provider-20261023` 설계 브랜치의 변경은 현행 `fix/main-browser-parity-20261023`와 분기되어 있으므로 **무조건 merge하지 않고 필요한 타입·문서 수정만 검토 후 선별 이관**.
+- [ ] 자산 관리 작업 재개를 결정했을 때만 아래 A0부터 체크리스트를 다시 순차 진행. 실제 수행 전 당시 최신 브랜치 기준으로 위험·테스트·데이터 계약 재점검.
+
+관련 설계: [AssetProvider 경계](https://github.com/yunskim/lexical-tufte-css/blob/design/host-asset-provider-20261023/docs/asset-provider-boundary.md), [ADR-0012](https://github.com/yunskim/lexical-tufte-css/blob/design/host-asset-provider-20261023/docs/adr/0012-host-reference-asset-provider-layers.ko.md), [ADR-0013](https://github.com/yunskim/lexical-tufte-css/blob/design/host-asset-provider-20261023/docs/adr/0013-document-reference-revision-serialization.ko.md).
+
+## 0. 장기 목표와 불변 원칙 (자산 기능 재개 시)
+
+**장기 목표(현재 보류):** Wagtail처럼 한 이미지 선택 UI에서 문서 자산 검색·재사용·새 항목 등록·속성 편집을 제공한다. 라이브러리 UI는 호스트 저장소와 분리하고, 필요 시 Magnolia Works 등의 외부 Asset 제공자를 교체할 수 있게 한다.
 
 - Wagtail에서 빌릴 것: **chooser → 기존 자산 선택 → 필요할 때 가져오기/로컬 참조 생성 → 에디터에서 일반 이미지로 사용**이라는 상호작용과 확장 지점.
 - `wagtail-bynder`에서 빌릴 것: **외부 자산 ID 보존, 중복 가져오기 방지, 동기화 작업과 선택 UI 분리, 오류 시 기존 사본 보존, 썸네일/웹용 파생본 구분**.
@@ -39,14 +66,14 @@
 - [ ] `imageCatalog.ts` 입력의 MIME/URL/중복/크기/악성 accessor 경계 및 기존 catalog 항목 전체 검증을 단위 테스트로 확정하지 않음.
 - [ ] canonical `TufteDocument.assets`와 Lexical 상태를 **하나의 정상 저장·복구 단위**로 묶는 UI 경로가 없음.
 - [ ] `packages/render/src/profile.ts`는 `tufte-inline-image`의 `assetId`, `width`, `height`를 여전히 `UNSUPPORTED_RENDER_PROPERTY`로 거부함. `packages/render/src/index.ts`도 inline image의 크기를 출력하지 않음.
-- [ ] 문서 자산과 `hostAsset` 참조에 대한 provider/resolver 추상화 없음.
+- [ ] **현행 fix 브랜치에는** 자산과 `hostAsset`을 잇는 실제 provider/resolver 주입이 없음. 별도 `design/host-asset-provider-20261023` 브랜치에는 호스트 중립 `AssetProvider` **공개 타입만** 구현됨(어댑터와 런타임 연결은 미구현).
 - [ ] 신규 코드의 빌드·단위·브라우저·공식 예제 패리티 재검증 미완료.
 
-## 2. 우선순위와 구현 단위
+## 2. 자산 기능 재개 시 작업 단위 (전체 보류)
 
 각 항목은 **하나의 의미 있는 변경 + 해당 의미를 검증하는 테스트 + 문서 갱신**으로 커밋한다. 코드가 있다는 사실은 `[x]`로 표시할 수 있지만, 아래 각 단계의 **완료 게이트는 테스트 증거가 있어야** 통과한다.
 
-### A0. 기준선 고정 및 계약 대조 — P0
+### A0. 기준선 고정 및 계약 대조 — 재개 시 1순위 (보류)
 
 - [ ] 최신 작업 브랜치와 `main`, 검증 브랜치의 차이를 다시 확인하고, cherry-pick 대상만 선별한다. 분기된 브랜치를 무조건 병합하지 않는다.
 - [ ] `tests/managed-note-assets-browser.mjs`, `note-image-chooser-browser.mjs`, `note-image-dimensions-browser.mjs`, `note-export-parity-browser.mjs`의 **기능/저장/접근성** 기대값을 매핑한다. 구형 `prompt()` 호출 방식은 제품 요구사항으로 고정하지 않는다.
@@ -55,7 +82,7 @@
 
 **A0 게이트:** 기존 테스트가 확인하려는 *데이터 불변조건*을 삭제하지 않고 새 UI 계약으로 옮길 범위가 명시됨.
 
-### A1. 순수 자산 계약과 안전한 등록 — P0
+### A1. 순수 자산 계약과 안전한 등록 — 재개 시 P0 (보류)
 
 - [ ] `imageCatalog.ts`를 공개 API(`packages/document/src/index.ts`)에 필요한 최소 범위로 export.
 - [ ] `AssetRef`는 문서 로컬 카탈로그 메타데이터이고 `ImageFields.assetId`는 그 ID를 가리키며, `hostAsset`는 호스트의 별도 네임스페이스라는 규칙을 타입·문서로 확정.
@@ -66,7 +93,7 @@
 
 **A1 게이트:** 등록 실패가 카탈로그와 기존 이미지 노드를 변경하지 않으며, document validator 계약과 모순이 없고 단위 테스트 통과.
 
-### A2. canonical 문서·저장·복구의 원자성 — P0
+### A2. canonical 문서·저장·복구의 원자성 — 재개 시 P0 (보류)
 
 - [ ] 임시 UI 카탈로그를 **문서 envelope의 `assets`**에서 읽고, Lexical `lexicalState`와 같은 저장본으로 내보낸다. 별도 영구 자산 목록을 두어 두 상태가 어긋나는 설계 금지.
 - [ ] managed envelope key와 기존 raw `lexical-tufte-p1` / recovery 슬롯의 우선순위·호환성 결정. 레거시 복원은 명시적 이전 경로로만 허용하며 손상된 managed 저장본을 raw 슬롯으로 조용히 대체하지 않는다.
@@ -77,7 +104,7 @@
 
 **A2 게이트:** 저장·복구 roundtrip에서 `assets`, `lexicalState`, `assetId`, `hostAsset`가 보존되고 실패/취소가 상태를 부분 적용하지 않음.
 
-### A3. Wagtail 패턴의 공통 이미지 Chooser — P0
+### A3. Wagtail 패턴의 공통 이미지 Chooser — 재개 시 P0 (보류)
 
 - [ ] `NoteImagePanel`의 썸네일·검색·상세 폼을 재사용 가능한 presentation 컴포넌트로 분리. 데이터 공급은 prop/adapter, 선택 결과는 명시적 callback으로 받는다.
 - [ ] UI를 **기존 노트 이미지 편집**과 **문서 자산 라이브러리에서 선택/등록/삽입**으로 나누어 명확한 제목·동작을 제공한다. 같은 대화상자 안의 탭/보기 구분은 가능하되 다른 의미의 작업을 혼동하지 않는다.
@@ -89,7 +116,7 @@
 
 **A3 게이트:** 기존 이미지 재사용과 새 등록이 모두 GUI로 작동하며, 본문·노트별 수정 대상이 섞이지 않고 브라우저 테스트 통과.
 
-### A4. 자산 연결 및 이미지 수정 의미론 — P0
+### A4. 자산 연결 및 이미지 수정 의미론 — 재개 시 P0 (보류)
 
 - [ ] `등록`(카탈로그에 AssetRef 추가), `연결`(선택한 이미지 노드에 assetId 설정), `삽입`(새 이미지 노드), `표현 변경`(alt/width/height 수정)을 서로 다른 명령으로 정의한다.
 - [ ] 문서 자산 선택 시 `src`/원본 치수를 카탈로그에서 일관되게 채운다. 동일 이미지의 여러 사용처는 동일 `assetId`를 공유하되 alt/표시 크기는 각 노드에서 독립적.
@@ -99,7 +126,7 @@
 
 **A4 게이트:** 같은 자산을 두 번 삽입해도 카탈로그는 1개이고, 각 사용처의 alt/크기·undo·저장·복구가 정상 작동.
 
-### A5. 발행, 이미지 크기, 같은 콘텐츠 패리티 — P0
+### A5. 자산 발행·크기·패리티 — 재개 시 P0 (보류; 편집기 일반 패리티 E1~E3는 현재 우선)
 
 - [ ] `packages/render/src/profile.ts`가 거부하는 managed/sized inline image 기능을 **실제 renderer 지원 추가와 함께** 해제한다. 단순히 실패 조건을 지워서 통과 처리하지 않는다.
 - [ ] 발행 `img`에서 안전하게 검증된 `src`, `alt`, 선택적 `width/height`를 출력. `assetId`는 내부 참조이며 원본 Tufte CSS HTML에 불필요한 관리 속성을 누출하지 않는다.
@@ -109,7 +136,7 @@
 
 **A5 게이트:** 관리·크기 지정 이미지가 validated SSR/HTML로 출력되고 기존 Tufte CSS 및 HostAsset 검증을 회귀시키지 않음.
 
-### A6. 교체 가능한 자산 Provider/Resolver 계약 — P1
+### A6. 교체 가능한 자산 Provider/Resolver 구현 — 후순위 (보류; 기본 타입만 다른 브랜치에 존재)
 
 - [ ] `AssetProvider`/resolver를 별도 모듈·포트로 정의. 권장 최소 연산: `search(query,cursor)`, `get(locator)`, `resolve(locator,revision)`, 명시적 `importOrCache`(capability 있을 때만).
 - [ ] 결과에 `provider/namespace`, 외부 asset ID, 사용 가능한 revision/etag·수정시각, MIME/파일 크기, 썸네일 URL, 접근 가능 여부를 **영구 보존 필드와 일시적 UI 메타데이터로 분리**.
@@ -119,7 +146,7 @@
 
 **A6 게이트:** 로컬 provider만으로 동일 UI·테스트가 통과하고, mock 외부 provider 실패/취소/재시도에서 저장본이 불변.
 
-### A7. Bynder식 외부 DAM 연동 및 revision 정책 — P2 (선택적)
+### A7. Bynder식 외부 DAM 연동 및 revision 정책 — 후순위 선택 (보류)
 
 - [ ] 실제 Bynder/Wagtail 의존 없이 **읽기 전용 가짜 DAM adapter**로 검색→선택→ID 매핑→명시적 로컬 캐시/복사 검증.
 - [ ] 이미 가져온 외부 자산을 ID로 조회하여 중복 다운로드/등록 방지. 동시 요청 중복·저장 실패 시 유효한 기존 복사본을 보존.
@@ -131,7 +158,7 @@
 
 **A7 게이트:** mock DAM로 버전 고정/변경 감지/명시적 갱신/오프라인 복구가 테스트되며, 기존 revision의 발행 바이트가 임의로 바뀌지 않음.
 
-### A8. 통합 검증·브랜치 이행·기록 — P0 (A1~A5 완료 시 1차)
+### A8. 자산 확장 후 통합 검증·브랜치 이행·기록 — 재개 시 (보류)
 
 - [ ] 의존성 frozen 설치, `pnpm check`, `pnpm package:check` 실행(단위 통과/실패를 파일별 기록).
 - [ ] `pnpm test:note-assets`의 테스트 4개를 **각각** 재실행하고 managed image UI/저장/출력 실패를 원인별 수정.
@@ -141,7 +168,7 @@
 - [ ] `docs/ERROR_LOG.md` 및 `docs/ERROR_PREVENTION.md`에 신규 회귀와 재발 방지 대책 기록.
 - [ ] 코드 리뷰 후 divergent `main`에 필요한 커밋만 선별 이관. 계획 문서도 동일하게 전달하며 원본 검증 브랜치는 그대로 둔다.
 
-**1차 완료 게이트:** A1~A5 및 A8 검증 통과, 해당 3개 자산 UI 회귀 테스트와 발행 계약 통과, 기존 안정 계약에 회귀 없음. **외부 DAM 및 자동 동기화(A6/A7)는 1차 완료의 선행조건이 아니다.**
+**향후 자산 기능 1차 완료 게이트(현재 편집기 완료 기준과 별도):** A1~A5 및 A8 검증 통과, 해당 3개 자산 UI 회귀 테스트와 발행 계약 통과, 기존 안정 계약에 회귀 없음. **외부 DAM 및 자동 동기화(A6/A7)는 1차 완료의 선행조건이 아니다.**
 
 ## 3. 요구 데이터 흐름 및 정책 결정 기록
 
@@ -173,11 +200,12 @@ Wagtail 스타일 공통 Chooser (presentation)
 - 작업 시작 때 브랜치가 바뀌었으면 `현재 기준 브랜치/HEAD`만 갱신하고, 단계의 불변 계약/테스트를 다시 검사한다. 특정 SHA에 과도하게 결합된 작업 지시는 피한다.
 - 남은 버그를 단위 테스트 제거, schema 완화, UI mock 버튼, 테스트 skip으로 숨기지 않는다.
 - 테스트 묶음 실행은 사용자가 요청하는 시점까지 유보한다. 현재 실행 수치는 **19 통과/15 실패**가 최종 증거이며, 새 코드가 통과했다는 뜻이 아니다.
-- 향후 요청이 단순히 `다음 진행하세요`라면 **A0 → A1 → A2 → A3 → A4 → A5 → A8** 순서로 다음 미완료 항목을 구현하고 체크박스/커밋을 업데이트한다. **A6/A7은 핵심 안정화 이후 별도 승인/우선순위에서 진행**한다.
+- 향후 요청이 단순히 `다음 진행하세요`라면 **우선 E1 → E2 → E3(필요 시 E4)**의 Tufte CSS 편집기 코드·테스트 준비를 진행한다. **A0~A8 자산 확장은 별도 재개 요청 전에는 진행하지 않는다.**
 
 ## 5. 작업 이력
 
 | 날짜 | 내용 | 증거 | 검증 |
 |---|---|---|---|
 | 2026-10-23 | 노트 내부 chooser, 이미지 표현 편집, 카탈로그 등록 함수 초안 존재 확인 및 이행 체크리스트 작성 | 위 경로 및 기준 브랜치 | 계획 작성/정적 확인; 신규 테스트 미실행 |
+| 2026-10-23 | AssetProvider는 인터페이스만 유지하고 자산 기능 확장 보류. E1~E3 Tufte CSS 편집기/발행 패리티 우선, pinned 기본 UX 및 revision 명칭 통일을 미래 체크리스트에 추가 | `design/host-asset-provider-20261023` 및 본 계획 | 계획만 갱신, 코드·테스트 미실행 |
 
