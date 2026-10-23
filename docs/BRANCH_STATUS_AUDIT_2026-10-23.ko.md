@@ -123,6 +123,15 @@ GitHub의 **두 브랜치**와 커밋 비교, main의 현재 파일, 작업 브�
 
 원본 파일 보존은 런타임 연결이나 테스트 통과를 의미하지 않는다.
 
+## 문서 계약 실제 전환 착수
+
+- [x] `packages/document/src/schema.ts`: concrete `tufte-sidenote` / `tufte-marginnote` 등록, figure 직접 자식은 marginnote만 허용.
+- [x] `packages/document/src/types.ts`: `kind` 없는 두 wire type으로 교체.
+- [x] `packages/document/src/validate.ts`: 중첩 노트/중복 ID 검사와 figure 제약을 concrete type 기준으로 변경.
+- [ ] Lexical registry/operations/editor, renderer, 저장 문서 이전 정책은 **아직 구형 모델**이므로 main은 현재 과도기적 불일치 상태다. 빌드·테스트 통과를 주장하지 않는다.
+- [ ] 기존 저장 `tufte-note + kind` 문서의 안전한 이전 처리.
+- [ ] 테스트/빌드/CI는 실행하지 않았다.
+
 ## 유의사항
 
 이 문서는 GitHub 원격 코드/기록을 근거로 한 **정적 감사**다. 테스트 실행 결과를 새로 생성하지 않았으며, 기록된 2026-10-19 실행 결과는 현재 브랜치 HEAD의 상태가 아니다.
