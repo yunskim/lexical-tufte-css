@@ -64,3 +64,10 @@ Restore와 Unpublish는 이제 중립 서비스로 호출 가능하다. 다만 �
 - 상태·스냅샷·공개 문서 조회 및 무결성 검사를 어댑터가 직접 수행.
 - 기초 상태·Unpublish CAS 계약 테스트 작성. Publish·Restore 경합과 실제 fixture 통합 계약 테스트는 후속.
 - 타입 검사·테스트·CI 미실행. 새 어댑터를 검증 완료로 간주하지 않는다.
+
+## 2026-10-23 통합 계약 테스트 추가
+
+- 실제 Tufte 문서 fixture 및 posts/publications 스키마를 사용하는 서비스→포트→SQLite 어댑터 통합 테스트 작성.
+- Publish→Restore→Unpublish와 불변 스냅샷·Draft 독립성 검증 시나리오.
+- stale generation 및 에셋 비동기 검사 중 Draft 변경에 대한 CAS 거부 시나리오.
+- 아직 실행하지 않았으므로 통과를 주장하지 않는다. 다음 테스트 배치에서 타입 검사, fixture 유효성, 오류 코드와 스키마 일치를 확인해야 한다.
