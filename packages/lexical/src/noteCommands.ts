@@ -49,28 +49,10 @@ export function $listSelectedTufteNoteImages():TufteNoteImageChoice[]{
 }
 
 
-export function registerNoteCommands(editor:LexicalEditor,onDiagnostic?:(diagnostic:Diagnostic)=>void):()=>void{
- if(!editor.hasNodes([SidenoteNode,MarginnoteNode]))throw Error('Note commands require concrete sidenote/marginnote nodes');
- const reject=(code:string,message:string)=>{
-  onDiagnostic?.({code,path:'$.selection',message});return true;
- };
- // Selection-only commands return false if refused, so the chooser does not
- // announce success for stale image keys (unlike handled mutation diagnostics).
- const rejectSelection=(code:string,message:string):false=>{
-  onDiagnostic?.({code,path:'$.selection',message});return false;
- };
- const selectedNote=():NoteNode|null=>{
-  const selection=$getSelection();
-  if(editor.isComposing()||!$isRangeSelection(selection)||!selection.isCollapsed())return null;
-  const note=$getContainingNote(selection.anchor.getNode());
-  // Conversion must not create figure > sidenote or other invalid nesting.
-  return note?.getParent()?.getType()==='paragraph'?note:null;
- };
  // A node selection identifies the image. A caret is sufficient only when
  // exactly one image exists in its note (including nested link/span content).
- const selectedImage=():{image:InlineImageNode;note:NoteNode}|null=>{
+export function $getSelectedTufteNoteImage():{image:InlineImageNode;note:NoteNode}|null{
   const selection=$getSelection();
-  if(editor.isComposing())return null;
   if($isNodeSelection(selection)){
    const nodes=selection.getNodes();
    if(nodes.length!==1||!(nodes[0] instanceof InlineImageNode))return null;
@@ -88,6 +70,25 @@ export function registerNoteCommands(editor:LexicalEditor,onDiagnostic?:(diagnos
   collect(note);
   return images.length===1?{image:images[0]!,note}:null;
  };
+
+export function registerNoteCommands(editor:LexicalEditor,onDiagnostic?:(diagnostic:Diagnostic)=>void):()=>void{
+ if(!editor.hasNodes([SidenoteNode,MarginnoteNode]))throw Error('Note commands require concrete sidenote/marginnote nodes');
+ const reject=(code:string,message:string)=>{
+  onDiagnostic?.({code,path:'$.selection',message});return true;
+ };
+ // Selection-only commands return false if refused, so the chooser does not
+ // announce success for stale image keys (unlike handled mutation diagnostics).
+ const rejectSelection=(code:string,message:string):false=>{
+  onDiagnostic?.({code,path:'$.selection',message});return false;
+ };
+ const selectedNote=():NoteNode|null=>{
+  const selection=$getSelection();
+  if(editor.isComposing()||!$isRangeSelection(selection)||!selection.isCollapsed())return null;
+  const note=$getContainingNote(selection.anchor.getNode());
+  // Conversion must not create figure > sidenote or other invalid nesting.
+  return note?.getParent()?.getType()==='paragraph'?note:null;
+ };
+ const selectedImage=()=>editor.isComposing()?null:$getSelectedTufteNoteImage();
  const registrations=[
   editor.registerCommand(SELECT_TUFTE_NOTE_IMAGE_COMMAND,payload=>{
    if(!payload||typeof payload!=='object'||Array.isArray(payload)||
