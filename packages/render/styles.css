@@ -7,6 +7,14 @@
 .tufte-article.tufte-align-start, .tufte-article .tufte-align-start { text-align: start; }
 .tufte-article.tufte-align-end, .tufte-article .tufte-align-end { text-align: end; }
 
+/* Show keyboard focus even when the note label lives inside newthought.
+   :has() selects only the actual preceding label; no script or inline CSS. */
+.tufte-article label.margin-toggle:has(+ input.margin-toggle:focus-visible),
+.tufte-article span.newthought:has(+ input.margin-toggle:focus-visible) > label.margin-toggle.sidenote-number {
+ outline: 2px solid currentColor;
+ outline-offset: 2px;
+}
+
 /* SVG supplies an intrinsic ratio without inline style under strict CSP. */
 .tufte-article .tufte-embed { position: relative; max-width: 55%; }
 .tufte-article .tufte-embed.fullwidth { max-width: 90%; }
