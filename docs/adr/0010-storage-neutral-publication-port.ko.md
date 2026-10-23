@@ -78,3 +78,10 @@ Restore와 Unpublish는 이제 중립 서비스로 호출 가능하다. 다만 �
 - Restore 에셋 사전 검사 중 publication head 변경 시 CAS 충돌과 불변 스냅샷 보존 검증.
 - 스냅샷 payload 변조 시 해시 불일치로 조회·공개 조회·복원 거부 검증.
 - 모든 신규 테스트는 작성만 했으며 실행하지 않았다. 특히 동시성 테스트는 단일 프로세스 내 interleaving만 검증하므로 다중 연결/프로세스 경쟁 테스트가 별도로 필요하다.
+
+## 2026-10-23 다중 연결 및 장애 주입 테스트
+
+- 파일 기반 SQLite를 두 DatabaseSync 연결로 열어 동일 generation Publish 경쟁을 재현하는 테스트 작성.
+- BEFORE INSERT 트리거로 snapshot insert 실패 및 head insert 실패를 주입하여 원자적 롤백을 확인하는 테스트 작성.
+- BEFORE UPDATE 트리거로 Unpublish 실패를 주입하여 기존 공개 상태 유지 확인 테스트 작성.
+- 테스트·빌드·타입 검사·CI 미실행. SQLite 잠금 타이밍에 따라 다중 연결 경쟁은 PUBLICATION_STORAGE_ERROR를 반환할 가능성도 있으므로 실제 실행 후 오류 분류 및 재시도 정책을 확인해야 한다.
