@@ -1,7 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {DatabaseSync} from 'node:sqlite';
-import {readFileSync} from 'node:fs';
+import {readFileSync,mkdtempSync,rmSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
 import {SqlitePostRevisionStoreV2} from '@lexical-tufte/document';
 import {PublicationService} from '../src/publicationService.ts';
 import {SqlitePublicationAdapter} from '../src/sqlitePublicationAdapter.ts';
@@ -156,5 +158,71 @@ test('SQLite adapter: snapshot payload tampering fails checksum and cannot resto
   notOk(await service.restore(id,first.snapshotId,{expectedGeneration:1,authorize:async()=>true,assetExists:async()=>true}),'SNAPSHOT_INTEGRITY_ERROR');
   assert.equal(ok(await store.readState(id)).generation,1);
   assert.equal(ok(await store.readState(id)).snapshotId,first.snapshotId);
+ }finally{db.close();}
+});
+
+test('SQLite adapter: separate database connections reject a stale publication generation',async()=>{
+ const directory=mkdtempSync(join(tmpdir(),'lexical-publication-cas-'));
+ const filename=join(directory,'publication.sqlite');
+ const firstDb=new DatabaseSync(filename),secondDb=new DatabaseSync(filename);
+ try{
+  firstDb.exec(readFileSync(new URL('../../document/sql/001_posts_v2.sql',import.meta.url),'utf8'));
+  firstDb.exec(readFileSync(new URL('../sql/001_publications_v1.sql',import.meta.url),'utf8'));
+  const post=initial();
+  ok(await new SqlitePostRevisionStoreV2(revisionDb(firstDb)).insert(post));
+  const first=new PublicationService(new SqlitePublicationAdapter(firstDb));
+  const second=new PublicationService(new SqlitePublicationAdapter(secondDb));
+  const id=post.document.id;
+  const [a,b]=await Promise.all([
+   first.publish(id,publishOptions(1,0,'2026-10-16T01:00:00Z')),
+   second.publish(id,publishOptions(1,0,'2026-10-16T01:01:00Z'))
+  ]);
+  assert.equal([a,b].filter(r=>r.ok).length,1);
+  assert.equal([a,b].filter(r=>!r.ok).length,1);
+  assert.ok([a,b].find(r=>!r.ok).diagnostics.some(d=>d.code==='PUBLICATION_CONFLICT'));
+  const store=new SqlitePublicationAdapter(firstDb);
+  assert.equal(ok(await store.readState(id)).generation,1);
+  assert.equal(firstDb.prepare('SELECT count(*) AS n FROM publication_snapshots_v1').get().n,1);
+ }finally{secondDb.close();firstDb.close();rmSync(directory,{recursive:true,force:true});}
+});
+test('SQLite adapter: snapshot insert failure rolls back head transition',async()=>{
+ const {db,store,service,id}=await integrated();
+ try{
+  db.exec(`CREATE TRIGGER reject_publication_snapshot BEFORE INSERT ON publication_snapshots_v1
+   BEGIN SELECT RAISE(ABORT,'simulated snapshot insert failure'); END;`);
+  const result=await service.publish(id,publishOptions(1,0,'2026-10-16T01:00:00Z'));
+  notOk(result,'PUBLICATION_STORAGE_ERROR');
+  assert.equal(ok(await store.readState(id)).generation,0);
+  assert.equal(db.prepare('SELECT count(*) AS n FROM publication_snapshots_v1').get().n,0);
+  db.exec('DROP TRIGGER reject_publication_snapshot');
+  ok(await service.publish(id,publishOptions(1,0,'2026-10-16T01:00:00Z')));
+  assert.equal(ok(await store.readState(id)).generation,1);
+ }finally{db.close();}
+});
+test('SQLite adapter: publication head insert failure rolls back newly inserted snapshot',async()=>{
+ const {db,store,service,id}=await integrated();
+ try{
+  db.exec(`CREATE TRIGGER reject_publication_head BEFORE INSERT ON publication_heads_v1
+   BEGIN SELECT RAISE(ABORT,'simulated head insert failure'); END;`);
+  const result=await service.publish(id,publishOptions(1,0,'2026-10-16T01:00:00Z'));
+  notOk(result,'PUBLICATION_STORAGE_ERROR');
+  assert.equal(ok(await store.readState(id)).generation,0);
+  assert.equal(db.prepare('SELECT count(*) AS n FROM publication_snapshots_v1').get().n,0);
+  db.exec('DROP TRIGGER reject_publication_head');
+  ok(await service.publish(id,publishOptions(1,0,'2026-10-16T01:00:00Z')));
+  assert.equal(db.prepare('SELECT count(*) AS n FROM publication_snapshots_v1').get().n,1);
+ }finally{db.close();}
+});
+test('SQLite adapter: unpublish update failure leaves active head intact',async()=>{
+ const {db,store,service,id}=await integrated();
+ try{
+  const published=ok(await service.publish(id,publishOptions(1,0,'2026-10-16T01:00:00Z')));
+  db.exec(`CREATE TRIGGER reject_unpublish BEFORE UPDATE ON publication_heads_v1
+   BEGIN SELECT RAISE(ABORT,'simulated unpublish failure'); END;`);
+  notOk(await store.unpublishPublication({postId:id,expectedGeneration:1}),'PUBLICATION_STORAGE_ERROR');
+  const head=ok(await store.readState(id));
+  assert.equal(head.generation,1);
+  assert.equal(head.snapshotId,published.snapshotId);
+  assert.equal(ok(await store.readPublic(id)).snapshotId,published.snapshotId);
  }finally{db.close();}
 });
