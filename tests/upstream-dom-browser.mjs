@@ -37,6 +37,14 @@ try{
   return {
    articleChildren:[...article.children].map(e=>e.tagName.toLowerCase()+(e.classList.contains('subtitle')?'.subtitle':'')),
    sections:sections.length,
+   sectionOutline:sections.map((section,index)=>({
+    index:index+1,
+    heading:section.querySelector(':scope > h2, :scope > h3')?.textContent?.trim()??null,
+    directChildren:[...section.children].map(child=>child.tagName.toLowerCase()),
+    notes:section.querySelectorAll('input.margin-toggle').length,
+    figures:section.querySelectorAll('figure').length,
+    tables:section.querySelectorAll('table').length
+   })),
    sectionFirstChildren:sections.map(s=>s.firstElementChild?.tagName.toLowerCase()),
    epigraphs:article.querySelectorAll('section > .epigraph > blockquote').length,
    fullwidthFigures:article.querySelectorAll('section > figure.fullwidth').length,
@@ -70,6 +78,9 @@ try{
  console.log('P2.2.e DOM comparison:',JSON.stringify({
   upstream:{sections:original.sections,notes:original.notes.length,epigraphs:original.epigraphs,fullwidthFigures:original.fullwidthFigures},
   published:{sections:published.sections,notes:published.notes.length,epigraphs:published.epigraphs,fullwidthFigures:published.fullwidthFigures},
-  knownGap:'newthought > sidenote label'
+  knownGap:'newthought > sidenote label',
+  upstreamSectionOutline:original.sectionOutline,
+  publishedFixtureSectionOutline:published.sectionOutline,
+  comparisonScope:'upstream page vs independent server-document fixture; not same-content parity'
  }));
 }finally{await browser.close();}
