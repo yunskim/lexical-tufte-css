@@ -54,7 +54,7 @@ export function validateDocument(input:unknown):ValidationResult{
    if(type==='tufte-figure'){
     const types=raw.children.map(n=>plain(n)?n.type:null);
     if(!['tufte-inline-image','tufte-imagequilt'].includes(String(types[0]))||types.filter(t=>t==='tufte-inline-image'||t==='tufte-imagequilt').length!==1||types.filter(t=>t==='tufte-caption').length>1)add('INVALID_FIGURE',path,'Expected one leading image and at most one caption');
-    for(const child of raw.children)if(plain(child)&&child.type==='tufte-note'&&child.kind!=='marginnote')add('INVALID_FIGURE_NOTE',path,'Direct figure notes must be margin notes');
+    for(const child of raw.children)if(plain(child)&&child.type==='tufte-sidenote')add('INVALID_FIGURE_NOTE',path,'Direct figure notes must be margin notes');
    }
    if(type==='tufte-definition-list'){
     let hasTerm=false,hasDefinition=false;
@@ -65,7 +65,7 @@ export function validateDocument(input:unknown):ValidationResult{
     const attributions=raw.children.map((n,i)=>plain(n)&&n.type==='tufte-attribution'?i:-1).filter(i=>i>=0);
     if(attributions.length>1||(attributions.length===1&&attributions[0]!==raw.children.length-1)||!raw.children.some(n=>plain(n)&&n.type!=='tufte-attribution'))add('INVALID_QUOTE',path,'Quote needs content then optional attribution');
    }
-   for(const [i,n]of raw.children.entries()){if(exhausted)break;visit(n,`${path}.children[${i}]`,type,depth+1,inNote||type==='tufte-note',inLink||type==='link'||type==='host-link');}
+   for(const [i,n]of raw.children.entries()){if(exhausted)break;visit(n,`${path}.children[${i}]`,type,depth+1,inNote||type==='tufte-sidenote'||type==='tufte-marginnote',inLink||type==='link'||type==='host-link');}
   }
   if(['text','tab','code-highlight'].includes(type)){
    if(typeof raw.text!=='string')add('INVALID_TEXT',path+'.text','Expected text');else textLength+=raw.text.length;
@@ -115,10 +115,9 @@ export function validateDocument(input:unknown):ValidationResult{
     else if(raw.src!==a.src||(['width','height'] as const).some(k=>raw[k]!==undefined&&a[k]!==undefined&&raw[k]!==a[k]))add('ASSET_MISMATCH',path,'Image URL/dimensions conflict with asset metadata');
    }
   }
-  if(type==='tufte-note'){
+  if(type==='tufte-sidenote'||type==='tufte-marginnote'){
    if(inNote)add('NESTED_NOTE',path,'Nested notes are not supported');
    if(!isIdentifier(raw.noteId)||notes.has(String(raw.noteId)))add('INVALID_NOTE_ID',path+'.noteId','Invalid or duplicate note id');notes.add(String(raw.noteId));
-   if(!enumeration(raw.kind,['sidenote','marginnote']))add('INVALID_NOTE_KIND',path+'.kind','Invalid note kind');
   }
   if(['tufte-figure','tufte-code','tufte-embed'].includes(type)&&!enumeration(raw.width,['body','fullwidth']))add('INVALID_WIDTH',path+'.width','Invalid width');
   if(type==='tufte-table-layout'&&!enumeration(raw.layout,['body','fullwidth','scroll']))add('INVALID_LAYOUT',path+'.layout','Invalid table layout');
