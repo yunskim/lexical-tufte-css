@@ -284,19 +284,6 @@ test('host link DOM update keeps reference identity without creating a URL',asyn
 
 test('document validator accepts a saved host reference and rejects URL metadata',async()=>{
  const {validateDocument}=await import('@lexical-tufte/document');
- const e=editor();
- e.update(()=>{
-  const section=$getRoot().getFirstChild();
-  const p=$createParagraphNode();
-  const link=$createHostLinkNode(reference);
-  link.append($createTextNode('Reference'));
-  p.append(link);
-  if(section?.getType()==='tufte-section')section.append(p);
-  else $getRoot().append(p);
- });
- await flush(e);
- const lexicalState=e.getEditorState().toJSON();
- // The document validator requires a section root; use the registered section factory.
  const {$createSectionNode}=await import('../dist/index.js');
  const valid=editor();
  valid.update(()=>{
