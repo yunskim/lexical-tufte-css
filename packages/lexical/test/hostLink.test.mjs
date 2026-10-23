@@ -88,3 +88,21 @@ test('picker invalidates a structural edit even when text is unchanged',()=>{
  const after={type:'root',children:[{type:'paragraph',children:[{type:'host-link',reference,children:[{type:'text',text:'same'}]}]}]};
  assert.equal(hasDocumentChanged(after,before),true);
 });
+
+test('host link rejects URL-bearing or unsupported-version JSON on reopen',async()=>{
+ const e=editor();
+ e.update(()=>{
+  const p=$createParagraphNode();
+  const link=$createHostLinkNode(reference);
+  link.append($createTextNode('Target'));
+  p.append(link);$getRoot().append(p);
+ });
+ await flush(e);
+ const original=e.getEditorState().toJSON();
+ for(const patch of [{url:'#'},{version:2},{type:'link'}]){
+  const invalid=structuredClone(original);
+  Object.assign(invalid.root.children[0].children[0],patch);
+  const reopened=editor();
+  assert.throws(()=>reopened.parseEditorState(JSON.stringify(invalid)));
+ }
+});
