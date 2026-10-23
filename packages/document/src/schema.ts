@@ -36,7 +36,7 @@ export function isSafeURL(value:unknown,kind:'image'|'link'):value is string{
  if(value.startsWith('/')||value.startsWith('./')||value.startsWith('../')||(kind==='link'&&value.startsWith('#')))return true;
  // Allow simple path-relative image URLs used by the pinned Tufte sample.
  // Never treat a scheme, authority, query or traversal as an ordinary path.
- if(/^[A-Za-z0-9][A-Za-z0-9._~/-]*$/.test(value)&&value.split('/').every(part=>part!==''&&part!=='.'&&part!=='..'))return true;
+ if(kind==='image'&&/^[A-Za-z0-9][A-Za-z0-9._~/-]*$/.test(value)&&value.split('/').every(part=>part!==''&&part!=='.'&&part!=='..'))return true;
  try{const u=new URL(value);return (kind==='image'?['http:','https:']:['http:','https:','mailto:','tel:','sms:']).includes(u.protocol)&&!u.username&&!u.password;}catch{return false;}
 }
 export function isEmbedURL(value:unknown,provider:unknown):value is string{
