@@ -75,11 +75,12 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
     width:String(n.width),height:String(n.height)
    },[],true)];
    case 'tufte-inline-image':return [element('img',{src:String(n.src),alt:String(n.alt)},[],true)];
-   case 'tufte-note':{
-    const id=`tufte-${prefix.length}-${prefix}-${n.noteId}`,kind=String(n.kind);
+   case 'tufte-sidenote':
+   case 'tufte-marginnote':{
+    const id=`tufte-${prefix.length}-${prefix}-${n.noteId}`,kind=n.type==='tufte-sidenote'?'sidenote':'marginnote';
     return [element('span',{'data-tufte-note':String(n.noteId)},[
      element('label',{for:id,class:`margin-toggle${kind==='sidenote'?' sidenote-number':''}`},kind==='marginnote'?['⊕']:[]),
-     element('input',{id,type:'checkbox',class:'margin-toggle'},[],true),
+     element('input',{id,type:'checkbox',class:'margin-toggle', 'aria-label':kind==='sidenote'?'Toggle sidenote':'Toggle marginnote'},[],true),
      element('span',withClass(n,kind),inner()),
     ])];
    }
