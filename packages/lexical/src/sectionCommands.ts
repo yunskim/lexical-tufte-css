@@ -1,5 +1,5 @@
 import {$getRoot,$getSelection,$isRangeSelection,$isElementNode,$setSelection,$createParagraphNode,$addUpdateTag,createCommand,COMMAND_PRIORITY_EDITOR,HISTORY_PUSH_TAG,type LexicalEditor,type LexicalNode,type RangeSelection,type LexicalCommand,type ElementNode} from 'lexical';
-import {HeadingNode,$createHeadingNode} from '@lexical/rich-text';
+import {TufteHeadingNode,$createTufteHeadingNode} from './TufteHeadingNode.js';
 import {NODE_SCHEMA,type Diagnostic} from '@lexical-tufte/document';
 import {SectionNode,$createSectionNode} from './LayoutNodes.js';
 import {$getContainingNote} from './noteOperations.js';
@@ -14,7 +14,7 @@ const block=(node:LexicalNode)=>nearest(node,n=>n.getType()==='paragraph'||n.get
 const properties=(node:ElementNode)=>{const {children:_,...value}=node.exportJSON();return JSON.stringify(value);};
 /** Register once per editor, outside editor.update. Invalid commands are consumed with diagnostics and no content mutation. */
 export function registerSectionCommands(editor:LexicalEditor,onDiagnostic?:(diagnostic:Diagnostic)=>void):()=>void{
- if(!editor.hasNodes([SectionNode,HeadingNode]))throw Error('Section commands require TUFTE_NODES');
+ if(!editor.hasNodes([SectionNode,TufteHeadingNode]))throw Error('Section commands require TUFTE_NODES');
  const reject=(code:string,message:string)=>{onDiagnostic?.({code,path:'$.selection',message});return true;};
  const range=(collapsed:boolean):RangeSelection|null=>{const s=$getSelection();return $isRangeSelection(s)&&(!collapsed||s.isCollapsed())&&!editor.isComposing()&&!$getContainingNote(s.anchor.getNode())&&!$getContainingNote(s.focus.getNode())?s:null;};
  const current=(s:RangeSelection):SectionNode|null=>{const n=nearest(s.anchor.getNode(),n=>n instanceof SectionNode);return n instanceof SectionNode&&n.getParent()?.getType()==='root'?n:null;};
@@ -56,8 +56,9 @@ export function registerSectionCommands(editor:LexicalEditor,onDiagnostic?:(diag
    const target=type==='paragraph'?'paragraph':'heading',parent=old.getParent();
    if(!parent||!NODE_SCHEMA[parent.getType()]?.children?.includes(target))return reject('INVALID_BLOCK_PARENT','이 위치에는 해당 제목/문단을 사용할 수 없습니다.');
    if(old.getChildren().some(n=>!NODE_SCHEMA[target]!.children!.includes(n.getType())))return reject('INVALID_BLOCK_CHILD','주석 등 현재 내용을 보존하며 이 제목으로 바꿀 수 없습니다.');
-   if(old.getType()===target&&(type==='paragraph'||(old instanceof HeadingNode&&old.getTag()===type)))return true;
-   const selected=s.clone(),replacement=type==='paragraph'?$createParagraphNode():$createHeadingNode(type);
+   if(old.getType()===target&&(type==='paragraph'||(old instanceof TufteHeadingNode&&old.getTag()===type)))return true;
+   const selected=s.clone(),replacement=type==='paragraph'?$createParagraphNode():$createTufteHeadingNode(type);
+   if(old instanceof TufteHeadingNode&&replacement instanceof TufteHeadingNode)replacement.setId(old.getId());
    replacement.setDirection(old.getDirection()).setFormat(old.getFormatType()).setIndent(old.getIndent()).setTextFormat(old.getTextFormat()).setTextStyle(old.getTextStyle());
    $addUpdateTag(HISTORY_PUSH_TAG);replacement.append(...old.getChildren());old.replace(replacement);
    for(const point of [selected.anchor,selected.focus])if(point.key===old.getKey())point.set(replacement.getKey(),point.offset,'element');
