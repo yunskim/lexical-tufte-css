@@ -346,3 +346,29 @@ test('host reference survives save, reopen, document validation and publication'
  const publishedAgain=renderArticle(saved);
  assert.deepEqual(publishedAgain,published,'publication must be deterministic');
 });
+
+test('invalid saved host reference does not replace the open editor document',async()=>{
+ const {loadDocumentIntoEditor}=await import('../dist/index.js');
+ const {$createSectionNode}=await import('../dist/index.js');
+ const e=editor();
+ e.update(()=>{
+  const section=$createSectionNode(),paragraph=$createParagraphNode();
+  paragraph.append($createTextNode('Keep this document'));
+  section.append(paragraph);$getRoot().append(section);
+ });
+ await flush(e);
+ const before=e.getEditorState().toJSON();
+ const bad={
+  schemaVersion:1,id:'invalid-host-link',locale:'en-US',title:'Rejected import',assets:[],
+  lexicalState:structuredClone(before)
+ };
+ const paragraph=bad.lexicalState.root.children[0].children[0];
+ paragraph.children=[{
+  type:'host-link',version:1,reference:{namespace:'workspace',kind:'external',id:'target'},
+  children:[{type:'text',version:1,text:'Invalid',format:0}]
+ }];
+ const result=loadDocumentIntoEditor(e,bad);
+ assert.equal(result.ok,false);
+ assert.ok(result.diagnostics.some(d=>d.code==='INVALID_REFERENCE'));
+ assert.deepEqual(e.getEditorState().toJSON(),before,'rejected import must leave the editor untouched');
+});
