@@ -236,7 +236,7 @@ export function reconstructPinnedArticle({html,modernFrame,modernCode}){
     return {
      type:'tufte-embed',version:1,provider:'youtube',
      src:modernFrame.src,title:modernFrame.title,
-     wrapper:'figure',width:'body',aspectRatio:16/9
+     wrapper:'figure',width:'body',aspectRatio:16/9,layout:'tufte'
     };
    }
    if(node.className!==''&&node.className!=='fullwidth')

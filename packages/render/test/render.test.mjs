@@ -242,6 +242,28 @@ test('F18 rejects unsafe provider URL before iframe rendering',()=>{
  assert.equal(result.html,null);
  assert.ok(result.diagnostics.some(x=>x.code==='UNSAFE_EMBED'),JSON.stringify(result.diagnostics));
 });
+test('F18 original Tufte layout keeps one direct iframe for either wrapper',()=>{
+ for(const wrapper of ['figure','div']){
+  const d=fixture();d.lexicalState.root.children[0].children.push({
+   type:'tufte-embed',version:1,provider:'youtube',src:'https://www.youtube-nocookie.com/embed/abcdefghijk',
+   title:'Original layout',wrapper,width:'body',aspectRatio:16/9,layout:'tufte'
+  });
+  const result=renderArticle(d);assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+  assert.ok(result.html.includes(`<${wrapper} class="iframe-wrapper"><iframe `));
+  assert.doesNotMatch(result.html,/<svg|data-tufte-ratio|style=/);
+  assert.match(result.html,/sandbox="allow-scripts allow-same-origin allow-presentation"/);
+ }
+});
+test('F18 Tufte fixed layout rejects unknown mode or conflicting ratio',()=>{
+ for(const fields of [{layout:'unknown'},{layout:'tufte',aspectRatio:4/3}]){
+  const d=fixture();d.lexicalState.root.children[0].children.push({
+   type:'tufte-embed',version:1,provider:'vimeo',src:'https://player.vimeo.com/video/1234',
+   title:'Layout conflict',wrapper:'div',width:'body',aspectRatio:16/9,...fields
+  });
+  const result=renderArticle(d);assert.equal(result.ok,false);assert.equal(result.html,null);
+  assert.ok(result.diagnostics.some(d=>d.code==='INVALID_EMBED_LAYOUT'));
+ }
+});
 
 test('F19 ImageQuilt publishes intrinsic size and escaped alt without mutating assets',()=>{
  const d=fixture(),section=d.lexicalState.root.children[0];

@@ -150,6 +150,7 @@ export function validateDocument(input:unknown):ValidationResult{
    if(!isEmbedURL(raw.src,raw.provider))add('UNSAFE_EMBED',path+'.src','Unsupported provider URL');
    if(!nonempty(raw.title,1000))add('INVALID_EMBED_TITLE',path+'.title','Embed needs accessible title');
    if(!enumeration(raw.wrapper,['figure','div'])||typeof raw.aspectRatio!=='number'||!Number.isFinite(raw.aspectRatio)||raw.aspectRatio<0.1||raw.aspectRatio>10)add('INVALID_EMBED_LAYOUT',path,'Invalid wrapper/aspect ratio');
+   if(raw.layout!==undefined&&(raw.layout!=='tufte'||raw.aspectRatio!==16/9))add('INVALID_EMBED_LAYOUT',path+'.layout','Tufte layout requires the fixed 16:9 CSS rule');
   }
  }
  if(!plain(input.lexicalState)||Object.keys(input.lexicalState).some(k=>k!=='root'))add('INVALID_STATE','$.lexicalState','Expected plain state containing only root');

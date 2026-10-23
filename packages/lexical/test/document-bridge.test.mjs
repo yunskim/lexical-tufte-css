@@ -18,6 +18,25 @@ import {TableNode,TableRowNode,TableCellNode,$createTableNode,$createTableRowNod
 const fixture=()=>JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document.json',import.meta.url),'utf8'));
 const editorNodes=TUFTE_NODES;
 const editor=()=>createHeadlessEditor({namespace:'document-bridge-test',nodes:editorNodes,onError(e){throw e;}});
+test('Tufte iframe layout survives bridge, clone and disk without changing older embed defaults',()=>{
+ const source=editor();
+ source.update(()=>{
+  const section=$createSectionNode();
+  for(const wrapper of ['figure','div'])section.append($createEmbedNode('youtube','https://www.youtube-nocookie.com/embed/abcdefghijk','Tufte layout',wrapper,'body',16/9,'tufte'));
+  section.append($createEmbedNode('vimeo','https://player.vimeo.com/video/1234','Ratio layout','div','fullwidth',4/3));
+  $getRoot().append(section);
+ },{discrete:true});
+ source.update(()=>{$getRoot().getFirstChild().getFirstChild().getWritable();},{discrete:true});
+ const doc={...fixture(),lexicalState:exportCanonicalEditorState(source.getEditorState())},before=JSON.stringify(doc);
+ const next=editor(),loaded=loadMigratedDocumentIntoEditor(next,JSON.parse(before));
+ assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
+ const saved=exportEditorToDocumentV2(next,loaded.value);assert.equal(saved.ok,true);
+ const nodes=saved.value.lexicalState.root.children[0].children;
+ assert.deepEqual(nodes.map(n=>n.layout),['tufte','tufte',undefined]);
+ assert.equal(Object.hasOwn(nodes[2],'layout'),false);
+ assert.equal(JSON.stringify(doc),before);
+ next.update(()=>assert.throws(()=>$createEmbedNode('vimeo','https://player.vimeo.com/video/1234','Conflict','div','body',4/3,'tufte'),/Invalid embed/),{discrete:true});
+});
 test('R02 strict Lexical bridge fails closed when a registered node is missing',()=>{
  const source=editor();
  source.update(()=>{

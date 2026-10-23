@@ -14,7 +14,7 @@ test('typed serializer rejects unsupported tags, attributes and void children',(
 });
 
 test('publication checkbox preserves an accessible name without allowing arbitrary attributes',()=>{
- const input=element('input',{id:'note-toggle',type:'checkbox','aria-label':'Toggle margin note'},[],true);
- assert.equal(serializeHTML(input),'<input id="note-toggle" type="checkbox" aria-label="Toggle margin note">');
+ const input=element('input',{id:'note-toggle',type:'checkbox','aria-label':'Toggle marginnote'},[],true);
+ assert.equal(serializeHTML(input),'<input id="note-toggle" type="checkbox" aria-label="Toggle marginnote">');
  assert.throws(()=>element('input',{'aria-roledescription':'unexpected'},[],true),/Unsupported/);
 });

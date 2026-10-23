@@ -5,6 +5,36 @@ import {$getRoot,$createParagraphNode,$createTextNode,$getSelection} from 'lexic
 import {LinkNode,$createLinkNode} from '@lexical/link';
 import {SidenoteNode,MarginnoteNode,InlineImageNode,$createSidenoteNode,$createMarginnoteNode,$createInlineImageNode,$reidentifyPastedNotes,$prepareNoteComposition,TufteSpanNode,$createTufteSpanNode,$insertNotePhrasing} from '../dist/index.js';
 function editor(){return createHeadlessEditor({namespace:'note-test',nodes:[SidenoteNode,MarginnoteNode,InlineImageNode,LinkNode,TufteSpanNode],onError(error){throw error;}});}
+test('nested rich note text owns its formatting instead of derived container state',()=>{
+ const e=editor();
+ e.update(()=>{
+  for(const createNote of [$createSidenoteNode,$createMarginnoteNode]){
+   const child=$createTextNode('Nested italic').toggleFormat('italic');
+   const note=createNote(createNote===$createSidenoteNode?'nested-side':'nested-margin').append(
+    $createLinkNode('https://example.org/source').append($createTufteSpanNode('sans').append(child)));
+   $getRoot().append($createParagraphNode().append(note));
+   // The DOM reconciler writes these derived fields after loading a note.
+   note.setTextFormat(2).setTextStyle('color: red;');
+   const json=note.exportJSON();
+   assert.equal(json.textFormat,undefined);assert.equal(json.textStyle,undefined);
+   assert.equal(json.children.length,0,'children are filled by state serialization');
+   assert.equal(child.getFormat(),2);assert.equal(child.getTextContent(),'Nested italic');
+  }
+ },{discrete:true});
+ const json=e.getEditorState().toJSON(),next=editor();
+ next.setEditorState(next.parseEditorState(JSON.stringify(json)));
+ assert.deepEqual(next.getEditorState().toJSON(),json);
+});
+test('textless note retains explicit insertion formatting through JSON restore',()=>{
+ const e=editor();
+ e.update(()=>{
+  const note=$createSidenoteNode('image-only').append($createInlineImageNode('/fixture.svg','Image only'));
+  note.setTextFormat(2);$getRoot().append($createParagraphNode().append(note));
+ },{discrete:true});
+ const json=e.getEditorState().toJSON();assert.equal(json.root.children[0].children[0].textFormat,2);
+ const next=editor();next.setEditorState(next.parseEditorState(JSON.stringify(json)));
+ assert.deepEqual(next.getEditorState().toJSON(),json);
+});
 test('rich inline note survives JSON restore with type, identity and body position',()=>{
  const e=editor();
  e.update(()=>{

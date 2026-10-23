@@ -80,6 +80,7 @@ try{
  assert.equal(saved.ok,true,JSON.stringify(saved.diagnostics));
  assert.deepEqual(saved.value,migrated.document);
  const onDisk=JSON.parse(JSON.stringify(saved.value));
+ const onDiskSnapshot=JSON.stringify(onDisk);
  assert.deepEqual(onDisk,migrated.document,'Simulated JSON persistence must preserve v2 envelope');
  const reopened=makeEditor();
  const reopenedResult=loadMigratedDocumentIntoEditor(reopened,onDisk);
@@ -110,7 +111,7 @@ try{
    if(!official||!published)throw Error('Missing original or published article');
    const attrs=node=>Object.fromEntries([...node.attributes].map(a=>[a.name,a.value]));
    const normalized=obj=>JSON.stringify(Object.entries(obj).sort());
-   if(normalized(attrs(official))!=='{}'||
+   if(normalized(attrs(official))!==normalized({})||
     normalized(attrs(published))!==normalized({
      id:'upstream-complete-demo-article',lang:'en-US',class:'tufte-article'
     }))throw Error('Unexpected original/published article attributes');
@@ -151,7 +152,7 @@ try{
     if(!label||!outputLabel)throw Error('Missing source or published label '+originalId);
     const kind=source.nextElementSibling?.className;
     if(kind!=='sidenote'&&kind!=='marginnote')throw Error('Unexpected note kind');
-    const name=kind==='sidenote'?'Toggle sidenote':'Toggle margin note';
+    const name=kind==='sidenote'?'Toggle sidenote':'Toggle marginnote';
     if(source.hasAttribute('aria-label')||
      target.getAttribute('aria-label')!==name)
      throw Error('Wrong accessibility exception for pinned note '+originalId);
@@ -258,7 +259,7 @@ try{
  const editedComparison=await compareWholePage(editedHTML,true);
  assert.deepEqual(editedComparison.actual,editedComparison.expected,
   'Exactly the one intentional text edit may differ from pinned demo DOM');
- assert.equal(JSON.stringify(onDisk),JSON.stringify(migrated.document),
+ assert.equal(JSON.stringify(onDisk),onDiskSnapshot,
   'Editing a separate stored copy mutated the original persisted document');
 
  // Narrow geometry check; image/font pixel parity is deliberately deferred

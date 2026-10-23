@@ -9,6 +9,8 @@
 
 ## 2026-10-23 우선순위 변경 — 편집기 먼저, 자산 기능 보류
 
+**최신 실행 업데이트:** E120/E123 해결. check423개·package5개 소비·Python16/HTTP 통과, browser33통과/1실패(timeout·skip0). 유일한 실패는 보류 자산 등록 UI다. 공식9섹션의 실제 편집/저장·DOM·6폭 pixel 대조는 명시된 예외 범위에서 통과했다. [최신 보고서](VERIFICATION_UPSTREAM_PARITY_2026-10-23.ko.md). A0–A8 보류 유지, 아래 수치는 과거 tree의 이력이다.
+
 **최신 실행 업데이트:** E117 등록 충돌 및 E114 회귀 검증 완료. check418개·package5개 소비·Python16/HTTP 통과, browser29통과/5실패(timeout·skip0). E123 React note 서식 drift와 E120 iframe 차이가 남아 E1/E2/E3 전체 완료는 아니다. A0–A8 보류 유지. [최신 보고서](VERIFICATION_NODE_REGISTRY_2026-10-23.ko.md). 바로 아래 수치는 이전 tree의 실행 이력이다.
 
 **실행 업데이트:** `383d25c` 재검증에서 build/typecheck·비-Lexical185개·Python16/HTTP 통과, Lexical62통과/77실패/2취소, browser12통과/20실패/2시간초과. E117 교체 registry 충돌과 E120 iframe 원본 구조 차이 미해결. E114 bridge는 파일 timeout으로 미검증, E115 문서 회귀는 통과. E1/E2/E3 완료로 체크하지 않는다. [재검증 보고서](VERIFICATION_BROWSER_REMEDIATION_2026-10-23.ko.md) 참조. A0–A8 보류는 변경하지 않는다.
@@ -17,10 +19,10 @@
 
 | 순서 | 현재 실제 작업 | 상태 |
 | --- | --- | --- |
-| E1 | 현행 브랜치 정적 코드 검토: Lexical 입력·저장·재열기, 발행 DOM, 실제 공식 Tufte CSS fixture와 테스트 계약 대조 | **진행 중** — titleId 누락·중복 heading anchor 수정, 전체 코드 점검·실행 검증 대기 |
-| E2 | 노트·newthought·heading·figure·quote 등 **편집기 고유** 기능의 미검증 수정 점검 및 실제 DOM/HTML 불일치 수정 | 진행 대기 · 최우선 |
-| E3 | 공식 Tufte CSS **9개 섹션 전체**의 동일 콘텐츠 저장→열기→발행→DOM·시각/픽셀 패리티 확보 | 진행 대기 · 최우선 |
-| E4 | 기존 작업 브랜치의 빌드·타입 검사·단위·브라우저 테스트를 한 번에 실행해 결과 보고, 실패 원인 수정·재검증 | 사용자 요청 시 일괄 실행; CI 미실행 |
+| E1 | 현행 브랜치 정적 코드 검토: Lexical 입력·저장·재열기, 발행 DOM, 실제 공식 Tufte CSS fixture와 테스트 계약 대조 | 현재 저장 경계/fixture 회귀 검증 완료 — titleId/앵커/registry 수정 포함 |
+| E2 | 노트·newthought·heading·figure·quote 등 **편집기 고유** 기능의 미검증 수정 점검 및 실제 DOM/HTML 불일치 수정 | 이번4개 실패 해결·재검증 완료; 전체 GUI 생성/편집 도구는 원래 P2 게이트 유지 |
+| E3 | 공식 Tufte CSS **9개 섹션 전체**의 동일 콘텐츠 저장→열기→발행→DOM·시각/픽셀 패리티 확보 | 검증 완료 — 실제 React 편집/저장·전체 DOM·6폭 pixel, 예외는 실행 보고서 명시 |
+| E4 | 기존 작업 브랜치의 빌드·타입 검사·단위·브라우저 테스트를 한 번에 실행해 결과 보고, 실패 원인 수정·재검증 | 실행 완료 — browser33/34, 보류 자산1실패 명시; CI 미실행 |
 | A0~A5 | 문서 전체 자산 카탈로그, 이미지 등록·재사용·발행, canonical 저장·복구, Wagtail식 chooser 확대 | **보류** |
 | A6~A7 | AssetProvider 어댑터, Bynder식 외부 DAM, Magnolia Works 연결 | **후순위 보류** |
 | A8 자산 범위 | 자산 기능 확장 이후 별도 통합 검증·이관 | **보류** |
@@ -31,9 +33,9 @@
 - [x] `documentBridge.ts`: 선택적 `titleId`가 v2 export 시 누락되는 부분 수정 및 v1→v2→JSON→재열기 회귀 테스트 추가(E114).
 - [x] `validate.ts`: 섹션 간 중복된 heading ID를 거부하고 title ID 충돌 계약을 보존하는 검사·테스트 추가(E115).
 - [x] `packages/blog/src` publication/recovery, `packages/document/src` canonical/backup/revision/SQLite 경계의 제목 필드 수작업 투영 여부 **정적 표본 점검**. 새로운 필드 누락 수정 사항은 위 bridge 1곳만 발견.
-- [ ] 공식 9개 섹션 fixture의 실제 Lexical 파서 호환성, 저장/재열기 결과 및 `h1#tufte-css` 검증을 실행.
-- [ ] Lexical 노드 등록(heading/quote/paragraph 교체) 및 React 실제 에디터 경로를 브라우저에서 재검증하고 오류를 수정.
-- [ ] 검증 결과를 파일별로 기록해 E1 완료 게이트 판단. 현재 체크 완료는 **작성/정적 검토**만 의미하며 테스트 통과가 아니다.
+- [x] 공식9개 섹션 fixture의 실제 Lexical 파서 호환성, 저장/재열기 및 `h1#tufte-css` 실행 통과. 최신 보고서 참조.
+- [x] 고유 runtime 노드 등록과 React 실제 편집 경로 오류(E117/E123) 수정 및 재검증 통과.
+- [x] 파일별 결과와6폭 pixel 수치를 최신 보고서/JSON에 기록. 자산 등록 실패는 보류 기능으로 유지.
 
 **분리 원칙:** 기존 19/34 browser 통과·15실패는 이전 검증 브랜치의 수치이며 이후 코드의 재검증 결과가 아니다. 자산 기능 미구현으로 실패하는 테스트는 **알려진 미완료 기능**으로 유지한다. 테스트를 제거·무력화·skip하여 전체 통과로 보고하지 않는다. 편집기 패리티를 검증할 때는 실패를 “편집기 오류 / 자산 확장 미구현 / 환경·시각 helper”로 분류한다.
 

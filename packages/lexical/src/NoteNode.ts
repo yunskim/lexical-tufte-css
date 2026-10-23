@@ -19,6 +19,10 @@ export abstract class NoteNode extends ElementNode {
  extractWithChild():true{return true;}
  isInline():true{return true;}
  canBeEmpty():false{return false;}
+ // Reconciliation derives insertion formatting from every text descendant,
+ // including text inside a link/span. Persist it only for textless notes.
+ // Otherwise DOM attachment would add a field that headless import never had.
+ shouldSerializeTextStyles():boolean{return this.getAllTextNodes().length===0;}
  createDOM(_config:EditorConfig):HTMLElement{
   const span=document.createElement('span');
   span.className='tufte-note-editor';

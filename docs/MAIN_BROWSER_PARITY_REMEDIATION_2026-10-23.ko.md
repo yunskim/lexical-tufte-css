@@ -1,5 +1,14 @@
 # main 브라우저 불일치 보완 — 2026-10-23
 
+## 최신 실행 판정 — 공식 전체 원본 대조 통과
+
+- [최신 보고서](VERIFICATION_UPSTREAM_PARITY_2026-10-23.ko.md), [파일별·pixel JSON](verification/upstream-parity-20261023.json)이 현재 증거다. 아래29/5 등은 과거 이력이다.
+- [x] E123 nested-note 파생 서식 직렬화 수정, 이미지 전용 note의 insertion format 보존, 실제9섹션 restore/입력/Undo/Redo/저장/재로드 통과.
+- [x] E120 layout:'tufte' 공식 figure/div 구조와 기존 임의5비율을 함께 보존. URL/title/sandbox 및 strict CSP5폭 검증 통과.
+- [x] 9섹션/60블록/7노트 v1/v2 왕복·DOM, Figures 및6폭 geometry·exact pixel(mask 밖 차이0) 통과. 기존 예외인 생성 ID/접근성·iframe 현대화·코드 예제1개와 검증 iframe mask는 보고서에 명시.
+- [x] check423개·package5개 소비·Python16/HTTP 통과. 전체34 browser33통과/1실패, timeout·skip0. CI 생략.
+- [ ] 보류 중인 자산 등록 UI 테스트1개 실패 유지. 각 노드의 전체 GUI 도구·실제 외부 iframe 재생 등 원래 기능 게이트는 별도 미완료.
+
 ## 최신 실행 판정 — E117 수정 후
 
 - [보고서](VERIFICATION_NODE_REGISTRY_2026-10-23.ko.md)가 최신 증거다. 아래 이전12/20/2는 이력으로 보존한다.

@@ -24,7 +24,7 @@ export const NODE_SCHEMA:Readonly<Record<string,{readonly fields:readonly string
  'tufte-code':{fields:['width','language'],children:['text','tab','linebreak','code-highlight']},
  text:{fields:['text','format','detail','mode','style']},tab:{fields:['text','format','detail','mode','style']},
  'code-highlight':{fields:['text','format','detail','mode','style','highlightType']},linebreak:{fields:[]},
- 'tufte-embed':{fields:['provider','src','title','wrapper','width','aspectRatio']},
+ 'tufte-embed':{fields:['provider','src','title','wrapper','width','aspectRatio','layout']},
 });
 for(const spec of Object.values(NODE_SCHEMA)){Object.freeze(spec.fields);if(spec.children)Object.freeze(spec.children);Object.freeze(spec);}
 export const DOCUMENT_SCHEMA_VERSION=1 as const;

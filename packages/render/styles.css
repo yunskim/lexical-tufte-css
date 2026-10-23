@@ -29,7 +29,11 @@
  outline-offset: 2px;
 }
 
-/* SVG supplies an intrinsic ratio without inline style under strict CSP. */
+/* Upstream's iframe wrapper has its own fixed padding geometry. Match its
+   legacy frameborder=0 with external CSS while keeping modern safe attributes. */
+.tufte-article .iframe-wrapper iframe { border: 0; }
+
+/* Other embeds retain arbitrary intrinsic ratios under strict CSP. */
 .tufte-article .tufte-embed { position: relative; max-width: 55%; }
 .tufte-article .tufte-embed.fullwidth { max-width: 90%; }
 .tufte-article .tufte-embed > svg { display: block; width: 100%; height: auto; pointer-events: none; }

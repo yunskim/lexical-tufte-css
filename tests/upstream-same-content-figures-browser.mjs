@@ -178,7 +178,7 @@ try{
    {width:'body',language:null});
   if(b.kind==='embed')return {type:'tufte-embed',version:1,provider:'youtube',
    src:modernFrame.src,title:modernFrame.title,wrapper:'figure',
-   width:'body',aspectRatio:16/9};
+   width:'body',aspectRatio:16/9,layout:'tufte'};
   throw Error('Unhandled Figures block '+b.kind);
  };
  const document={
@@ -224,7 +224,7 @@ try{
   for(let i=0;i<before.length;i++){
    const kind=before[i].nextElementSibling?.classList.contains('sidenote')
     ?'sidenote':'marginnote';
-   const accessibleName=kind==='sidenote'?'Toggle sidenote':'Toggle margin note';
+   const accessibleName=kind==='sidenote'?'Toggle sidenote':'Toggle marginnote';
    if(after[i].getAttribute('aria-label')!==accessibleName)
     throw Error('Modern note accessibility contract changed');
    before[i].setAttribute('aria-label',accessibleName);

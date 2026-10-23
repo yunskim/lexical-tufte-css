@@ -1,3 +1,11 @@
+## 2026-10-23 공식9섹션 편집·발행·픽셀 대조 통과 — browser33/34
+
+- `bb2b80e` 후속: E123 중첩 노트의 파생 insertion format 직렬화를 수정하고, E120 공식 iframe 레이아웃을 선택 필드 layout:'tufte'로 추가했다. 기존 임의 비율·CSP·저장 golden은 유지한다.
+- check423개(실패·취소·skip0), package5개 소비, Python16개 및 실제 HTTP/SQLite 통과. CI 생략.
+- browser34파일33통과/1실패, timeout·skip0. 유일한 실패는 보류 중인 문서 이미지 자산 등록 버튼 부재다.
+- 공식9섹션/60블록/7노트의 v1/v2 저장/재열기·전체 DOM·실제 React 편집/Undo/Redo/저장/재열기 통과.6폭(375/759/760/761/1024/1440)의 geometry와 단일 iframe mask 밖 exact RGBA 차이0을 확인했다.
+- [최신 보고서](VERIFICATION_UPSTREAM_PARITY_2026-10-23.ko.md), [iframe 계약](EMBED_LAYOUT.ko.md). 원본 재현 게이트는 검증했고 각 노드를 GUI에서 생성/수정/삭제하는 도구 전체와 외부 iframe 재생·호스트 운영 게이트는 별도 미완료다.
+
 ## 2026-10-23 E117 등록 충돌 수정 — browser29/34
 
 - `be2317d` 후속 수정: core paragraph/quote/heading factory와 metadata 전용 runtime class를 분리하고 canonical 저장 경계·예제 저장/복구·schema 기반 명령/메뉴 검사를 연결했다. 저장 schema/golden은 변경하지 않았다.

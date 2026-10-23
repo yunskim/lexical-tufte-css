@@ -1,0 +1,428 @@
+{
+  "date": "2026-10-23",
+  "repository": "yunskim/lexical-tufte-css",
+  "branch": "fix/main-browser-parity-20261023",
+  "baseCommit": "bb2b80e19d7afce5e97f189d8086afa7f2514bbf",
+  "ci": "not-run-by-user-request",
+  "check": {
+    "status": "pass",
+    "unit": {
+      "document": 57,
+      "render": 51,
+      "blog": 77,
+      "editorPorts": 2,
+      "lexical": 236,
+      "total": 423,
+      "fail": 0,
+      "cancelled": 0,
+      "skip": 0
+    },
+    "build": "pass",
+    "typecheck": "pass",
+    "auditLintInventoryFont": "pass",
+    "auditedFiles": 181
+  },
+  "package": {
+    "status": "pass",
+    "tarballs": 5,
+    "js": "pass",
+    "declarations": "pass",
+    "strictRoundtrip": "pass",
+    "sql": "pass",
+    "published": false
+  },
+  "browser": {
+    "total": 34,
+    "pass": 33,
+    "fail": 1,
+    "fileTimeout": 0,
+    "skip": 0,
+    "rows": [
+      {
+        "file": "all-nodes-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "contextual-ui-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "definition-pairs-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "font-proof-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "full-page-pixel-parity-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "inline-span-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "layout-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "list-kind-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "managed-note-assets-browser.mjs",
+        "exitCode": 1,
+        "status": "fail"
+      },
+      {
+        "file": "note-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "note-dom-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "note-editing-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "note-export-parity-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "note-image-chooser-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "note-image-dimensions-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "publication-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "recovery-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "section-commands-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "server-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "text-format-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-dom-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-full-document-editor-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-full-document-roundtrip-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-full-document-visual-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-full-page-baseline-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-geometry-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-newthought-sidenote-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-same-content-epigraphs-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-same-content-figures-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-same-content-final-sections-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-same-content-fundamentals-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-same-content-getting-started-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-same-content-opening-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-same-content-sidenotes-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      }
+    ]
+  },
+  "python": {
+    "pass": 16,
+    "fail": 0,
+    "skip": 0,
+    "warnings": 1
+  },
+  "httpSqlite": "pass",
+  "upstream": {
+    "commit": "b5d7b7bbe5ce9c4c50fcfad4f19ee3646cfd7ae1",
+    "sections": 9,
+    "blocks": 60,
+    "notes": 7,
+    "images": 5,
+    "fontFaces": 4,
+    "strictV1V2SaveReopen": "pass",
+    "realReactEditUndoRedoSaveReopen": "pass",
+    "fullDOM": "pass",
+    "pixelParity": "exact-outside-one-validated-iframe-mask",
+    "exceptions": [
+      "generated note namespace IDs and accessible control names",
+      "modern privacy iframe URL/security/accessibility attributes",
+      "one instructional iframe code snippet modernized on live official DOM",
+      "two formatting-only note control whitespace gaps in DOM comparator",
+      "single iframe intersection mask with geometry checks and area limit"
+    ],
+    "pixels": [
+      {
+        "width": 375,
+        "mask": {
+          "x": 30,
+          "y": 12188.046875,
+          "width": 283.5,
+          "height": 202.1875
+        },
+        "dimensions": {
+          "upstream": [
+            375,
+            15247
+          ],
+          "published": [
+            375,
+            15247
+          ]
+        },
+        "dimensionsMatch": true,
+        "totalPixels": 5717625,
+        "maskedPixels": 56883,
+        "maskedMismatchPixels": 0,
+        "unmaskedMismatchPixels": 0,
+        "maxChannelDelta": 0,
+        "mismatchBounds": null,
+        "firstDifferences": []
+      },
+      {
+        "width": 759,
+        "mask": {
+          "x": 60.71875,
+          "y": 7897.890625,
+          "width": 573.78125,
+          "height": 383.609375
+        },
+        "dimensions": {
+          "upstream": [
+            759,
+            10948
+          ],
+          "published": [
+            759,
+            10948
+          ]
+        },
+        "dimensionsMatch": true,
+        "totalPixels": 8309532,
+        "maskedPixels": 219459,
+        "maskedMismatchPixels": 0,
+        "unmaskedMismatchPixels": 0,
+        "maxChannelDelta": 0,
+        "mismatchBounds": null,
+        "firstDifferences": []
+      },
+      {
+        "width": 760,
+        "mask": {
+          "x": 60.796875,
+          "y": 7898.8125,
+          "width": 574.546875,
+          "height": 384.09375
+        },
+        "dimensions": {
+          "upstream": [
+            760,
+            10950
+          ],
+          "published": [
+            760,
+            10950
+          ]
+        },
+        "dimensionsMatch": true,
+        "totalPixels": 8322000,
+        "maskedPixels": 219842,
+        "maskedMismatchPixels": 0,
+        "unmaskedMismatchPixels": 0,
+        "maxChannelDelta": 0,
+        "mismatchBounds": null,
+        "firstDifferences": []
+      },
+      {
+        "width": 761,
+        "mask": {
+          "x": 95.125,
+          "y": 10855.0625,
+          "width": 366.21875,
+          "height": 399.546875
+        },
+        "dimensions": {
+          "upstream": [
+            761,
+            14211
+          ],
+          "published": [
+            761,
+            14211
+          ]
+        },
+        "dimensionsMatch": true,
+        "totalPixels": 10814571,
+        "maskedPixels": 145270,
+        "maskedMismatchPixels": 0,
+        "unmaskedMismatchPixels": 0,
+        "maxChannelDelta": 0,
+        "mismatchBounds": null,
+        "firstDifferences": []
+      },
+      {
+        "width": 1024,
+        "mask": {
+          "x": 128,
+          "y": 9166.453125,
+          "width": 492.796875,
+          "height": 529
+        },
+        "dimensions": {
+          "upstream": [
+            1024,
+            12587
+          ],
+          "published": [
+            1024,
+            12587
+          ]
+        },
+        "dimensionsMatch": true,
+        "totalPixels": 12889088,
+        "maskedPixels": 259776,
+        "maskedMismatchPixels": 0,
+        "unmaskedMismatchPixels": 0,
+        "maxChannelDelta": 0,
+        "mismatchBounds": null,
+        "firstDifferences": []
+      },
+      {
+        "width": 1440,
+        "mask": {
+          "x": 180,
+          "y": 7842.96875,
+          "width": 693,
+          "height": 733.75
+        },
+        "dimensions": {
+          "upstream": [
+            1440,
+            11630
+          ],
+          "published": [
+            1440,
+            11630
+          ]
+        },
+        "dimensionsMatch": true,
+        "totalPixels": 16747200,
+        "maskedPixels": 507969,
+        "maskedMismatchPixels": 0,
+        "unmaskedMismatchPixels": 0,
+        "maxChannelDelta": 0,
+        "mismatchBounds": null,
+        "firstDifferences": []
+      }
+    ]
+  },
+  "resolved": [
+    "E120 original iframe layout vs arbitrary intrinsic ratio",
+    "E123 nested rich note derived text format serialization",
+    "E125 dormant stale test assertions"
+  ],
+  "remaining": {
+    "file": "managed-note-assets-browser.mjs",
+    "reason": "document image asset registration button absent",
+    "classification": "deferred-asset-expansion",
+    "exitCode": 1,
+    "detail": "locator.click Timeout 5000ms; no process timeout",
+    "implementation": "not-started-by-current-priority"
+  },
+  "compatibility": {
+    "optionalEmbedField": "layout?: 'tufte'",
+    "defaultLayout": "unchanged-intrinsic-ratio",
+    "schemaAndNodeVersion": 1,
+    "oldGolden": "unchanged",
+    "oldReaders": "reject unknown layout; update document/lexical/render together"
+  },
+  "limits": [
+    "All-node GUI creation/deletion tools still have separate P2 gates",
+    "External iframe provider playback not tested offline",
+    "Korean font proof baseline ran; original OTF and OS fallback matrix not rerun"
+  ]
+}

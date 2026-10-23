@@ -29,6 +29,8 @@ export function mountPublicationHarness(input){
    $createFigureNode('fullwidth').append($createImageQuiltNode('/fixture.svg','검증 ImageQuilt',undefined,120,48)),
    $createEmbedNode('youtube','https://www.youtube-nocookie.com/embed/abcdefghijk','검증 16:9','figure','body',16/9),
    $createEmbedNode('vimeo','https://player.vimeo.com/video/1234','검증 4:3','div','fullwidth',4/3),
+   $createEmbedNode('youtube','https://www.youtube-nocookie.com/embed/abcdefghijk','검증 Tufte figure','figure','body',16/9,'tufte'),
+   $createEmbedNode('vimeo','https://player.vimeo.com/video/1234','검증 Tufte div','div','fullwidth',16/9,'tufte'),
   ));
  },{discrete:true});
  const base=input??{schemaVersion:1,id:'publication-check',locale:'ko-KR',title:'신규 노드 검증',assets:[],lexicalState:editor.getEditorState().toJSON()};

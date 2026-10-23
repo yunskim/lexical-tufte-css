@@ -124,6 +124,9 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
      width:'960',height:String(Math.round(960/Number(n.aspectRatio))),
      allowfullscreen:''
     },[]);
+    if(n.layout==='tufte')return [element(wrapper,{
+     class:[n.width==='fullwidth'?'fullwidth':'','iframe-wrapper'].filter(Boolean).join(' ')
+    },[frame])];
     return [element(wrapper,{
      class:[n.width==='fullwidth'?'fullwidth':'','tufte-embed'].filter(Boolean).join(' '),
      'data-tufte-ratio':String(n.aspectRatio)

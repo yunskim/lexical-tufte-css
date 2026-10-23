@@ -1,5 +1,21 @@
 # 에러 기록
 
+## 2026-10-23 E120/E123 수정 및 전체 원본 대조 완료
+
+기준 `bb2b80e` 후속 변경: **check423개·package5개 소비·Python16개·HTTP 통과, browser33통과/1실패/timeout·skip0**. 유일한 실패는 보류 중인 문서 자산 등록 UI다. [최신 보고서](VERIFICATION_UPSTREAM_PARITY_2026-10-23.ko.md). 이전29/5 등은 각 과거 tree의 이력이다.
+
+- E123 해결: Lexical DOM reconciler가 하위 텍스트에서 textFormat/textStyle을 계산한다. base serializer는 직접 TextNode 자식만 확인하여 링크 안에만 텍스트가 있는 노트의 파생 값2를 저장했다. NoteNode는 모든 텍스트 자손 유무로 저장 필요성을 판단한다. 텍스트 없는 이미지 노트의 명시적 insertion format은 보존한다. 중첩/이미지 전용 회귀와 실제9섹션 편집·Undo/Redo·저장·재열기 통과.
+- E120 해결: 선택 필드 layout:'tufte'가 원본 CSS의 figure/div.iframe-wrapper > 단일 iframe을 명시한다. layout 생략 시 기존 임의 비율·CSP 출력 유지. 충돌 비율/알 수 없는 layout 거부, v1/v2/clone/두 wrapper 및 기존5비율×5폭 CSP 검증 통과. [저장 계약](EMBED_LAYOUT.ko.md).
+- 공식9섹션/60블록/7노트의 strict 저장·재열기·DOM, 실제 React 편집, 6폭 geometry 및 iframe 제외 exact RGBA pixel 비교 통과. 원본 라이브러리 버전·HTML/CSS·기존 golden은 변경하지 않았다. 외부 iframe 재생은 별도 호스트 검증이다.
+
+## E125 — 앞선 제품 실패에 가려진 원본 대조 테스트의 잘못된 기대
+
+- 전체 DOM 검사에서 Object.entries를 정렬한 배열 JSON을 빈 객체 문자열 '{}'와 비교해 항상 실패했다. 양쪽에 같은 normalized 함수를 사용하도록 수정했다.
+- 독립 복사본 편집 후 원본 불변성 검사가 onDisk와 migrated.document의 JSON 문자열을 비교해 속성 순서 차이를 변경으로 오판했다. 편집 전 onDisk 문자열을 캡처하고 동일 객체의 편집 후 문자열과 비교해 실제 변경을 검사한다. 전체 DOM·한정 텍스트 수정 검사는 유지한다.
+- Figures/전체 roundtrip의 접근성 이름에 E119와 같은 옛 spelling이 남았다. 현행 고정 이름으로 수정하고 모든 활성 소스를 검색했다. audit:notes에 구형 이름 검출을 추가했고, 이 검사가 tree serializer 테스트의 추가2곳을 찾아 함께 수정했다.
+- 검증: audit181파일 및 전체423개·browser33/34 통과. 테스트 조건 완화나 skip 없음. 유일한 자산 실패는 기존 보류 기능이다. M114/M115.
+- 문서 patch의 동일 파일 중복 target은 적용 거부됐다. 한 Update 항목으로 합쳐 재적용했으며 미적용 상태에서 파일을 덮어쓰지 않았다. M113의 컨텍스트 확인 절차를 유지한다.
+
 ## 2026-10-23 E117 수정 및 재검증
 
 기준 `be2317d` 후속 수정. **check418개·package5개·Python16개·HTTP 통과, browser29통과/5실패/timeout·skip0**. [최신 보고서](VERIFICATION_NODE_REGISTRY_2026-10-23.ko.md). 아래12/20/2는 이전 tree의 이력이다.
@@ -23,11 +39,11 @@
 - upstream 재구성 helper는 원본 HTML에서 읽지 않은 root textFormat:0/textStyle:''를 추가했다. Lexical0.52는 이 기본값을 생략하므로 strict bridge가 손실로 거부했다. helper에서 **추가한 기본값 두 개만** 제거하고9섹션/60블록/7노트·콘텐츠·metadata 검사는 유지. validator나 손실 거부를 완화하지 않았다.
 - 재검증: dimensions 통과. 전체 roundtrip은 저장/재열기·titleId 보존을 통과하고 E120 iframe 검사에서 실패. 전체 editor는 실제 JSON 비교에 도달해 E123을 발견. M112.
 
-## E123 — React 전체 문서 재열기에서 노트 textFormat 추가 (미해결)
+## E123 — React 전체 문서 재열기에서 노트 textFormat 추가 (해결)
 
 - 실제9섹션 restore 후 첫 JSON 비교에서 sn-in-his-later-books sidenote에 원본 상태에 없는 textFormat:2가 추가됐다. DOM 또는 콘텐츠 삭제를 확인한 것은 아니지만 **정확한 저장 동등성 실패**다.
 - headless 왕복은 통과하므로 React 갱신/정규화 경로를 별도 분석해야 한다. 정확한 쓰기 지점/원인은 아직 확정하지 않았다. 서식 필드를 무조건 삭제하거나 수락 비교에서 제외하지 않았다.
-- 다음: 해당 노트의 rich child 구성을 작은 React 회귀로 축소, load→reconcile→inspect 단계의 상태 변경을 확인하고 명시적 서식 보존·Undo/Redo·재로드까지 재검증. M112.
+- 후속 확인: 상단 최신 실행 기록과 같이 중첩 텍스트의 파생 서식 저장을 수정했고 단위 및 실제 React 전체 문서 restore/Undo/Redo/재로드를 검증했다. M112/M114.
 
 ## E124 — HTTP 회귀가 테스트 venv 대신 시스템 Python을 사용
 
@@ -44,7 +60,7 @@
 - 수정: 객체 검사 이후 titleId를 지역 상수에 캡처해 기존 충돌 검사에 사용. validator 규칙 변경 없음.
 - 검증: 수정 후 전체 build/typecheck 및 document57개 통과. 해결. M107.
 
-## E117 — 동일 wire type을 사용하는 Lexical 교체 노드 등록 충돌 (미해결)
+## E117 — 동일 wire type을 사용하는 Lexical 교체 노드 등록 충돌 (해결)
 
 - 확인: TufteParagraphNode/ParagraphNode는 paragraph, TufteQuoteNode/QuoteNode는 quote type을 공유한다. TUFTE_NODES의 마지막 replace 항목이 Lexical0.52 registry의 해당 type을 기본 klass로 덮어쓴다.
 - 재현: heading-id.test.mjs의 block command 테스트가 `$createParagraphNode()` → replacement 생성에서 `Type paragraph in node TufteParagraphNode does not match registered node ParagraphNode with the same type`으로 실패. 다수 편집기 브라우저는 .editor 생성 이전 실패.
@@ -62,11 +78,11 @@
 - fundamentals/sidenotes가 `Toggle margin note`를 기대했지만 현재 renderer의 고정 이름은 `Toggle marginnote`다(E109와 같은 원인 재발).
 - 세 기대값만 수정하고 접근 가능한 이름·연결·모바일 toggle 수락은 유지. 두 파일 독립 재실행 통과. M100/M110.
 
-## E120 — iframe 발행 DOM과 공식 전체 페이지 수락 계약 차이 (미해결)
+## E120 — iframe 발행 DOM과 공식 전체 페이지 수락 계약 차이 (해결)
 
 - 자산9개 무결성 검증·동기화 후 실제 시각 테스트를 실행했다. published iframe은 `figure.tufte-embed` + 보조 svg이며 수락 계약은 단일 iframe을 가진 `figure.iframe-wrapper`다.
 - visual은 `Modernized published iframe/snippet changed`에서 실패하여 픽셀 비교에 도달하지 못했다. Figures 섹션은 svg 부재 검사에서 실패. screenshot이 생성됐다는 이유로 parity 통과라고 하지 않는다.
-- 공식 구조, responsive 비율, 안전한 iframe 속성 계약을 함께 정리해 renderer/회귀를 수정해야 한다. 원본·golden·수락 조건을 완화하지 않았다. M110.
+- 후속: layout:'tufte'로 공식 구조를 명시하고 기존 임의 비율과 함께 검증했다. 최종 Figures/전체 roundtrip/6폭 visual 통과. 원본·golden·수락 조건을 유지했다. M110/M114.
 
 ## E114 — v2 문서 브리지에서 문서 제목 앵커(titleId) 소실 위험
 

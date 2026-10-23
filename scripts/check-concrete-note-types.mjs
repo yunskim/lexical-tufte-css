@@ -1,4 +1,4 @@
-/** Fail closed when active code or fixtures reintroduce the removed tufte-note wire type. */
+/** Fail closed on removed note APIs/wire types or the obsolete toggle name. */
 import {readdirSync,readFileSync} from 'node:fs';
 import {join,relative,resolve,extname} from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -14,6 +14,7 @@ const patterns=[
  {name:'removed note factory',pattern:/\$createNoteNode\b/g},
  {name:'removed NoteKind alias',pattern:/\bNoteKind\b/g},
  {name:'legacy note wire type',pattern:/['"]tufte-note['"]/g},
+ {name:'obsolete marginnote accessible name',pattern:/['"]Toggle margin note['"]/g},
 ];
 let examined=0;
 const failures=[];
