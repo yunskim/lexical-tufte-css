@@ -37,6 +37,8 @@
 
 ## E110 — main 런타임과 이관된 브라우저 수락 계약 불일치 (미해결)
 
+- 후속 정적 보완(2026-10-23): `fix/main-browser-parity-20261023`에서 시각 자산 검증·명시적 동기화 경로, 원본 메타데이터(`titleId`/heading.id/quote.cite/paragraph.sans)와 bare 상대 이미지 경로, 마진노트 우선 figure 구조, Lexical roundtrip을 선별 반영했다. **변경 후 빌드·테스트 미실행**이므로 E110을 해결 처리하지 않는다. [후속 체크리스트](MAIN_BROWSER_PARITY_REMEDIATION_2026-10-23.ko.md) 참조.
+
 - 실제 browser34개 전수 실행 및 변경한 두 파일 재실행 후 15개 실패가 남았다. main에는 관리 자산 등록/노트 이미지 선택/크기 수정 UI가 없으며 테스트는 해당 버튼에서 timeout으로 실패한다.
 - 전체/섹션 fixture는 titleId·heading.id·quote.cite·tufteClass, note-first figure 및 img/... 상대 URL을 요구하지만 main schema/validator는 지원하지 않는다. 전체 editor 로드는 같은 fixture를 받아들이지 못해 완료 상태를 얻지 못한다.
 - 발행 renderer는 pre-wrap 및 note wrapper를 유지하고 newthought split-parent 처리를 하지 않아 opening DOM, Lexical/publication note parity 및 원본 newthought 대조가 실패한다. Lexical 쪽 이름/selector 기대만 고쳐 이 제품 차이를 숨기지 않았다.
