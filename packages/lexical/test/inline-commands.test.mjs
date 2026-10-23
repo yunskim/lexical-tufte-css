@@ -2,10 +2,61 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createHeadlessEditor} from '@lexical/headless';
 import {$createLinkNode} from '@lexical/link';
-import {$getSelection,$getRoot,$createParagraphNode,$createTextNode,$createRangeSelection,$setSelection} from 'lexical';
+import {$getSelection,$getRoot,$createParagraphNode,$createTextNode,$createRangeSelection,$setSelection,$setCompositionKey} from 'lexical';
 import {TufteSpanNode,$createTufteSpanNode,$createSidenoteNode,$createMarginnoteNode,TUFTE_NODES,registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND,WRAP_TUFTE_SPAN_COMMAND,UNWRAP_TUFTE_SPAN_COMMAND} from '../dist/index.js';
 
+test('P2.2.b.1 every wrap kind retains rich text, link URL and neighboring note through JSON restore',()=>{
+ for(const kind of ['sans','newthought','numeral','danger']){
+  const editor=createHeadlessEditor({nodes:TUFTE_NODES,onError:error=>{throw error;}});
+  const dispose=registerInlineCommands(editor);
+  editor.update(()=>{
+   const text=$createTextNode('ABCDEF').setFormat(3);
+   $getRoot().append($createParagraphNode().append(
+    $createLinkNode('https://example.org/source').append(text),
+    $createMarginnoteNode('rich-neighbor').append($createTextNode('memo'))));
+   text.select(1,5);
+  },{discrete:true});
+  editor.update(()=>editor.dispatchCommand(WRAP_TUFTE_SPAN_COMMAND,kind),{discrete:true});
+  const json=editor.getEditorState().toJSON(),children=json.root.children[0].children;
+  assert.equal(children[0].url,'https://example.org/source');
+  assert.deepEqual(children[0].children.map(n=>n.type),['text','tufte-span','text']);
+  assert.equal(children[0].children[1].kind,kind);
+  assert.equal(children[0].children[1].children[0].text,'BCDE');
+  assert.equal(children[0].children[1].children[0].format,3);
+  assert.equal(children[1].noteId,'rich-neighbor');
+  assert.deepEqual(editor.parseEditorState(JSON.stringify(json)).toJSON(),json);
+  dispose();
+ }
+});
+
 const make=()=>createHeadlessEditor({namespace:'inline-command-test',nodes:[TufteSpanNode],onError(error){throw error;}});
+test('P2.2.b.1 composition rejects wrap, kind change and unwrap without changing state or selection',()=>{
+ for(const [command,payload,wrapped] of [
+  [WRAP_TUFTE_SPAN_COMMAND,'sans',false],
+  [SET_TUFTE_SPAN_KIND_COMMAND,'danger',true],
+  [UNWRAP_TUFTE_SPAN_COMMAND,undefined,true],
+ ]){
+  const editor=make(),diagnostics=[];
+  const dispose=registerInlineCommands(editor,d=>diagnostics.push(d));
+  editor.update(()=>{
+   const text=$createTextNode('한글 input');
+   $getRoot().append($createParagraphNode().append(wrapped?$createTufteSpanNode('newthought').append(text):text));
+   text.select(1,command===WRAP_TUFTE_SPAN_COMMAND?3:1);
+  },{discrete:true});
+  const before=JSON.stringify(editor.getEditorState().toJSON());
+  editor.update(()=>{
+   const selection=$getSelection(),original=selection.clone(),anchor=original.anchor,focus=original.focus;
+   $setCompositionKey(selection.anchor.key);
+   assert.equal(editor.isComposing(),true);
+   assert.equal(editor.dispatchCommand(command,payload),true);
+   assert.equal($getSelection().anchor.key,anchor.key);assert.equal($getSelection().anchor.offset,anchor.offset);
+   assert.equal($getSelection().focus.key,focus.key);assert.equal($getSelection().focus.offset,focus.offset);
+   $setCompositionKey(null);
+  },{discrete:true});
+  assert.equal(JSON.stringify(editor.getEditorState().toJSON()),before);
+  assert.equal(diagnostics.at(-1).code,'INVALID_SPAN_SELECTION');dispose();
+ }
+});
 test('P2.2.b existing span kind command preserves text and rejects invalid payload',()=>{
  const editor=make(),diagnostics=[];
  const unregister=registerInlineCommands(editor,d=>diagnostics.push(d));

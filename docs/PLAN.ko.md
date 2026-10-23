@@ -175,7 +175,7 @@ P1 gate: 완료. 노트 편집 회귀와 SSR 출력의 실제 브라우저 비�
   - [x] P2.2.a section 묶기/추가/블록 경계 분할/병합 및 paragraph·h2·h3 명령, 내용 보존·거부 원자성·실제 UI 왕복. [명령 계약](SECTION_COMMANDS_P22A.ko.md), check214개·browser10개·package4개 통과.
   - [ ] P2.2.b F03/F05 인라인 속성 및 F06 목록/정의목록 명령과 회귀. [추적 이슈 #9](https://github.com/yunskim/lexical-tufte-css/issues/9).
     - [x] P2.2.b.0 editor prototype의 직접 import가 package.json과 pnpm-lock에 명시되는지 확인하고 workspace frozen install/package 경계를 검증한다. 2026-10-18 frozen/check297개/package4개 통과, [실행 보고서](VERIFICATION_2026-10-18.ko.md). E087 실행 검증 완료.
-    - [ ] P2.2.b.1 기존 span kind 변경에 더해 선택 텍스트를 Tufte span으로 **생성·해제**한다. 부분 선택·같은/다른 인라인 부모·link·note·IME의 보존/거부 기준을 명시하고 atomic undo/redo와 HTML roundtrip을 검증한다.
+    - [x] P2.2.b.1 선택 텍스트 span 생성·기존 kind 변경·해제의 지원/거부 경계 및 atomic undo/redo, JSON/인라인 HTML 왕복 검증. 한 TextNode 부분 선택·링크·rich text·인접 note identity를 보존하고 cross-node/부모·노트 내부·IME는 명시적 거부. [지원 계약](INLINE_SPAN_P22B1.ko.md), [실행 증거](VERIFICATION_INLINE_SPAN_2026-10-23.ko.md): check425개, browser35개 중34통과/보류 자산1실패, 모바일/데스크톱·키보드·CDP IME 검증. 전체 문서 HTML importer는 P2.4, 실제 OS IME/스크린리더는 P6.
     - [ ] P2.2.b.2 ul/ol 항목 생성·추가·형태 변경·중첩·들여쓰기·내어쓰기/해제·키보드 Enter/Backspace/Tab 경계(필요한 정책 포함)를 설계·구현한다. 빈 목록/최초·최종 항목, 혼합/중첩 목록, 선택 범위, note payload/ID 보존을 검사한다.
       - [ ] P2.2.b.2-K1 키보드 소유권 확인: Lexical 기본 Enter/Backspace 명령과 별도 Tufte 목록 명령의 충돌 여부를 headless/browser로 증명한다. Tufte 섹션 안의 ul/ol만 개입하고 note/IME/선택 범위는 우선 보존한다.
       - [ ] P2.2.b.2-K2 Enter: 일반 항목의 중간/끝에서 분할·추가, 빈 최종 항목에서 목록 종료, 중첩 목록의 빈 항목에서 한 단계 내어쓰기. 이력 한 단계·노트 ID·저장/발행 구조를 각각 검증한다.

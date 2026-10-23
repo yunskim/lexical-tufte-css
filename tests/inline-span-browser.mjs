@@ -13,7 +13,8 @@ try{
   if(i===99)throw Error('Editor server not ready');await setTimeout(100);
  }
  browser=await chromium.launch({headless:true,args:['--no-sandbox']});
- const page=await browser.newPage();page.setDefaultTimeout(6000);
+ for(const width of [1440,375]){
+ const page=await browser.newPage();await page.setViewportSize({width,height:1000});page.setDefaultTimeout(6000);
  const errors=[];page.on('pageerror',error=>errors.push(error.message));
  await page.goto(url);
  const editor=page.locator('.editor');await editor.waitFor();
@@ -39,7 +40,8 @@ try{
   document.dispatchEvent(new Event('selectionchange'));
  });
  await page.waitForFunction(()=>window.getSelection()?.toString()==='selected');
- await action('선택 텍스트 newthought').click();
+ if(width===375){await action('선택 텍스트 newthought').focus();await page.keyboard.press('Space');}
+ else await action('선택 텍스트 newthought').click();
  const wrapped=await snapshot();
  const span=collect(wrapped.root).find(node=>node.type==='tufte-span'&&node.kind==='newthought');
  assert.ok(span,'Selection should create a semantic Tufte span');
@@ -59,8 +61,36 @@ try{
  await page.reload();await editor.waitFor();
  await page.getByRole('button',{name:'불러오기',exact:true}).click();
  assert.deepEqual(await snapshot(),wrapped,'Browser save/reopen must preserve the wrapper');
- await editor.locator('.newthought').click();
+ // Actual browser composition must not let a toolbar action remove its span.
+ await editor.locator('.newthought').evaluate(span=>{
+  const node=document.createTreeWalker(span,NodeFilter.SHOW_TEXT).nextNode();
+  const range=document.createRange();range.setStart(node,2);range.collapse(true);
+  const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);
+  document.dispatchEvent(new Event('selectionchange'));
+ });
+ await editor.focus();
+ const cdp=await page.context().newCDPSession(page);
+ await cdp.send('Input.imeSetComposition',{text:'한',selectionStart:1,selectionEnd:1});
+ assert.match(await editor.locator('.newthought').innerText(),/한/);
  await action('인라인 속성 해제').click();
+ assert.equal(await editor.locator('.newthought').count(),1,'Composition keeps the span intact');
+ await cdp.send('Input.imeSetComposition',{text:'',selectionStart:0,selectionEnd:0});
+ assert.deepEqual(await snapshot(),wrapped,'Cancelled composition and rejected unwrap preserve canonical JSON');
+ await cdp.detach();
+ for(const kind of ['sans','numeral','danger']){
+  await editor.locator('.newthought').click();await action(`인라인 ${kind}`).click();
+  const changed=await snapshot();
+  assert.equal(collect(changed.root).find(n=>n.type==='tufte-span').kind,kind);
+  await page.getByRole('button',{name:'실행 취소',exact:true}).click();
+  assert.deepEqual(await snapshot(),wrapped,'Kind change is one undo step');
+  await page.getByRole('button',{name:'다시 실행',exact:true}).click();
+  assert.deepEqual(await snapshot(),changed,'Redo retains note identity and changed kind');
+  await page.getByRole('button',{name:'실행 취소',exact:true}).click();
+  assert.deepEqual(await snapshot(),wrapped);
+ }
+ await editor.locator('.newthought').click();
+ if(width===375){await action('인라인 속성 해제').focus();await page.keyboard.press('Space');}
+ else await action('인라인 속성 해제').click();
  const unwrapped=await snapshot();
  assert.equal(collect(unwrapped.root).some(node=>node.type==='tufte-span'&&node.kind==='newthought'),false);
  assert.equal(await editor.locator('.newthought').count(),0);
@@ -70,5 +100,7 @@ try{
  await page.getByRole('button',{name:'다시 실행',exact:true}).click();
  assert.deepEqual(await snapshot(),unwrapped,'Redo must remove wrapper again');
  assert.deepEqual(errors,[]);
- console.log('P2.2.b browser: selected-text span wrapping and undo/redo, pure renderer, save/reopen, unwrap and undo/redo PASS.');
+ console.log(`P2.2.b.1 ${width}px: real selection, wrap/unwrap undo/redo, save/reopen and composition cancellation/guard PASS.`);
+ await page.close();
+ }
 }finally{await browser?.close();server.kill();}

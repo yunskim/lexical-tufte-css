@@ -1,5 +1,13 @@
 # 에러 기록
 
+## E126 — Tufte span HTML 복원 누락 및 native export의 정렬 소실 (해결)
+
+- 발견(2026-10-23, P2.2.b.1): TufteSpanNode에 importDOM이 없어서 HTML에서 sans/newthought/numeral/danger 의미를 복원할 수 없었다. 새 실제 브라우저 왕복에서 native export 후 format:right가 빈 값으로 바뀌는 실패도 재현했다.
+- 원인: ElementNode 기본 HTML export는 Tufte 종류를 해석하는 converter를 제공하지 않으며 인라인 정렬도 출력하지 않는다. JSON 왕복/일반 기본값 출력 통과만으로 HTML 의미 보존을 입증할 수 없었다.
+- 수정: 인식한 Tufte class를 typed node로 복원하고 native export에 scoped 정렬 class를 출력. dir 및 단일 안전한 text-align 입력을 보존하고 복수 kind/알 수 없는 속성·클래스/임의·중복·important CSS/정렬 충돌은 오류 처리한다. 원본 style 문자열도 검사해 CSSOM의 잘못된 선언 생략을 손실 승인으로 오인하지 않는다.
+- 검증:4 kind×3방향/정렬 입력의 native/publisher 왕복36회, malformed12종 거부 시 기존 편집 상태 보존. inline unit15개와 실제 UI1440/375px history/저장/IME guard·취소/키보드 Space 검증. 전체 check425개·package5개·Python16/HTTP 및 browser34/35 통과, 유일한 실패는 기존 보류 자산 등록이다. M116 참조.
+- 지원 한계: HTML 검증은 인라인 span/link fragment다. 전체 문서/노트 controls/외부 HTML strict importer는 P2.4에 남는다. 실제 OS IME/스크린리더는 P6. [보고서](VERIFICATION_INLINE_SPAN_2026-10-23.ko.md).
+
 ## 2026-10-23 E120/E123 수정 및 전체 원본 대조 완료
 
 기준 `bb2b80e` 후속 변경: **check423개·package5개 소비·Python16개·HTTP 통과, browser33통과/1실패/timeout·skip0**. 유일한 실패는 보류 중인 문서 자산 등록 UI다. [최신 보고서](VERIFICATION_UPSTREAM_PARITY_2026-10-23.ko.md). 이전29/5 등은 각 과거 tree의 이력이다.

@@ -1,5 +1,11 @@
 # main 브라우저 불일치 보완 — 2026-10-23
 
+## 후속 실행 판정 — P2.2.b.1
+
+- [최신 인라인 검증](VERIFICATION_INLINE_SPAN_2026-10-23.ko.md): check425개·package5개·Python16/HTTP 통과, browser35파일34통과/보류 자산1실패. 파일timeout·skip0, CI 생략.
+- 인라인 HTML4종·서식/URL/방향·정렬 왕복, malformed12종의 기존 상태 보존,1440/375px 실제 UI history/저장/IME·키보드 검증 완료. 공식9섹션6폭 pixel(mask 밖 차이0) 유지.
+- P2.2.b.1의 명시된 지원/거부 범위만 완료. 다음은 P2.2.b.2 목록/키보드 경계다. 자산 확대는 계속 보류한다.
+
 ## 최신 실행 판정 — 공식 전체 원본 대조 통과
 
 - [최신 보고서](VERIFICATION_UPSTREAM_PARITY_2026-10-23.ko.md), [파일별·pixel JSON](verification/upstream-parity-20261023.json)이 현재 증거다. 아래29/5 등은 과거 이력이다.

@@ -1,3 +1,10 @@
+## 2026-10-23 P2.2.b.1 인라인 속성 지원 범위 검증 완료
+
+- TufteSpanNode의 span4종 HTML 복원과 정렬 class export를 구현했다. 링크/글자 서식/방향·정렬을 native/publisher 인라인 HTML 왕복에서 보존하고 malformed 속성12종은 기존 편집 상태를 유지하며 거부한다.
+- 실제1440/375px UI에서 wrap/unwrap/kind Undo/Redo·저장/재열기·CDP IME 중 해제 거부/취소,375px Space 버튼 활성화까지 통과. 명령의3종 composition guard와4종 rich wrap 단위 회귀 추가.
+- check425개·package5개·Python16/HTTP 통과. 전체35 browser34통과/보류 자산1실패, 파일timeout·skip0. 공식9섹션6폭 pixel(mask 밖 차이0) 유지. CI 생략.
+- [지원 계약](INLINE_SPAN_P22B1.ko.md), [실행 보고서](VERIFICATION_INLINE_SPAN_2026-10-23.ko.md), E126/M116 반영. P2.2.b.1만 해당 범위에서 체크, P2.2.b/F03/F05 전체는 미완료 유지. 다음 첫 미완료 항목은 P2.2.b.2 목록/키보드 경계다.
+
 ## 2026-10-23 공식9섹션 편집·발행·픽셀 대조 통과 — browser33/34
 
 - `bb2b80e` 후속: E123 중첩 노트의 파생 insertion format 직렬화를 수정하고, E120 공식 iframe 레이아웃을 선택 필드 layout:'tufte'로 추가했다. 기존 임의 비율·CSP·저장 golden은 유지한다.
