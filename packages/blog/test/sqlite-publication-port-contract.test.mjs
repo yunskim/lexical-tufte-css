@@ -226,3 +226,34 @@ test('SQLite adapter: unpublish update failure leaves active head intact',async(
   assert.equal(ok(await store.readPublic(id)).snapshotId,published.snapshotId);
  }finally{db.close();}
 });
+
+test('SQLite adapter: restore update failure rolls back without changing publication head',async()=>{
+ const {db,store,service,id}=await integrated();
+ try{
+  const first=ok(await service.publish(id,publishOptions(1,0,'2026-10-16T01:00:00Z')));
+  const second=ok(await service.publish(id,publishOptions(1,1,'2026-10-16T02:00:00Z')));
+  db.exec(`CREATE TRIGGER reject_restore BEFORE UPDATE ON publication_heads_v1
+   BEGIN SELECT RAISE(ABORT,'simulated restore failure'); END;`);
+  notOk(await service.restore(id,first.snapshotId,{expectedGeneration:2,authorize:async()=>true,assetExists:async()=>true}),'PUBLICATION_STORAGE_ERROR');
+  const head=ok(await store.readState(id));
+  assert.equal(head.generation,2);
+  assert.equal(head.snapshotId,second.snapshotId);
+  assert.equal(head.lastSnapshotId,second.snapshotId);
+  assert.equal(ok(await store.readPublic(id)).snapshotId,second.snapshotId);
+  assert.equal(db.prepare('SELECT count(*) AS n FROM publication_snapshots_v1').get().n,2);
+  db.exec('DROP TRIGGER reject_restore');
+  const restored=ok(await service.restore(id,first.snapshotId,{expectedGeneration:2,authorize:async()=>true,assetExists:async()=>true}));
+  assert.equal(restored.generation,3);
+  assert.equal(restored.snapshotId,first.snapshotId);
+ }finally{db.close();}
+});
+test('SQLite adapter: invalid restore snapshot cannot change head',async()=>{
+ const {db,store,service,id}=await integrated();
+ try{
+  const first=ok(await service.publish(id,publishOptions(1,0,'2026-10-16T01:00:00Z')));
+  notOk(await store.restorePublication({postId:id,snapshotId:'f'.repeat(64),expectedGeneration:1}),'SNAPSHOT_NOT_FOUND');
+  const head=ok(await store.readState(id));
+  assert.equal(head.generation,1);
+  assert.equal(head.snapshotId,first.snapshotId);
+ }finally{db.close();}
+});
