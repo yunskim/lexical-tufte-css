@@ -72,6 +72,9 @@ try {
  await page.reload();await page.locator('.editor').waitFor();
  await page.getByRole('button',{name:'불러오기',exact:true}).click();
  assert.deepEqual(await snapshot(),after,'Saved document must reopen after rejected imports');
+ // An invalid live structure must never overwrite the last good save.
+ // The editor offers a layout fixture and structure inspector; exercise this
+ // invariant separately once a deterministic invalid-structure fixture exists.
  assert.deepEqual(errors,[],'Rejected imports caused uncaught browser exceptions');
  console.log('Malformed persisted JSON/root: live Lexical state preserved and subsequent editing works.');
 }finally{await browser?.close();server?.kill();}
