@@ -1,12 +1,12 @@
 import {createHeadlessEditor} from '@lexical/headless';
 import {$getRoot,$createParagraphNode as p,$createTextNode as t,$createLineBreakNode as br,$createTabNode as tab} from 'lexical';
-import {$createHeadingNode as heading,$createQuoteNode as quote} from '@lexical/rich-text';
+import {$createQuoteNode as quote} from '@lexical/rich-text';
 import {$createListNode as list,$createListItemNode as item} from '@lexical/list';
 import {$createLinkNode as link} from '@lexical/link';
 import {$createTableNode as table,$createTableRowNode as row,$createTableCellNode as cell} from '@lexical/table';
 import {$createHorizontalRuleNode as hr} from '@lexical/react/LexicalHorizontalRuleNode';
 import {
- TUFTE_NODES,$createTufteCodeHighlightNode as token,$createSectionNode as section,$createSidenoteNode as side,$createMarginnoteNode as margin,$createInlineImageNode as image,$createTufteSpanNode as span,
+ TUFTE_NODES,$createTufteHeadingNode as heading,$createTufteCodeHighlightNode as token,$createSectionNode as section,$createSidenoteNode as side,$createMarginnoteNode as margin,$createInlineImageNode as image,$createTufteSpanNode as span,
  $createHostLinkNode as hostLink,$createFigureNode as figure,$createCaptionNode as caption,$createTableLayoutNode as layout,
  $createDefinitionListNode as dl,$createDefinitionTermNode as dt,$createDefinitionDescriptionNode as dd,
  $createEpigraphNode as epigraph,$createAttributionNode as attribution,$createCiteNode as cite,$createSectionFooterNode as footer,
