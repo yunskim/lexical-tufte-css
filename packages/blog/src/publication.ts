@@ -122,8 +122,9 @@ export class SqlitePublicationStore{
    const latest=this.draft(id);if(!latest.ok){this.db.exec('ROLLBACK');started=false;return latest;}
    if(latest.value.metadata.slug!==draft.value.metadata.slug||latest.value.metadata.createdAt!==draft.value.metadata.createdAt){this.db.exec('ROLLBACK');started=false;return fail('REVISION_CONFLICT','Draft identity changed during restore');}
    this.db.prepare('UPDATE publication_heads_v1 SET generation=generation+1,snapshot_id=?,last_snapshot_id=?,published_revision=? WHERE post_id=?').run(snapshotId,snapshotId,candidate.value.snapshot.publishedRevision,id);
+   const restored:PublicationState={...current,generation:current.generation+1,snapshotId,lastSnapshotId:snapshotId,publishedRevision:candidate.value.snapshot.publishedRevision};
    this.db.exec('COMMIT');started=false;
-   return this.readState(id);
+   return {ok:true,value:restored,diagnostics:[]};
   }catch{if(started)try{this.db.exec('ROLLBACK');}catch{}return fail('PUBLICATION_STORAGE_ERROR','Could not restore published snapshot');}
  }
  unpublish(id:string,expectedGeneration:number):Result<PublicationState>{
