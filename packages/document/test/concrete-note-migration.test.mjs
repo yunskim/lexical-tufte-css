@@ -37,3 +37,16 @@ test('migration is idempotent for a migrated v2 document',()=>{
  assert.equal(second.ok,true);
  assert.deepEqual(second.document,first.document);
 });
+
+test('noncloneable nested values fail with diagnostics rather than throwing',()=>{
+ const original=document();
+ original.lexicalState.root.children[0].children[0].children[1].children.push({type:'text',version:1,text:'bad',format:0,callback:()=>42});
+ assert.doesNotThrow(()=>migrateStoredDocument(original));
+ assert.equal(migrateStoredDocument(original).ok,false);
+});
+test('legacy note without a recognized kind cannot bypass strict validation',()=>{
+ const original=document();
+ delete original.lexicalState.root.children[0].children[0].children[1].kind;
+ const result=migrateStoredDocument(original);
+ assert.equal(result.ok,false);
+});
