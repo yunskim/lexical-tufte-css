@@ -1,5 +1,12 @@
 # 재발 방지 대책 및 정기 점검
 
+## M104 — 이미지 chooser UI와 자산 identity/발행 계약 분리
+
+- E113: 선택 UI는 썸네일과 검색·상세 편집을 제공하되 image node를 통째로 교체하거나 src를 암묵적으로 바꾸지 않는다. assetId/HostAsset locator는 사용자에게 보이는 alt/표시 크기와 다른 항목이며 불변으로 보존한다.
+- 모달 열기 전에 Lexical note/image key를 기록하고 실제 편집 시 현재 editor tree에 존재하며 그 note의 자식인지 재검증한다. 이미지 크기는 양의 안전 정수 또는 생략만 허용하고 입력 전체를 검증한 뒤 일괄 반영한다. 접근성 label/aria-pressed/dialog/ESC/Tab, 375px 경계와 자동 복원/저장 왕복을 테스트한다.
+- 노트 내 기존 이미지 선택과 **문서 전체 라이브러리 자산 등록**을 혼동하지 않는다. 관련 테스트의 기존 prompt 기대는 실제 GUI 테스트로 교체하되 중복 ID·잘못된 URL·불량 snapshot 거부 등 데이터 안전성 검사는 유지한다.
+
+
 ## M102 — 원본 DOM을 비교할 때 wrapper 및 텍스트의 의미적 추가를 금지
 
 - E111: Lexical 내부 노드 모델과 출력 HTML은 분리한다. 노트는 직접 `label + input + span` 형제이며, 인접 `newthought + sidenote`만 label을 앞 span 자식으로 이동한다. 타입 변환 UI나 저장 JSON 필드 변경으로 문제를 해결하지 않는다.
