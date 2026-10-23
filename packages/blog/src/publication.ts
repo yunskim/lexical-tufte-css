@@ -13,6 +13,7 @@ export type PublicationState={generation:number;snapshotId:string|null;lastSnaps
 export type PublishOptions={expectedRevision:number;expectedGeneration:number;publishedAt:string;assetExists:(src:string)=>Promise<boolean>};
 /** Opt-in no-op policy. Only asset-free documents can be compared safely without an immutable asset manifest. */
 export type PublishIfChangedOptions=PublishOptions;
+export type RestorePublicationOptions={expectedGeneration:number;assetExists:(src:string)=>Promise<boolean>;authorize:()=>Promise<boolean>};
 const fail=(code:string,message:string):Result<never>=>({ok:false,diagnostics:[{code,path:'$.publication',message}]});
 const validCount=(n:number,min=0)=>Number.isSafeInteger(n)&&n>=min;
 const emptyState=():PublicationState=>({generation:0,snapshotId:null,lastSnapshotId:null,firstPublishedAt:null,publishedAt:null,publishedRevision:null});
@@ -90,6 +91,32 @@ export class SqlitePublicationStore{
    this.db.exec('COMMIT');started=false;
    return {ok:true,value:{snapshotId,snapshot:structuredClone(snapshot)},diagnostics:[]};
   }catch{if(started)try{this.db.exec('ROLLBACK');}catch{/* Preserve original storage failure. */}return fail('PUBLICATION_STORAGE_ERROR','Publication preflight or storage failed; no successful publication was reported');}
+ }
+ /** Re-expose a historical immutable snapshot without changing the current draft. */
+ async restorePublishedSnapshot(id:string,snapshotId:string,options:RestorePublicationOptions):Promise<Result<PublicationState>>{
+  if(!isIdentifier(id)||!/^[0-9a-f]{64}$/.test(snapshotId)||!options||!validCount(options.expectedGeneration,1)||typeof options.authorize!=='function'||typeof options.assetExists!=='function')return fail('INVALID_PUBLICATION_INPUT','Invalid restore request');
+  let started=false;
+  try{
+   const before=this.head(id);
+   if(before.generation!==options.expectedGeneration)return fail('PUBLICATION_CONFLICT','Publication generation changed');
+   if(before.generation===Number.MAX_SAFE_INTEGER)return fail('PUBLICATION_GENERATION_EXHAUSTED','Publication generation exhausted');
+   if(!await options.authorize())return fail('PUBLICATION_FORBIDDEN','Restore is not authorized');
+   const candidate=await this.readSnapshot(snapshotId);if(!candidate.ok)return candidate;
+   if(candidate.value.snapshot.post.document.id!==id)return fail('SNAPSHOT_POST_MISMATCH','Snapshot belongs to another post');
+   const draft=this.draft(id);if(!draft.ok)return draft;
+   if(candidate.value.snapshot.post.metadata.createdAt!==draft.value.metadata.createdAt)return fail('CREATED_AT_IMMUTABLE','Creation timestamp differs');
+   if(candidate.value.snapshot.post.metadata.slug!==draft.value.metadata.slug)return fail('SLUG_RENAME_REQUIRED','Restoring a different slug requires redirect handling');
+   for(const src of candidate.value.snapshot.assetSources)if(!await options.assetExists(src))return fail('MISSING_PUBLICATION_ASSET','Historical publication asset is unavailable');
+   this.db.exec('BEGIN IMMEDIATE');started=true;
+   const current=this.head(id);
+   if(current.generation!==options.expectedGeneration){this.db.exec('ROLLBACK');started=false;return fail('PUBLICATION_CONFLICT','Publication changed during restore');}
+   if(current.snapshotId===snapshotId){this.db.exec('COMMIT');started=false;return {ok:true,value:current,diagnostics:[]};}
+   const latest=this.draft(id);if(!latest.ok){this.db.exec('ROLLBACK');started=false;return latest;}
+   if(latest.value.metadata.slug!==draft.value.metadata.slug||latest.value.metadata.createdAt!==draft.value.metadata.createdAt){this.db.exec('ROLLBACK');started=false;return fail('REVISION_CONFLICT','Draft identity changed during restore');}
+   this.db.prepare('UPDATE publication_heads_v1 SET generation=generation+1,snapshot_id=?,last_snapshot_id=?,published_revision=? WHERE post_id=?').run(snapshotId,snapshotId,candidate.value.snapshot.publishedRevision,id);
+   this.db.exec('COMMIT');started=false;
+   return this.readState(id);
+  }catch{if(started)try{this.db.exec('ROLLBACK');}catch{}return fail('PUBLICATION_STORAGE_ERROR','Could not restore published snapshot');}
  }
  unpublish(id:string,expectedGeneration:number):Result<PublicationState>{
   if(!isIdentifier(id)||!validCount(expectedGeneration,1))return fail('INVALID_PUBLICATION_INPUT','Invalid id or publication generation');
