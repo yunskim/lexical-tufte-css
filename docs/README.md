@@ -4,7 +4,7 @@
 
 | 역할 | 현재 정본 / 경로 |
 | --- | --- |
-| specification | [문서 스키마](DOCUMENT_SCHEMA_V1.ko.md), [ADR](adr/) |
+| specification | [문서 스키마](DOCUMENT_SCHEMA_V1.ko.md), [AssetProvider 인터페이스](asset-provider-boundary.md), [ADR](adr/) |
 | decisions | [ADR](adr/) |
 | plans | [계획](PLAN.ko.md), [계획 감사](PLAN_AUDIT_2026-10-17.ko.md), [진행 기록](PROGRESS.md) |
 | verification | [오류 기록](ERROR_LOG.md), [재발 방지](ERROR_PREVENTION.md), 테스트 코드 및 증거 |
