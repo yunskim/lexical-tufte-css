@@ -10,3 +10,7 @@ __pycache__/
 packages/*/LICENSE
 packages/*/THIRD_PARTY_NOTICES.md
 packages/*/licenses/
+
+# Pinned Tufte visual assets: local opt-in and Git blob verified.
+fixtures/tufte/upstream/img/
+fixtures/tufte/upstream/et-book/
