@@ -380,3 +380,33 @@ test('invalid host references fail publication without partial HTML',()=>{
   assert.equal(rendered.html,null);
  }
 });
+
+test('host reference rejects missing, non-object and unexpected identity fields',()=>{
+ for(const reference of [
+  null,undefined,[],42,'note-123',
+  {namespace:'workspace',kind:'note'},
+  {namespace:'workspace',kind:'note',id:'note-123',href:'#note-123'},
+  {namespace:' ',kind:'note',id:'note-123'},
+  {namespace:'workspace',kind:'note',id:' '}
+ ]){
+  const d=withHostLink(hostLink(reference));
+  const result=renderArticle(d);
+  assert.equal(result.ok,false,JSON.stringify(reference));
+  assert.equal(result.html,null);
+  assert.ok(result.diagnostics.some(x=>x.code==='INVALID_REFERENCE'));
+ }
+});
+
+test('host references cannot contain nested URL or host links',()=>{
+ for(const type of ['link','host-link']){
+  const d=withHostLink();
+  const link=d.lexicalState.root.children[0].children[0].children.at(-1);
+  link.children=[type==='link'
+   ?{type:'link',version:1,url:'#target',children:[{type:'text',version:1,text:'nested',format:0}]}
+   :hostLink({namespace:'workspace',kind:'task',id:'nested'},'nested')];
+  const result=renderArticle(d);
+  assert.equal(result.ok,false,type);
+  assert.equal(result.html,null);
+  assert.ok(result.diagnostics.some(x=>x.code==='INVALID_CHILD'||x.code==='NESTED_LINK'),JSON.stringify(result.diagnostics));
+ }
+});
