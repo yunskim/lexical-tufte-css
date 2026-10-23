@@ -18,8 +18,9 @@ import {
   SELECTION_INSERT_CLIPBOARD_NODES_COMMAND, COPY_COMMAND, CUT_COMMAND, PASTE_COMMAND, KEY_BACKSPACE_COMMAND, KEY_DELETE_COMMAND, HISTORY_PUSH_TAG, UNDO_COMMAND, REDO_COMMAND,
   COMMAND_PRIORITY_HIGH, type LexicalNode, type EditorState, type RangeSelection,
 } from 'lexical';
-import {registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,registerQuotationCommands,INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_SECTION_CITE_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,registerListKeyboardCommands,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,SET_TUFTE_LIST_KIND_COMMAND,CHANGE_TUFTE_LIST_INDENT_COMMAND,UNWRAP_TUFTE_LIST_COMMAND,registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND,WRAP_TUFTE_SPAN_COMMAND,UNWRAP_TUFTE_SPAN_COMMAND,registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_PAIR_COMMAND,MOVE_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_LIST_COMMAND,registerSectionCommands,WRAP_TUFTE_ROOT_COMMAND,INSERT_TUFTE_SECTION_COMMAND,SPLIT_TUFTE_SECTION_COMMAND,MERGE_TUFTE_SECTION_COMMAND,SET_TUFTE_BLOCK_COMMAND,inspectEditorStructure,focusStructureIssue,type StructureIssue,replaceEditorDocumentState,TUFTE_NODES,NoteNode, $createSidenoteNode, $createMarginnoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, registerNoteEdgeTypingGuard} from '@lexical-tufte/lexical';
+import {registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,registerQuotationCommands,INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_SECTION_CITE_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,registerListKeyboardCommands,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,SET_TUFTE_LIST_KIND_COMMAND,CHANGE_TUFTE_LIST_INDENT_COMMAND,UNWRAP_TUFTE_LIST_COMMAND,registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND,WRAP_TUFTE_SPAN_COMMAND,UNWRAP_TUFTE_SPAN_COMMAND,registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_PAIR_COMMAND,MOVE_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_LIST_COMMAND,registerSectionCommands,WRAP_TUFTE_ROOT_COMMAND,INSERT_TUFTE_SECTION_COMMAND,SPLIT_TUFTE_SECTION_COMMAND,MERGE_TUFTE_SECTION_COMMAND,SET_TUFTE_BLOCK_COMMAND,inspectEditorStructure,focusStructureIssue,type StructureIssue,replaceEditorDocumentState,TUFTE_NODES,NoteNode, InlineImageNode, $createSidenoteNode, $createMarginnoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, registerNoteEdgeTypingGuard} from '@lexical-tufte/lexical';
 import {NODE_SCHEMA} from '@lexical-tufte/document';
+import {NoteImagePanel,type NoteImageChoice,type ImagePresentation} from './NoteImagePanel.js';
 import './style.css';
 
 type ToolbarIconName='bold'|'italic'|'code'|'quote'|'epigraph'|'sidenote'|'marginnote'|'rule'|'undo'|'redo'|'list'|'numbered'|'definition'|'attribution'|'figure'|'underline'|'strike'|'highlight';
@@ -329,6 +330,10 @@ function EditorUI(){
   const [status,setStatus]=useState('본문을 선택하고 노트를 삽입하세요.');
   const [html,setHtml]=useState('');
   const [json,setJson]=useState('');
+  const [imageChooserOpen,setImageChooserOpen]=useState(false);
+  const [noteImages,setNoteImages]=useState<NoteImageChoice[]>([]);
+  const chooserNoteKey=useRef<string|null>(null);
+  const chooserTrigger=useRef<HTMLButtonElement>(null);
   useEffect(()=>registerSectionCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
   useEffect(()=>registerInlineCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
   useEffect(()=>registerDefinitionCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
@@ -610,6 +615,47 @@ function EditorUI(){
       }else $insertNotePhrasing(s,[$createInlineImageNode('/fixture.svg','프로토타입의 파란 막대 그림'),$createTextNode(' ')]);
     });editor.focus();
   }
+  function openNoteImageChooser(){
+    let noteKey:string|null=null;
+    const images:NoteImageChoice[]=[];
+    editor.getEditorState().read(()=>{
+      const selection=$getSelection();
+      if(!$isRangeSelection(selection))return;
+      const note=containingNote(selection.anchor.getNode());
+      if(!note)return;
+      noteKey=note.getKey();
+      const inspect=(node:LexicalNode):void=>{
+        if(node instanceof InlineImageNode){
+          images.push({key:node.getKey(),...node.getImageProperties()});
+        }else if($isElementNode(node))node.getChildren().forEach(inspect);
+      };
+      note.getChildren().forEach(inspect);
+    });
+    if(!noteKey){setStatus('먼저 노트 안으로 이동해 이미지를 선택하세요.');return;}
+    if(!images.length){setStatus('현재 노트에 이미지가 없습니다. 이미지를 삽입한 후 다시 선택하세요.');return;}
+    chooserNoteKey.current=noteKey;
+    setNoteImages(images);setImageChooserOpen(true);
+  }
+  function closeNoteImageChooser(){
+    setImageChooserOpen(false);
+    chooserTrigger.current?.focus();
+  }
+  function saveNoteImage(imageKey:string,properties:ImagePresentation):boolean{
+    const noteKey=chooserNoteKey.current;
+    let valid=false;
+    editor.getEditorState().read(()=>{
+      const node=$getNodeByKey(imageKey),note=noteKey?$getNodeByKey(noteKey):null;
+      valid=node instanceof InlineImageNode&&note instanceof NoteNode&&containingNote(node)?.is(note)===true;
+    });
+    if(!valid){setStatus('선택한 노트 또는 이미지가 변경되었습니다. 다시 선택하세요.');return false;}
+    editor.update(()=>{
+      const node=$getNodeByKey(imageKey),note=noteKey?$getNodeByKey(noteKey):null;
+      if(!(node instanceof InlineImageNode)||!(note instanceof NoteNode)||!containingNote(node)?.is(note))return;
+      node.setImagePresentation(properties.alt,properties.width,properties.height);
+    },{tag:HISTORY_PUSH_TAG,discrete:true});
+    setStatus('선택한 노트 이미지의 대체 텍스트와 표시 크기를 수정했습니다.');
+    return true;
+  }
   function exportDocument(){
     if(inspectEditorStructure(editor).length){setHtml('');setJson(JSON.stringify(editor.getEditorState().toJSON(),null,2));setStatus('구조를 수정해야 HTML을 생성할 수 있습니다. JSON은 복구용으로 보존합니다.');return;}
     editor.getEditorState().read(()=>setHtml($generateHtmlFromNodes(editor)));
@@ -689,6 +735,7 @@ function EditorUI(){
       {INLINE_ACTIONS.map(action=><IconButton key={action.id} name={action.icon} label={action.label} onMouseDown={preserve} onClick={()=>editor.update(()=>{editor.dispatchCommand(FORMAT_TEXT_COMMAND,action.id);},{tag:HISTORY_PUSH_TAG})}/>)}
       <button onMouseDown={preserve} onClick={()=>insertPayload('link')}>노트 링크 삽입</button>
       <button onMouseDown={preserve} onClick={()=>insertPayload('image')}>노트 이미지 삽입</button>
+      <button ref={chooserTrigger} type="button" onMouseDown={preserve} onClick={openNoteImageChooser} aria-haspopup="dialog" aria-expanded={imageChooserOpen}>노트 이미지 선택</button>
       <button onMouseDown={preserve} onClick={()=>noteOperation('split')}>노트 나누기</button>
       <button onMouseDown={preserve} onClick={()=>noteOperation('merge')}>다음 노트와 합치기</button>
       <button onMouseDown={preserve} onClick={()=>noteOperation('previous')}>노트 앞으로 이동</button>
@@ -696,6 +743,7 @@ function EditorUI(){
       <IconButton name="undo" label="실행 취소" onMouseDown={preserve} onClick={()=>editor.dispatchCommand(UNDO_COMMAND,undefined)}/>
       <IconButton name="redo" label="다시 실행" onMouseDown={preserve} onClick={()=>editor.dispatchCommand(REDO_COMMAND,undefined)}/>
     </div>
+    {imageChooserOpen&&<NoteImagePanel images={noteImages} onClose={closeNoteImageChooser} onSave={saveNoteImage}/>}
     <p id="help">본문에서 Alt+↓: 다음 노트로 이동 · 노트에서 Escape: 본문으로 이동</p>
     <main>
       <RichTextPlugin contentEditable={<ContentEditable className="editor" aria-label="본문과 사이드노트 편집" aria-describedby="help"/>} ErrorBoundary={LexicalErrorBoundary}/>
