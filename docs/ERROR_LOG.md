@@ -1,5 +1,12 @@
 # 에러 기록
 
+## E113 — 이미지 속성을 브라우저 prompt에 의존하고 대상 노드 정체성을 잃을 위험
+
+- 발견(2026-10-23): 노트 이미지 선택·설명·크기 기능이 메인 UI에 없고 기존 브라우저 테스트는 prompt 기반 UX를 요구했다. 이미지 교체로 구현하면 assetId/hostAsset 식별자와 선택 위치·저장 동등성 보존이 어려워진다.
+- 조치: Wagtail의 검색/썸네일 선택/상세 속성 편집 흐름을 참고한 모달 추가. 선택 당시 note/image key를 보유해 폼 포커스 이동 뒤에도 대상 확인. `InlineImageNode.setImagePresentation`에서 alt 및 크기를 일괄 검증해 동일 노드·자산 연결을 유지. 구형 prompt 기반 두 브라우저 테스트는 접근 가능한 실제 폼 검증으로 변경.
+- 상태: 코드 및 테스트 작성, 빌드·실행 검증 전. **문서 자산 라이브러리/업로드 및 관리 envelope는 미구현**이며 자산 등록 테스트는 계속 실패 대상으로 분리한다. M104 참조.
+
+
 ## E111 — 발행 노트 DOM wrapper와 기본 텍스트 span이 원본 구조를 훼손
 
 - 정적 원인(2026-10-23): publisher는 `data-tufte-note` wrapper 아래 label/input/payload를 출력했고, 모든 text를 `tufte-pre-wrap` span으로 감쌌다. 공식 Tufte CSS에서는 세 노트 요소가 직접 형제이며, newthought+인접 sidenote의 label만 newthought 안에 있다. 두 경로가 같은 Lexical 모델을 가져도 DOM 동등성 검사를 통과할 수 없다.
