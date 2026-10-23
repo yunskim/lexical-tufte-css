@@ -9,8 +9,10 @@ export type HostReference={namespace:string;kind:'document'|'note'|'task'|'asset
 export type HostAssetLocator={namespace:string;assetId:string;revisionId?:string};
 export type ImageFields={src:string;alt:string;assetId?:string;hostAsset?:HostAssetLocator;width?:number;height?:number};
 export type JsonNode=
- | Element<'root'|'tufte-section'|'paragraph'|'tufte-caption'|'quote'|'tufte-epigraph'|'tufte-attribution'|'tufte-cite'|'tufte-section-footer'|'tufte-definition-list'|'tufte-term'|'tufte-definition'|'tufte-fullwidth'>
- | Element<'heading',{tag:'h2'|'h3'}>
+ | Element<'root'|'tufte-section'|'tufte-caption'|'tufte-epigraph'|'tufte-attribution'|'tufte-cite'|'tufte-section-footer'|'tufte-definition-list'|'tufte-term'|'tufte-definition'|'tufte-fullwidth'>
+ | Element<'paragraph',{tufteClass?:'sans'}>
+ | Element<'quote',{cite?:string}>
+ | Element<'heading',{tag:'h2'|'h3';id?:string}>
  | Element<'list',{listType:'bullet'|'number';tag:'ul'|'ol';start:number}>
  | Element<'listitem',{value:number;checked?:undefined}>
  | Element<'link',{url:string;rel?:string|null;target?:'_blank'|'_self'|null;title?:string|null}>
@@ -28,7 +30,7 @@ export type JsonNode=
  | ({type:'tufte-inline-image'|'tufte-imagequilt';version:1}&ImageFields)
  | {type:'tufte-embed';version:1;provider:'youtube'|'vimeo';src:string;title:string;wrapper:'figure'|'div';width:'body'|'fullwidth';aspectRatio:number};
 export type AssetRef={id:string;src:string;mimeType:string;alt?:string;width?:number;height?:number;byteLength?:number;sha256?:string};
-export type TufteDocument={schemaVersion:1;id:string;locale:string;title:string;subtitle?:string;lexicalState:{root:Element<'root'>};assets:AssetRef[]};
+export type TufteDocument={schemaVersion:1;id:string;locale:string;title:string;titleId?:string;subtitle?:string;lexicalState:{root:Element<'root'>};assets:AssetRef[]};
 export type PostMetadata={slug:string;summary:string;tags:string[];authors:string[];status:'draft'|'published'|'archived';createdAt:string;updatedAt:string;publishedAt?:string;revision:number};
 export type PostRecord={document:TufteDocument;metadata:PostMetadata};
 export type ValidationResult={ok:true;document:TufteDocument;diagnostics:Diagnostic[]}|{ok:false;diagnostics:Diagnostic[]};
