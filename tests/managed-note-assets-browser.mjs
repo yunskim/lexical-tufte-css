@@ -99,6 +99,22 @@ try{
  assert.match(await page.getByRole('status',{name:'편집 작업 상태'}).innerText(),/자산 등록 거부/);
  assert.match(await catalog.innerText(),/문서 자산 1개/);
  const originalSnapshot=JSON.stringify(saved);
+ await page.waitForFunction(()=>{
+  const keys=Object.keys(localStorage).filter(key=>key.startsWith('lexical-tufte-recovery-v2:'));
+  return keys.some(key=>{
+   try{
+    const snapshot=JSON.parse(localStorage.getItem(key));
+    const images=[];
+    const collect=node=>{
+     if(node.type==='tufte-inline-image')images.push(node);
+     node.children?.forEach(collect);
+    };
+    collect(snapshot.state.root);
+    return snapshot.assets?.[0]?.id==='fixture-image'&&
+     images.some(image=>image.assetId==='fixture-image');
+   }catch{return false;}
+  });
+ },null,{timeout:5000});
 
  await page.reload();
  await editor.waitFor();
@@ -119,6 +135,25 @@ try{
  assert.match(await page.getByRole('status',{name:'편집 작업 상태'}).innerText(),/관리 문서 검증 실패/);
  assert.equal(await image.getAttribute('width'),'640');
  assert.match(await catalog.innerText(),/문서 자산 1개/);
+
+ // A complete recovery snapshot restores both sides even if the normal
+ // managed-save slot is corrupt. The old raw slot must not be used.
+ await page.evaluate(saved=>{
+  const key='lexical-tufte-recovery-v2:fixture-test';
+  localStorage.setItem(key,JSON.stringify({
+   savedAt:'2030-01-01T00:00:00.000Z',state:saved.lexicalState,assets:saved.assets
+  }));
+ },saved);
+ page.on('dialog',dialog=>{
+  if(dialog.type()==='prompt')void dialog.accept('0');
+  else if(dialog.type()==='confirm')void dialog.accept();
+ });
+ await button('복구용 사본 열기').click();
+ await page.waitForFunction(()=>document.querySelector('[aria-label="편집 작업 상태"]')
+  ?.textContent?.includes('복구본의 본문과 자산 목록'));
+ assert.match(await catalog.innerText(),/문서 자산 1개/);
+ assert.equal(await image.getAttribute('width'),'640');
+ assert.equal(await image.getAttribute('height'),'480');
  assert.deepEqual(errors,[]);
  console.log('Managed image catalog, same-envelope save/restore, publication, duplicate and corruption regressions written.');
 }finally{
