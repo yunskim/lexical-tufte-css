@@ -40,7 +40,7 @@ test('published notes preserve the upstream label/input/payload relationship, wi
 });
 
 test('newthought followed by sidenote publishes split-parent markup without a note wrapper',()=>{
- assert.match(upstream,/<span class="newthought">[^<]*<label\\b[^>]*class="margin-toggle sidenote-number"/);
+ assert.match(upstream,/<span class="newthought">[^<]*<label\b[^>]*class="margin-toggle sidenote-number"/);
  const doc=documentFixture(),section=doc.lexicalState.root.children[0];
  const text=value=>({type:'text',version:1,text:value,format:0});
  const node=(type,children,fields={})=>({type,version:1,children,...fields});
@@ -51,7 +51,7 @@ test('newthought followed by sidenote publishes split-parent markup without a no
  ]));
  const result=renderArticle(doc);
  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
- assert.match(result.html,/<span class="newthought">Later books<label for="([^"]+)" class="margin-toggle sidenote-number"><\\/label><\\/span><input id="\\1" type="checkbox" class="margin-toggle" aria-label="Toggle sidenote"><span class="sidenote">Reference<\\/span>/);
+ assert.match(result.html,/<span class="newthought">Later books<label for="([^"]+)" class="margin-toggle sidenote-number"><\/label><\/span><input id="\1" type="checkbox" class="margin-toggle" aria-label="Toggle sidenote"><span class="sidenote">Reference<\/span>/);
  assert.doesNotMatch(result.html,/data-tufte-note=|tufte-note-editor/);
 });
 
@@ -70,8 +70,8 @@ test('other adjacent notes and intervening text do not steal a newthought label'
  ]));
  const result=renderArticle(doc);
  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
- assert.match(result.html,/<span class="newthought">A new thought<\\/span> and then <label for="([^"]+)" class="margin-toggle sidenote-number"><\\/label><input id="\\1"/);
- assert.match(result.html,/<span class="newthought">Another thought<\\/span><label for="([^"]+)" class="margin-toggle">⊕<\\/label><input id="\\1"/);
+ assert.match(result.html,/<span class="newthought">A new thought<\/span> and then <label for="([^"]+)" class="margin-toggle sidenote-number"><\/label><input id="\1"/);
+ assert.match(result.html,/<span class="newthought">Another thought<\/span><label for="([^"]+)" class="margin-toggle">⊕<\/label><input id="\1"/);
 });
 
 test('upstream margin toggles have matching labels and adjacent payloads',()=>{
