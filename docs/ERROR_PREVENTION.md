@@ -1,5 +1,16 @@
 # 재발 방지 대책 및 정기 점검
 
+## M105 — 문서 envelope의 선택 필드는 모든 versioned bridge에서 보존
+
+- E114: 새로운 루트 필드(`titleId` 등)는 문서 스키마만 수정하지 말고 `validateDocumentV2`, `migrateStoredDocument`, `loadMigratedDocumentIntoEditor`, `exportEditorToDocumentV2`를 순서대로 점검한다. v1 투영/검증 후 v2 복원에서 필드가 사라지는 수작업 destructuring을 회귀 테스트로 탐지한다.
+- 공식 Tufte CSS 9개 섹션 문서를 저장→재열기→발행하는 실제 검증과, 단일 `titleId` 입력을 사용하는 작은 테스트를 분리한다. JSON 왕복 검사뿐 아니라 HTML의 `h1[id]` 실제 앵커도 확인한다.
+
+## M106 — 문서 전체 고유 HTML 앵커 검증
+
+- E115: 제목 앵커 ID와 각각의 heading ID를 개별 값 검증만 하지 않고 **문서 전체 범위**에서 중복 검증한다. 서로 다른 섹션이라도 같은 ID는 잘못된 발행 HTML이므로 거부한다.
+- validator에서 기존 안전한 식별자 규칙, `DUPLICATE_TITLE_ID`, 진단 경로를 유지한다. 정적/단위 테스트와 공식 샘플의 9개 섹션 실제 DOM 식별자 유일성 검증을 별도로 수행한다.
+
+
 ## M104 — 이미지 chooser UI와 자산 identity/발행 계약 분리
 
 - E113: 선택 UI는 썸네일과 검색·상세 편집을 제공하되 image node를 통째로 교체하거나 src를 암묵적으로 바꾸지 않는다. assetId/HostAsset locator는 사용자에게 보이는 alt/표시 크기와 다른 항목이며 불변으로 보존한다.
