@@ -330,14 +330,18 @@ test('F07 section footer citation publishes semantic footer and cite in order',(
  assert.equal(JSON.stringify(d),original);
 });
 
-test('host references render as non-navigable spans with escaped identifiers',()=>{
+const hostLink=(reference={namespace:'workspace',kind:'note',id:'note-123'},text='Read note',format='')=>({
+ type:'host-link',version:1,format,indent:0,direction:null,reference,
+ children:[{type:'text',version:1,text,format:0,detail:0,mode:'normal',style:''}]
+});
+const withHostLink=(link=hostLink())=>{
  const d=fixture();
- const paragraph=d.lexicalState.root.children[0].children[0];
- paragraph.children.push({
-  type:'host-link',version:1,format:'',indent:0,direction:null,
-  reference:{namespace:'workspace',kind:'note',id:'note-123'},
-  children:[{type:'text',version:1,text:'Read note',format:0,detail:0,mode:'normal',style:''}]
- });
+ d.lexicalState.root.children[0].children[0].children.push(link);
+ return d;
+};
+
+test('host references render as non-navigable spans with escaped identifiers',()=>{
+ const d=withHostLink();
  const result=renderArticle(d);
  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
  assert.match(result.html,/<span class="tufte-host-link" data-host-reference="note-123" data-host-namespace="workspace" data-host-kind="note">/);
@@ -345,13 +349,7 @@ test('host references render as non-navigable spans with escaped identifiers',()
 });
 
 test('host reference retains its identity class when aligned',()=>{
- const d=fixture();
- const paragraph=d.lexicalState.root.children[0].children[0];
- paragraph.children.push({
-  type:'host-link',version:1,format:'center',indent:0,direction:null,
-  reference:{namespace:'workspace',kind:'task',id:'task-123'},
-  children:[{type:'text',version:1,text:'Task',format:0,detail:0,mode:'normal',style:''}]
- });
+ const d=withHostLink(hostLink({namespace:'workspace',kind:'task',id:'task-123'},'Task','center'));
  const result=renderArticle(d);
  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
  assert.match(result.html,/class="tufte-host-link tufte-align-center" data-host-reference="task-123"/);
@@ -359,13 +357,7 @@ test('host reference retains its identity class when aligned',()=>{
 });
 
 test('host reference attributes and text are HTML-escaped without creating navigation',()=>{
- const d=fixture();
- d.lexicalState.root.children[0].children[0].children.push({
-  type:'host-link',version:1,reference:{
-   namespace:'space" <team>&',kind:'asset',id:'item" <script>&'
-  },
-  children:[{type:'text',version:1,text:'Open <asset> & "details"',format:0}]
- });
+ const d=withHostLink(hostLink({namespace:'space\" <team>&',kind:'asset',id:'item\" <script>&'},'Open <asset> & \"details\"'));
  const rendered=renderArticle(d);
  assert.equal(rendered.ok,true,JSON.stringify(rendered.diagnostics));
  assert.match(rendered.html,/data-host-reference="item&quot; &lt;script&gt;&amp;"/);
@@ -376,12 +368,7 @@ test('host reference attributes and text are HTML-escaped without creating navig
 });
 
 test('invalid host references fail publication without partial HTML',()=>{
- const valid=fixture();
- valid.lexicalState.root.children[0].children[0].children.push({
-  type:'host-link',version:1,
-  reference:{namespace:'workspace',kind:'note',id:'note-123'},
-  children:[{type:'text',version:1,text:'Note',format:0}]
- });
+ const valid=withHostLink(hostLink(undefined,'Note'));
  for(const patch of [
   {namespace:''},{kind:'external'},{id:''},{url:'https://example.org'},
   {namespace:'a'.repeat(129)},{id:'x'.repeat(257)}
