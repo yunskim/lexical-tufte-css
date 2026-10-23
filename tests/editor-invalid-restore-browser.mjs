@@ -30,11 +30,16 @@ try {
  await editor.click();await page.keyboard.press('Control+End');
  await page.keyboard.insertText('KEEP-LIVE-EDITOR');
  const before=await snapshot();
+ // Establish an actual undoable edit before attempting rejected imports.
+ await editor.click();await page.keyboard.press('Control+End');
+ await page.keyboard.insertText(' HISTORY-MARKER');
+ const historyState=await snapshot();
+ assert.notDeepEqual(historyState,before);
  // The saved-document loader is the actual import boundary. A malformed
  // JSON payload must be rejected without clearing the current Lexical tree.
  await page.evaluate(()=>localStorage.setItem('lexical-tufte-p1','{invalid-json'));
  await page.getByRole('button',{name:'불러오기',exact:true}).click();
- assert.deepEqual(await snapshot(),before,'Malformed saved JSON replaced live editor');
+ assert.deepEqual(await snapshot(),historyState,'Malformed saved JSON replaced live editor');
  assert.equal(await page.evaluate(()=>localStorage.getItem('lexical-tufte-p1')),'{invalid-json',
   'Rejected data must remain available for manual recovery');
  assert.match(await editor.innerText(),/KEEP-LIVE-EDITOR/);
@@ -43,8 +48,14 @@ try {
   root:{type:'unknown-node',version:1,children:[]}
  })));
  await page.getByRole('button',{name:'불러오기',exact:true}).click();
- assert.deepEqual(await snapshot(),before,'Invalid Lexical root replaced live editor');
+ assert.deepEqual(await snapshot(),historyState,'Invalid Lexical root replaced live editor');
  assert.match(await editor.innerText(),/KEEP-LIVE-EDITOR/);
+ // Rejected imports must not silently clear the undo/redo history.
+ await page.getByRole('button',{name:'실행 취소',exact:true}).click();
+ const undone=await snapshot();
+ assert.deepEqual(undone,before,'Rejected imports must retain undo history');
+ await page.getByRole('button',{name:'다시 실행',exact:true}).click();
+ assert.deepEqual(await snapshot(),historyState,'Rejected imports must retain redo history');
  // Recovery must remain usable after rejected input.
  await editor.click();await page.keyboard.press('Control+End');
  await page.keyboard.insertText(' AFTER-REJECTION');
