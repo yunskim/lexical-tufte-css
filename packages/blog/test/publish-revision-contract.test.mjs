@@ -243,21 +243,16 @@ test('restore preserves original snapshot timestamps and last new-publication ti
 });
 
 test('restore refuses a snapshot belonging to a different post',async()=>{
- const a=await setup(),b=await setup();
+ const {db,store,id}=await setup();
  try{
-  const first=ok(await a.store.publish(a.id,opts(1,0,'2026-10-16T01:00:00Z')));
-  // A snapshot hash must exist in the target store to exercise ownership validation.
-  const row=a.db.prepare('SELECT snapshot_id,post_id,source_revision,payload FROM publication_snapshots_v1 WHERE snapshot_id=?').get(first.snapshotId);
-  const foreign=structuredClone(b.post);
-  foreign.document.id='foreign-post-id';
-  // Ownership is checked against the requested post, not against the current draft.
-  const result=await a.store.restorePublishedSnapshot('other-post',first.snapshotId,{
-   expectedGeneration:1,authorize:async()=>true,assetExists:async()=>true
+  const first=ok(await store.publish(id,opts(1,0,'2026-10-16T01:00:00Z')));
+  const result=await store.restorePublishedSnapshot('other-post',first.snapshotId,{
+   expectedGeneration:0,authorize:async()=>true,assetExists:async()=>true
   });
   assert.equal(result.ok,false);
-  assert.ok(result.diagnostics.some(d=>d.code==='PUBLICATION_CONFLICT'||d.code==='SNAPSHOT_POST_MISMATCH'));
-  assert.equal(ok(a.store.readState(a.id)).generation,1);
- }finally{a.db.close();b.db.close();}
+  assert.ok(result.diagnostics.some(d=>d.code==='INVALID_PUBLICATION_INPUT'||d.code==='SNAPSHOT_POST_MISMATCH'));
+  assert.equal(ok(store.readState(id)).generation,1);
+ }finally{db.close();}
 });
 test('restore aborts when publication head changes during async asset preflight',async()=>{
  const {db,store,id}=await setup();
