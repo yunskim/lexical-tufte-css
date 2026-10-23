@@ -11,6 +11,8 @@ export type PublicationSnapshot={snapshotVersion:1;post:PostRecordV2;publishedRe
 export type PublishedSnapshot={snapshotId:string;snapshot:PublicationSnapshot};
 export type PublicationState={generation:number;snapshotId:string|null;lastSnapshotId:string|null;firstPublishedAt:string|null;publishedAt:string|null;publishedRevision:number|null};
 export type PublishOptions={expectedRevision:number;expectedGeneration:number;publishedAt:string;assetExists:(src:string)=>Promise<boolean>};
+/** Opt-in no-op policy. Only asset-free documents can be compared safely without an immutable asset manifest. */
+export type PublishIfChangedOptions=PublishOptions;
 const fail=(code:string,message:string):Result<never>=>({ok:false,diagnostics:[{code,path:'$.publication',message}]});
 const validCount=(n:number,min=0)=>Number.isSafeInteger(n)&&n>=min;
 const emptyState=():PublicationState=>({generation:0,snapshotId:null,lastSnapshotId:null,firstPublishedAt:null,publishedAt:null,publishedRevision:null});
@@ -61,6 +63,13 @@ export class SqlitePublicationStore{
    const scan=(node:{type:string;src?:string;children?:unknown[]})=>{if((node.type==='tufte-inline-image'||node.type==='tufte-imagequilt')&&node.src)sources.add(node.src);for(const child of node.children??[])scan(child as Parameters<typeof scan>[0]);};
    scan(draft.value.document.lexicalState.root);
    for(const src of sources)if(!await options.assetExists(src))return fail('MISSING_PUBLICATION_ASSET','A referenced publication asset is unavailable');
+   let noOp:PublishedSnapshot|null=null;
+   if(allowNoOp&&head.snapshotId!==null&&sources.size===0&&draft.value.document.assets.length===0){
+    const active=await this.readSnapshot(head.snapshotId);if(!active.ok)return active;
+    const previous=active.value.snapshot;
+    const publicMetadata=(record:PostRecordV2)=>{const {revision:_,updatedAt:__,status:___,publishedAt:____,...rest}=record.metadata;return rest;};
+    if(previous.assetSources.length===0&&previous.assets.length===0&&previous.rendererProfile===RENDER_PROFILE&&JSON.stringify(previous.post.document)===JSON.stringify(draft.value.document)&&JSON.stringify(publicMetadata(previous.post))===JSON.stringify(publicMetadata(draft.value)))noOp=active.value;
+   }
    const snapshot:PublicationSnapshot={snapshotVersion:1,post:structuredClone(draft.value),publishedRevision:options.expectedRevision,generation:head.generation+1,firstPublishedAt:head.firstPublishedAt??options.publishedAt,publishedAt:options.publishedAt,rendererProfile:RENDER_PROFILE,assets:structuredClone(draft.value.document.assets),assetSources:[...sources].sort(),html:rendered.html};
    const payload=JSON.stringify(snapshot),snapshotId=await sha256(payload);
    // No await inside the transaction: lock, recheck both heads, insert, pointer switch.
@@ -69,6 +78,12 @@ export class SqlitePublicationStore{
    if(!current.ok){this.db.exec('ROLLBACK');started=false;return current;}
    if(current.value.metadata.revision!==options.expectedRevision||JSON.stringify(current.value)!==JSON.stringify(draft.value)){this.db.exec('ROLLBACK');started=false;return fail('REVISION_CONFLICT','Draft changed during publication preflight');}
    if(this.head(id).generation!==options.expectedGeneration){this.db.exec('ROLLBACK');started=false;return fail('PUBLICATION_CONFLICT','Publication changed during preflight');}
+   if(noOp){
+    const currentHead=this.head(id);
+    if(currentHead.snapshotId!==noOp.snapshotId){this.db.exec('ROLLBACK');started=false;return fail('PUBLICATION_CONFLICT','Active publication changed');}
+    this.db.exec('COMMIT');started=false;
+    return {ok:true,value:structuredClone(noOp),diagnostics:[]};
+   }
    this.db.prepare('INSERT INTO publication_snapshots_v1(snapshot_id,post_id,source_revision,payload) VALUES(?,?,?,?)').run(snapshotId,id,options.expectedRevision,payload);
    if(head.generation===0)this.db.prepare('INSERT INTO publication_heads_v1(post_id,generation,snapshot_id,last_snapshot_id,first_published_at,last_published_at,published_revision) VALUES(?,?,?,?,?,?,?)').run(id,snapshot.generation,snapshotId,snapshotId,snapshot.firstPublishedAt,snapshot.publishedAt,snapshot.publishedRevision);
    else this.db.prepare('UPDATE publication_heads_v1 SET generation=?,snapshot_id=?,last_snapshot_id=?,first_published_at=?,last_published_at=?,published_revision=? WHERE post_id=?').run(snapshot.generation,snapshotId,snapshotId,snapshot.firstPublishedAt,snapshot.publishedAt,snapshot.publishedRevision,id);
