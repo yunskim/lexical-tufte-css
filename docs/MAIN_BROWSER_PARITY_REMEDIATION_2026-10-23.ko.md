@@ -62,3 +62,15 @@ Wagtail의 이미지 chooser(기존 목록에서 검색·선택 → 이미지 �
 - [ ] 관리 이미지 등록 브라우저 테스트(`tests/managed-note-assets-browser.mjs`)는 기존 prompt 방식이므로 다음 UI 구현에 맞게 **계약을 유지하면서** 조정 필요. 통과로 판정하지 않음.
 
 **검증 판정:** 앞서 보고된 browser 19/34 통과가 마지막 실행 증거이며 이후 코드 변경은 미검증. `main`과 과거 검증 브랜치는 그대로 보존했고 CI는 실행하지 않았다.
+
+
+## 이미지 자산 관리 이행 계획 (2026-10-23)
+
+문서 전체 자산 라이브러리, 공통 Wagtail 스타일 chooser, Bynder식 provider 연결, 발행 지원과 검증의 **정본 작업 체크리스트**는 [ASSET_CHOOSER_MIGRATION_PLAN_2026-10-23.ko.md](ASSET_CHOOSER_MIGRATION_PLAN_2026-10-23.ko.md)에서 관리한다.
+
+- 현재 구현됨(실행 검증 전): 노트 내부 이미지 chooser·표현 편집, 문서 카탈로그 등록 순수 함수 초안.
+- 현재 미구현: canonical assets 저장·복구 연결, 문서 전체 카탈로그 GUI, 자산 재사용 및 참조 연결, managed/sized 이미지 발행, 외부 provider.
+- 우선순위: A0 기준 계약 → A1 순수 catalog → A2 원자적 저장·복구 → A3 chooser → A4 연결 명령 → A5 발행 → A8 통합 검증. A6/A7 외부 provider·DAM 동기화는 별도 후순위.
+- 마지막 실행 증거는 이전 기준 브랜치의 19/34 browser 통과이며, 계획 작성으로 테스트 상태는 변경되지 않는다. CI는 실행하지 않는다.
+
+기존 본 문서의 과거 체크박스는 당시 상태를 보여주는 이력이고, **이미지 자산 관리의 이후 완료 표시는 새 계획의 체크리스트를 우선한다.**
