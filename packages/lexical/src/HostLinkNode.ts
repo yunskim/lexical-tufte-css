@@ -36,7 +36,7 @@ export class HostLinkNode extends ElementNode{
   dom.setAttribute(HOST_REFERENCE_ATTRIBUTES.namespace,reference.namespace);
   dom.setAttribute(HOST_REFERENCE_ATTRIBUTES.kind,reference.kind);
   // Keep the identity marker if a host or editor decoration changed the class.
-  if(!dom.classList.contains(HOST_REFERENCE_CLASS))dom.classList.add(HOST_REFERENCE_CLASS);
+  if(!dom.className.split(/\s+/).includes(HOST_REFERENCE_CLASS))dom.className=[dom.className,HOST_REFERENCE_CLASS].filter(Boolean).join(' ');
   return false;
  }
  exportJSON():SerializedHostLink{
