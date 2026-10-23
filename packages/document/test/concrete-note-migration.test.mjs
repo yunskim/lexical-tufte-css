@@ -50,3 +50,14 @@ test('legacy note without a recognized kind cannot bypass strict validation',()=
  const result=migrateStoredDocument(original);
  assert.equal(result.ok,false);
 });
+
+test('nested accessors are never invoked during legacy migration',()=>{
+ const original=document();
+ let invoked=0;
+ Object.defineProperty(original.lexicalState.root.children[0].children[0].children[1],'extra',{
+  enumerable:true,get(){invoked++;throw Error('getter must not run');}
+ });
+ const result=migrateStoredDocument(original);
+ assert.equal(result.ok,false);
+ assert.equal(invoked,0);
+});
