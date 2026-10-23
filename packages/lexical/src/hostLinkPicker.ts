@@ -16,6 +16,7 @@ export function mountHostLinkPicker({editor,container,provider,onError}:HostLink
  const unregister=registerHostLinkCommands(editor);
  let saved:RangeSelection|null=null;
  let selectedText:string|null=null;
+ let capturedState:ReturnType<LexicalEditor['getEditorState']>|null=null;
  let disposed=false;
  const capture=()=>{
   editor.getEditorState().read(()=>{
@@ -25,6 +26,7 @@ export function mountHostLinkPicker({editor,container,provider,onError}:HostLink
    const node=selection.anchor.getNode();
    if($isTextNode(node)&&node.isSimpleText()){
     saved=selection.clone();
+    capturedState=editor.getEditorState();
     selectedText=node.getTextContent().slice(Math.min(selection.anchor.offset,selection.focus.offset),Math.max(selection.anchor.offset,selection.focus.offset));
    }
   });
@@ -36,6 +38,8 @@ export function mountHostLinkPicker({editor,container,provider,onError}:HostLink
    if(disposed||!saved||selectedText===null)return;
    const selected=saved.clone();
    const expectedText=selectedText;
+   const originalState=capturedState;
+   if(editor.getEditorState()!==originalState)return;
    editor.update(()=>{
     const anchor=selected.anchor.getNode();
     const focus=selected.focus.getNode();
@@ -49,5 +53,5 @@ export function mountHostLinkPicker({editor,container,provider,onError}:HostLink
    });
   }
  });
- return ()=>{disposed=true;saved=null;selectedText=null;detach();unregister();};
+ return ()=>{disposed=true;saved=null;selectedText=null;capturedState=null;detach();unregister();};
 }
