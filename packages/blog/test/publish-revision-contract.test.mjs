@@ -188,3 +188,32 @@ test('restore rejects unauthorized, missing assets, wrong document and stale gen
   assert.equal(ok(store.readState(id)).generation,1);
  }finally{db.close();}
 });
+
+test('restoring older public snapshot permits later publish of current newer draft',async()=>{
+ const {db,store,drafts,post,id}=await setup();
+ try{
+  const first=ok(await store.publish(id,opts(1,0,'2026-10-16T01:00:00Z')));
+  const next=structuredClone(post);next.metadata.revision=2;next.metadata.updatedAt='2026-10-16T02:00:00Z';next.document.title='newer';
+  ok(await drafts.compareAndSwap(next,1));
+  ok(await store.publish(id,opts(2,1,'2026-10-16T03:00:00Z')));
+  ok(await store.restorePublishedSnapshot(id,first.snapshotId,{expectedGeneration:2,authorize:async()=>true,assetExists:async()=>true}));
+  const republished=ok(await store.publish(id,opts(2,3,'2026-10-16T04:00:00Z')));
+  assert.equal(republished.snapshot.publishedRevision,2);
+  assert.equal(ok(store.readState(id)).generation,4);
+  assert.equal(db.prepare('SELECT revision FROM posts_v2 WHERE id=?').get(id).revision,2);
+ }finally{db.close();}
+});
+test('restore retry with stale generation fails safely and can reconcile by reading head',async()=>{
+ const {db,store,id}=await setup();
+ try{
+  const first=ok(await store.publish(id,opts(1,0,'2026-10-16T01:00:00Z')));
+  ok(store.unpublish(id,1));
+  const options={expectedGeneration:2,authorize:async()=>true,assetExists:async()=>true};
+  const committed=ok(await store.restorePublishedSnapshot(id,first.snapshotId,options));
+  const retry=await store.restorePublishedSnapshot(id,first.snapshotId,options);
+  assert.equal(retry.ok,false);
+  assert.ok(retry.diagnostics.some(d=>d.code==='PUBLICATION_CONFLICT'));
+  assert.equal(ok(store.readState(id)).snapshotId,first.snapshotId);
+  assert.equal(ok(store.readState(id)).generation,committed.generation);
+ }finally{db.close();}
+});
