@@ -45,6 +45,47 @@ test('image metadata and relative URL survive Lexical JSON roundtrip',()=>{
  restored.setEditorState(restored.parseEditorState(JSON.stringify(json)));
  assert.deepEqual(restored.getEditorState().toJSON(),json);
 });
+test('editing image presentation preserves managed asset identity and rejects partial invalid updates',()=>{
+ const e=editor();
+ e.update(()=>{
+  const image=$createInlineImageNode('/fixture.svg','Original','asset-1',640,480);
+  $getRoot().append($createParagraphNode().append($createSidenoteNode('image-note').append(image)));
+  const before=image.exportJSON();
+  assert.throws(()=>image.setImagePresentation('Changed',0,480),/Invalid image properties/);
+  assert.deepEqual(image.exportJSON(),before,'Rejected dimension must not change the image or its metadata');
+  image.setImagePresentation('Changed',320,240);
+  const after=image.exportJSON();
+  assert.equal(after.alt,'Changed');
+  assert.equal(after.width,320);assert.equal(after.height,240);
+  assert.equal(after.assetId,'asset-1');
+  assert.equal(after.src,'/fixture.svg');
+  image.setImagePresentation('Changed again');
+  const cleared=image.exportJSON();
+  assert.equal(Object.hasOwn(cleared,'width'),false);
+  assert.equal(Object.hasOwn(cleared,'height'),false);
+  assert.equal(cleared.assetId,'asset-1');
+ },{discrete:true});
+ const json=e.getEditorState().toJSON();
+ const restored=editor();restored.setEditorState(restored.parseEditorState(JSON.stringify(json)));
+ assert.deepEqual(restored.getEditorState().toJSON(),json);
+});
+
+test('host-asset locator remains detached and intact when image description and size change',()=>{
+ const e=editor(),locator={namespace:'magnolia',assetId:'original',revisionId:'rev-3'};
+ e.update(()=>{
+  const image=$createInlineImageNode('/fixture.svg','Original',undefined,128,96,locator);
+  $getRoot().append($createParagraphNode().append(image));
+  const read=image.getImageProperties();
+  assert.deepEqual(read.hostAsset,locator);
+  read.hostAsset.assetId='mutated-copy';
+  assert.equal(image.exportJSON().hostAsset.assetId,'original');
+  image.setImagePresentation('Revised image',64,48);
+  assert.deepEqual(image.exportJSON().hostAsset,locator);
+  assert.equal(image.exportJSON().width,64);
+  assert.equal(image.exportJSON().alt,'Revised image');
+ },{discrete:true});
+});
+
 test('image and note validation share document constraints',()=>{
  const e=editor();
  e.update(()=>{
