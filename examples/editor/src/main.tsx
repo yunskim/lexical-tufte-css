@@ -582,7 +582,7 @@ function EditorUI(){
     const typing=registerNoteEdgeTypingGuard(editor);
     return()=>{escape();down();typing();copying();cutting();pasting();plainPaste();backspace();forwardDelete();composing();enter();};
   },[editor]);
-  function insertNote(kind:NoteKind='sidenote'){
+  function insertNote(kind:'sidenote'|'marginnote'='sidenote'){
     editor.update(()=>{
       const s=$getSelection();
       if(!$isRangeSelection(s)||!s.isCollapsed()){setStatus('본문의 삽입 위치 한 곳을 선택하세요.');return;}
