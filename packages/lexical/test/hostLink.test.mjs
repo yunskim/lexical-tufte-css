@@ -268,7 +268,11 @@ test('host link DOM update keeps reference identity without creating a URL',asyn
   e.getEditorState().read(()=>{
    const link=$getRoot().getFirstChild().getFirstChild();
    const dom=link.createDOM({});
+   dom.className='host-decoration';
    assert.equal(link.updateDOM(link,dom),false);
+   assert.equal(dom.className,'host-decoration tufte-host-link');
+   assert.equal(link.updateDOM(link,dom),false);
+   assert.equal(dom.className,'host-decoration tufte-host-link');
    assert.deepEqual(dom.dataset,{
     hostReference:reference.id,
     hostNamespace:reference.namespace,
