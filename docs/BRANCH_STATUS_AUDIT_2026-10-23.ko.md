@@ -170,3 +170,11 @@ GitHub의 **두 브랜치**와 커밋 비교, main의 현재 파일, 작업 브�
 - [x] 문서 스키마가 허용하고 렌더러가 처리하는 `tufte-figure`의 `tufte-marginnote`를 발행 프로파일에서 더 이상 일괄 거부하지 않음.
 - [ ] 그림 마진노트의 발행 HTML 및 실제 CSS 레이아웃 회귀 테스트 실행 전.
 - [ ] 전체 예제/브라우저 테스트의 구형 note API 잔여 참조 확인 필요.
+
+
+## 서버 렌더링 fixture 및 그림 주석 테스트
+
+- [x] `fixtures/tufte/server-document.json`의 기존 노트 2개를 concrete wire type으로 전환.
+- [x] `packages/render/test/figure-margin-note.test.mjs`에 그림 마진노트 발행 성공 및 사이드노트 거부 회귀 테스트 추가.
+- [ ] 렌더링 테스트 전체 및 브라우저 테스트 실행 전.
+- [ ] 다른 fixture의 legacy `tufte-note` 잔여 참조 확인 필요.
