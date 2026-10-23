@@ -336,10 +336,13 @@ test('host reference survives save, reopen, document validation and publication'
  assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
  const published=renderArticle(saved);
  assert.equal(published.ok,true,JSON.stringify(published.diagnostics));
+ assert.equal(JSON.stringify(saved),JSON.stringify(exported.value),'publication must not mutate the saved document');
  assert.deepEqual(reopened.getEditorState().toJSON(),source.getEditorState().toJSON());
  const hostLink=reopened.getEditorState().toJSON().root.children[0].children[0].children[1];
  assert.deepEqual(hostLink.reference,reference);
  assert.equal(hostLink.children[0].text,'Read note');
  assert.match(published.html,/data-host-reference="note-123" data-host-namespace="magnolia" data-host-kind="note"/);
  assert.doesNotMatch(published.html,/<a[^>]*data-host-reference=/);
+ const publishedAgain=renderArticle(saved);
+ assert.deepEqual(publishedAgain,published,'publication must be deterministic');
 });
