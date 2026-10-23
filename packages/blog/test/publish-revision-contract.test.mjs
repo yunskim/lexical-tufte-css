@@ -217,3 +217,27 @@ test('restore retry with stale generation fails safely and can reconcile by read
   assert.equal(ok(store.readState(id)).generation,committed.generation);
  }finally{db.close();}
 });
+
+test('restore preserves original snapshot timestamps and last new-publication timestamp',async()=>{
+ const {db,store,id}=await setup();
+ try{
+  const first=ok(await store.publish(id,opts(1,0,'2026-10-16T01:00:00Z')));
+  const second=ok(await store.publish(id,opts(1,1,'2026-10-16T02:00:00Z')));
+  const before=ok(store.readState(id));
+  const restored=ok(await store.restorePublishedSnapshot(id,first.snapshotId,{
+   expectedGeneration:2,authorize:async()=>true,assetExists:async()=>true
+  }));
+  assert.equal(restored.generation,3);
+  assert.equal(restored.snapshotId,first.snapshotId);
+  assert.equal(restored.firstPublishedAt,before.firstPublishedAt);
+  assert.equal(restored.publishedAt,before.publishedAt);
+  assert.equal(restored.publishedRevision,first.snapshot.publishedRevision);
+  assert.equal(ok(await store.readPublic(id)).snapshot.publishedAt,first.snapshot.publishedAt);
+  assert.equal(ok(await store.readSnapshot(second.snapshotId)).snapshot.publishedAt,'2026-10-16T02:00:00Z');
+  const repeat=ok(await store.restorePublishedSnapshot(id,first.snapshotId,{
+   expectedGeneration:3,authorize:async()=>true,assetExists:async()=>true
+  }));
+  assert.deepEqual(repeat,restored);
+  assert.equal(db.prepare('SELECT count(*) AS n FROM publication_snapshots_v1').get().n,2);
+ }finally{db.close();}
+});
