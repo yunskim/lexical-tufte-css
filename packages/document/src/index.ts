@@ -14,3 +14,6 @@ export {SqlitePostRevisionStoreV2,type SqliteDatabase,type SqliteStatement} from
 export {createPostBackupV2,inspectPostBackupV2,restorePostBackupV2,type PostBackupV2} from './backup.js';
 export {readSqlitePostSnapshotV2,type SqliteReadDatabase,type SqliteReadStatement} from './sqliteSnapshot.js';
 export {HOST_REFERENCE_CLASS,HOST_REFERENCE_ATTRIBUTES,hostReferenceAttributes} from './hostReferenceDOM.js';
+
+/** Accessible labels for note toggles shared by editor and published HTML. */
+export const NOTE_TOGGLE_ACCESSIBLE_NAME={sidenote:'Toggle sidenote',marginnote:'Toggle marginnote'} as const;
