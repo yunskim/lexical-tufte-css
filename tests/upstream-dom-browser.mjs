@@ -61,6 +61,17 @@ try{
  const published=await inspect(result.html);
  assert.equal(original.sections,9,'pinned upstream example must retain its nine sections');
  assert.equal(original.sectionOutline.length,9,'every upstream section must be inventoried');
+ assert.deepEqual(original.sectionOutline.map(section=>section.heading),[
+  null,
+  'Getting Started',
+  'Fundamentals',
+  'Epigraphs',
+  'Sidenotes: Footnotes and Marginal Notes',
+  'Figures',
+  'Code',
+  'ImageQuilts',
+  'Epilogue'
+ ],'pinned upstream section headings and order must remain stable');
  assert.ok(original.sectionOutline.every((section,i)=>section.index===i+1&&section.directChildren.length>0),'upstream section outline must preserve order and content');
  assert.ok(published.sections>=1,'published sections should be direct article children');
  assert.deepEqual(original.articleChildren.slice(0,2),['h1','p.subtitle']);
