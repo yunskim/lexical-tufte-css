@@ -2,7 +2,7 @@
 export type RenderChild=RenderElement|string;
 export type RenderElement={readonly tag:string;readonly attrs:Readonly<Record<string,string>>;readonly children:readonly RenderChild[];readonly void?:boolean};
 const TAGS=new Set(['svg','article','pre','iframe','section','h1','h2','h3','p','span','strong','em','code','s','u','sub','sup','mark','br','a','img','label','input','figure','figcaption','blockquote','footer','cite','hr','ol','ul','li','dl','dt','dd','div','table','thead','tbody','tr','th','td']);
-const ATTRS=new Set(['viewBox','aria-hidden','aria-label','focusable','id','class','lang','dir','href','target','title','rel','src','alt','for','type','scope','start','value','data-tufte-note','data-host-reference','data-host-namespace','data-host-kind','loading','referrerpolicy','sandbox','allowfullscreen','width','height','data-tufte-ratio']);
+const ATTRS=new Set(['viewBox','aria-hidden','aria-label','focusable','id','class','lang','dir','href','target','title','rel','cite','src','alt','for','type','scope','start','value','data-tufte-note','data-host-reference','data-host-namespace','data-host-kind','loading','referrerpolicy','sandbox','allowfullscreen','width','height','data-tufte-ratio']);
 export function element(tag:string,attrs:Record<string,string>={},children:readonly RenderChild[]=[],isVoid=false):RenderElement{
  if(!TAGS.has(tag))throw new Error('Unsupported HTML tag');
  for(const key of Object.keys(attrs))if(!ATTRS.has(key))throw new Error('Unsupported HTML attribute');
