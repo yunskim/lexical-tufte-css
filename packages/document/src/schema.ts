@@ -1,5 +1,5 @@
 /** Versioned node registry: schemas do not imply editor/render capability. */
-const phrasing=['text','linebreak','link','tufte-inline-image','tufte-span','tufte-note'];
+const phrasing=['text','linebreak','link','host-link','tufte-inline-image','tufte-span','tufte-note'];
 const inline=phrasing.filter(t=>t!=='tufte-note');
 const blocks=['paragraph','heading','list','tufte-definition-list','horizontalrule','quote','tufte-epigraph','tufte-figure','tufte-table-layout','tufte-code','tufte-embed','tufte-fullwidth','tufte-section-footer'];
 export const NODE_SCHEMA:Readonly<Record<string,{readonly fields:readonly string[];readonly children?:readonly string[]}>>=Object.freeze({
@@ -11,7 +11,8 @@ export const NODE_SCHEMA:Readonly<Record<string,{readonly fields:readonly string
  horizontalrule:{fields:[]},quote:{fields:[],children:[...phrasing,'paragraph','tufte-attribution']},
  'tufte-epigraph':{fields:[],children:['quote']},'tufte-attribution':{fields:[],children:[...inline,'tufte-cite']},
  'tufte-cite':{fields:[],children:inline},'tufte-section-footer':{fields:[],children:[...inline,'tufte-cite']},
- 'tufte-span':{fields:['kind'],children:inline},link:{fields:['url','reference','target','rel','title'],children:['text','linebreak','tufte-inline-image','tufte-span']},
+ 'tufte-span':{fields:['kind'],children:inline},link:{fields:['url','target','rel','title'],children:['text','linebreak','tufte-inline-image','tufte-span']},
+ 'host-link':{fields:['reference'],children:['text','linebreak','tufte-inline-image','tufte-span']},
  'tufte-note':{fields:['noteId','kind'],children:inline},
  'tufte-inline-image':{fields:['src','alt','assetId','hostAsset','width','height']},'tufte-imagequilt':{fields:['src','alt','assetId','hostAsset','width','height']},
  'tufte-figure':{fields:['width'],children:['tufte-inline-image','tufte-imagequilt','tufte-caption','tufte-note']},
