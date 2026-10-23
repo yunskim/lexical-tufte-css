@@ -1,9 +1,15 @@
 /** Dependency smoke surface; Tufte nodes are implemented in P1/P2. */
 export {createEditor} from "lexical";
 export {createHeadlessEditor} from "@lexical/headless";
-export {$createNoteNode, NoteNode, type NoteKind, type SerializedNoteNode} from './NoteNode.js';
+export {TufteParagraphNode,TufteQuoteNode,$createTufteParagraphNode,$createTufteQuoteNode,type SerializedTufteParagraph,type SerializedTufteQuote} from './TufteBlockNodes.js';
+export {TufteHeadingNode,$createTufteHeadingNode,type SerializedTufteHeadingNode} from './TufteHeadingNode.js';
+export {NoteNode,type SerializedNoteNode} from './NoteNode.js';
+export {SidenoteNode,$createSidenoteNode} from './SidenoteNode.js';
+export {MarginnoteNode,$createMarginnoteNode} from './MarginnoteNode.js';
 export {$createInlineImageNode, InlineImageNode} from './InlineImageNode.js';
 export {$getContainingNote,$splitNoteAtSelection,$mergeNoteWithNext,$moveNote,$insertNotePhrasing} from './noteOperations.js';
+export {registerNoteCommands,SET_TUFTE_NOTE_KIND_COMMAND,REMOVE_TUFTE_NOTE_COMMAND,UPDATE_TUFTE_NOTE_IMAGE_COMMAND,SELECT_TUFTE_NOTE_IMAGE_COMMAND,$listSelectedTufteNoteImages,$getSelectedTufteNoteImage,type TufteNoteImageChoice,type SelectTufteNoteImage,type TufteNoteKind,type UpdateTufteNoteImage} from './noteCommands.js';
+export {registerNoteAssetCommands,ASSIGN_TUFTE_NOTE_IMAGE_ASSET_COMMAND,DETACH_TUFTE_NOTE_IMAGE_ASSET_COMMAND,SET_TUFTE_NOTE_IMAGE_DIMENSIONS_COMMAND,type TufteNoteImageDimensions} from './noteAssetCommands.js';
 export {SectionNode,FigureNode,CaptionNode,TableLayoutNode,$createSectionNode,$createFigureNode,$createCaptionNode,$createTableLayoutNode,type FigureWidth,type TableLayout} from './LayoutNodes.js';
 export {$collectNoteIds,$reidentifyPastedNotes} from './clipboardNotes.js';
 export {$prepareNoteComposition,registerNoteCompositionGuard} from './noteComposition.js';

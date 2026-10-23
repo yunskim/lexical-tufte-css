@@ -1,15 +1,15 @@
 /** Browser-only regression harness, loaded explicitly by publication-browser.mjs. */
 import {createEditor,$getRoot,$createParagraphNode,$createTextNode,$createLineBreakNode,$createTabNode} from 'lexical';
-import {registerRichText,HeadingNode,QuoteNode,$createHeadingNode,$createQuoteNode} from '@lexical/rich-text';
+import {registerRichText,HeadingNode,QuoteNode,$createQuoteNode} from '@lexical/rich-text';
 import {LinkNode} from '@lexical/link';
 import {ListNode,ListItemNode} from '@lexical/list';
-import {HorizontalRuleNode} from '@lexical/react/LexicalHorizontalRuleNode';
+import {HorizontalRuleNode} from '@lexical/extension/HorizontalRuleExtension';
 import {$generateHtmlFromNodes} from '@lexical/html';
 import {
  TUFTE_NODES,loadDocumentIntoEditor,SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,
  DefinitionListNode,DefinitionTermNode,DefinitionDescriptionNode,EpigraphNode,AttributionNode,CiteNode,SectionFooterNode,
  FullwidthNode,TufteCodeNode,ImageQuiltNode,EmbedNode,
- $createSectionNode,$createDefinitionListNode,$createDefinitionTermNode,$createDefinitionDescriptionNode,
+ $createTufteHeadingNode,$createSectionNode,$createDefinitionListNode,$createDefinitionTermNode,$createDefinitionDescriptionNode,
  $createEpigraphNode,$createAttributionNode,$createCiteNode,$createSectionFooterNode,$createFullwidthNode,
  $createTufteCodeNode,$createImageQuiltNode,$createFigureNode,$createEmbedNode,exportEditorToDocument,
 } from '../src/index.js';
@@ -20,7 +20,7 @@ export function mountPublicationHarness(input){
  if(input){const loaded=loadDocumentIntoEditor(editor,input);if(!loaded.ok)throw Error(JSON.stringify(loaded.diagnostics));}
  else editor.update(()=>{
   $getRoot().append($createSectionNode().append(
-   $createHeadingNode('h2').append($createTextNode('검증 제목')),
+   $createTufteHeadingNode('h2').append($createTextNode('검증 제목')),
    $createDefinitionListNode().append($createDefinitionTermNode().append($createTextNode('검증 용어')),$createDefinitionDescriptionNode().append($createParagraphNode().append($createTextNode('검증 정의')))),
    $createEpigraphNode().append($createQuoteNode().append($createParagraphNode().append($createTextNode('검증 인용문')),$createAttributionNode().append($createTextNode('저자 '),$createCiteNode().append($createTextNode('출처'))))),
    $createSectionFooterNode().append($createTextNode('검증 맺음말')),

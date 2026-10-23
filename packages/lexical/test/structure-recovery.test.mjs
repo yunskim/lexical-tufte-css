@@ -18,7 +18,7 @@ for(const [name,create,codes]of [
   // Headless selection without DOM focus is tested by the real browser integration.
  });
 }
-test('R05 complete 33-node document is structurally accepted without normalizing data',()=>{
+test('R05 complete registry document is structurally accepted without normalizing data',()=>{
  const editor=createFixtureEditor(),doc=createAllNodesDocument();assert.equal(loadDocumentIntoEditor(editor,doc).ok,true);
  const before=editor.getEditorState().toJSON();assert.deepEqual(inspectEditorStructure(editor),[]);assert.deepEqual(editor.getEditorState().toJSON(),before);assert.deepEqual(JSON.parse(JSON.stringify(before)),doc.lexicalState);
 });

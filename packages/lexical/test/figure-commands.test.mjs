@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createHeadlessEditor} from '@lexical/headless';
 import {$getRoot,$createParagraphNode,$createTextNode,$createNodeSelection,$setSelection,$getSelection,$isRangeSelection} from 'lexical';
-import {TUFTE_NODES,$createSectionNode,registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,$createFigureNode,$createInlineImageNode,$createCaptionNode,$createNoteNode,$reidentifyPastedNotes} from '../dist/index.js';
+import {TUFTE_NODES,$createSectionNode,registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,$createFigureNode,$createInlineImageNode,$createCaptionNode,$createMarginnoteNode,$reidentifyPastedNotes} from '../dist/index.js';
 
 function setup(){
  const diagnostics=[];
@@ -77,10 +77,10 @@ test('figure marginnote is inserted before caption and rejects duplicate IDs',()
  editor.update(()=>{},{discrete:true});
  editor.getEditorState().read(()=>{
   const figure=$getRoot().getFirstChild().getFirstChild();
-  assert.deepEqual(figure.getChildren().map(n=>n.getType()),['tufte-inline-image','tufte-note','tufte-caption']);
+  assert.deepEqual(figure.getChildren().map(n=>n.getType()),['tufte-inline-image','tufte-marginnote','tufte-caption']);
   const note=figure.getChildAtIndex(1);
   assert.equal(note.getNoteId(),'figure-note-1');
-  assert.equal(note.getKind(),'marginnote');
+  assert.equal(note.getType(),'tufte-marginnote');
   assert.equal(note.getTextContent(),'margin annotation');
  });
  editor.update(()=>{
@@ -94,12 +94,48 @@ test('figure marginnote is inserted before caption and rejects duplicate IDs',()
  dispose();
 });
 
+test('repeated figure margin notes keep explicit before/after-image insertion order',()=>{
+ const {editor,diagnostics,dispose}=setup();
+ editor.update(()=>{
+  const figure=$createFigureNode('body').append(
+   $createInlineImageNode('/diagram.png','diagram'),
+   $createCaptionNode().append($createTextNode('caption'))
+  );
+  $getRoot().append($createSectionNode().append(figure));
+ },{discrete:true});
+ const insert=(noteId,placement)=>{
+  editor.update(()=>{
+   const figure=$getRoot().getFirstChild().getFirstChild();
+   const selection=$createNodeSelection();selection.add(figure.getKey());$setSelection(selection);
+  },{discrete:true});
+  assert.equal(editor.dispatchCommand(INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,
+   {noteId,text:noteId,...(placement?{placement}:{})}),true);
+  editor.update(()=>{},{discrete:true});
+ };
+ insert('after-one');
+ insert('after-two');
+ insert('before-one','before-image');
+ insert('before-two','before-image');
+ editor.getEditorState().read(()=>{
+  const figure=$getRoot().getFirstChild().getFirstChild(),children=figure.getChildren();
+  assert.deepEqual(children.map(n=>n.getType()),[
+   'tufte-marginnote','tufte-marginnote','tufte-inline-image',
+   'tufte-marginnote','tufte-marginnote','tufte-caption'
+  ]);
+  assert.deepEqual(children.filter(n=>n.getType()==='tufte-marginnote').map(n=>n.getNoteId()),
+   ['before-one','before-two','after-one','after-two']);
+  assert.equal(children[5].getTextContent(),'caption');
+ });
+ assert.deepEqual(diagnostics,[]);
+ dispose();
+});
+
 test('clipboard note reidentification traverses notes nested inside figures',()=>{
  const {editor,dispose}=setup();
  editor.update(()=>{
-  const existing=$createNoteNode('figure-note-1','marginnote').append($createTextNode('original'));
+  const existing=$createMarginnoteNode('figure-note-1').append($createTextNode('original'));
   const original=$createFigureNode().append($createInlineImageNode('/original.png','original'),existing);
-  const pasted=$createFigureNode().append($createInlineImageNode('/copy.png','copy'),$createNoteNode('figure-note-1','marginnote').append($createTextNode('copied')));
+  const pasted=$createFigureNode().append($createInlineImageNode('/copy.png','copy'),$createMarginnoteNode('figure-note-1').append($createTextNode('copied')));
   $getRoot().append($createSectionNode().append(original,pasted));
   const changes=$reidentifyPastedNotes([pasted],new Set(),()=> 'figure-note-2');
   assert.deepEqual(changes.get('figure-note-1'),['figure-note-2']);
@@ -112,8 +148,8 @@ test('clipboard note reidentification traverses notes nested inside figures',()=
 test('attached cut payload with colliding note IDs renews both copies',()=>{
  const {editor,dispose}=setup();
  editor.update(()=>{
-  const first=$createFigureNode().append($createInlineImageNode('/a.png','a'),$createNoteNode('shared-cut','marginnote').append($createTextNode('a')));
-  const second=$createFigureNode().append($createInlineImageNode('/b.png','b'),$createNoteNode('shared-cut','marginnote').append($createTextNode('b')));
+  const first=$createFigureNode().append($createInlineImageNode('/a.png','a'),$createMarginnoteNode('shared-cut').append($createTextNode('a')));
+  const second=$createFigureNode().append($createInlineImageNode('/b.png','b'),$createMarginnoteNode('shared-cut').append($createTextNode('b')));
   $getRoot().append($createSectionNode().append(first,second));
   let nextId=0;
   const changes=$reidentifyPastedNotes([first,second],new Set(['shared-cut']),()=> 'renewed-copy-'+(++nextId));
@@ -127,7 +163,7 @@ test('attached cut payload with colliding note IDs renews both copies',()=>{
 test('figure marginnote update and removal preserve sibling caption',()=>{
  const {editor,diagnostics,dispose}=setup();
  editor.update(()=>{
-  const figure=$createFigureNode().append($createInlineImageNode('/figure.png','figure'),$createNoteNode('figure-note','marginnote').append($createTextNode('before')),$createCaptionNode().append($createTextNode('caption')));
+  const figure=$createFigureNode().append($createInlineImageNode('/figure.png','figure'),$createMarginnoteNode('figure-note').append($createTextNode('before')),$createCaptionNode().append($createTextNode('caption')));
   $getRoot().append($createSectionNode().append(figure));
   const selection=$createNodeSelection();selection.add(figure.getKey());$setSelection(selection);
  },{discrete:true});
@@ -156,7 +192,7 @@ test('figure marginnote update and removal preserve sibling caption',()=>{
 test('figure note commands reject invalid content and missing IDs without changing figure',()=>{
  const {editor,diagnostics,dispose}=setup();
  editor.update(()=>{
-  const figure=$createFigureNode().append($createInlineImageNode('/figure.png','figure'),$createNoteNode('kept-note','marginnote').append($createTextNode('keep')));
+  const figure=$createFigureNode().append($createInlineImageNode('/figure.png','figure'),$createMarginnoteNode('kept-note').append($createTextNode('keep')));
   $getRoot().append($createSectionNode().append(figure));
   const selection=$createNodeSelection();selection.add(figure.getKey());$setSelection(selection);
  },{discrete:true});
@@ -175,7 +211,7 @@ test('figure note commands reject invalid content and missing IDs without changi
 test('figure note text replacement retains a selection inside the replacement note',()=>{
  const {editor,dispose}=setup();
  editor.update(()=>{
-  const figure=$createFigureNode().append($createInlineImageNode('/figure.png','figure'),$createNoteNode('selection-note','marginnote').append($createTextNode('old text')));
+  const figure=$createFigureNode().append($createInlineImageNode('/figure.png','figure'),$createMarginnoteNode('selection-note').append($createTextNode('old text')));
   $getRoot().append($createSectionNode().append(figure));
   const selection=$createNodeSelection();selection.add(figure.getKey());$setSelection(selection);
  },{discrete:true});

@@ -3,6 +3,14 @@
 - 결정일: 2026-10-16
 - 상태: 채택 (v1의 phrasing 주석 범위, P1.3)
 - 근거 버전: Lexical / @lexical 0.52.0
+
+> **2026-10-22 현재 DOM 계약 보정**: 채택한 *하나의 인라인 노트 논리 모델*은
+> 유지하지만, 아래 P1 당시 HTML wrapper 예시는 더 이상 현행 발행 결과가 아니다.
+> 현재 발행 DOM은 `label + input + span`이며, 인접 `newthought + sidenote`는
+> label만 newthought 내부로 이동시키고 input/span은 바깥 형제로 내보낸다.
+> 임베드 및 접근성 예외는
+> [섹션 parity 매트릭스](../UPSTREAM_PAGE_PARITY_MATRIX.ko.md)와
+> [코드 리뷰 보완 체크리스트](../CODE_REVIEW_REMEDIATION_2026-10-22.ko.md)를 우선한다.
 - 관련 작업: P1.1–P1.3, E007/E009/E010/E011/E012, M006/M008–M011
 
 ## 결정
@@ -49,18 +57,24 @@
 발행 DOM 예시:
 
 ```html
-<span data-tufte-note="n1">
-  <label for="prototype-n1" class="margin-toggle sidenote-number"></label>
-  <input id="prototype-n1" type="checkbox" class="margin-toggle">
-  <span class="sidenote">주석 내용</span>
-</span>
+<label for="tufte-7-article-n1" class="margin-toggle sidenote-number"></label>
+<input id="tufte-7-article-n1" type="checkbox" class="margin-toggle" aria-label="Toggle sidenote">
+<span class="sidenote">주석 내용</span>
 ```
 
-- label → input → span payload는 같은 부모의 직계 형제로 순서를 유지한다. CSS의 `:checked + .sidenote/.marginnote`가 작동해야 한다.
+- 일반 note는 label → input → span payload가 같은 부모의 직계 형제로 이어지고,
+  `input:checked + .sidenote/.marginnote` 관계를 유지한다. **newthought 결합인
+  sidenote에서는 label만 preceding newthought span의 직접 자식**이다.
+  input/span은 paragraph 형제로 인접한다.
 - marginnote는 payload class를 바꾸고 label에 ⊕를 표시하며 sidenote-number를 붙이지 않는다.
 - 편집용 class, data-lexical-* 및 contenteditable은 발행 HTML에 포함하지 않는다. 이미지의 src/alt처럼 의미적인 속성만 공유한다.
 - export 전후 canonical JSON은 같아야 한다. 체크박스의 기본 상태는 unchecked다.
-- 현재 `prototype-` ID prefix는 개발용이다. 복수 article namespace와 결정적 export 옵션은 P4.1/F22에서 구현·검증한다. 이번 단계에서 여러 글 ID 격리가 완료됐다고 보지 않는다.
+- 순수 발행 렌더러는 `idPrefix`/document ID를 포함하는 결정적 ID를 사용하며,
+  Lexical의 독립 HTML export는 현재 `prototype-` prefix를 사용한다.
+  이 출력을 발행 정본 대신 사용하지 않으며 경로별 ID 정책은 별도 검증한다.
+- 모바일 주석 input은 `aria-label`을 갖고 scoped CSS로 화면에서만 숨겨
+  키보드/Space 조작과 focus 표시가 가능하다. 이 현대화 속성 하나만
+  공식 고정 원본 대비 명시적으로 허용한다.
 - upstream CSS의 375px 토글 동작을 실제 Chromium에서 확인했다. 전체 반응형·폰트·접근성 gate는 P4/P6에 남아 있다.
 
 ## 비용과 후속 조건

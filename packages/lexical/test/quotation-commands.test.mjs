@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {createHeadlessEditor} from '@lexical/headless';
 import {$getRoot,$createParagraphNode,$createTextNode,UNDO_COMMAND,REDO_COMMAND} from 'lexical';
 import {registerHistory,createEmptyHistoryState} from '@lexical/history';
-import {TUFTE_NODES,$createSectionNode,registerQuotationCommands,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,APPEND_TUFTE_SECTION_CITE_COMMAND,INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,$createNoteNode} from '../dist/index.js';
+import {TUFTE_NODES,$createSectionNode,registerQuotationCommands,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,APPEND_TUFTE_SECTION_CITE_COMMAND,INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,$createSidenoteNode} from '../dist/index.js';
 
 function setup(){
  const diagnostics=[];
@@ -124,7 +124,7 @@ test('F07 rejects insertion inside a note without altering note identity or payl
  const {editor,diagnostics,dispose}=setup();
  editor.update(()=>{
   const inside=$createTextNode('protected');
-  const note=$createNoteNode('f07-note').append(inside);
+  const note=$createSidenoteNode('f07-note').append(inside);
   $getRoot().append($createSectionNode().append($createParagraphNode().append($createTextNode('body'),note)));
   inside.select(3,3);
  },{discrete:true});

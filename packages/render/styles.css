@@ -1,6 +1,5 @@
 /* Scoped publication styles. Include alongside Tufte CSS. */
 .tufte-article { counter-reset: sidenote-counter; }
-.tufte-article .tufte-pre-wrap { white-space: pre-wrap; }
 .tufte-article.tufte-align-left, .tufte-article .tufte-align-left { text-align: left; }
 .tufte-article.tufte-align-center, .tufte-article .tufte-align-center { text-align: center; }
 .tufte-article.tufte-align-right, .tufte-article .tufte-align-right { text-align: right; }
@@ -8,12 +7,49 @@
 .tufte-article.tufte-align-start, .tufte-article .tufte-align-start { text-align: start; }
 .tufte-article.tufte-align-end, .tufte-article .tufte-align-end { text-align: end; }
 
-/* SVG supplies an intrinsic ratio without inline style under strict CSP. */
-.tufte-article .tufte-embed { position: relative; max-width: 55%; }
-.tufte-article .tufte-embed.fullwidth { max-width: 90%; }
-.tufte-article .tufte-embed > svg { display: block; width: 100%; height: auto; pointer-events: none; }
-.tufte-article .tufte-embed iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
-@media (max-width: 760px) { .tufte-article .tufte-embed { max-width: 90%; } }
+/* Mirror the official Tufte CSS .iframe-wrapper hierarchy and 16:9
+   layout without inline styles. This also works if the optional scoped
+   stylesheet is used without the original global Tufte CSS bundle.
+   An author-specified intrinsic iframe width/height does not replace the
+   original .iframe-wrapper responsive 16:9 layout contract. */
+.tufte-article .iframe-wrapper {
+ position: relative;
+ padding-bottom: 56.25%;
+ padding-top: 25px;
+ height: 0;
+}
+.tufte-article .iframe-wrapper > iframe {
+ position: absolute;
+ top: 0;
+ left: 0;
+ width: 100%;
+ height: 100%;
+ border: 0;
+}
+
+/* Original Tufte CSS hides these checkbox inputs with display:none.
+   On mobile they must instead be visually hidden but keyboard-focusable;
+   the exact label + input + span hierarchy and :checked + note CSS stay intact.
+   Desktop note payloads are already visible, so the source policy is retained. */
+@media (max-width: 760px) {
+ .tufte-article input.margin-toggle {
+  display: block;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+ }
+ .tufte-article label.margin-toggle:has(+ input.margin-toggle:focus-visible),
+ .tufte-article span.newthought:has(+ input.margin-toggle:focus-visible) > label.margin-toggle {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+ }
+}
 
 /* Composed ImageQuilt: retain its intrinsic ratio within a Tufte figure. */
 .tufte-article figure img.imagequilt { display: block; max-width: 100%; height: auto; }

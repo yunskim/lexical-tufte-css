@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {validateDocument,parseDocument,canonicalizeDocument,parseCanonicalDocument,validateMetadata,validatePostRecord,isTimestamp,NODE_SCHEMA,DOCUMENT_LIMITS} from '../dist/index.js';
+import {validateDocument,parseDocument,canonicalizeDocument,parseCanonicalDocument,validateMetadata,validatePostRecord,isTimestamp,NODE_SCHEMA,DOCUMENT_LIMITS,isSafeURL} from '../dist/index.js';
 const fixture=()=>JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document.json',import.meta.url),'utf8'));
 const text=(value='한글')=>({type:'text',version:1,text:value,format:0});
 const el=(type,children=[],props={})=>({type,version:1,children,...props});
@@ -27,14 +27,15 @@ test('planned semantic node contracts compose in one document before editor/rend
   el('tufte-fullwidth',[p()]),
   el('tufte-code',[text('const x ='),{type:'tab',version:1,text:'\t',format:0},{type:'code-highlight',version:1,text:'1',format:0,highlightType:'number'},{type:'linebreak',version:1}],{width:'fullwidth',language:'typescript'}),
   {type:'tufte-embed',version:1,provider:'youtube',src:'https://www.youtube-nocookie.com/embed/abcdefghijk',title:'예제 동영상',wrapper:'figure',width:'body',aspectRatio:16/9},
-  el('tufte-figure',[{type:'tufte-imagequilt',version:1,src:'/quilt.svg',alt:'완성된 ImageQuilt',width:800,height:400},el('tufte-caption',[text('그림 설명')]),el('tufte-note',[text('그림 여백')],{noteId:'figure-margin',kind:'marginnote'})],{width:'fullwidth'})
+  el('tufte-figure',[{type:'tufte-imagequilt',version:1,src:'/quilt.svg',alt:'완성된 ImageQuilt',width:800,height:400},el('tufte-caption',[text('그림 설명')]),el('tufte-marginnote',[text('그림 여백')],{noteId:'figure-margin'})],{width:'fullwidth'})
  );
  const result=validateDocument(d);assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
 });
 test('malformed structures and unsupported versions fail with precise paths',()=>{
  for(const [mutate,code]of [
   [d=>d.schemaVersion=2,'UNSUPPORTED_VERSION'],[d=>note(d).version=2,'UNSUPPORTED_NODE_VERSION'],
-  [d=>d.locale='not_a_locale','INVALID_LOCALE'],[d=>note(d).kind=['sidenote'],'INVALID_NOTE_KIND'],
+  [d=>d.locale='not_a_locale','INVALID_LOCALE'],[d=>note(d).type='tufte-unknown-note','UNKNOWN_NODE'],
+  [d=>note(d).kind='sidenote','UNKNOWN_FIELD'],
   [d=>d.lexicalState.root.children[0].children.push(el('heading',[text()],{tag:'h4'})),'INVALID_HEADING'],
   [d=>d.lexicalState.root.children[0].children.push(el('tufte-definition-list',[el('tufte-definition',[p()])])),'INVALID_DEFINITION_LIST'],
   [d=>note(d).children.push(el('paragraph',[text()])),'INVALID_CHILD'],
@@ -54,6 +55,20 @@ test('URL/style injection and nested links through spans are blocked',()=>{
  for(const url of ['javascript:alert(1)','//evil.test/a','https://user:pass@example.com/a','data:image/svg+xml,foo','/a\\b']){const d=fixture();note(d).children[2].src=url;assert.ok(has(validateDocument(d),'UNSAFE_URL'));}
  const d=fixture();note(d).children[1].children=[el('tufte-span',[el('link',[text()],{url:'https://lexical.dev'})],{kind:'sans'})];assert.ok(has(validateDocument(d),'NESTED_LINK'));
  note(d).children=[text()];note(d).children[0].style='background:url(//evil.test)';assert.ok(has(validateDocument(d),'UNSUPPORTED_STYLE'));
+});
+test('pinned upstream image paths remain exact relative URLs without relaxing schemes',()=>{
+ for(const src of ['img/imagequilt-chinese-calligraphy.png','img/imagequilt-animal-sounds.png','images/chart-1.svg']){
+  assert.equal(isSafeURL(src,'image'),true,src);
+  const doc=fixture();
+  note(doc).children[2].src=src;
+  assert.equal(validateDocument(doc).ok,true,src);
+ }
+ for(const src of [
+  'javascript:alert(1)','data:image/svg+xml,foo','//evil.test/asset.png',
+  'https://user:pass@example.com/a.png','img/bad.png?autoplay=1',
+  'img/unsafe.png#fragment','img/evil name.png',
+  'img/../private.png','img//double-slash.png','img/./file.png','img/evil\\\\name.png'
+ ])assert.equal(isSafeURL(src,'image'),false,src);
 });
 test('embed URLs are provider specific and titles are mandatory',()=>{
  const d=fixture();const embed={type:'tufte-embed',version:1,provider:'vimeo',src:'https://player.vimeo.com/video/1234',title:'설명',wrapper:'div',width:'body',aspectRatio:1.5};d.lexicalState.root.children[0].children.push(embed);assert.equal(validateDocument(d).ok,true);

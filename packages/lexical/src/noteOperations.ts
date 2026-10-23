@@ -1,6 +1,8 @@
 import {$copyNode,$getSelection,$isRangeSelection,$isTextNode,type LexicalNode,type ElementNode,type RangeSelection} from 'lexical';
 import {$isLinkNode} from '@lexical/link';
-import {$createNoteNode,NoteNode} from './NoteNode.js';
+import {NoteNode} from './NoteNode.js';
+import {SidenoteNode,$createSidenoteNode} from './SidenoteNode.js';
+import {MarginnoteNode,$createMarginnoteNode} from './MarginnoteNode.js';
 export function $getContainingNote(node:LexicalNode|null):NoteNode|null {
   for(let current=node;current;current=current.getParent())if(current instanceof NoteNode)return current;
   return null;
@@ -23,13 +25,14 @@ export function $splitNoteAtSelection(newId:string):NoteNode|null {
     const wrapper=$copyNode(parent);wrapper.append(...right);
     right=[wrapper,...parent.getNextSiblings()];parent=parent.getParentOrThrow();
   }
-  const second=$createNoteNode(newId,note.getKind()).append(...right);
+  if(!(note instanceof SidenoteNode)&&!(note instanceof MarginnoteNode))return null;
+  const second=(note instanceof SidenoteNode?$createSidenoteNode(newId):$createMarginnoteNode(newId)).append(...right);
   note.insertAfter(second);second.selectStart();return second;
 }
 /** Keep the first note's identity; merging different note kinds is explicit no-op. */
 export function $mergeNoteWithNext(note:NoteNode):boolean {
   const next=note.getNextSibling();
-  if(!(next instanceof NoteNode)||next.getKind()!==note.getKind())return false;
+  if(!(next instanceof NoteNode)||next.getType()!==note.getType())return false;
   const end=note.getLastDescendant();
   const left=note.getLastChild(),right=next.getFirstChild();
   if($isLinkNode(left)&&$isLinkNode(right)&&left.getType()===right.getType()&&

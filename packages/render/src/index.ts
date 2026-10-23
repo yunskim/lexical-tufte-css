@@ -1,9 +1,9 @@
-import {validateDocument,type JsonNode,type Diagnostic,type ElementFields} from '@lexical-tufte/document';
+import {validateDocument,NOTE_TOGGLE_ACCESSIBLE_NAME,type JsonNode,type Diagnostic,type ElementFields} from '@lexical-tufte/document';
 import {validateRenderProfile} from './profile.js';
 import {element,serializeHTML,type RenderChild,type RenderElement} from './tree.js';
 export {element,serializeHTML,type RenderElement,type RenderChild} from './tree.js';
 export {parseDocument,validateDocument,isSafeURL,type TufteDocument,type JsonNode,type Diagnostic,type AssetRef} from '@lexical-tufte/document';
-export {RENDER_PROFILE} from './profile.js';
+export {RENDER_PROFILE,RENDER_SUPPORTED_NODE_TYPES} from './profile.js';
 export {escapeHTML} from './tree.js';
 export type RenderResult={ok:true;html:string;diagnostics:Diagnostic[]}|{ok:false;html:null;diagnostics:Diagnostic[]};
 export function renderArticle(input:unknown,options:{idPrefix?:string}={}):RenderResult{
@@ -11,6 +11,21 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
  const capabilities=validateRenderProfile(result.document);if(capabilities.length)return {ok:false,html:null,diagnostics:capabilities};
  const doc=result.document,prefix=options.idPrefix??doc.id;
  if(typeof prefix!=='string'||!/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(prefix))return {ok:false,html:null,diagnostics:[{code:'INVALID_ID_PREFIX',path:'options.idPrefix',message:'Invalid article namespace'}]};
+ // The h1 anchor must stay stable when idPrefix changes. Do not silently
+ // rewrite links; reject collisions with generated article or note IDs.
+ if(doc.titleId!==undefined){
+  if(doc.titleId===`${prefix}-article`)
+   return {ok:false,html:null,diagnostics:[{code:'DUPLICATE_TITLE_ID',path:'$.titleId',message:'Title ID conflicts with article ID'}]};
+  const noteIDs=new Set<string>();
+  const visitNotes=(n:JsonNode):void=>{
+   if(n.type==='tufte-sidenote'||n.type==='tufte-marginnote')
+    noteIDs.add(`tufte-${prefix.length}-${prefix}-${n.noteId}`);
+   if('children'in n)for(const child of n.children)visitNotes(child);
+  };
+  visitNotes(doc.lexicalState.root);
+  if(noteIDs.has(doc.titleId))
+   return {ok:false,html:null,diagnostics:[{code:'DUPLICATE_TITLE_ID',path:'$.titleId',message:'Title ID conflicts with generated note ID'}]};
+ }
  const attrs=(n:ElementFields):Record<string,string>=>({
   ...(n.direction?{dir:String(n.direction)}:{}),
   ...(n.format&&typeof n.format==='string'?{class:`tufte-align-${n.format}`}:{}),
@@ -23,8 +38,22 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
   switch(n.type){
    case 'root':return inner();
    case 'tufte-section':return [element('section',attrs(n),inner())];
-   case 'paragraph':return [element('p',attrs(n),inner())];
-   case 'heading':return [element(n.tag,attrs(n),inner())];
+   case 'paragraph':{
+    const output:RenderChild[]=[];
+    for(let i=0;i<n.children.length;i++){
+     const child=n.children[i]!;
+     const next=n.children[i+1];
+     if(child.type==='tufte-span'&&child.kind==='newthought'&&next?.type==='tufte-sidenote'){
+      const notePieces=render(next);
+      output.push(element('span',withClass(child,'newthought'),[
+       ...child.children.flatMap(render),notePieces[0]!,
+      ]),...notePieces.slice(1));
+      i++;
+     }else output.push(...render(child));
+    }
+    return [element('p',n.tufteClass==='sans'?withClass(n,'sans'):attrs(n),output)];
+   }
+   case 'heading':return [element(n.tag,{...attrs(n),...(n.id?{id:String(n.id)}:{})},inner())];
    case 'horizontalrule':return [element('hr',{},[],true)];
    case 'list':return [element(n.tag,{...attrs(n),...(n.tag==='ol'&&n.start!==1?{start:String(n.start)}:{})},
     n.children.map(item=>item.type==='listitem'
@@ -34,14 +63,14 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
    case 'tufte-definition-list':return [element('dl',attrs(n),inner())];
    case 'tufte-term':return [element('dt',attrs(n),inner())];
    case 'tufte-definition':return [element('dd',attrs(n),inner())];
-   case 'quote':return [element('blockquote',attrs(n),inner())];
+   case 'quote':return [element('blockquote',{...attrs(n),...(n.cite?{cite:n.cite}:{})},inner())];
    case 'tufte-epigraph':return [element('div',withClass(n,'epigraph'),inner())];
    case 'tufte-attribution':return [element('footer',attrs(n),inner())];
    case 'tufte-cite':return [element('cite',attrs(n),inner())];
    case 'tufte-section-footer':return [element('footer',attrs(n),inner())];
-   case 'tufte-span':return [element('span',withClass(n,n.kind==='sans'?'sans':n.kind),inner())];
+   case 'tufte-span':return [element('span',withClass(n,n.kind),inner())];
    case 'text':{
-    let child:RenderChild=element('span',{class:'tufte-pre-wrap'},[String(n.text)]);
+    let child:RenderChild=String(n.text);
     for(const [flag,tag] of [[16,'code'],[1,'strong'],[2,'em'],[4,'s'],[8,'u'],[32,'sub'],[64,'sup'],[128,'mark']] as const)
      if((Number(n.format)&flag)!==0)child=element(tag,{},[child]);
     return [child];
@@ -70,17 +99,26 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
     src:String(n.src),alt:String(n.alt),class:'imagequilt',
     width:String(n.width),height:String(n.height)
    },[],true)];
-   case 'tufte-inline-image':return [element('img',{src:String(n.src),alt:String(n.alt)},[],true)];
-   case 'tufte-note':{
-    const id=`tufte-${prefix.length}-${prefix}-${n.noteId}`,kind=String(n.kind);
-    return [element('span',{'data-tufte-note':String(n.noteId)},[
+   case 'tufte-inline-image':return [element('img',{
+     src:String(n.src),alt:String(n.alt),
+     ...(n.width===undefined?{}:{width:String(n.width)}),
+     ...(n.height===undefined?{}:{height:String(n.height)})
+    },[],true)];
+   case 'tufte-sidenote':
+   case 'tufte-marginnote':
+   {
+    const id=`tufte-${prefix.length}-${prefix}-${n.noteId}`,kind=n.type==='tufte-sidenote'?'sidenote':'marginnote';
+    return [
      element('label',{for:id,class:`margin-toggle${kind==='sidenote'?' sidenote-number':''}`},kind==='marginnote'?['⊕']:[]),
-     element('input',{id,type:'checkbox',class:'margin-toggle'},[],true),
+     element('input',{id,type:'checkbox',class:'margin-toggle','aria-label':NOTE_TOGGLE_ACCESSIBLE_NAME[kind]},[],true),
      element('span',withClass(n,kind),inner()),
-    ])];
+    ];
    }
    case 'tufte-embed':{
     const wrapper=n.wrapper==='figure'?'figure':'div';
+    // Keep the official Tufte CSS direct-child selector intact:
+    // .iframe-wrapper > iframe. Modern attributes are intentional
+    // exceptions to the pinned upstream example; extra SVG wrappers are not.
     const frame=element('iframe',{
      src:String(n.src),title:String(n.title),loading:'lazy',
      referrerpolicy:'strict-origin-when-cross-origin',
@@ -89,9 +127,8 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
      allowfullscreen:''
     },[]);
     return [element(wrapper,{
-     class:[n.width==='fullwidth'?'fullwidth':'','tufte-embed'].filter(Boolean).join(' '),
-     'data-tufte-ratio':String(n.aspectRatio)
-    },[element('svg',{'viewBox':`0 0 960 ${960/Number(n.aspectRatio)}`,width:'960',height:String(960/Number(n.aspectRatio)),'aria-hidden':'true',focusable:'false'},[]),frame])];
+     class:[n.width==='fullwidth'?'fullwidth':'','iframe-wrapper'].filter(Boolean).join(' ')
+    },[frame])];
    }
    case 'tufte-fullwidth':return [element('div',withClass(n,'fullwidth'),inner())];
    case 'tufte-figure':return [element('figure',n.width==='fullwidth'?withClass(n,'fullwidth'):attrs(n),inner())];
@@ -131,7 +168,7 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
  const article=element('article',{
   id:`${prefix}-article`,lang:doc.locale,class:rootClass,
   ...(root.direction?{dir:String(root.direction)}:{}),
- },[element('h1',{},[doc.title]),
+ },[element('h1',doc.titleId?{id:doc.titleId}:{},[doc.title]),
  ...(doc.subtitle!==undefined?[element('p',{class:'subtitle'},[doc.subtitle])]:[]),
  ...render(root)]);
  return {ok:true,html:serializeHTML(article),diagnostics:[]};

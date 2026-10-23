@@ -2,14 +2,14 @@ import {$addUpdateTag,$createTextNode,$getSelection,$isRangeSelection,$isNodeSel
 import {NODE_SCHEMA,isSafeURL,isIdentifier,type Diagnostic} from '@lexical-tufte/document';
 import {SectionNode,FigureNode,CaptionNode,$createFigureNode,$createCaptionNode,type FigureWidth} from './LayoutNodes.js';
 import {InlineImageNode,$createInlineImageNode} from './InlineImageNode.js';
-import {$createNoteNode,NoteNode} from './NoteNode.js';
+import {MarginnoteNode,$createMarginnoteNode} from './MarginnoteNode.js';
 import {$collectNoteIds} from './clipboardNotes.js';
 import {$getContainingNote} from './noteOperations.js';
 
 export type InsertTufteFigure={src:string;alt:string;assetId?:string;imageWidth?:number;imageHeight?:number;width?:FigureWidth;caption?:string};
 export const INSERT_TUFTE_FIGURE_COMMAND:LexicalCommand<InsertTufteFigure>=createCommand('INSERT_TUFTE_FIGURE');
 export const SET_TUFTE_FIGURE_WIDTH_COMMAND:LexicalCommand<FigureWidth>=createCommand('SET_TUFTE_FIGURE_WIDTH');
-export type InsertFigureMarginNote={noteId:string;text:string};
+export type InsertFigureMarginNote={noteId:string;text:string;placement?:'before-image'|'after-image'};
 export const INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND:LexicalCommand<InsertFigureMarginNote>=createCommand('INSERT_TUFTE_FIGURE_MARGINNOTE');
 export const REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND:LexicalCommand<string>=createCommand('REMOVE_TUFTE_FIGURE_MARGINNOTE');
 export type UpdateFigureMarginNote={noteId:string;text:string};
@@ -75,25 +75,33 @@ export function registerFigureCommands(editor:LexicalEditor,onDiagnostic?:(diagn
    $addUpdateTag(HISTORY_PUSH_TAG);figure.setWidth(width);return true;
   },COMMAND_PRIORITY_EDITOR),
   editor.registerCommand(INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,payload=>{
-   if(!payload||!isIdentifier(payload.noteId)||typeof payload.text!=='string'||!payload.text.trim()||payload.text.length>2000)
+   if(!payload||!isIdentifier(payload.noteId)||typeof payload.text!=='string'||!payload.text.trim()||payload.text.length>2000||
+     (payload.placement!==undefined&&!['before-image','after-image'].includes(payload.placement)))
     return reject('INVALID_FIGURE_NOTE','여백 주석 ID와 내용을 확인하세요.');
    const figure=selectedFigure();
    if(!figure)return reject('INVALID_FIGURE_SELECTION','그림을 선택한 후 여백 주석을 삽입하세요.');
    const ids=$collectNoteIds();
    if(ids.has(payload.noteId))return reject('DUPLICATE_NOTE_ID','이미 사용 중인 여백 주석 ID입니다.');
+   const image=figure.getChildren().find(child=>child instanceof InlineImageNode||child.getType()==='tufte-imagequilt');
+   if(!image)return reject('INVALID_FIGURE','그림에 이미지가 없습니다.');
    $addUpdateTag(HISTORY_PUSH_TAG);
-   const note=$createNoteNode(payload.noteId,'marginnote').append($createTextNode(payload.text));
-   const caption=figure.getChildren().find(child=>child instanceof CaptionNode);
-   if(caption)caption.insertBefore(note);
-   else figure.append(note);
+   const note=$createMarginnoteNode(payload.noteId).append($createTextNode(payload.text));
+   if(payload.placement==='before-image')image.insertBefore(note);
+   else {
+    // Repeated after-image inserts retain their insertion order rather than
+    // reversing each other immediately after the image.
+    let anchor:LexicalNode=image;
+    while(anchor.getNextSibling() instanceof MarginnoteNode)anchor=anchor.getNextSibling()!;
+    anchor.insertAfter(note);
+   }
    note.selectEnd();return true;
   },COMMAND_PRIORITY_EDITOR),
   editor.registerCommand(REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,noteId=>{
    if(!isIdentifier(noteId))return reject('INVALID_FIGURE_NOTE','삭제할 주석 ID가 올바르지 않습니다.');
    const figure=selectedFigure();
    if(!figure)return reject('INVALID_FIGURE_SELECTION','그림을 선택한 후 여백 주석을 삭제하세요.');
-   const note=figure.getChildren().find(child=>child instanceof NoteNode&&child.getKind()==='marginnote'&&child.getNoteId()===noteId);
-   if(!(note instanceof NoteNode))return reject('FIGURE_NOTE_NOT_FOUND','선택한 그림에 해당 여백 주석이 없습니다.');
+   const note=figure.getChildren().find(child=>child instanceof MarginnoteNode&&child.getNoteId()===noteId);
+   if(!(note instanceof MarginnoteNode))return reject('FIGURE_NOTE_NOT_FOUND','선택한 그림에 해당 여백 주석이 없습니다.');
    $addUpdateTag(HISTORY_PUSH_TAG);
    note.remove();
    figure.selectEnd();return true;
@@ -103,8 +111,8 @@ export function registerFigureCommands(editor:LexicalEditor,onDiagnostic?:(diagn
     return reject('INVALID_FIGURE_NOTE','수정할 주석 ID와 내용을 확인하세요.');
    const figure=selectedFigure();
    if(!figure)return reject('INVALID_FIGURE_SELECTION','그림을 선택한 후 여백 주석을 수정하세요.');
-   const note=figure.getChildren().find(child=>child instanceof NoteNode&&child.getKind()==='marginnote'&&child.getNoteId()===payload.noteId);
-   if(!(note instanceof NoteNode))return reject('FIGURE_NOTE_NOT_FOUND','선택한 그림에 해당 여백 주석이 없습니다.');
+   const note=figure.getChildren().find(child=>child instanceof MarginnoteNode&&child.getNoteId()===payload.noteId);
+   if(!(note instanceof MarginnoteNode))return reject('FIGURE_NOTE_NOT_FOUND','선택한 그림에 해당 여백 주석이 없습니다.');
    if(note.getTextContent()===payload.text)return true;
    $addUpdateTag(HISTORY_PUSH_TAG);
    const previous=note.getChildren();

@@ -1,0 +1,20 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {renderArticle,validateDocument} from '../dist/index.js';
+const fixture=()=>JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document.json',import.meta.url),'utf8'));
+test('concrete sidenote/marginnote variants are valid and publish without losing note ID',()=>{
+ const d=fixture();
+ const note=d.lexicalState.root.children[0].children[0].children[1];
+ const before=JSON.stringify(note.children);
+ assert.equal(note.type,'tufte-sidenote');
+ note.type='tufte-marginnote';
+ assert.equal(validateDocument(d).ok,true);
+ const html=renderArticle(d);
+ assert.equal(html.ok,true,JSON.stringify(html.diagnostics));
+ assert.match(html.html,/aria-label="Toggle margin note"/);
+ assert.equal(JSON.stringify(note.children),before);
+ note.type='tufte-sidenote';
+ assert.equal(validateDocument(d).ok,true);
+ assert.match(renderArticle(d).html,/aria-label="Toggle sidenote"/);
+});

@@ -51,13 +51,37 @@ try {
  const before=await page.getByRole('textbox',{name:'문서 JSON',exact:true}).inputValue();
  const html=await page.getByRole('textbox',{name:'발행 HTML',exact:true}).inputValue();
  assert.match(html,/class="sidenote"/);assert.match(html,/code_test/);assert.match(html,/alt="프로토타입의 파란 막대 그림"/);
- const valid=await page.evaluate(html=>{
+ const structure=await page.evaluate(html=>{
   const doc=new DOMParser().parseFromString(html,'text/html');
-  return [...doc.querySelectorAll('[data-tufte-note]')].every(n=>{
-   const [label,input,payload]=n.children;
-   return label?.tagName==='LABEL'&&input?.tagName==='INPUT'&&payload?.className==='sidenote'&&label.htmlFor===input.id;
-  });
- },html);assert.equal(valid,true,'export keeps adjacent label/input/payload');
+  const payloads=[...doc.querySelectorAll('span.sidenote')];
+  return {
+   obsoleteWrappers:doc.querySelectorAll('[data-tufte-note]').length,
+   notes:payloads.map(payload=>{
+    const input=payload.previousElementSibling;
+    const label=input?.previousElementSibling;
+    return {
+     payload:payload.className,
+     input:input?.tagName,
+     inputType:input?.getAttribute('type'),
+     label:label?.tagName,
+     reference:!!input?.id&&label?.htmlFor===input.id,
+     adjacency:input?.nextElementSibling===payload&&label?.nextElementSibling===input,
+     numbered:label?.classList.contains('sidenote-number')
+    };
+   })
+  };
+ },html);
+ assert.equal(structure.obsoleteWrappers,0,'publication must not restore legacy note wrappers');
+ assert.equal(structure.notes.length,2,'both inserted sidenotes must appear in publication HTML');
+ for(const note of structure.notes){
+  assert.equal(note.payload,'sidenote');
+  assert.equal(note.input,'INPUT');
+  assert.equal(note.inputType,'checkbox');
+  assert.equal(note.label,'LABEL');
+  assert.equal(note.reference,true,'label targets the adjacent checkbox');
+  assert.equal(note.adjacency,true,'publication keeps label/input/payload as sibling controls');
+  assert.equal(note.numbered,true);
+ }
  await page.reload();await editor.waitFor();
  await page.getByRole('button',{name:'불러오기',exact:true}).click();
  await page.getByRole('button',{name:'JSON·HTML 확인',exact:true}).click();

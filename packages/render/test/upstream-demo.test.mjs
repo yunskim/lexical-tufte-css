@@ -30,6 +30,8 @@ test('published notes preserve the upstream label/input/payload relationship, wi
  const notes=[...html.matchAll(/<label\b[^>]*for="([^"]+)"[^>]*>([^<]*)<\/label><input\b[^>]*id="([^"]+)"[^>]*><span\b[^>]*class="(sidenote|marginnote)"/g)];
  assert.ok(notes.length>=2,'expected both Tufte note kinds in published fixture');
  assert.deepEqual(new Set(notes.map(note=>note[4])),new Set(['sidenote','marginnote']));
+ assert.match(html,/<input[^>]*aria-label="Toggle sidenote"[^>]*><span class="sidenote">/);
+ assert.match(html,/<input[^>]*aria-label="Toggle margin note"[^>]*><span class="marginnote">/);
  for(const [,id,glyph,inputId,kind] of notes){
   assert.equal(id,inputId,'label must target its adjacent input');
   assert.equal(glyph,kind==='sidenote'?'':'⊕');
@@ -39,14 +41,14 @@ test('published notes preserve the upstream label/input/payload relationship, wi
  assert.match(upstream,/<span class="sidenote">/);
 });
 
-test('upstream newthought embeds a note label inside span: known schema/DOM fidelity gap',()=>{
- // The current renderer wraps note markup in a data-tufte-note span.
- // This upstream nesting cannot yet be reproduced by the current note-in-span schema.
+test('publication avoids obsolete note wrappers; newthought split-parent is verified separately',()=>{
+ // The full upstream page puts one sidenote label inside a newthought span.
+ // See newthought-sidenote.test.mjs and upstream-newthought-sidenote-browser.mjs for
+ // the same-content split-parent comparison; this fixture uses ordinary notes.
  assert.match(upstream,/<span class="newthought">[^<]*<label\b[^>]*class="margin-toggle sidenote-number"/);
  const result=renderArticle(documentFixture());
  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
- assert.match(result.html,/<span data-tufte-note="/);
- // Do not mark F05/F10 upstream DOM parity complete until this difference is resolved.
+ assert.doesNotMatch(result.html,/<span data-tufte-note="/);
 });
 
 test('upstream margin toggles have matching labels and adjacent payloads',()=>{

@@ -1,4 +1,172 @@
+## E133 — 독립 Lexical 저장과 자산 목록의 분리로 생기는 dangling assetId 위험 (사전 설계 발견)
+
+- 기존 P1 예제는 raw `editorState.toJSON()`만 저장/복원하고,
+  P2.3.a.4는 관리 자산 명령을 제공하면서 prototype getter는
+  빈 목록만 반환했다. UI에 자산 부착을 단순히 노출하면
+  저장 후 `assetId`를 해석할 자산 목록을 잃을 수 있다.
+- 관리 자산 등록·부착/저장/발행은 같은
+  `TufteDocument.assets` 객체의 현재 스냅샷을 사용한다.
+  관리 자산이 있을 때는 스키마 검증 후 본문+assets를 단일
+  `MANAGED_DOCUMENT_KEY`에 함께 저장하고 정본 우선 복원한다.
+  관리 자산 문서가 손상되었을 때 구버전 raw 슬롯으로의
+  묵시적 fallback을 금지한다. 복구본에도 자산 스냅샷을 보존한다.
+- 사용자 파일 업로드/원격 저장을 구현했다는 뜻이 아니다.
+  브라우저 및 타입/빌드 회귀 작성만 완료; **실측 미확인**. M123.
+
+## E132 — 관리 자산의 참조 불일치와 inline image 치수 발행 누락 (정적 발견)
+
+- 문서 스키마는 이미지 `assetId`를 자산 테이블과 대조하며,
+  `src`가 다르거나 양쪽에 있는 `width/height`가 다르면
+  거부한다. 기존 이미지 src 수정 명령이 관리 자산 URL 변경을
+  막아두었기 때문에 정상적인 자산 교체 경로가 없었다.
+- 추가로 순수 renderer의 일반 `tufte-inline-image`는 width/height
+  정보가 있어도 HTML에 출력하지 않았다. 이는 편집기 내 크기와
+  발행 HTML의 표현이 달라질 수 있는 정적 불일치이다.
+- 해결 코드: 호스트의 정본 assets getter를 명시적 의존성으로
+  받아 전체 레코드 검사 후 assetId/src/치수를 한 번에 교체하고,
+  detached 상태는 URL을 유지한다. 순수 HTML renderer는
+  **명시적 치수만** 기록해 dimension-free 원본 출력은 유지한다.
+- 저장 JSON·document validator·pure renderer·undo/redo 및
+  browser 회귀는 작성했으나 **실제 실행 전**, 실측 실패나
+  통과라고 주장하지 않는다. M122 참조.
+
+## E131 — 여러 노트 이미지의 수정 대상이 명확히 선택되지 않는 UX 결손 (사전 확인)
+
+- 원인: P2.3.a.2는 한 노트에 이미지가 여러 개이면 정확한
+  Lexical NodeSelection을 요구했으나 예제 편집기는 이미지별
+  선택 동선을 제공하지 않았다. 한 개만 있는 경우의 caret 선택은
+  가능하지만 다중 이미지 편집은 사실상 막혀 있었다.
+- 대응: 현재 노트의 이미지 목록을 alt/src와 함께 노출하고 각
+  이미지의 `noteId+noteKey+nodeKey`를 선택 시점에 다시 검증한다.
+  삭제/이동된 키나 현재 다른 노트를 가리키는 선택은 진단 후 거부.
+  목록의 키보드 초점을 제공하되 Lexical 편집 초점의 복원도 명시한다.
+- 회귀: 2개 이미지 중 2번만 수정, 원본 noteId/1번 이미지 불변,
+  선택 키 만료/노트 전환, 순수 HTML 및 저장·재열기, 좁은 화면.
+  **코드/테스트 작성이며 런타임 실패/통과 실측은 없다**. M121.
+
+## E130 — 노트 이미지 수정에서 대상 모호성·자산 참조 손실 위험 (사전 설계 점검)
+
+- 노트에는 image 자식이 여럿 있을 수 있고 링크/인라인 span 아래에도
+  이미지가 들어갈 수 있다. caret 위치만으로 임의 이미지를 수정하면
+  사용자 의도와 다른 자산을 바꿀 위험이 있다. `assetId`/intrinsic
+  크기가 붙은 기존 이미지는 URL만 바꾸면 정본 참조/치수가 어긋날 수 있다.
+- 대응: 정확한 image node selection 또는 이미지 하나뿐인 노트의
+  collapsed caret에만 수정 명령을 허용하고, 나머지는 선택 진단으로 거부.
+  새 src는 공유 `isSafeURL(...,'image')`로 검사하며 managed/sized
+  이미지의 src 변경은 명시적 자산 갱신 계약 전까지 차단한다.
+  alt만 변경할 때 assetId 및 width/height는 보존하고 노트의 다른
+  Lexical children/ID를 변경하지 않는다.
+- 상태: **예상 위험을 바탕으로 코드를 작성했으며 테스트 실행 결과는 없음**.
+  허용 케이스와 실패 케이스를 누적 배치에서 확인해야 한다. M120 참조.
+
+## E129 — 노트 구조 조작 명령의 부모 계약·실제 내용 보존 위험 (사전 점검)
+
+- 전환을 단순히 type 문자열로 수정하면 실제 Lexical concrete
+  node class와 저장 type이 불일치한다. 또한 그림 아래에는
+  marginnote만 허용되므로 sidenote로 바꾸면 문서 검증이 실패한다.
+  이 문제는 코드 리뷰에서 발견한 잠재 위험이며 실측 실패 보고가 아니다.
+- 별도의 생성자로 올바른 concrete node를 만들고 원래 noteId와
+  자식 Lexical 노드를 옮긴다. 현재 단계의 명령은 paragraph에
+  직접 속한 한 노트와 collapsed selection에만 사용한다.
+  범위를 벗어난 선택·IME 중 요청을 거부하고 진단한다.
+- 실제 편집/undo·JSON/발행 회귀 코드 작성, **테스트 미실행**.
+  실행 결과에 따라 문서화할 것. M119.
+
+## E128 — 공식 h1 앵커가 정본에 없어 소실되는 설계 문제 (코드 수정·실행 대기)
+
+- 기존 문서에는 title 문자열만 있었으며, 순수 발행은 h1의 ID를
+  출력하지 않아 공식 `h1#tufte-css`가 왕복에서 소실되었다.
+- 선택적 `titleId`를 도입하고 validator·v1/v2 Lexical bridge·
+  renderer·고정 fixture 및 회귀 테스트로 연결했다. 기존 DOM
+  오라클의 h1 ID 누락 예외를 제거했다.
+- 신규 변경 테스트/CI 미실행. 합격 판정 전이며 M118에 연결한다.
+
+## E127 — iframe 현대화 코드 설명이 시각 기준을 흔들 위험 (사전 정적 발견)
+
+- 공식 Tufte CSS의 구형 iframe 설명과 발행본의 현대화 설명은 텍스트 길이가 다르다. 같은 내용임을 전제한 픽셀 비교에서 후속 요소의 위치 차이를 만들 수 있다. 실제 브라우저 실패가 발생한 것은 아직 확인되지 않았다.
+- 대응: 기존 ADR의 승인 범위 내에서 정확한 원문 문자열을 확인한 다음 해당 한 pre > code만 브라우저 메모리에서 변환한다. 공식 원본 HTML은 불변이며 원형 스크린샷을 별도 보관할 수 있다.
+- YouTube iframe 자체는 기존 URL/구조/geometry 검사를 유지하고, 그 내부 교집합 한 곳만 mask로 허용한다. 주변 글자·그림·주석은 엄격한 RGBA 픽셀 비교 대상이다.
+- 신규 테스트 및 비교기 반례 코드는 **실행 대기**, CI 미실행. M117에 연결한다.
+
 # 에러 기록
+
+## 2026-10-19 최신 브랜치 재검증
+
+기준 `c4f0411039c733331425d349bf7668f49fb22ff2`. 후속 수정 포함 최종 batch69/69·JS339·browser22·Python16·packed 소비/HTTP 통과, 실패·skip0, CI 생략. 이전 실행 보고서는 역사 기록이며 이번 결과는 [재검증 보고서](VERIFICATION_NOTE_PARITY_2026-10-19.ko.md)를 따른다. E109의 현행 concrete note 생성기·fixture·golden/API 이전과 E111–E113 수정은 실행 검증 완료다. 사용자 결정에 따라 구형 `tufte-note` 저장 형식 호환/migration은 추가하지 않으며 명시적 거부 계약을 유지한다.
+
+## E114 — 일반 텍스트 wrapper 제거 뒤 남은 렌더러 기대값
+
+- 첫 `verify:batch`에서 render.test.mjs의 28개 중 2개가 실패했다. 일반 텍스트에 없어진 `span.tufte-pre-wrap`을 요구하고 s/u/mark의 자식도 같은 래퍼를 기대했다. 나머지 파일은 모두 통과했다.
+- 현재 upstream 지향 출력에 맞춰 일반 텍스트의 래퍼 부재와 escaped 본문을 확인한다. s/u/mark 각각 및 조합의 정확한 태그 순서, 한글·&·<tag> 보존/이스케이프를 함께 확인한다. inline style 금지 regex의 이중 escape도 실제 공백 패턴으로 수정했다.
+- 집중 재실행 28/28 및 최종 단위339/batch69단계 통과. 제품 renderer는 변경하지 않았다. M105.
+
+## E115 — Playwright CDN 다운로드의 손상된 ZIP
+
+- Chromium/FFMPEG 최초 CDN 응답을 설치기가 ZIP으로 열면서 `end of central directory record signature not found`가 발생했다.
+- 설치기 자체의 공식 대체 CDN fallback으로 다운로드·설치를 완료했다. 최종 install exit 0과 실제 Chromium 테스트로 확인한다. 캐시 임의 조작이나 브라우저 버전 변경 없이 고정 Playwright 1.51.1/Chromium 134를 사용했다.
+- 상태: 환경 준비 완료. 다운로드 오류를 제품 테스트 실패로 집계하지 않는다. M106.
+
+## E116 — 고정 노드 개수 문구와 중간 상태 보고의 부정확성
+
+- registry는 34종인데 all-nodes browser/structure recovery 설명은 이전 33종 문구를 유지했다. 중간 진행 보고도 전체 실패 집계를 확인하기 전에 단위 테스트 전체 통과로 잘못 안내했다.
+- 개수를 고정한 두 설명을 실제 registry 전체를 가리키도록 수정했다. 보고는 즉시 정정했으며 최종 summary 및 파일별 node:test pass/fail/skip를 모아 판정한다. 첫 batch는 69단계 중 68 통과/1 실패, 단위 assertion은 337 통과/2 실패였다.
+- 상태: 기능 assertion은 유지하고 진단/집계 절차를 수정했다. M106.
+
+## 2026-10-19 full-page baseline 브랜치 검증
+
+대상 `test/upstream-full-page-baseline-20261019`, 기준 `851ceddb7b363beb63a39784848441965960f2e6`. 아래 판정은 이 브랜치에 한정한다. 이전 main 통과 기록은 이번 브랜치의 통과 증거가 아니다. 상세 결과는 [실행 보고서](VERIFICATION_FULL_BASELINE_2026-10-19.ko.md)를 따른다. CI 생략.
+
+## E103 — 발행 노트 테스트가 제거된 wrapper를 조회
+
+- `tests/note-dom-browser.mjs`가 `[data-tufte-note]` 안의 자식을 기대해 현재 label/input/span 형제 구조를 검사하지 못했다.
+- checkbox에서 앞 label·뒤 payload를 찾아 부모/인접성/for=id/고유 ID/종류/phrasing을 검사한다. 발행 wrapper 부재, 편집 DOM 분리, JSON 불변성, 모바일 열기·닫기도 확인한다.
+- 상태: Chromium 실행 통과. M095.
+
+## E104 — 노트·제목 모델 변경의 타입 및 예제 반영 누락
+
+- renderer는 concrete note와 heading ID를 사용하지만 공개 JsonNode는 기존 `tufte-note`만 선언했다. 제목 override는 superclass의 polymorphic this와 불일치했고 예제는 삭제된 `$createNoteNode`/NoteKind를 import했다. 빌드/타입 검사가 순차 실패했다.
+- JsonNode를 현행 schema에 맞추고 updateDOM 인자를 `this`로 수정했다. 예제는 구체적인 노트 생성 함수를 사용한다.
+- 상태: 전체 build/typecheck 통과. 저장 포맷 이전 문제 E109는 별도 미해결. M096.
+
+## E105 — 신규 Lexical 테스트의 active editor 및 canonical root 전제 오류
+
+- note DOM export 테스트가 editor.update 밖에서 노드를 생성해 active editor 오류를 냈다. heading fixture는 Lexical root가 내보내지 않는 textFormat/textStyle을 포함하여 strict bridge의 정규화 거부에 걸렸다.
+- DOM export는 등록된 headless editor의 discrete update 안에서 실행한다. heading fixture의 비정본 root 필드만 제거하고 strict bridge의 손실 감지는 유지한다.
+- 새 figure-marginnote fixture는 이미지 leaf를 element helper로 만들어 children/direction/format/indent의 UNKNOWN_FIELD를 일으켰다. 세 이미지 fixture를 올바른 leaf JSON으로 바꿨고 해당 파일의 6개 테스트가 통과했다.
+- 상태: 해당 테스트 통과. M099.
+
+## E106 — 공식 샘플 비교 fixture의 envelope 누락과 들여쓰기 차이
+
+- 신규 비교 3개가 필수 `assets`를 빠뜨려 INVALID_ASSETS로 실패했다. 추가 후 opening/Getting Started는 section 블록 사이 원본 HTML 들여쓰기 Text node에서만 달랐다.
+- assets:[]를 추가했다. 두 section 비교는 SECTION 직속 공백-only Text node만 제외하며 inline/pre/code의 공백·속성·계층은 계속 비교한다. assertion에 예외를 명시했다. newthought는 ID namespace 외 DOM을 그대로 비교한다.
+- 상태: 세 비교 최종 실행 통과. 페이지 전체 시각 동등성 판정은 아니다. M099.
+
+## E107 — 제목 명령이 미등록 기본 HeadingNode를 생성
+
+- section/contextual UI 브라우저 테스트의 h2 생성이 timeout으로 실패했다. 독립 headless 회귀에서 `Type heading in node HeadingNode does not match registered node TufteHeadingNode`를 재현했다.
+- sectionCommands의 등록 확인·생성을 TufteHeadingNode로 통일하고 h2↔h3 변환 시 ID를 보존한다. 클래스·텍스트·ID를 검증하는 회귀를 추가했다.
+- publication browser harness에도 같은 기본 heading factory가 남아 있어 교체했다.
+- 상태: headless 및 section/contextual UI/publication 브라우저 재실행 통과. M097.
+
+## E108 — 구조 검사기가 변경 전 그림 순서·노트 타입을 유지
+
+- schema는 marginnote→image를 허용하지만 inspector는 image-first를 강제했다. 직접 sidenote 검사는 과거 `tufte-note.kind`를 보고 있었다. 독립 회귀에서 두 오류를 재현했다.
+- 이미지 정확히 하나/캡션 최대 하나·이미지 뒤 조건으로 변경하고 concrete sidenote를 진단한다. 노트 앞뒤 허용 및 캡션 역순·직접 sidenote 거부를 검사한다.
+- 상태: 신규 회귀 2개 통과. M098.
+
+## E109 — concrete note 전환의 저장 fixture/API 회귀 미이전 (수정 후 재검증 대기)
+
+- 발견: 2026-10-19 Work 전체 검증에서 `tufte-note {kind}` 입력을 현행 validator가 `UNKNOWN_NODE`로 거부했다. Lexical 테스트 10개 파일은 삭제된 `$createNoteNode` import로 실행 전 실패했으며, 이로 인해 서버·브라우저·packed JS consumer도 연쇄 실패했다.
+- 원인: 핵심 schema/renderer/editor에서 노드 분리 후, 저장 v1/v2 fixture와 golden·공통 생성기·테스트의 wire type/생성 함수/기대 진단까지 함께 이전하지 않았다. 저장 envelope v1→v2 변환은 구형 내부 노드 의미 변환과 별개다.
+- 사용자 결정: 구형 `tufte-note` 문서 호환성이나 자동 마이그레이션은 도입하지 않는다. schema validator의 `UNKNOWN_NODE` 거부를 유지한다. 과거 실행 보고서의 호환성 도입 체크리스트는 이 결정으로 대체한다.
+- 처리(현재 브랜치, 후속 실행 전): 서버 v1/v2 fixture, all-nodes golden/생성기, 서버 fixture 생성기, Lexical 테스트 API·노드 등록과 관련 기대값을 concrete note로 이전했다. 문서 검증 테스트는 `kind`의 `UNKNOWN_FIELD` 거부를 확인하게 변경했고, 렌더러의 구형 래퍼 미지원 기대값을 수정했다. v1/v2 데이터에서 주석 ID·링크·이미지를 보존하고 내부 Lexical state가 일치하는지 검사하는 고정 fixture 회귀도 추가했다.
+- 상태: 코드/fixture 이전은 진행됐지만 이후 전체 빌드·단위·브라우저·패키지 소비 검증은 **미실행**. 2026-10-19 Work의 85 JS 실패/5 브라우저 실패를 아직 해결 확인한 것으로 집계하지 않는다. 다음 일괄 실행에서 새로 드러나는 실패도 조사한다. M096/M100/M101 참조.
+
+## E110 — 진단 도구의 구문·escape 계층 오류 재발
+
+- 임시 진단의 중첩 append 괄호, 패키지 밖에서의 pnpm 의존성 import, section 공백 정규식의 이중 escape로 진단 자체가 실패했다. encoded-slash GitHub branch 조회와 확인하지 않은 문서 제목의 patch도 실패했다. 커밋 전 대용량 문서 JSON 읽기는 출력 한도로 잘려 분할 읽기로 바꿨다.
+- 회귀는 패키지의 독립 테스트 파일과 단계별 지역 변수로 구성한다. 공백 판정은 trim으로 바꾸고 실제 비교 실행을 확인했다. GitHub 조회는 git/ref/heads 경로를 사용하고 patch 문맥을 먼저 읽는다.
+- 상태: 진단 실패를 제품 실패의 증거로 사용하지 않음. E067/M060, E102/M094 재점검 및 M100 반영.
 
 2026-10-19 완료 판정: E102 수정 후 check318개/browser16개/package4개/실제HTTP와 Python16개 통과. [실행 보고서](VERIFICATION_DOMPARSER_2026-10-19.ko.md)의 범위에서 검증했다. 전체 원본 fidelity 차이는 해결 처리하지 않는다.
 
@@ -700,3 +868,106 @@ E001–E049/M001–M042를 검토했다. E024의 경계 입력은 실제 Chromiu
 - 발견: 예제 편집기의 cutIds는 cut 또는 paste 때만 초기화되어 cut→copy→paste에서 오래된 cut ID를 새 클립보드 내용에 적용할 수 있었다.
 - 처리: COPY_COMMAND에 초기화 핸들러를 추가하고 Work 검증에 cut→copy→paste 시나리오를 등록했다.
 - 상태: 코드 수정, Work 실행 검증 대기. 외부 앱의 clipboard 변경과 취소된 cut/copy는 미해결. M064 참조.
+
+## E111 — 구형 래퍼 selector의 빈 배열 검사로 브라우저 테스트가 허위 통과
+
+- 발견: `tests/note-browser.mjs`에서 `querySelectorAll('[data-tufte-note]')` 결과에 바로 `.every(...)`를 호출한다. 발행 DOM이 래퍼 없는 `label + input + span` 구조로 변경된 이후 대상이 0개여도 true를 반환한다. 이전 Work의 해당 browser 파일 통과는 노트 발행 HTML 인접성의 독립적 증거가 아니었다.
+- 처리: `span.sidenote` 2개 존재를 먼저 강제하고, 각 note의 이전 형제 `input.margin-toggle` 및 `label`, 체크박스·for/id·번호 class·요소 인접성, 구형 래퍼 부재를 검사한다.
+- 상태: 코드 수정, 후속 Work 일괄 재실행 전. M102 참조.
+
+## E112 — 구체 노트 타입 전환에 남은 API 기대와 반복 그림 삽입의 역순
+
+- 발견: `figure-commands.test.mjs`에서 삭제된 `getKind()`를 호출하고, `note.test.mjs`는 future-version import가 기존 `Unsupported` 오류를 던질 것으로 기대했다. 새 `SidenoteNode.importJSON()`은 `Invalid sidenote`를 반환한다. 그림의 기본 `after-image` 삽입은 매번 이미지 바로 뒤에 붙여 연속 주석의 순서가 역전됐다.
+- 처리: 테스트는 실제 구체 타입 및 버전 거부 메시지를 확인한다. 그림 노트 삽입은 이미지 뒤에 연속된 `MarginnoteNode` 중 마지막 뒤에 넣어 기존 순서를 유지한다. before/after 위치에 각각 두 번 삽입한 순서와 캡션 보존을 확인하는 단위 회귀를 추가했다. 타입 변경 테스트는 Lexical 공식 `replace(replacement, true)`로 자식 트리를 옮겨 일시적 빈 주석을 만들지 않게 수정했다.
+- 상태: 수정 코드와 회귀 추가, 빌드·테스트 실행은 대기. M103 및 E059/M052 참조.
+
+## E113 — Lexical HTML export와 발행 렌더러의 newthought 레이블 부모 불일치
+
+- 발견: P2 노트 모델을 구체 타입으로 이전한 뒤 새 실제 HTML 비교 시나리오를 설계하면서, 발행 렌더러는 연속된 `newthought / sidenote`에 대해 레이블을 `span.newthought` 내부에 넣지만 `NoteNode.exportDOM()`은 모든 레이블을 체크박스와 같은 부모의 형제로 출력한다는 차이를 확인했다. JSON 논리 모델은 형제 관계가 맞다.
+- 처리: Lexical HTML 내보내기에서만 직전 논리 형제가 `TufteSpanNode(kind='newthought')`이며 부모가 paragraph인 경우 앞서 출력된 `span.newthought`에 레이블을 추가한다. `input + span.sidenote`은 paragraph 형제로 유지한다. 중간 일반 텍스트, 다른 종류의 노트, 다른 부모는 결합하지 않는다. 실제 `$generateHtmlFromNodes`와 `renderArticle`가 같은 문서의 6개 주석(풍부한 payload/그림/직접 인접/텍스트 간섭/여백 노트)을 동일한 구조로 출력하는 브라우저 회귀를 추가했다.
+- 상태: 코드 및 테스트 커밋 완료, **Work 재실행 전**. DOM/소비자 검사 실제 결과를 받기 전에는 verified나 phase 완료로 표시하지 않는다. M104 참조.
+
+## E117 — 공식 ImageQuilts 샘플의 bare-relative 이미지 경로가 문서 정책에서 거부됨
+
+- 발견: 원본 8번째 섹션의 두 figure는 `src="img/imagequilt-*.png"`를 사용한다. 기존 `isSafeURL(value,'image')`는 `/`/`./`/`../` 또는 HTTP(S) 절대 URL만 허용하여, 원본과 같은 HTML을 생성하려는 새 동일 콘텐츠 fixture가 검증 단계에서 거부된다.
+- 처리: 영숫자로 시작하며 영숫자·`.`·`_`·`~`·`-`·`/`만 포함하는 제한된 bare-relative 경로를 추가했다. URI scheme, protocol-relative URL, 자격 증명, 공백, 역슬래시, bare-relative 경로의 query/fragment는 새 허용 경로에 포함하지 않는다. 공식 `img/...` 입력과 공격적 반례를 문서 검증 단위 테스트에 함께 추가했다.
+- 상태: 코드 및 테스트 작성, 실제 Work 빌드·검증 **대기**. 보안 회귀와 전체 발행 경로가 통과하기 전 verified로 표시하지 않는다. M107 참조.
+
+## E118 — Fundamentals 원본의 블록 레벨 속성이 기존 논리 모델에서 보존되지 않음
+
+- 발견: 공식 Tufte CSS 샘플 Fundamentals 섹션은 `<p class="sans">`와 `<blockquote cite="...">`를 사용한다. 기존 문서 스키마의 paragraph/quote는 해당 속성의 직렬화를 허용하지 않았으며, 인라인 `tufte-span(kind='sans')`로 바꾸면 CSS selector/원본 DOM 구조가 달라진다. `blockquote`의 citation URL을 본문 텍스트로 넣어도 원본 속성은 사라진다.
+- 처리: **새 wire node type 추가 없이** paragraph에 선택적 `tufteClass:'sans'`, quote에 선택적 `cite` 필드를 명시하고, 검사 없는 CSS 문자열/위험한 URL은 거부한다. Pure renderer에는 직접 요소 클래스·`cite` 출력과 whitelist를 추가했다. Lexical 0.52.0의 native paragraph/quote factory를 subclass+withKlass 교체로 연결하고, 저장/복원 시 기본 importJSON의 가상 `updateFromJSON`을 통해 선택적 필드를 보존하게 했다. 기존 기본 노드의 wire JSON은 속성 없는 형태를 유지한다. 단위 검증 및 고정 원본 Fundamentals 14블록/3노트 strict DOM 비교 테스트를 추가했다.
+- 상태: 수정 코드·테스트 작성, 새 빌드·타입·단위·브라우저 **검증 대기**. 코드 작성만으로 원본 parity 성공이나 이전 전체 batch 통과를 주장하지 않는다. M108 참조.
+
+## E119 — Figures의 iframe 렌더러가 Tufte CSS 계층과 달라 CSS 오라클이 무효화됨
+
+- 발견: 공식 예제 Figures의 `figure.iframe-wrapper > iframe`와 달리 기존 pure renderer/Lexical export는 `figure.tufte-embed > svg + iframe` 구조다. 자체 CSS·SVG가 비율을 예약하여 공식 `.iframe-wrapper iframe` 선택자/반응형 계층과 달랐으며, 원본 예제에는 `frameborder="0"` 및 제목 없는 `youtube.com` URL이 있다. 원본만 베껴서는 현재 URL allowlist/접근성·보안 계약이 후퇴한다.
+- 처리: 문서 wire model과 HTTPS 제공자 allowlist/제목/지연 로딩/referrerpolicy/sandbox는 유지하고, 두 HTML 출력 경로를 `(figure|div).iframe-wrapper > iframe`으로 통일했다. SVG·추가 data 속성 및 오래된 frameborder는 발행 HTML에서 제거한다. 기존 HTML 코드 스니펫도 게시 예제에서 현대식으로 설명한다. `packages/render/styles.css`는 Tufte의 16:9 padding-bottom/25px padding-top 계층을 미러링한다.
+- 회귀 계약: `tests/upstream-same-content-figures-browser.mjs`는 원본 11블록·rich note 2개를 정확히 재구성한다. iframe **전체 속성 집합**과 이 iframe을 보여주는 `pre > code` 한 곳만 현대화 예외로 허용하며, 다른 DOM은 tag/attrs/order/텍스트를 엄격 비교한다. 6개 폭에서 기존/현대 구조의 CSS 위치·크기를 비교한다. renderer/Lexical 두 HTML 경로·CSP/비율 메타데이터 회귀도 추가/수정했다. ADR 0003 참고.
+- 제한/상태: 사용자 선택에 따라 CSS 표시는 공식 iframe-wrapper의 **16:9 예약 공간**을 따른다. 기존 임의 `aspectRatio` 메타데이터는 iframe intrinsic `width/height`에 반영되지만 실제 CSS 표시 비율을 바꾸지 않는다. 필요 시 별도 비율별 CSS 정책을 도입할 것. 코드·테스트 작성, 실제 build/type/unit/browser/packed 검사 **미실행·대기**. M109 참조. 이 단계는 9개 섹션 전체 발행/저장 및 pixel parity 검증 완료가 아니다.
+
+## E120 — 노드 교체 후 Lexical registry 배열의 freeze 계약 누락
+
+- 발견: `packages/lexical/src/nodes.ts`의 `TUFTE_NODE_CLASSES`는 frozen이지만 `TUFTE_NODES`는 일반 배열이었다. 기존 `all-nodes.test.mjs` R02는 `Object.isFrozen(TUFTE_NODES)===true`를 요구하므로 현행 소스와 검사가 불일치한다.
+- 처리: node replacement 배열을 `Object.freeze([...])`로 감쌌다. 실제 런타임 전체 노드 등록·editor import/format 검증은 기존 R02와 새 일괄 실행에서 확인한다.
+- 상태: 정적 계약 수정 커밋, **실제 테스트 미실행**. M110 참조.
+
+## E121 — 발행 예외가 renderer/asset/SQLite를 동일한 저장 오류로 표현
+
+- 발견: `SqlitePublicationStore.publish`는 renderer 내부 throw, 외부 `assetExists` reject, SQLite 트랜잭션 실패를 `PUBLICATION_STORAGE_ERROR`로 합쳐 원인 분류를 잃는다. renderer가 구조화된 실패를 반환하는 정상 경로는 이미 원본 diagnostics를 반환한다.
+- 처리: renderer의 *예상 밖 예외*에는 `PUBLICATION_RENDER_ERROR`/`$.publication.render`, asset checker 예외에는 `PUBLICATION_ASSET_CHECK_ERROR`/`$.publication.assets`, DB 예외에는 `PUBLICATION_STORAGE_ERROR`/`$.publication.storage`를 반환한다. 객체 원본 오류 문자열이나 민감한 외부 URL은 공개하지 않고 기존 트랜잭션 경계와 rollback, CAS를 보존했다. 거부 결과와 이전 snapshot 보호 테스트를 갱신했다.
+- 상태: 코드·테스트 작성, **실행 미검증**. M111 참조.
+
+## E122 — validator/profile/실제 render 분기 일치가 전체로 검증되지 않음
+
+- 발견: `NODE_SCHEMA`, `validateRenderProfile`의 지원 목록, `renderArticle`의 `switch`가 따로 관리돼 새 타입을 한 군데 누락할 위험이 있다. 기존 R02는 `NODE_SCHEMA` ↔ Lexical registry는 검사하나 renderer의 실제 구현 분기는 대조하지 않는다.
+- 처리: immutable `RENDER_SUPPORTED_NODE_TYPES`를 정의해 profile에서 사용하고, 테스트에서 Schema keys/profile 목록/실제 렌더러 `case` 집합을 정확히 비교하며 중복·obsolete case도 거부한다. 실패 시 문서에 추가된 노드의 발행을 조용히 생략하지 않는 원칙 유지.
+- 상태: 코드·테스트 작성, **실행 미검증**. M112 참조.
+
+## E123 — headless lexical 패키지에 React-only horizontal rule 의존
+
+- 발견: `nodes.ts`, `quotationCommands.ts`, all-node golden 생성기는 React 기반의 deprecated `LexicalHorizontalRuleNode`를 직접 import했다. `packages/lexical`의 peer dependencies react/react-dom/yjs까지 불필요하게 요구했다. Lexical 0.52.0은 React 없는 `@lexical/extension/HorizontalRuleExtension`을 제공한다.
+- 처리: 초기 세 import(`nodes.ts`, `quotationCommands.ts`, all-node golden 생성기)를 React-free node/factory로 교체했고, 후속 정적 점검에서 발견한 **두 번째 누락 지점**(`document-bridge.test.mjs`, `publication-browser-harness.mjs`)도 교체했다. 총 다섯 진입점의 React-free import를 회귀 테스트로 강제한다. `packages/lexical/package.json` 및 `pnpm-lock.yaml`의 direct dependency/peer/dev 기록을 정리했다. 같은 `horizontalrule` type/version/HTML, golden 왕복, HR 명령을 검증하는 테스트를 추가했다. Editor React 앱의 독립 의존성은 유지한다.
+- 상태: **frozen install/빌드/타입/브라우저/packed 미실행**. M113 참조.
+
+## E124 — 모바일 note toggle의 접근 가능한 이름/키보드 포커스 누락
+
+- 발견: Tufte CSS 공식 예제의 빈 sidenote label과 `input.margin-toggle {display:none}`를 발행에 그대로 재현하면 모바일 체크박스가 키보드 탭 대상이 되지 않고 스크린리더 이름도 없다.
+- 처리: document 공유 상수로 `Toggle sidenote`/`Toggle margin note` 이름을 정의하고 pure render와 Lexical HTML export의 `input`에 정확한 `aria-label` 한 속성을 추가했다. 발행 scoped CSS에서 **모바일에 한해** checkbox를 visual-hide/keyboard-focusable로 바꾸고 label focus cue를 명시했으며 CSS sibling 구조는 바꾸지 않았다. 공식 예제 오라클은 파싱된 원본 INPUT에만 동일 속성을 채우는 한정된 예외를 사용한다. Playwright의 이름/Space 토글 및 split-parent focus 표시 검사를 추가했다.
+- 제한/상태: 코드와 브라우저 회귀 **실행 대기**. 실제 스크린리더, OS/브라우저/터치 지원 수동 수락은 미실행. M114 참조.
+
+## E125 — Lexical 업그레이드 시 과거 JSON의 무손실 수락 절차가 부족
+
+- 발견: v1→v2 `migrateStoredDocument`는 envelope만 전환한다. `LEXICAL_IMPORT_LOSSY` 및 `UNKNOWN_FIELD`는 안전한 fail-closed 동작이지만, Lexical 런타임을 업그레이드할 때 옛 golden·node type·실제 저장/발행 비교가 누락되면 이전 데이터를 열 수 없을 수 있다.
+- 처리: 현재 pin된 v0.52.0 golden/manifest/frozen lock 일치, v1→v2 저장→열기→다시 export, 미래의 미지원 editorFormat/미지 필드 거부를 별도 회귀로 작성했다. `docs/LEXICAL_UPGRADE_POLICY.ko.md`에서 업그레이드 수락 절차와 구 버전 보존·migration·거부 경계를 정의했다.
+- 상태: 정책·회귀 작성, **실제 검증/미래 runtime upgrade는 하지 않음**. M115 참조.
+
+## E126 — 섹션별 동일 콘텐츠 검사만으로 9개 섹션의 단일 저장·발행 왕복은 보장되지 않음
+
+- 발견: 기존 9개 섹션은 여러 파일의 독립 HTML/JSON fixture로 재구성된다. 각각의
+  순수 renderer DOM 대조가 성공하더라도 **공식 9섹션 전체가 들어간 한 문서**를
+  `validateDocument` → v2 migration → 실제 Lexical parse/export → JSON 저장·재열기 →
+  전체 순수 발행 HTML로 되돌리는 경계는 별도의 검증이 필요하다.
+  특히 전역 note ID 7개와 newthought split-parent·여백 그림·epigraph·
+  Figures 현대화 iframe/예제 코드가 한 문서 안에서 상호작용한다.
+- 처리: `tests/helpers/pinned-upstream-article.mjs`에 공식 pinned
+  `index.html`만으로 9섹션·60직접 블록·7노트를 재구성하는 fail-closed
+  브라우저 fixture 변환기를 추가했다. 지원하지 않는 태그/속성/임베드 호스트/
+  예제 코드 구조를 임의 생략하지 않고 실패시킨다.
+  `tests/upstream-full-document-roundtrip-browser.mjs`에 v1→v2 migration,
+  전체 Lexical 저장·재열기, 저장 JSON 복제본의 한 문장 변경 후 재발행,
+  9섹션 DOM 대조와 6개 viewport의 iframe-wrapper geometry를 추가했다.
+  이와 **별개로** `tests/upstream-full-document-editor-browser.mjs`에서
+  동일 문서를 실제 React Lexical 편집기에 로드하고 키보드 본문 수정·
+  undo/redo·저장/재열기 후 8개 무변경 섹션과 전체 note/iframe 발행을 비교한다.
+  `pnpm test:upstream-same-content`, `pnpm test:browser`,
+  batch auto-discovery에 각 회귀를 등록했다.
+- 의도적 차이: 원본 `article` 무속성 ↔ 발행 `article#upstream-complete-demo-article.tufte-article[lang]`,
+  원본 `h1#tufte-css` ↔ 현재 발행 h1 ID 없음. 이를 명시적으로 고정 검사한다.
+  실제 7개 노트의 네임스페이스 ID/접근성 aria-label 및 Figures iframe
+  한 곳/설명 코드 한 곳을 제외하고 의미 있는 DOM을 느슨하게 정규화하지 않는다.
+- 상태: **코드 작성·커밋, 두 브라우저 테스트 모두 미실행**.
+  키보드/undo 테스트 코드를 추가했더라도 실제 검증은 아직 없다.
+  본문 한 곳의 키보드 테스트가 주석/figure 개별 명령, OS IME,
+  이미지/폰트/스크린샷 수락을 대체하지 않는다.
+  P2.2.e.1–4 및 M116 참조. 실패의 존재/수정 완료는 실행 후 판정한다.

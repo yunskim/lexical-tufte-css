@@ -59,6 +59,6 @@ try{
  await page.getByRole('button',{name:'저장',exact:true}).click();await page.reload();await page.locator('.editor').waitFor();await page.getByRole('button',{name:'불러오기',exact:true}).click();assert.deepEqual(await snapshot(),edited);
  const style=await page.getByText(editedText['포맷 본문'],{exact:true}).evaluate(e=>({line:getComputedStyle(e).textDecorationLine,background:getComputedStyle(e).backgroundColor}));assert.match(style.line,/underline/);assert.match(style.line,/line-through/);assert.notEqual(style.background,'rgba(0, 0, 0, 0)');
  await select(editedText['포맷 본문']);await page.keyboard.press('Control+c');await select('번호 없는 주석');await page.keyboard.press('Control+v');
- const pasted=await snapshot(),margin=collect(pasted.root).find(n=>n.type==='tufte-note'&&n.noteId==='server-margin');assert.ok(margin.children.some(n=>n.type==='text'&&n.text===editedText['포맷 본문']&&n.format===140));
+ const pasted=await snapshot(),margin=collect(pasted.root).find(n=>n.type==='tufte-marginnote'&&n.noteId==='server-margin');assert.ok(margin.children.some(n=>n.type==='text'&&n.text===editedText['포맷 본문']&&n.format===140));
  assert.deepEqual(errors,[]);console.log('R10: body/note/link format bits, combinations, toggle off/on, undo/redo, edit, reopen, combined CSS and semantic publication passed.');
 }finally{await browser.close();server?.kill();}

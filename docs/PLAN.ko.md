@@ -10,6 +10,67 @@
 
 기능 구현 순서는 **예제 DOM 대응 확인 → schema 계약 → Lexical 편집/경계 → 순수 renderer HTML → fixture 작성 → 누적 실행 검증**으로 한다. 기본 Lexical 키 입력을 재구현하기보다 문서 schema를 위반할 수 있는 경계에서만 가로채고, 붙여넣기·IME·undo/redo·저장/발행은 동일 불변식을 검사한다. 사용자 요청에 따라 현재 테스트는 작성·누적하고 일괄 실행하기 전까지 관련 체크박스를 완료 처리하지 않는다. 공식 예제의 지원 범위와 제3자 임의 HTML의 지원 범위는 구분한다.
 
+## 2026-10-22 실제 코드 리뷰 보완 체크리스트
+
+[**CR01–CR08 — 현재 코드 리뷰 후속 수정 및 누적 검증**](CODE_REVIEW_REMEDIATION_2026-10-22.ko.md)를
+독립 체크리스트로 관리한다. 해당 문서의 체크박스는 **맨 끝**에 있으며
+실제 검사 통과 전에는 완료 표시하지 않는다.
+
+- 코드 수정: node registry freeze, renderer/asset/SQLite 발행 오류 분류,
+  schema↔render switch/profile 정합성, React-free HorizontalRule 및
+  의존성/lockfile, 모바일 note의 이름/키보드 접근성, Lexical 버전별 golden
+  보전 및 회귀를 포함한다.
+- 공식 원본과 구조적 동일성 목표는 유지한다. 현대화는 기존 Figures iframe 및
+  note input `aria-label`의 **명시적 예외**로 제한하며 원본 fixture를 바꾸지 않는다.
+- Lexical 업그레이드 수락 조건은
+  [호환성/마이그레이션 정책](LEXICAL_UPGRADE_POLICY.ko.md)을 따른다.
+  `UNKNOWN_FIELD`와 `LEXICAL_IMPORT_LOSSY` 실패 경계는 유지한다.
+- 상태: 코드/테스트/문서 커밋 중, **신규 일괄 검증 미실행**. 기존 Work 통과를
+  최신 변경의 통과 증거로 사용하지 않는다. CI 생략.
+- 우선순위: 이 보완점은 새 기능을 넓히기 위한 것이 아니라 기존 P2의
+  안전성·확장성 전제이며, 이후 9개 섹션 단일 문서 통합으로 돌아간다.
+  Recovery host(P5) 및 Wagtail asset 구현은 별도 후순위다.
+
+## 고정 upstream 9개 섹션 동일 콘텐츠 진행표 (2026-10-22)
+
+[섹션별 동일 콘텐츠 DOM 추적표](UPSTREAM_PAGE_PARITY_MATRIX.ko.md)를 기준으로 진행한다.
+2026-10-19 Work 결과는 기존 두 섹션(Opening, Getting Started)과 독립
+newthought 샘플에 한해 동일 콘텐츠 DOM 검증을 완료했다.
+이후 **Fundamentals, Epigraphs, Sidenotes, Figures, Code, ImageQuilts, Epilogue**
+총 7개 섹션의 동일 콘텐츠 비교 테스트를 추가했다.
+즉 **9/9 섹션의 단독 오라클 코드가 작성**되었으나, 새 7개 테스트의
+실제 Work 실행·검증은 아직 대기 상태다. 코드 작성을 DOM parity 통과로 표시하지 않는다.
+
+Figures의 iframe은 사용자 결정에 따라 **현대적인 접근성/보안 속성은 유지하면서
+`figure.iframe-wrapper > iframe` CSS 계층을 보존**한다. 원본의 오래된
+`frameborder`·YouTube 호스트 및 설명용 코드 한 곳만 엄격한 현대화 예외로
+허용한다([ADR 0003](adr/0003-modern-iframe-upstream-parity.ko.md)).
+원본 CSS의 16:9 예약 공간과 임의 저장 intrinsic 비율은 구별한다.
+
+`pnpm test:upstream-same-content`가 9개 섹션의 비교 파일을 실행하고,
+`pnpm verify:batch` 또한 전체 브라우저 파일을 자동 발견한다.
+기존 69/69 검증은 신규 코드 이전의 결과이므로 재실행 전 상태를 혼동하지 않는다.
+원본 9개 섹션을 하나의 Lexical 문서로 묶는
+`tests/helpers/pinned-upstream-article.mjs` 재구성기와
+`tests/upstream-full-document-roundtrip-browser.mjs`의
+**60블록/7노트 전체 문서 v1→v2·Lexical 저장→재열기→발행·문장 수정 후 재발행 오라클 코드를 추가했다.**
+이 코드는 `pnpm test:upstream-same-content`와 batch에 등록됐으나 **실행되지 않았다**.
+실제 편집기 키 입력/undo, 전체 페이지 이미지·폰트·스크린샷 parity도 아직 미완료다.
+과거 공식 `h1#tufte-css` ID 누락은 P2.2.e.4의 `titleId`
+계약으로 수정했으나 실행 검증은 여전히 대기한다. CI 생략.
+
+## Wagtail 참고 범용 에셋 라이브러리 (2026-10-20)
+
+이미지뿐 아니라 PDF·일반 첨부파일·오디오·동영상까지 관리하기 위한
+[**에셋 라이브러리 설계 및 A0–A8 체크리스트**](ASSET_LIBRARY_WAGTAIL_PLAN.ko.md)를
+별도 실행 계획으로 둔다. [**Wagtail 공식 문서/소스 독립 4차 교차 검증 및 R1–R12 수락 기준**](ASSET_LIBRARY_WAGTAIL_CROSS_REVIEW_2026-10-20.ko.md)을 반영했다. Wagtail의 중앙 라이브러리·검색/업로드 chooser·태그/컬렉션·사용처·파생 이미지 UX를
+참고하지만 Wagtail/Django 의존성을 추가하지 않는다.
+
+현재 `AssetRef`는 이미지 전용 메타데이터이며 실제 파일 업로드/라이브러리/범용 바이너리 저장 구현은 없다.
+새 계획은 파일 저장과 문서 표현을 분리하고, immutable 파일 버전 및 발행 스냅샷 참조를 기본으로 한다.
+**계획 작성과 독립 검토만 완료**, 실제 A0–A8의 38개 구현·검증 체크리스트 및 교차 검증 R1–R12 게이트는 모두 미완료. 구형 `tufte-note` 문서 호환성 정책은 바꾸지 않는다.
+기존 Tufte CSS 전체 샘플 재현 검증과 에셋 개발 수락 기준을 서로 혼동하지 않는다.
+
 ## 목표와 완료 정의
 
 Lexical로 Tufte CSS의 모든 표현을 구조적으로 작성·수정하고, 같은 문서를 미리보기·HTML 발행·블로그 운영에 사용하는 재사용 라이브러리를 만든다. 최종 산출물은 편집기, 독립 렌더러, 블로그 코어와 저장소 어댑터, 실제 운영 가능한 예제 블로그, 문서 및 배포 패키지다.
@@ -178,8 +239,106 @@ P1 gate: 완료. 노트 편집 회귀와 SSR 출력의 실제 브라우저 비�
     - [ ] P2.2.d.1 `NODE_SCHEMA`에서 허용되는 타입/속성과 editor import/export 및 순수 renderer capability를 기능별 매트릭스로 대조한다. 구현하지 않은 속성은 침묵 변환 대신 진단·발행 차단.
     - [ ] P2.2.d.2 F01–F09 대표/거부 fixture에 대해 편집→JSON 저장→재열기→HTML 발행→semantic DOM 비교를 실행하고 명령별 history/IME/접근성 증거를 남긴다.
   - [ ] P2.2.e 공식 Tufte CSS 1.9.0 고정 예제 `index.html`의 의미 있는 DOM 요소·부모/자식·순서·CSS direct-child 관계를 전수 대조한다. `fixtures/tufte/inventory.json`의 selector 목록과 별개로 예제 DOM → F01–F22 → 문서 schema → Lexical node/command → 순수 renderer HTML의 대응표와 대표/거부 fixture를 작성한다. 한 논리 노드가 여러 HTML 요소로 출력되는 note처럼 1:n 관계를 명시하고, 비지원·의도적 차이는 진단/ADR에 남긴다. **P2.2의 기능별 수락 전에 대응표의 관련 행을 먼저 확인한다.**
+  - [ ] P2.2.e.1 **전체 9섹션 단일 문서 동일 콘텐츠 오라클**: upstream 고정 HTML에서
+    9섹션·60블록·7노트를 무손실 구성하고 v1→v2·Lexical 저장·재열기,
+    전체 렌더링 DOM·문장 단일 수정 후 재발행·6폭 iframe CSS geometry를
+    비교한다. [재구성/전체 DOM 추적표](UPSTREAM_PAGE_PARITY_MATRIX.ko.md).
+    **테스트 작성 및 명령 등록, 일괄 실행 전 미완료**.
+  - [ ] P2.2.e.2 **실제 편집 동작 수락**:
+    `tests/upstream-full-document-editor-browser.mjs`에 공식
+    9섹션 문서를 React editor로 불러와 본문 실제 키보드 수정·
+    undo/redo→로컬 저장/재열기→변경하지 않은 8섹션과 note/figure/iframe
+    HTML 무손실을 검사하는 코드를 추가했다.
+    **실행 검증 전 미완료**이며 이 1개 문장의 실제 입력 테스트가
+    note/figure 각자의 사용자 편집 명령/IME/접근성을 전부 보증하지 않는다.
+    JSON 필드 1개를 직접 바꾸는 통합 fixture 테스트는 실제 키보드 검증이 아니다.
+  - [ ] P2.2.e.3 **완전 시각 비교**: 공식 이미지·폰트 파일을 재현성 있게 제공한
+    환경에서 모든 섹션의 geometry·이미지 로딩·Source Han/ET Book 폰트·
+    screenshot pixel 결과를 폭별 비교하고 P4.3에 증거를 남긴다.
+    **준비 코드(미검증, 2026-10-22):** `assets-manifest.json`에 5 PNG/4 WOFF
+    원본 blob을 고정하고 `scripts/sync-upstream-visual-assets.mjs` 및
+    `tests/upstream-full-document-visual-browser.mjs`를 작성했다.
+    동일한 9섹션 원본/발행본에 로컬 파일을 제공하여 이미지 decode·
+    FontFace 로드·6폭 geometry를 비교하고, 선택적으로 screenshot 쌍을 남긴다.
+    RGBA pixel diff(마스크 밖 불일치 0개) 및 비교기 자체 반례 코드를
+    추가했다. 공식 iframe 예제 설명 코드 1곳만 원문을 확인한 뒤 비교용
+    브라우저 DOM에서 현대화하며 원본 파일은 그대로 둔다. iframe viewport
+    교집합 하나만 마스킹하고 면적은 전체 화면의 25% 미만이다.
+    **코드 작성 후 실행 대기**. 스크린리더·Source Han 검증은 별도다.
+    batch에서는 미설치 자산만 SKIP으로 보고하며, 존재하는 자산의 손상/해시 불일치는 FAIL로 보고한다.
+  - [ ] P2.2.e.4 **발행 제목 앵커 계약**: 공식 `h1#tufte-css`를
+    선택적 문서 `titleId`로 보존하기로 결정했다. 제품이 추가하는
+    article의 고유 namespace/class/lang는 별도의 명시적 차이로 유지한다.
+    h1 ID 누락은 DOM 비교의 허용 예외에서 제거했다.
+    **2026-10-22 코드 추가/실행 대기:** 정본에 선택적
+    `TufteDocument.titleId?:string`을 추가했다. 공식 `tufte-css` ID를
+    원본 재구성→v1/v2 migration→실제 Lexical import/export→HTML 발행에
+    전달한다. 부적절한 ID·heading ID·발행 namespace에서 생성하는 ID와
+    충돌하면 거부한다. 기존 titleId 없는 문서는 출력 불변.
+    신규 문서/렌더/bridge 회귀와 통합 DOM 오라클은 작성했으나 미실행.
+
 - [ ] P2.3 F10–F19 노트·그림·표·코드·embed 구현.
   - [ ] P2.3.a 노트 F10–F12: note 종류 전환/텍스트·이미지 편집/삭제/이동, anchor/ID 일체성, copy/paste/undo/redo, 복수 article 번호와 모바일 fallback.
+    - [ ] P2.3.a.1 **본문 노트 삭제·전환(후순위 편의 기능)**: `registerNoteCommands`와
+      `SET_TUFTE_NOTE_KIND_COMMAND` / `REMOVE_TUFTE_NOTE_COMMAND`를
+      추가했다. 문단 안에 선택된 하나의 노트만 대상으로 하며,
+      전환 시 noteId·서식/링크/이미지 자식 Lexical 노드를 이동해 유지한다.
+      그림 내부 주석, 본문 밖 선택, IME 조합 시 요청은 거부한다.
+      예제 편집기에 버튼 3개 연결, headless/document/render/history
+      회귀 코드 작성. **빌드/테스트 전이므로 수락 미완료**.
+    - [ ] P2.3.a.2 **기존 노트 이미지 속성 편집**: `UPDATE_TUFTE_NOTE_IMAGE_COMMAND`로
+      노트 안의 하나의 선택된 이미지의 URL·alt를 수정한다.
+      단일 이미지 노트의 collapsed caret 또는 정확한 image node selection만 지원하고,
+      여러 이미지의 모호한 선택은 거부한다. managed assetId를 유지한 채 다른
+      src로 바꾸거나 명시된 width/height를 갖는 이미지의 src를 검증 없이 바꾸는
+      요청도 진단하고 거부한다. 기존 노트 종류·ID·주변 서식·링크/형제는 보존한다.
+      React prototype에 이미지 URL/대체 텍스트 버튼 2개를 연결하고
+      Lexical/문서/순수 renderer 회귀를 추가했다. **실행 전 수락 미완료**.
+    - [ ] P2.3.a.3 **노트 이미지 대상 선택 UI**: 현재 노트의
+      이미지만 나열하는 `$listSelectedTufteNoteImages`와 정확한 이미지
+      선택 명령 `SELECT_TUFTE_NOTE_IMAGE_COMMAND`를 추가했다.
+      단일/복수 이미지를 alt·URL·순서로 구분하는 `role=group`
+      선택 패널과 키보드 초점/취소·375px 반응형 스타일을 작성했다.
+      대상은 편집 세션 내 noteId+noteKey+nodeKey로 확인하므로
+      다른 노트·삭제된 이미지·진행 중 변경으로 오래된 키가 되면 거부한다.
+      headless target/reject·발행 및 브라우저 선택→수정→저장/재열기
+      회귀 코드 작성. **실행 전 미완료**.
+    - [ ] P2.3.a.4 **노트 관리 자산/크기 변경**:
+      `registerNoteAssetCommands(editor,getAssets,onDiagnostic)`로
+      호스트 문서의 정본 `assets`를 읽는다. 관리 자산 연결·교체는
+      `assetId` 페이로드만 허용하며 동일한 자산 레코드에서
+      `src/width/height`를 가져와 노드를 원자적으로 교체한다.
+      자산 연결 해제 시 현재 이미지 URL/alt/치수는 유지한다.
+      변경할 폭·높이는 양의 안전 정수, `null`은 선택 필드 해제.
+      문서 스키마의 자산 URL/치수 일치 규칙을 사전 검사하여
+      미존재/중복 ID·유효하지 않은 목록·치수 충돌을 거부한다.
+      순수 renderer에서 일반 inline 이미지의 명시적 width/height만
+      HTML 속성으로 출력하며 생략된 원본 문서 출력은 불변.
+      headless undo/redo·스키마/발행·브라우저 저장/복원 코드 작성.
+      prototype에는 비관리 이미지 크기 UI만 노출하며
+      관리 자산 연결 UI는 문서 envelope `assets` 연동 후 구성한다.
+      **실행 전 수락 미완료**.
+    - [ ] P2.3.a.5 **정본 문서의 자산 목록을 예제 GUI에 연결**:
+      별도 `managedDocument.ts` 경계에서 `schemaVersion:1`의
+      본문·assets를 함께 검증한다. URL 참조 자산의 ID/MIME/선택적
+      원본 크기를 등록하고, 한 노트 이미지에 관리 자산을 지정하거나
+      연결을 해제하는 버튼을 제공한다. 정본 `assets`의 동일한
+      메모리 스냅샷을 `registerNoteAssetCommands`, 순수 렌더러,
+      단일 `lexical-tufte-p1-document` 저장 키가 참조한다.
+      기존 빈 자산 JSON 흐름은 `lexical-tufte-p1`을 유지하며
+      새로운 단일 저장본 우선 복원에 실패하면 구버전 저장본으로
+      조용히 fallback하지 않는다. 자동 복구본에도 관리 자산 목록을
+      함께 기록하고 복원 전 검사한다. 기존 렌더러의 pure
+      `renderArticle`을 연결하여 자산 문서 발행 시 정본 HTML을
+      사용한다. 브라우저 등록/중복 거부/이미지 연결/원자적 저장/
+      재열기/손상된 저장본 거부/복구본 및 레거시 호환 테스트 작성.
+      **설치·타입·빌드·브라우저 수락 전이므로 미완료**.
+    - [ ] P2.3.a.6 **다음 범위**: 실제 파일 업로드 및 자산
+      생명주기/삭제·치환·원본 크기 확인, 편집기 전반의 정본
+      document 저장 체계 통일, 노트 ID 기반 선택·이동 UI,
+      실제 모바일·스크린리더·IME·복수 article 번호 수락.
+      종류 전환은 비필수 편의 기능으로 prototype toolbar에서
+      제외했다(내부 명령만 유지).
   - [ ] P2.3.b 그림·ImageQuilts F13/F14/F19: src/alt/caption/asset ID 수정 및 body/fullwidth/여백 변환, 자산 유실·삭제 시 진단, schema 유효성 보존.
   - [ ] P2.3.c 표/전체 폭 F15/F16: 셀·헤더·행/열 편집, 스크롤/폭 전환, 병합 거부와 접근 가능한 설명, 좁은 화면 overflow.
   - [ ] P2.3.d 코드/embed F17/F18: code block·language·fullwidth·공백/탭 및 embed의 provider allowlist/title/aspect ratio/서식 편집. 외부 HTML/sanitization 정책과 통합.
@@ -215,7 +374,7 @@ P2 gate: F01–F19의 데이터 보존 및 구조 검증 통과. 편집·시각 
 - [ ] P3.3 동일 렌더러로 preview, draft 복구·dirty state·오류 표시.
   - [ ] P3.3.a `renderArticle` 정본 결과를 독립 sandbox/격리 스타일의 preview로 보여 주고 발행 실패 진단을 위치·원인과 연결한다. JSON/HTML 텍스트 표시를 실제 미리보기로 오인하지 않는다.
   - [ ] P3.3.b 로컬 복구본 목록·선택적 복원·복원 전 diff/확인, dirty/saving/saved/error/conflict 표시와 navigate-away 보호, 비공개 draft 및 최종 공개 snapshot 분리를 검증한다.
-- [ ] P3.4 assets 업로드/진행/취소/실패 재시도, alt/caption, 본문/여백/전체 폭 전환.
+- [ ] P3.4 assets 업로드/진행/취소/실패 재시도, alt/caption, 본문/여백/전체 폭 전환. 상세 단계/완료 조건: [에셋 계획 A0–A4](ASSET_LIBRARY_WAGTAIL_PLAN.ko.md).
   - [ ] P3.4.a `AssetStore` 어댑터와 브라우저 임시 blob/외부 URL/저장 asset ID의 소유권·중복 제거·미참조 회수 기준을 명시한다. 업로드 실패 시 공개본 참조 보호, 취소 후 복구·재시도를 검증한다.
   - [ ] P3.4.b 파일 MIME 매직바이트·크기 제한·SVG 정책·alt 필수/장식 이미지·캡션 수정/삭제를 테스트하고 외부 URL과 호스트 인증 경계를 유지한다.
 - [ ] P3.5 노트의 모바일 작성 UI는 항상 접근 가능하게 제공; 독자용 접힘 상태와 구분.
@@ -236,7 +395,7 @@ P4 gate: F01–F22 완료 증거 확보, 공개 페이지에 editor dependency�
 
 ### P5 — 블로그 운영 라이브러리 (P4 이후)
 
-- [ ] P5.1 filesystem repository와 asset adapter, 원자적 저장·revision 충돌·초안 복구.
+- [ ] P5.1 filesystem repository와 asset adapter, 원자적 저장·revision 충돌·초안 복구. 범용 바이너리 저장 및 버전/사용처 계약: [에셋 계획 A1/A5/A6](ASSET_LIBRARY_WAGTAIL_PLAN.ko.md).
   - [ ] P5.1.a `packages/adapter-fs` 구현: fsync/원자 rename·expectedRevision CAS·경로/slug 중복·삭제/정리 오류·동시 프로세스 쓰기·복구/백업·Windows 파일명 경계를 테스트한다.
   - [ ] P5.1.b `packages/blog`의 현 SQLite publication/recovery proof를 실제 호스트 저장소 어댑터와 연결하되 공개 snapshot·초안·편집 세션·복구본 데이터 소유권 및 retention/삭제 규칙을 분리한다.
 - [ ] P5.2 create/edit/preview/publish/update/unpublish/delete; 공개 snapshot과 초안 분리.
@@ -244,7 +403,7 @@ P4 gate: F01–F22 완료 증거 확보, 공개 페이지에 editor dependency�
 - [ ] P5.4 SEO title/description/canonical/Open Graph, RSS/Atom·sitemap·robots, HTML escape.
 - [ ] P5.5 정적 build, 콘텐츠/자산 누락 검출, 백업·복원 및 포맷 내보내기.
 - [ ] P5.6 호스트가 인증/권한/CSRF/배포를 책임지는 경계 문서화; 예제 관리 API는 인증 또는 로컬 전용으로 제한.
-- [ ] P5.7 업로드 MIME/크기 제한·path traversal 방지·URL protocol allowlist·embed provider 정책·SVG 처리·XSS 회귀 검증.
+- [ ] P5.7 업로드 MIME/크기 제한·path traversal 방지·URL protocol allowlist·embed provider 정책·SVG 처리·XSS 회귀 검증. 종류별 파일 정책 및 다운로드 권한: [에셋 계획 A2/A8](ASSET_LIBRARY_WAGTAIL_PLAN.ko.md).
 - [ ] P5.8 `examples/blog` 소비자 예제로 문서 생성→편집→preview→publish→update→unpublish→restore→delete·검색/목록을 실제 경로로 연결한다. 공개 라우트는 편집 의존성, 초안·복구본·인증 비밀 누출 금지. 호스트의 인증·ACL·Origin/CSRF와 recovery 서비스 연결 책임을 문서화한다.
 
 P5 gate: 실제 예제 블로그에서 작성→발행→수정→비공개→복원 및 revision 충돌 시나리오 통과.

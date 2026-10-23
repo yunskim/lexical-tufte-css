@@ -1,0 +1,54 @@
+{
+  "pinnedCommit": "b5d7b7bbe5ce9c4c50fcfad4f19ee3646cfd7ae1",
+  "sourceRepository": "edwardtufte/tufte-css",
+  "note": "Unmodified upstream binary objects, pinned to their Git blob SHA-1. Download only for local visual tests; generated binaries are gitignored.",
+  "images": [
+    {
+      "path": "img/exports-imports.png",
+      "size": 804996,
+      "gitBlobSha": "0857266b00c91bf9caaceba7dc1a2e120687706c"
+    },
+    {
+      "path": "img/rhino.png",
+      "size": 527896,
+      "gitBlobSha": "86167008bbe62e3323f94e09da8fbb6a43a05465"
+    },
+    {
+      "path": "img/napoleons-march.png",
+      "size": 399321,
+      "gitBlobSha": "1502c7e3a04dc41d561166c710a2e4d4dd186d51"
+    },
+    {
+      "path": "img/imagequilt-chinese-calligraphy.png",
+      "size": 424264,
+      "gitBlobSha": "74a4245740b247741cfae3db9e198dd2552ac6a9"
+    },
+    {
+      "path": "img/imagequilt-animal-sounds.png",
+      "size": 204461,
+      "gitBlobSha": "8d81563bfaa32797bdd9c2131fa8fadff87717a4"
+    }
+  ],
+  "fonts": [
+    {
+      "path": "et-book/et-book-roman-line-figures/et-book-roman-line-figures.woff",
+      "size": 44016,
+      "gitBlobSha": "440ae0447d86d8477101cdf1a6d1bb8672565cea"
+    },
+    {
+      "path": "et-book/et-book-display-italic-old-style-figures/et-book-display-italic-old-style-figures.woff",
+      "size": 43780,
+      "gitBlobSha": "b0e5b68da0a88bb56232c764231d3a5a3a93f2a6"
+    },
+    {
+      "path": "et-book/et-book-bold-line-figures/et-book-bold-line-figures.woff",
+      "size": 45364,
+      "gitBlobSha": "c6685a143d49ee75d27a48e679606895696e84f6"
+    },
+    {
+      "path": "et-book/et-book-roman-old-style-figures/et-book-roman-old-style-figures.woff",
+      "size": 43900,
+      "gitBlobSha": "10eb3366f263fc36780047ffde837a3bd7b2d485"
+    }
+  ]
+}

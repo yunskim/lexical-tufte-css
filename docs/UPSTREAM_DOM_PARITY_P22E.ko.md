@@ -1,4 +1,15 @@
-# 공식 Tufte CSS 데모 DOM 대응표 — P2.2.e (초안)
+# 공식 Tufte CSS 데모 DOM 대응표 — P2.2.e (역사적 초안)
+
+> **현재 정본이 아님 (2026-10-22)**. 이 문서는 당시의 `tufte-note`
+> wrapper·newthought 분할 불가 등 해결 전 문제를 기록한 검토 초안이다.
+> 2026-10-19 이후 구현에서 발행 노트는 직접 `label + input + span`,
+> newthought 직전인 sidenote는 분할 부모 변환을 지원한다. 관련 unit/browser
+> 검사는 작성되었으며 이전 batch 범위는 별도 증거로 확인한다.
+> 현행 구현/미검증 상태는
+> [전체 섹션 대응표](UPSTREAM_PAGE_PARITY_MATRIX.ko.md),
+> [후속 수정 체크리스트](CODE_REVIEW_REMEDIATION_2026-10-22.ko.md),
+> [ADR-0001 현행 주석 보정](adr/0001-note-editor-model.ko.md)을 참고한다.
+> 아래 과거 판정 문장은 당시 상태의 기록이며 현행 미지원 목록이 아니다.
 
 기준: edwardtufte/tufte-css v1.9.0, commit `b5d7b7bbe5ce9c4c50fcfad4f19ee3646cfd7ae1`, `index.html`.
 고정 원본: `fixtures/tufte/upstream/index.html`. CSS selector 목록은 `fixtures/tufte/inventory.json`.
