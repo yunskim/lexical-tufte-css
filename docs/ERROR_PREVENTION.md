@@ -1,5 +1,18 @@
 # 재발 방지 대책 및 정기 점검
 
+## M102 — 원본 DOM을 비교할 때 wrapper 및 텍스트의 의미적 추가를 금지
+
+- E111: Lexical 내부 노드 모델과 출력 HTML은 분리한다. 노트는 직접 `label + input + span` 형제이며, 인접 `newthought + sidenote`만 label을 앞 span 자식으로 이동한다. 타입 변환 UI나 저장 JSON 필드 변경으로 문제를 해결하지 않는다.
+- 정규 표현식만으로 구조를 단정하지 말고 browser DOMParser로 실제 부모·형제·`for/id`·payload 위치를 확인한다. 일반 prose의 공백은 고정 원본의 HTML 규칙을 사용하고 강제 pre-wrap을 추가하려면 별도 요구/검증을 확보한다.
+- 수정 후에도 전체 페이지 parity는 DOM, 모바일 toggle, 키보드 접근성, 원본 이미지·폰트 로딩 및 시각 스크린샷으로 별도 검증한다.
+
+## M103 — 숨김 컨트롤 접근성과 비어 있는 검사 대상 예방
+
+- E112: `display:none` 컨트롤을 `focus()`만 호출해 검증하지 않는다. 실제 문서에서 keyboard modality와 `document.activeElement`, 표시된 focus cue, Space 왕복을 확인한다. 라벨은 접근 가능한 이름과 연결 ID가 있어야 한다.
+- 선택자 교체 시 `querySelectorAll(...).every()` 이전에 최소 개수 및 각 요소 존재성을 검사한다. 오래된 wrapper 기반 테스트를 현재 구조에 맞춰 수정하되 기대 구조를 느슨하게 하지 않는다.
+- 원본 자체의 구조와 독립 fixture의 차이를 제품 결함이라고 기록하지 않고, 같은 콘텐츠 재구성 검증을 별도로 수행한다.
+
+
 ## 2026-10-23 main 시작·완료 점검
 
 AGENTS, E103/E104·M095/M096 및 기존 active-editor/fixture/타입 좁히기/출력 구조 대책을 확인했다. 시작 기준은 main c081546이며 기존 작업 브랜치와 분리된 worktree에서 실행했다. E105–E110/M097–M101을 설치·코드·테스트·결과 기록에 반영했다. check403/Python16/package5/HTTP 통과, browser19통과/15실패이며 E110을 유지한다. 다음 점검은 main의 schema/renderer/UI/asset helper 선별 통합 시작·완료 시 수행한다. CI 없음.
