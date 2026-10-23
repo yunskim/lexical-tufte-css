@@ -74,6 +74,12 @@ test('other adjacent notes and intervening text do not steal a newthought label'
  assert.match(result.html,/<span class="newthought">Another thought<\/span><label for="([^"]+)" class="margin-toggle">⊕<\/label><input id="\1"/);
 });
 
+test('published note focus cue supports ordinary and newthought split-parent labels',()=>{
+ const css=readFileSync(new URL('../styles.css',import.meta.url),'utf8');
+ assert.match(css,/label\\.margin-toggle:has\\(\\+ input\\.margin-toggle:focus-visible\\)/);
+ assert.match(css,/span\\.newthought:has\\(\\+ input\\.margin-toggle:focus-visible\\) > label\\.margin-toggle\\.sidenote-number/);
+});
+
 test('upstream margin toggles have matching labels and adjacent payloads',()=>{
  // Upstream attributes are not consistently ordered; parse both orderings.
  const inputs=[...upstream.matchAll(/<input\b[^>]*>/g)]
