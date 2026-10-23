@@ -1,5 +1,17 @@
 # 재발 방지 대책 및 정기 점검
 
+## M095 — node type 전환은 active fixture/golden/test까지 동시 감사
+
+- E103: 팩터리와 스키마를 바꾼 경우 호출부, 렌더러, 생성 스크립트, 저장 v1/v2 fixture, Lexical golden, 브라우저 assertion을 하나의 변경 단위로 점검한다.
+- `pnpm audit:notes`로 active 코드와 fixture의 `$createNoteNode`, `NoteKind`, 문자열 리터럴 `tufte-note`를 탐지한다. 레거시 문서 마이그레이션 및 그 명시적 테스트만 예외로 한다.
+- 자동 감사를 통과해도 golden 런타임 재생성/직렬화 일치를 증명한 것은 아니다. 전체 테스트에서 별도 확인한다.
+
+## M096 — 직렬화기 allowlist와 접근성 마크업 일치 검증
+
+- E104: 렌더러가 추가하는 HTML 속성은 `tree.ts` allowlist에서 허용되는지 같은 변경에서 확인한다. 필요한 속성만 허용하며 이벤트 핸들러 등 임의 속성은 거부한다.
+- note 발행 회귀에서 label/input/span 인접성, `for`/`id` 연결, `aria-label` 및 편집 전용 속성 부재를 확인한다. 렌더링 테스트 실행 전에는 검증 완료로 표시하지 않는다.
+
+
 2026-10-19 완료 점검: E102/M094의 escape 계층 대책과 독립 DOMParser 실행을 반영했다. check318개/Python16개/browser16개/package4개/실제HTTP 통과. 원본 section9/note7과 별도 발행 section1/note2를 같은 콘텐츠 전수 비교로 확대하지 않는다. 다음 구현 시작/완료와 baseline 변경 때 재점검한다.
 
 ## 2026-10-19 DOM 대조 시작 점검
