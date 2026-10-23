@@ -51,13 +51,20 @@ try {
  const before=await page.getByRole('textbox',{name:'문서 JSON',exact:true}).inputValue();
  const html=await page.getByRole('textbox',{name:'발행 HTML',exact:true}).inputValue();
  assert.match(html,/class="sidenote"/);assert.match(html,/code_test/);assert.match(html,/alt="프로토타입의 파란 막대 그림"/);
+ assert.doesNotMatch(html,/data-tufte-note=|tufte-note-editor/,
+  'Published notes must not leak obsolete wrappers or editor markup');
  const valid=await page.evaluate(html=>{
   const doc=new DOMParser().parseFromString(html,'text/html');
-  return [...doc.querySelectorAll('[data-tufte-note]')].every(n=>{
-   const [label,input,payload]=n.children;
-   return label?.tagName==='LABEL'&&input?.tagName==='INPUT'&&payload?.className==='sidenote'&&label.htmlFor===input.id;
+  const inputs=[...doc.querySelectorAll('input.margin-toggle[type="checkbox"]')];
+  // A missing wrapper must not make a vacuous .every() pass: check count first.
+  return inputs.length===2&&inputs.every(input=>{
+   const label=[...doc.querySelectorAll('label.margin-toggle')].find(label=>label.htmlFor===input.id);
+   const payload=input.nextElementSibling;
+   return !!input.id&&label===input.previousElementSibling&&
+    payload?.matches('span.sidenote')&&
+    input.getAttribute('aria-label')==='Toggle sidenote';
   });
- },html);assert.equal(valid,true,'export keeps adjacent label/input/payload');
+ },html);assert.equal(valid,true,'two notes retain adjacent label/input/payload and accessible names');
  await page.reload();await editor.waitFor();
  await page.getByRole('button',{name:'불러오기',exact:true}).click();
  await page.getByRole('button',{name:'JSON·HTML 확인',exact:true}).click();
