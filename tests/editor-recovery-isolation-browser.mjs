@@ -49,11 +49,13 @@ try {
  // Cancellation must not change either the editor or the canonical save.
  page.once('dialog',dialog=>dialog.dismiss());
  await button.click();
- await page.getByRole('status',{name:'편집 작업 상태'}).filter({hasText:'복구본 선택을 취소했습니다.'}).waitFor().catch(()=>{});
  assert.doesNotMatch(await editor.innerText(),/RECOVERY-ONLY/);
  assert.equal(await page.evaluate(()=>localStorage.getItem('lexical-tufte-p1')),canonical);
  // Confirmation opens the recovery copy but does not implicitly save it.
- page.once('dialog',dialog=>dialog.accept(dialog.type()==='prompt'?'0':undefined));
+ page.once('dialog',dialog=>{
+  assert.equal(dialog.type(),'confirm');
+  dialog.accept();
+ });
  await button.click();
  await page.getByRole('status',{name:'편집 작업 상태'}).filter({
   hasText:'선택한 복구본을 열었습니다.'
@@ -78,13 +80,25 @@ try {
  await deleteButton.click();
  assert.equal(await page.evaluate(key=>localStorage.getItem(key),recoveryKey),stored,
   'Canceling recovery selection must preserve the recovery copy');
- page.once('dialog',dialog=>dialog.accept('0'));
- page.once('dialog',dialog=>dialog.dismiss());
+ page.once('dialog',dialog=>{
+  assert.equal(dialog.type(),'prompt');
+  dialog.accept('0');
+ });
+ page.once('dialog',dialog=>{
+  assert.equal(dialog.type(),'confirm');
+  dialog.dismiss();
+ });
  await deleteButton.click();
  assert.equal(await page.evaluate(key=>localStorage.getItem(key),recoveryKey),stored,
   'Declining the deletion confirmation must preserve the recovery copy');
- page.once('dialog',dialog=>dialog.accept('0'));
- page.once('dialog',dialog=>dialog.accept());
+ page.once('dialog',dialog=>{
+  assert.equal(dialog.type(),'prompt');
+  dialog.accept('0');
+ });
+ page.once('dialog',dialog=>{
+  assert.equal(dialog.type(),'confirm');
+  dialog.accept();
+ });
  await deleteButton.click();
  assert.equal(await page.evaluate(key=>localStorage.getItem(key),recoveryKey),null,
   'Confirmed deletion must remove the selected recovery copy');
