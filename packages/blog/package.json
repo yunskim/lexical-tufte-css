@@ -10,6 +10,10 @@
       "import": "./dist/index.js"
     },
     "./sql/001_publications_v1.sql": "./sql/001_publications_v1.sql",
+    "./publication-client": {
+      "types": "./dist/publicationHttpClient.d.ts",
+      "import": "./dist/publicationHttpClient.js"
+    },
     "./recovery-client": {
       "types": "./dist/recoveryClient.d.ts",
       "import": "./dist/recoveryClient.js"
