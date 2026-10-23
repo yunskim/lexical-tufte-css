@@ -329,3 +329,17 @@ test('F07 section footer citation publishes semantic footer and cite in order',(
  assert.equal(footer.replace(/<span class="tufte-pre-wrap">(.*?)<\/span>/gs,'$1'),'References: <cite>A published source</cite>');
  assert.equal(JSON.stringify(d),original);
 });
+
+test('host references render as non-navigable spans with escaped identifiers',()=>{
+ const d=fixture();
+ const paragraph=d.lexicalState.root.children[0].children[0];
+ paragraph.children.push({
+  type:'host-link',version:1,format:'',indent:0,direction:null,
+  reference:{namespace:'workspace',kind:'note',id:'note-123'},
+  children:[{type:'text',version:1,text:'Read note',format:0,detail:0,mode:'normal',style:''}]
+ });
+ const result=renderArticle(d);
+ assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+ assert.match(result.html,/<span class="tufte-host-link" data-host-reference="note-123" data-host-namespace="workspace" data-host-kind="note">/);
+ assert.doesNotMatch(result.html,/href="note-123"/);
+});
