@@ -30,20 +30,26 @@ try{
  await page.keyboard.press('Control+Home');
  await page.keyboard.press('Alt+ArrowDown');
  await page.getByRole('button',{name:'노트 이미지 삽입',exact:true}).click();
- assert.equal(await page.locator('[data-note-id="seed-note"] img').count(),1);
- const change=page.getByRole('button',{name:'노트 이미지 크기 수정',exact:true});
- const setSize=async(width,height)=>{
-  const answers=[width,height];
-  const handler=dialog=>{
-   assert.equal(dialog.type(),'prompt');
-   return dialog.accept(answers.shift());
-  };
-  page.on('dialog',handler);
-  try{await change.click();}finally{page.off('dialog',handler);}
-  assert.equal(answers.length,0,'Both dimension prompts were shown');
- };
- await setSize('320','240');
  const image=page.locator('[data-note-id="seed-note"] img');
+ assert.equal(await image.count(),1);
+ const open=async()=>{
+  await page.getByRole('button',{name:'노트 이미지 선택',exact:true}).click();
+  const dialog=page.getByRole('dialog',{name:'노트 이미지 선택'});
+  await dialog.waitFor();
+  return dialog;
+ };
+ let dialog=await open();
+ const set=async(width,height)=>{
+  await dialog.getByRole('textbox',{name:'너비 (px)'}).fill(width);
+  await dialog.getByRole('textbox',{name:'높이 (px)'}).fill(height);
+ };
+ await set('0','240');
+ await dialog.getByRole('button',{name:'이미지 변경 저장'}).click();
+ assert.match(await dialog.getByRole('alert').innerText(),/양의 정수/);
+ assert.equal(await image.getAttribute('width'),null,'Invalid dimensions must not mutate the note');
+ await set('320','240');
+ await dialog.getByRole('button',{name:'이미지 변경 저장'}).click();
+ assert.equal(await dialog.count(),0);
  assert.equal(await image.getAttribute('width'),'320');
  assert.equal(await image.getAttribute('height'),'240');
  await page.getByRole('button',{name:'JSON·HTML 확인'}).click();
@@ -63,15 +69,16 @@ try{
  assert.equal(await image.getAttribute('width'),'320');
  assert.equal(await image.getAttribute('height'),'240');
 
- // Empty values explicitly remove optional dimensions.
  await editor.click();
  await page.keyboard.press('Control+Home');
  await page.keyboard.press('Alt+ArrowDown');
- await setSize('','');
+ dialog=await open();
+ await set('','');
+ await dialog.getByRole('button',{name:'이미지 변경 저장'}).click();
  assert.equal(await image.getAttribute('width'),null);
  assert.equal(await image.getAttribute('height'),null);
  assert.deepEqual(errors,[]);
- console.log('Note image dimensions: set/restore/clear + publication assertions written.');
+ console.log('Note image properties UI: valid, invalid, restore and cleared dimensions covered.');
 }finally{
  await browser?.close();
  server?.kill();
