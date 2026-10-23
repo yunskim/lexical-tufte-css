@@ -71,10 +71,10 @@ test('publication output has no inline style and uses scoped CSS classes',()=>{
  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
  assert.doesNotMatch(result.html,/\\sstyle=/);
  assert.match(result.html,/class="tufte-article/);
- assert.match(result.html,/class="tufte-pre-wrap"/);
+ assert.doesNotMatch(result.html,/class="tufte-pre-wrap"/);
  const css=readFileSync(new URL('../styles.css',import.meta.url),'utf8');
  assert.match(css,/counter-reset: sidenote-counter/);
- assert.match(css,/white-space: pre-wrap/);
+ assert.doesNotMatch(css,/\.tufte-pre-wrap/);
 });
 
 test('table column headers use thead and preserve tbody and scope',()=>{
@@ -108,14 +108,14 @@ test('R10 underline, strike and highlight compose without losing text',()=>{
   text.format=flag;
   const result=renderArticle(d);
   assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
-  assert.match(result.html,new RegExp('<'+tag+'><span class="tufte-pre-wrap">'));
-  assert.match(result.html,new RegExp('</span></'+tag+'>'));
+  assert.match(result.html,new RegExp('<'+tag+'>'));
+  assert.match(result.html,new RegExp('</'+tag+'>'));
  }
  const d=fixture();note(d).children[0].format=4|8|128;
  const combined=renderArticle(d);
  assert.equal(combined.ok,true,JSON.stringify(combined.diagnostics));
- assert.match(combined.html,/<mark><u><s><span class="tufte-pre-wrap">/);
- assert.match(combined.html,/<\/span><\/s><\/u><\/mark>/);
+ assert.match(combined.html,/<mark><u><s>/);
+ assert.match(combined.html,/<\/s><\/u><\/mark>/);
 });
 
 test('P2.2 F02-F09 headings, lists, definitions and quotations render semantically',()=>{
@@ -326,7 +326,7 @@ test('F07 section footer citation publishes semantic footer and cite in order',(
  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
  const footer=result.html.match(/<footer>(.*?)<\/footer>/s)?.[1];
  assert.ok(footer);
- assert.equal(footer.replace(/<span class="tufte-pre-wrap">(.*?)<\/span>/gs,'$1'),'References: <cite>A published source</cite>');
+ assert.equal(footer,'References: <cite>A published source</cite>');
  assert.equal(JSON.stringify(d),original);
 });
 
