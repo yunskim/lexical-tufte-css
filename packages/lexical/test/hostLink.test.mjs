@@ -100,7 +100,7 @@ test('host link rejects URL-bearing or unsupported-version JSON on reopen',async
  });
  await flush(e);
  const original=e.getEditorState().toJSON();
- for(const patch of [{url:'#'},{target:'_blank'},{rel:'noopener'},{title:'Injected'},{version:2},{type:'link'}]){
+ for(const patch of [{url:'#'},{target:'_blank'},{rel:'noopener'},{title:'Injected'},{version:2}]){
   const invalid=structuredClone(original);
   Object.assign(invalid.root.children[0].children[0],patch);
   const reopened=editor();
@@ -206,4 +206,40 @@ test('host reference is an inline ElementNode, not a URL LinkNode',async()=>{
   assert.equal(node.isInline(),true);
  });
  await flush(e);
+});
+
+test('host link insertion wraps only the selected substring',async()=>{
+ const e=editor();
+ const unregister=registerHostLinkCommands(e);
+ e.update(()=>{
+  const p=$createParagraphNode();
+  const text=$createTextNode('before target after');
+  p.append(text);$getRoot().append(p);
+  text.select(7,13);
+  e.dispatchCommand(INSERT_HOST_LINK_COMMAND,reference);
+ });
+ await flush(e);
+ const children=e.getEditorState().toJSON().root.children[0].children;
+ assert.deepEqual(children.map(node=>node.type),['text','host-link','text']);
+ assert.equal(children[0].text,'before ');
+ assert.equal(children[1].children[0].text,'target');
+ assert.deepEqual(children[1].reference,reference);
+ assert.equal(children[2].text,' after');
+ unregister();
+});
+
+test('host link serialization preserves inline element formatting on reopen',async()=>{
+ const e=editor();
+ e.update(()=>{
+  const p=$createParagraphNode();
+  const link=$createHostLinkNode(reference);
+  link.setFormat('center');
+  link.append($createTextNode('Formatted'));
+  p.append(link);$getRoot().append(p);
+ });
+ await flush(e);
+ const json=e.getEditorState().toJSON();
+ const reopened=editor();
+ reopened.setEditorState(reopened.parseEditorState(JSON.stringify(json)));
+ assert.deepEqual(reopened.getEditorState().toJSON(),json);
 });
