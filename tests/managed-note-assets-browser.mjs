@@ -118,6 +118,19 @@ try{
 
  await page.reload();
  await editor.waitFor();
+ // A fresh legacy editor must not silently delete an existing managed snapshot.
+ await editor.click();
+ await page.keyboard.press('Control+Home');
+ await button('본문을 섹션으로 묶기').click();
+ page.once('dialog',dialog=>{
+  assert.equal(dialog.type(),'confirm');
+  void dialog.dismiss();
+ });
+ await button('저장').click();
+ assert.match(await page.getByRole('status',{name:'편집 작업 상태'}).innerText(),
+  /기존 관리 문서 저장본을 유지/);
+ assert.equal(await page.evaluate(()=>localStorage.getItem('lexical-tufte-p1-document')),
+  originalSnapshot);
  await button('불러오기').click();
  assert.match(await page.getByRole('status',{name:'편집 작업 상태'}).innerText(),/함께 불러왔습니다/);
  assert.match(await catalog.innerText(),/문서 자산 1개/);
