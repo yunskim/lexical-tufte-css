@@ -3,6 +3,11 @@ import {mountReferencePicker,type ReferenceProvider} from '@lexical-tufte/editor
 import {INSERT_HOST_LINK_COMMAND,registerHostLinkCommands} from './hostLinkCommands.js';
 import {HostLinkNode} from './HostLinkNode.js';
 
+/** Compare document payload only; selection and editor-state identity are not document edits. */
+export function hasDocumentChanged(current:unknown,previous:unknown):boolean{
+ return JSON.stringify(current)!==JSON.stringify(previous);
+}
+
 export type HostLinkPickerOptions={
  editor:LexicalEditor;
  container:HTMLElement;
@@ -16,7 +21,6 @@ export function mountHostLinkPicker({editor,container,provider,onError}:HostLink
  const unregister=registerHostLinkCommands(editor);
  let saved:RangeSelection|null=null;
  let selectedText:string|null=null;
- let capturedState:ReturnType<LexicalEditor['getEditorState']>|null=null;
  let selectionGeneration=0;
  let disposed=false;
  const capture=()=>{
@@ -27,7 +31,6 @@ export function mountHostLinkPicker({editor,container,provider,onError}:HostLink
    const node=selection.anchor.getNode();
    if($isTextNode(node)&&node.isSimpleText()){
     saved=selection.clone();
-    capturedState=editor.getEditorState();
     selectionGeneration++;
     selectedText=node.getTextContent().slice(Math.min(selection.anchor.offset,selection.focus.offset),Math.max(selection.anchor.offset,selection.focus.offset));
    }
@@ -38,8 +41,8 @@ export function mountHostLinkPicker({editor,container,provider,onError}:HostLink
   if(disposed||!saved)return;
   // Selection-only changes caused by focusing the picker must not invalidate the snapshot.
   // Actual document edits invalidate it, even when the selected text happens to match.
-  if(JSON.stringify(editorState.toJSON().root)!==JSON.stringify(prevEditorState.toJSON().root)){
-   saved=null;selectedText=null;capturedState=null;selectionGeneration++;
+  if(hasDocumentChanged(editorState.toJSON().root,prevEditorState.toJSON().root)){
+   saved=null;selectedText=null;selectionGeneration++;
   }
  });
  const detach=mountReferencePicker({
@@ -49,7 +52,6 @@ export function mountHostLinkPicker({editor,container,provider,onError}:HostLink
    const selected=saved.clone();
    const expectedText=selectedText;
    const generation=selectionGeneration;
-   if(!capturedState)return;
    editor.update(()=>{
     if(disposed||generation!==selectionGeneration)return;
     const anchor=selected.anchor.getNode();
@@ -64,5 +66,5 @@ export function mountHostLinkPicker({editor,container,provider,onError}:HostLink
    });
   }
  });
- return ()=>{disposed=true;saved=null;selectedText=null;capturedState=null;detach();unregisterUpdate();unregister();};
+ return ()=>{disposed=true;saved=null;selectedText=null;detach();unregisterUpdate();unregister();};
 }
