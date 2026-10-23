@@ -242,15 +242,15 @@ test('restore preserves original snapshot timestamps and last new-publication ti
  }finally{db.close();}
 });
 
-test('restore refuses a snapshot belonging to a different post',async()=>{
+test('restore rejects a target without an existing publication head',async()=>{
  const {db,store,id}=await setup();
  try{
   const first=ok(await store.publish(id,opts(1,0,'2026-10-16T01:00:00Z')));
   const result=await store.restorePublishedSnapshot('other-post',first.snapshotId,{
-   expectedGeneration:0,authorize:async()=>true,assetExists:async()=>true
+   expectedGeneration:1,authorize:async()=>true,assetExists:async()=>true
   });
   assert.equal(result.ok,false);
-  assert.ok(result.diagnostics.some(d=>d.code==='INVALID_PUBLICATION_INPUT'||d.code==='SNAPSHOT_POST_MISMATCH'));
+  assert.ok(result.diagnostics.some(d=>d.code==='PUBLICATION_CONFLICT'));
   assert.equal(ok(store.readState(id)).generation,1);
  }finally{db.close();}
 });
@@ -268,5 +268,38 @@ test('restore aborts when publication head changes during async asset preflight'
   assert.ok(result.diagnostics.some(d=>d.code==='PUBLICATION_CONFLICT'));
   assert.equal(ok(store.readState(id)).generation,2);
   assert.equal(ok(store.readState(id)).snapshotId,null);
+ }finally{db.close();}
+});
+
+test('restore rejects a valid snapshot from a different post when target head exists',async()=>{
+ const {db,store,post,id,drafts}=await setup();
+ try{
+  const first=ok(await store.publish(id,opts(1,0,'2026-10-16T01:00:00Z')));
+  const second=structuredClone(post);
+  second.document.id='other-post';
+  second.metadata.slug='other-publication';
+  ok(await drafts.insert(second));
+  ok(await store.publish(second.document.id,opts(1,0,'2026-10-16T01:00:00Z')));
+  const result=await store.restorePublishedSnapshot(second.document.id,first.snapshotId,{
+   expectedGeneration:1,authorize:async()=>true,assetExists:async()=>true
+  });
+  assert.equal(result.ok,false);
+  assert.ok(result.diagnostics.some(d=>d.code==='SNAPSHOT_POST_MISMATCH'));
+  assert.equal(ok(store.readState(second.document.id)).generation,1);
+ }finally{db.close();}
+});
+test('restore reports the committed state even when a later read changes',async()=>{
+ const {db,store,id}=await setup();
+ try{
+  const first=ok(await store.publish(id,opts(1,0,'2026-10-16T01:00:00Z')));
+  ok(store.unpublish(id,1));
+  const originalRead=store.readState.bind(store);
+  store.readState=()=>{throw new Error('unexpected post-commit read');};
+  const restored=ok(await store.restorePublishedSnapshot(id,first.snapshotId,{
+   expectedGeneration:2,authorize:async()=>true,assetExists:async()=>true
+  }));
+  store.readState=originalRead;
+  assert.equal(restored.generation,3);
+  assert.equal(restored.snapshotId,first.snapshotId);
  }finally{db.close();}
 });
