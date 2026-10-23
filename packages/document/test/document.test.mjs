@@ -42,6 +42,24 @@ test('malformed structures and unsupported versions fail with precise paths',()=
   [d=>note(d).children[0].future=true,'UNKNOWN_FIELD'],
  ]){const d=fixture();mutate(d);const r=validateDocument(d);assert.ok(has(r,code),JSON.stringify(r));assert.ok(r.diagnostics.every(x=>x.path.startsWith('$.')));}
 });
+test('E1 published heading anchors must remain unique across all nine sections',()=>{
+ const d=fixture();
+ d.titleId='tufte-css';
+ const first=el('heading',[text('Getting Started')],{tag:'h2',id:'getting-started'});
+ const second=el('heading',[text('Again')],{tag:'h3',id:'getting-started'});
+ d.lexicalState.root.children[0].children.push(first);
+ d.lexicalState.root.children.push(el('tufte-section',[second]));
+ const original=JSON.stringify(d);
+ const collision=validateDocument(d);
+ assert.ok(has(collision,'DUPLICATE_HEADING_ID'),JSON.stringify(collision));
+ assert.equal(collision.diagnostics.some(x=>x.path==='$.lexicalState.root.children[1].children[0].id'),true);
+ assert.equal(JSON.stringify(d),original,'Validation must not mutate either heading');
+ second.id='another-section';
+ assert.equal(validateDocument(d).ok,true,'Distinct heading anchors in separate sections are valid');
+ second.id=d.titleId;
+ assert.ok(has(validateDocument(d),'DUPLICATE_TITLE_ID'),'Heading IDs must not reuse the article title anchor');
+});
+
 test('managed images resolve declared assets, dimensions and duplicate identifiers',()=>{
  const d=fixture(),image=note(d).children[2];
  d.assets=[{id:'chart',src:image.src,mimeType:'image/svg+xml',width:800,height:400,byteLength:120,sha256:'a'.repeat(64)}];
