@@ -216,6 +216,25 @@
 - 실제 정본 문서 자산 목록을 보유한 GUI는 아직 연결되지 않았다.
   **빌드·단위·브라우저 테스트 실행 전**이며 P2.3.a.4 미수락.
 
+## P2.3.a.5 — GUI 관리 자산 등록에서 정본 저장까지 (2026-10-23, 미실행)
+
+- document schema의 `assets[]`를 Lexical 노트 이미지와
+  분리해서 관리하되, **정본 저장 단위**는 한 문서다.
+  단순 URL 참조 asset 등록은 허용하지만 파일 업로드,
+  이미지 메타데이터 자동 추측 및 은닉된 MIME 생성은 하지 않는다.
+- 선택된 노트의 이미지에 catalog ID를 연결하면
+  같은 자산 레코드의 src/width/height와 함께 image node를
+  교체한다. noteId, 대체 텍스트, 인접 노드들은 그대로다.
+- 전체 문서 스키마 통과 전에는 managed save 및 pure publish를
+  진행하지 않는다. managed slot 복원 실패 시 legacy raw slot을
+  자동 채택하지 않는다. 구버전 저장만 있을 때 raw 복원을 유지.
+- 임시 복구 슬롯의 자산 목록은 정본과 함께 읽고 검증한다.
+  관리 문서의 HTML은 기존 Lexical exportDOM이 아니라
+  `renderArticle` 결과를 사용하여 label/input/span 직속
+  구조와 이미지 width/height를 그대로 발행한다.
+- 새 브라우저 oracle 작성, 실행 대기. 전체 CSS/모바일/
+  스크린리더/IME 렌더 수락이나 자산 파일 업로드는 미구현.
+
 ## 다음 작업 순서
 
 1. 9개 섹션의 단독 동일 콘텐츠 비교 테스트와 Lexical/document/render 회귀를 **한 번에 실행**해

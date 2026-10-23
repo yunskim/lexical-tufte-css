@@ -1,3 +1,33 @@
+## 2026-10-23 — P2.3.a.5 정본 assets와 실제 GUI 저장 경계 (코드 작성, 미실행)
+
+- `examples/editor/src/managedDocument.ts`를 추가해 `validateDocument`
+  기반의 정본 후보 생성·자산 등록 제안·저장·복원을 분리했다.
+  정본에 존재하는 `assets` 객체를 실제 노트 이미지 명령에 주입한다.
+- 예제 편집기의 `문서 이미지 자산` 그룹에서 image URL/MIME/ID 및
+  선택적 원본 너비·높이를 등록할 수 있다. 해당 자산을 현재 노트의
+  선택된 이미지에 연결·해제하는 컨트롤을 추가했다. 실제 업로드와
+  외부 자산 다운로드는 제공하지 않는다. 문서 전체 스키마 검증에
+  실패하면 자산 추가를 적용하지 않는다. 처음의 레거시 P1 루트
+  문단은 `본문을 섹션으로 묶기` 후 관리 자산을 등록한다.
+- 관리 자산이 있으면 검증된 본문 JSON+assets를 하나의
+  `lexical-tufte-p1-document` 슬롯에 저장한다. 복원은
+  `loadDocumentIntoEditor`의 strict bridge로 정본을 검증·설치한
+  이후에만 자산 목록을 교체한다. 손상된 정본은 기존 Lexical
+  저장으로 묵시적으로 fallback하지 않는다.
+- 관리 자산이 없는 종전 사용자는 `lexical-tufte-p1` 저장
+  키를 계속 사용한다. 누적 P1 테스트를 깨지 않도록 원래 JSON
+  편집 상태 검사/복원을 유지했다. 관리 자산을 포함한 발행에서는
+  순수 `renderArticle`을 사용하고 전체 정본 envelope도 표시한다.
+- 자동 복구본에는 Lexical 상태와 현재 assets를 함께 기록한다.
+  자산 목록만 바뀔 때도 복구 사본을 갱신하며, 복원 직전
+  전체 문서/asset 참조를 검사한다.
+- `pnpm-lock.yaml`에 editor → render 워크스페이스 연결 반영.
+  `tests/managed-note-assets-browser.mjs`에서 자산 등록,
+  원자적 이미지 할당, 발행 HTML, 저장·재열기, 중복 ID·손상된
+  정본 복원 거부 및 자동 복구본 assets를 검증하도록 작성했다.
+- **테스트·CI 실행 없음**. 실제 파일 업로드/삭제·서버 동기화
+  및 전체 모바일/접근성 수락은 남아 있다.
+
 ## 2026-10-23 — P2.3.a.4 노트 이미지 관리 자산·치수 갱신 (구현/실행 대기)
 
 - `packages/lexical/src/noteAssetCommands.ts`: 세 명령

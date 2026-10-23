@@ -318,11 +318,27 @@ P1 gate: 완료. 노트 편집 회귀와 SSR 출력의 실제 브라우저 비�
       prototype에는 비관리 이미지 크기 UI만 노출하며
       관리 자산 연결 UI는 문서 envelope `assets` 연동 후 구성한다.
       **실행 전 수락 미완료**.
-    - [ ] P2.3.a.5 **남은 기본 기능**: 문서 `assets`를 보유하는
-      실제 GUI/자산 선택기를 정본과 연결해 자산 부착 UI 완성,
-      특정 노트 ID 선택·이동 UI 및 키보드/IME·모바일·스크린리더,
-      복수 article 번호 수락. 종류 전환은 비필수 편의 기능으로
-      prototype toolbar에서 제외했다(내부 명령만 유지).
+    - [ ] P2.3.a.5 **정본 문서의 자산 목록을 예제 GUI에 연결**:
+      별도 `managedDocument.ts` 경계에서 `schemaVersion:1`의
+      본문·assets를 함께 검증한다. URL 참조 자산의 ID/MIME/선택적
+      원본 크기를 등록하고, 한 노트 이미지에 관리 자산을 지정하거나
+      연결을 해제하는 버튼을 제공한다. 정본 `assets`의 동일한
+      메모리 스냅샷을 `registerNoteAssetCommands`, 순수 렌더러,
+      단일 `lexical-tufte-p1-document` 저장 키가 참조한다.
+      기존 빈 자산 JSON 흐름은 `lexical-tufte-p1`을 유지하며
+      새로운 단일 저장본 우선 복원에 실패하면 구버전 저장본으로
+      조용히 fallback하지 않는다. 자동 복구본에도 관리 자산 목록을
+      함께 기록하고 복원 전 검사한다. 기존 렌더러의 pure
+      `renderArticle`을 연결하여 자산 문서 발행 시 정본 HTML을
+      사용한다. 브라우저 등록/중복 거부/이미지 연결/원자적 저장/
+      재열기/손상된 저장본 거부/복구본 및 레거시 호환 테스트 작성.
+      **설치·타입·빌드·브라우저 수락 전이므로 미완료**.
+    - [ ] P2.3.a.6 **다음 범위**: 실제 파일 업로드 및 자산
+      생명주기/삭제·치환·원본 크기 확인, 편집기 전반의 정본
+      document 저장 체계 통일, 노트 ID 기반 선택·이동 UI,
+      실제 모바일·스크린리더·IME·복수 article 번호 수락.
+      종류 전환은 비필수 편의 기능으로 prototype toolbar에서
+      제외했다(내부 명령만 유지).
   - [ ] P2.3.b 그림·ImageQuilts F13/F14/F19: src/alt/caption/asset ID 수정 및 body/fullwidth/여백 변환, 자산 유실·삭제 시 진단, schema 유효성 보존.
   - [ ] P2.3.c 표/전체 폭 F15/F16: 셀·헤더·행/열 편집, 스크롤/폭 전환, 병합 거부와 접근 가능한 설명, 좁은 화면 overflow.
   - [ ] P2.3.d 코드/embed F17/F18: code block·language·fullwidth·공백/탭 및 embed의 provider allowlist/title/aspect ratio/서식 편집. 외부 HTML/sanitization 정책과 통합.
