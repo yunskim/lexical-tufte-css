@@ -1,6 +1,7 @@
 import {HeadingNode,QuoteNode} from '@lexical/rich-text';
 import {ListNode,ListItemNode} from '@lexical/list';
 import {LinkNode} from '@lexical/link';
+import {HostLinkNode} from './HostLinkNode.js';
 import {TableNode,TableRowNode,TableCellNode} from '@lexical/table';
 import {TufteCodeHighlightNode} from './CodeHighlightNode.js';
 import {HorizontalRuleNode} from '@lexical/react/LexicalHorizontalRuleNode';
@@ -18,7 +19,7 @@ import {EmbedNode} from './EmbedNode.js';
 /** Full document-schema registry. Registration does not imply renderer/UI support. */
 export const TUFTE_NODE_CLASSES=Object.freeze([
  SectionNode,NoteNode,InlineImageNode,TufteSpanNode,FigureNode,CaptionNode,TableLayoutNode,
- HeadingNode,QuoteNode,ListNode,ListItemNode,LinkNode,TableNode,TableRowNode,TableCellNode,
+ HeadingNode,QuoteNode,ListNode,ListItemNode,LinkNode,HostLinkNode,TableNode,TableRowNode,TableCellNode,
  HorizontalRuleNode,DefinitionListNode,DefinitionTermNode,DefinitionDescriptionNode,
  EpigraphNode,AttributionNode,CiteNode,SectionFooterNode,FullwidthNode,TufteCodeNode,ImageQuiltNode,EmbedNode,TufteCodeHighlightNode,
 ]);
