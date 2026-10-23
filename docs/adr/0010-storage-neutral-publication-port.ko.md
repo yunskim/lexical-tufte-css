@@ -35,11 +35,16 @@ Magnolia Works는 자체 Task/Asset/Revision과 저장소를 유지한다. Lexic
 
 - [x] SQL 독립 포트와 원자성 계약 추가
 - [x] SQLite 직접 제어 코드를 당장 제거하지 않고 레거시로 격리
-- [ ] `PublicationService`로 렌더·검증·발행 규칙 이동
-- [ ] `SqlitePublicationAdapter implements PublicationStore` 작성
+- [x] `PublicationService`에 Publish·Restore·Unpublish 오케스트레이션 추가 (레거시 코드 제거는 후속)
+- [x] `SqlitePublicationAdapter implements PublicationStore` 작성 (Restore·Unpublish는 레거시 위임)
 - [ ] 공통 포트 계약 테스트를 SQLite 어댑터에 적용
+- [x] 중립 서비스 Restore·Unpublish 계약 테스트 작성 (미실행)
 - [ ] SQLite 전용 테스트와 기존 공개 API 회귀 확인
 - [ ] Host 인가·에셋 manifest 확장 포인트 정의
 - [ ] Magnolia Works 통합용 저장소 비의존 예제 작성
 - [ ] 기존 구현 deprecated 처리 여부 결정 (호환성 검토 후)
 - [ ] 빌드·타입 검사·테스트 일괄 실행 (사용자 지시에 따라 보류)
+
+## 2026-10-23 후속 검토
+
+Restore와 Unpublish는 이제 중립 서비스로 호출 가능하다. 다만 호스트의 비동기 인가 및 에셋 존재 확인과 저장소 commit 사이의 철회·변경 경쟁은 해결되지 않았다. 동일 일관성 경계의 권한 검증 및 불변 에셋 참조 계약은 후속 작업이다. 중립 서비스의 사전 검증만으로 원자적 보안을 보장한다고 표현하지 않는다.
