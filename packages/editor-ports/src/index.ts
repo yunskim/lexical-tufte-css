@@ -42,7 +42,7 @@ export type ResolvedAsset=AssetIdentity&{
  * Optional host-owned asset catalog. Search and revision lists are UI data,
  * never authorization grants. The host rechecks access on every resolve.
  *
- * resolve(null): missing or not authorized. Offline/transient failures reject;
+ * resolve(...) returns null when missing or not authorized. Offline/transient failures reject;
  * AbortSignal cancellation must be respected by the implementation.
  * Never serialize ResolvedAsset.url as the canonical document reference.
  *
