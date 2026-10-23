@@ -1,12 +1,12 @@
 /** Host-neutral editor discovery contracts. No database, HTTP, or Lexical runtime imports. */
 export type ReferenceKind='document'|'note'|'task'|'asset'|'external';
-export type Reference={id:string;kind:ReferenceKind;title:string;description?:string};
+export type Reference={namespace:string;id:string;kind:ReferenceKind;title:string;description?:string};
 export type SearchPage<T>={items:T[];nextCursor:string|null};
 export type ReferenceQuery={text:string;kinds?:ReferenceKind[];limit?:number;cursor?:string};
 export interface ReferenceProvider{
  search(query:ReferenceQuery,signal?:AbortSignal):Promise<SearchPage<Reference>>;
- resolve(id:string,signal?:AbortSignal):Promise<Reference|null>;
- backlinks(id:string,query?:{limit?:number;cursor?:string},signal?:AbortSignal):Promise<SearchPage<Reference>>;
+ resolve(reference:{namespace:string;kind:ReferenceKind;id:string},signal?:AbortSignal):Promise<Reference|null>;
+ backlinks(reference:{namespace:string;kind:ReferenceKind;id:string},query?:{limit?:number;cursor?:string},signal?:AbortSignal):Promise<SearchPage<Reference>>;
 }
 export type AssetSummary={id:string;title:string;mediaType:string;size?:number;currentRevision?:string};
 export type AssetRevision={id:string;assetId:string;createdAt?:string;checksum?:string};
