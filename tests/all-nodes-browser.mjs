@@ -43,7 +43,7 @@ try {
  const collect=n=>[n,...(n.children?.flatMap(collect)??[])];
  const nodes=collect(edited.root);assert.deepEqual([...new Set(nodes.map(n=>n.type))].sort(),[...new Set(collect(golden.lexicalState.root).map(n=>n.type))].sort());
  assert.deepEqual(nodes.filter(n=>n.type==='code-highlight').map(n=>n.highlightType),['keyword','number',null]);
- assert.deepEqual(nodes.filter(n=>n.type==='tufte-note').map(n=>n.noteId),collect(golden.lexicalState.root).filter(n=>n.type==='tufte-note').map(n=>n.noteId));
+ assert.deepEqual(nodes.filter(n=>(n.type==='tufte-sidenote'||n.type==='tufte-marginnote')).map(n=>n.noteId),collect(golden.lexicalState.root).filter(n=>(n.type==='tufte-sidenote'||n.type==='tufte-marginnote')).map(n=>n.noteId));
  await page.getByRole('button',{name:'저장',exact:true}).click();await page.reload();await page.locator('.editor').waitFor();await page.getByRole('button',{name:'불러오기',exact:true}).click();assert.deepEqual(await exported(),edited);
  // Invalid raw layout states remain recoverable, cannot replace the valid save or emit HTML.
  for(const [kind,make] of [
