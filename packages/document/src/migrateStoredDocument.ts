@@ -13,11 +13,21 @@ export type MigrationResult=
  * compatibility: the editor bridge must still reject lossy parse/export.
  */
 /** Convert only known legacy note wire identities; leave malformed payloads for validation to reject. */
+function containsUnsafeDescriptors(value:unknown,seen=new WeakSet<object>()):boolean{
+ if(value===null||typeof value!=='object')return false;
+ if(seen.has(value))return false;
+ seen.add(value);
+ if(Object.getOwnPropertySymbols(value).length)return true;
+ for(const descriptor of Object.values(Object.getOwnPropertyDescriptors(value))){
+  if(!('value' in descriptor))return true;
+  if(containsUnsafeDescriptors(descriptor.value,seen))return true;
+ }
+ return false;
+}
 function normalizeLegacyNotes(input:unknown):unknown{
  if(!isRecord(input))return input;
  // Never invoke user-defined accessors during migration.
- if(Object.getOwnPropertySymbols(input).length||
-  Object.values(Object.getOwnPropertyDescriptors(input)).some(d=>!('value' in d)))return input;
+ if(containsUnsafeDescriptors(input))return input;
  let copy:Record<string,unknown>;
  try{copy=structuredClone(input);}catch{return input;}
  const seen=new WeakSet<object>();
