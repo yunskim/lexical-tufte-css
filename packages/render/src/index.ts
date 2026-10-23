@@ -66,6 +66,13 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
     return [element('a',{href:String(n.url),...(n.target?{target:String(n.target)}:{}),
      ...(n.title?{title:String(n.title)}:{}),...(rel.size?{rel:[...rel].join(' ')}:{}),...attrs(n)},inner())];
    }
+   case 'host-link':return [element('span',{
+    class:'tufte-host-link',
+    'data-host-reference':n.reference.id,
+    'data-host-namespace':n.reference.namespace,
+    'data-host-kind':n.reference.kind,
+    ...attrs(n)
+   },inner())];
    case 'tufte-imagequilt':return [element('img',{
     src:String(n.src),alt:String(n.alt),class:'imagequilt',
     width:String(n.width),height:String(n.height)
