@@ -102,6 +102,7 @@ export function validateDocument(input:unknown):ValidationResult{
    if(typeof raw.alt!=='string')add('INVALID_ALT',path+'.alt','Image alt string required');
    for(const key of ['width','height'])if(raw[key]!==undefined&&!integer(raw[key],1,Number.MAX_SAFE_INTEGER))add('INVALID_IMAGE_SIZE',path+'.'+key,'Expected positive integer');
    if(type==='tufte-imagequilt'&&(raw.width===undefined||raw.height===undefined))add('INVALID_IMAGE_SIZE',path,'ImageQuilt requires intrinsic dimensions');
+   if(raw.hostAsset!==undefined&&raw.assetId!==undefined)add('AMBIGUOUS_ASSET_REFERENCE',path,'Choose either hostAsset or document-local assetId');
    if(raw.hostAsset!==undefined){
     const host=raw.hostAsset;
     if(!plain(host)||Object.keys(host).some(k=>!['namespace','assetId','revisionId'].includes(k))||
