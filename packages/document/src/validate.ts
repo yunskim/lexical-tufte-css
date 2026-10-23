@@ -10,12 +10,13 @@ export function validateDocument(input:unknown):ValidationResult{
  const add=(code:string,path:string,message:string)=>{if(diagnostics.length<L.diagnostics)diagnostics.push({code,path,message});};
  const unknownFields=(obj:Record<string,unknown>,keys:readonly string[],path:string)=>{for(const key of Object.keys(obj))if(!keys.includes(key))add('UNKNOWN_FIELD',`${path}.${key}`,'Unrecognized field');};
  if(!plain(input))return {ok:false,diagnostics:[{code:'INVALID_DOCUMENT',path:'$',message:'Expected plain document object without accessors'}]};
- unknownFields(input,['schemaVersion','id','locale','title','subtitle','lexicalState','assets'],'$');
+ unknownFields(input,['schemaVersion','id','locale','title','titleId','subtitle','lexicalState','assets'],'$');
  if(input.schemaVersion!==1)add('UNSUPPORTED_VERSION','$.schemaVersion','Only schemaVersion 1 is supported');
  if(!isIdentifier(input.id))add('INVALID_ID','$.id','Invalid document identifier');
  let locale=false;if(typeof input.locale==='string'&&input.locale.length<=64)try{locale=Intl.getCanonicalLocales(input.locale).length===1;}catch{}
  if(!locale)add('INVALID_LOCALE','$.locale','Expected BCP 47 locale');
  if(!nonempty(input.title,1000))add('INVALID_TITLE','$.title','Expected title up to 1000 characters');
+ if(input.titleId!==undefined&&!isIdentifier(input.titleId))add('INVALID_TITLE_ID','$.titleId','Title anchor must be a safe HTML identifier');
  if(input.subtitle!==undefined&&(typeof input.subtitle!=='string'||input.subtitle.length>2000))add('INVALID_SUBTITLE','$.subtitle','Invalid subtitle');
  const assets=new Map<string,AssetRef>();
  if(!Array.isArray(input.assets)||input.assets.length>L.assets)add('INVALID_ASSETS','$.assets','Expected at most 1000 assets');
@@ -53,7 +54,7 @@ export function validateDocument(input:unknown):ValidationResult{
    if(type==='tufte-table-layout'&&(raw.children.length!==1||!plain(raw.children[0])||raw.children[0].type!=='table'))add('INVALID_TABLE_LAYOUT',path,'Expected exactly one table');
    if(type==='tufte-figure'){
     const types=raw.children.map(n=>plain(n)?n.type:null);
-    if(!['tufte-inline-image','tufte-imagequilt'].includes(String(types[0]))||types.filter(t=>t==='tufte-inline-image'||t==='tufte-imagequilt').length!==1||types.filter(t=>t==='tufte-caption').length>1)add('INVALID_FIGURE',path,'Expected one leading image and at most one caption');
+    if(types.filter(t=>t==='tufte-inline-image'||t==='tufte-imagequilt').length!==1||types.filter(t=>t==='tufte-caption').length>1||(types.indexOf('tufte-caption')!==-1&&types.indexOf('tufte-caption')<types.findIndex(t=>t==='tufte-inline-image'||t==='tufte-imagequilt')))add('INVALID_FIGURE',path,'Expected one image, optional margin notes, and at most one caption after the image');
     for(const child of raw.children)if(plain(child)&&child.type==='tufte-sidenote')add('INVALID_FIGURE_NOTE',path,'Direct figure notes must be margin notes');
    }
    if(type==='tufte-definition-list'){
@@ -77,6 +78,10 @@ export function validateDocument(input:unknown):ValidationResult{
    if(type==='tab'&&raw.text!=='\t')add('INVALID_TAB',path+'.text','Tab node must contain one tab');
    if(type==='code-highlight'&&raw.highlightType!==null&&(typeof raw.highlightType!=='string'||!/^[a-zA-Z][a-zA-Z0-9_-]{0,63}$/.test(raw.highlightType)))add('INVALID_HIGHLIGHT',path+'.highlightType','Invalid highlight token');
   }
+  if(type==='paragraph'&&raw.tufteClass!==undefined&&raw.tufteClass!=='sans')add('INVALID_PARAGRAPH_CLASS',path+'.tufteClass','Only sans is supported');
+  if(type==='quote'&&raw.cite!==undefined&&!isSafeURL(raw.cite,'link'))add('INVALID_QUOTE_CITE',path+'.cite','Invalid quote cite URL');
+  if(type==='heading'&&raw.id!==undefined&&!isIdentifier(raw.id))add('INVALID_HEADING_ID',path+'.id','Heading ID must be a safe identifier');
+  if(type==='heading'&&input.titleId!==undefined&&raw.id===input.titleId)add('DUPLICATE_TITLE_ID',path+'.id','Heading ID conflicts with document title');
   if(type==='heading'&&!enumeration(raw.tag,['h2','h3']))add('INVALID_HEADING',path+'.tag','Only h2/h3 supported');
   if(type==='list'&&(!enumeration(raw.listType,['bullet','number'])||raw.tag!==(raw.listType==='bullet'?'ul':'ol')||!integer(raw.start,1,Number.MAX_SAFE_INTEGER)))add('INVALID_LIST',path,'Invalid list kind/tag/start');
   if(type==='listitem'&&raw.checked!==undefined)add('UNSUPPORTED_PROPERTY',path+'.checked','Checklist semantics are outside this schema');
