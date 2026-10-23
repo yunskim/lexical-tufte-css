@@ -307,3 +307,39 @@ test('document validator accepts a saved host reference and rejects URL metadata
  assert.equal(rejected.ok,false);
  assert.ok(rejected.diagnostics.some(d=>d.code==='UNKNOWN_FIELD'));
 });
+
+test('host reference survives save, reopen, document validation and publication',async()=>{
+ const {validateDocument}=await import('@lexical-tufte/document');
+ const {renderArticle}=await import('@lexical-tufte/render');
+ const {$createSectionNode,exportEditorToDocument,loadDocumentIntoEditor}=await import('../dist/index.js');
+ const source=editor();
+ source.update(()=>{
+  const section=$createSectionNode();
+  const paragraph=$createParagraphNode();
+  const link=$createHostLinkNode(reference);
+  link.append($createTextNode('Read note'));
+  paragraph.append($createTextNode('Before '),link,$createTextNode(' after'));
+  section.append(paragraph);
+  $getRoot().append(section);
+ });
+ await flush(source);
+ const base={
+  schemaVersion:1,id:'host-link-roundtrip',locale:'en-US',title:'Reference roundtrip',
+  assets:[],lexicalState:source.getEditorState().toJSON()
+ };
+ const exported=exportEditorToDocument(source,base);
+ assert.equal(exported.ok,true,JSON.stringify(exported.diagnostics));
+ const saved=JSON.parse(JSON.stringify(exported.value));
+ assert.equal(validateDocument(saved).ok,true);
+ const reopened=editor();
+ const loaded=loadDocumentIntoEditor(reopened,saved);
+ assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
+ const published=renderArticle(saved);
+ assert.equal(published.ok,true,JSON.stringify(published.diagnostics));
+ assert.deepEqual(reopened.getEditorState().toJSON(),source.getEditorState().toJSON());
+ const hostLink=reopened.getEditorState().toJSON().root.children[0].children[0].children[1];
+ assert.deepEqual(hostLink.reference,reference);
+ assert.equal(hostLink.children[0].text,'Read note');
+ assert.match(published.html,/data-host-reference="note-123" data-host-namespace="magnolia" data-host-kind="note"/);
+ assert.doesNotMatch(published.html,/<a[^>]*data-host-reference=/);
+});
