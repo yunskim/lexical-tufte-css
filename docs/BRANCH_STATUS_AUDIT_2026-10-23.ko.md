@@ -70,6 +70,14 @@ GitHub의 **두 브랜치**와 커밋 비교, main의 현재 파일, 작업 브�
 - `tufte-sidenote` ↔ `tufte-marginnote` 전환 기능은 이번 결정에 포함되지 않는다.
 - 현재 main은 여전히 generic note 코드이므로 **결정 확정 ≠ 구현 완료**. 구조 이전·테스트 수락은 미완료다.
 
+## Concrete note 코드 이관 1단계 — 원본 보존
+
+- [x] 작업 브랜치의 `NoteNode.ts`, `SidenoteNode.ts`, `MarginnoteNode.ts`를 **원문 그대로** `integration/concrete-notes/`에 보존했다.
+- [ ] 실제 패키지 `packages/lexical/src/` 등록 및 호출 경로 교체. 현재 main의 `noteOperations.ts`는 `$createNoteNode(id,kind)`와 `getKind()`를 사용하므로 구형 API를 먼저 대체해야 한다.
+- [ ] schema/validator/renderer/fixture와 저장 이전을 함께 전환한다.
+- [ ] 실행 수락. 이관 원본은 현재 런타임에 등록되지 않았으며 **기능 통합 완료가 아니다**.
+- 기존 노드 소스를 변경하지 않았고 테스트/빌드/CI도 실행하지 않았다.
+
 ## 유의사항
 
 이 문서는 GitHub 원격 코드/기록을 근거로 한 **정적 감사**다. 테스트 실행 결과를 새로 생성하지 않았으며, 기록된 2026-10-19 실행 결과는 현재 브랜치 HEAD의 상태가 아니다.
