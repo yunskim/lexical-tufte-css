@@ -310,7 +310,7 @@ test('document validator accepts a saved host reference and rejects URL metadata
 
 test('host reference survives save, reopen, document validation and publication',async()=>{
  const {validateDocument}=await import('@lexical-tufte/document');
- const {renderArticle}=await import('@lexical-tufte/render');
+ const {renderArticle}=await import('../../render/dist/index.js');
  const {$createSectionNode,exportEditorToDocument,loadDocumentIntoEditor}=await import('../dist/index.js');
  const source=editor();
  source.update(()=>{
