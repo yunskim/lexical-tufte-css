@@ -1,5 +1,5 @@
-import {isIdentifier,validatePostRecordV2,type PostRecordV2,type Result} from '@lexical-tufte/document';
-import {SqlitePublicationStore,type PublicationDatabase,type PublicationState} from './publication.js';
+import {isIdentifier,isTimestamp,validatePostRecordV2,type PostRecordV2,type Result} from '@lexical-tufte/document';
+import type {PublicationDatabase,PublicationState,PublicationSnapshot,PublishedSnapshot} from './publication.js';
 import type {PublicationStore,PublicationCommit,PublicationCommitResult,PublicationRestoreCommit,PublicationUnpublishCommit} from './publicationStore.js';
 
 const fail=(code:string,message:string):Result<never>=>({ok:false,diagnostics:[{code,path:'$.publication',message}]});
@@ -10,8 +10,7 @@ const count=(n:number,min=0)=>Number.isSafeInteger(n)&&n>=min;
  * Uses its own synchronous connection; callers must not wrap calls in a host transaction.
  */
 export class SqlitePublicationAdapter implements PublicationStore{
- private readonly legacy:SqlitePublicationStore;
- constructor(private readonly db:PublicationDatabase){this.legacy=new SqlitePublicationStore(db);}
+ constructor(private readonly db:PublicationDatabase){}
  async readDraft(postId:string):Promise<Result<PostRecordV2>>{
   if(!isIdentifier(postId))return fail('INVALID_POST_ID','Invalid post id');
   try{
@@ -22,9 +21,40 @@ export class SqlitePublicationAdapter implements PublicationStore{
    return checked;
   }catch{return fail('PUBLICATION_STORAGE_ERROR','Could not read draft');}
  }
- async readState(postId:string){return this.legacy.readState(postId);}
- async readSnapshot(snapshotId:string){return this.legacy.readSnapshot(snapshotId);}
- async readPublic(postId:string){return this.legacy.readPublic(postId);}
+ private head(postId:string):PublicationState{
+  const row=this.db.prepare('SELECT generation,snapshot_id,last_snapshot_id,first_published_at,last_published_at,published_revision FROM publication_heads_v1 WHERE post_id=?').get(postId) as Record<string,unknown>|undefined;
+  return row?{generation:Number(row.generation),snapshotId:row.snapshot_id as string|null,lastSnapshotId:row.last_snapshot_id as string|null,firstPublishedAt:row.first_published_at as string|null,publishedAt:row.last_published_at as string|null,publishedRevision:row.published_revision===null?null:Number(row.published_revision)}:{generation:0,snapshotId:null,lastSnapshotId:null,firstPublishedAt:null,publishedAt:null,publishedRevision:null};
+ }
+ async readState(postId:string):Promise<Result<PublicationState>>{
+  if(!isIdentifier(postId))return fail('INVALID_POST_ID','Invalid post id');
+  try{return {ok:true,value:this.head(postId),diagnostics:[]};}catch{return fail('PUBLICATION_STORAGE_ERROR','Could not read publication state');}
+ }
+ private async decode(snapshotId:string,payload:unknown,postId:unknown,revision:unknown):Promise<Result<PublishedSnapshot>>{
+  if(typeof payload!=='string')return fail('SNAPSHOT_INTEGRITY_ERROR','Snapshot payload missing');
+  const digest=Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(payload))),n=>n.toString(16).padStart(2,'0')).join('');
+  if(digest!==snapshotId)return fail('SNAPSHOT_INTEGRITY_ERROR','Snapshot checksum mismatch');
+  try{
+   const snapshot=JSON.parse(payload) as PublicationSnapshot;
+   const checked=validatePostRecordV2(snapshot.post);if(!checked.ok)return checked;
+   if(snapshot.snapshotVersion!==1||checked.value.document.id!==postId||snapshot.publishedRevision!==revision||snapshot.publishedRevision!==checked.value.metadata.revision||typeof snapshot.html!=='string'||!isTimestamp(snapshot.firstPublishedAt)||!isTimestamp(snapshot.publishedAt)||Date.parse(snapshot.firstPublishedAt)>Date.parse(snapshot.publishedAt))
+    return fail('INVALID_PUBLICATION_SNAPSHOT','Invalid snapshot envelope');
+   return {ok:true,value:{snapshotId,snapshot:structuredClone(snapshot)},diagnostics:[]};
+  }catch{return fail('INVALID_PUBLICATION_SNAPSHOT','Invalid snapshot JSON');}
+ }
+ async readSnapshot(snapshotId:string):Promise<Result<PublishedSnapshot>>{
+  if(!/^[0-9a-f]{64}$/.test(snapshotId))return fail('INVALID_SNAPSHOT_ID','Invalid snapshot hash');
+  try{
+   const row=this.db.prepare('SELECT payload,post_id,source_revision FROM publication_snapshots_v1 WHERE snapshot_id=?').get(snapshotId) as Record<string,unknown>|undefined;
+   return row?await this.decode(snapshotId,row.payload,row.post_id,row.source_revision):fail('SNAPSHOT_NOT_FOUND','Snapshot not found');
+  }catch{return fail('PUBLICATION_STORAGE_ERROR','Could not read snapshot');}
+ }
+ async readPublic(postId:string):Promise<Result<PublishedSnapshot>>{
+  if(!isIdentifier(postId))return fail('INVALID_POST_ID','Invalid post id');
+  try{
+   const row=this.db.prepare('SELECT s.snapshot_id,s.payload,s.post_id,s.source_revision FROM publication_heads_v1 h JOIN publication_snapshots_v1 s ON s.snapshot_id=h.snapshot_id AND s.post_id=h.post_id WHERE h.post_id=?').get(postId) as Record<string,unknown>|undefined;
+   return row?await this.decode(String(row.snapshot_id),row.payload,row.post_id,row.source_revision):fail('NOT_PUBLISHED','No active public snapshot');
+  }catch{return fail('PUBLICATION_STORAGE_ERROR','Could not read public snapshot');}
+ }
  async commitPublication(command:PublicationCommit):Promise<Result<PublicationCommitResult>>{
   if(!command||!isIdentifier(command.postId)||!count(command.expectedDraftRevision,1)||!count(command.expectedGeneration)||!(/^[0-9a-f]{64}$/.test(command.snapshotId)))return fail('INVALID_PUBLICATION_INPUT','Invalid commit request');
   let started=false;
@@ -43,7 +73,7 @@ export class SqlitePublicationAdapter implements PublicationStore{
    if(row.id!==postId||row.slug!==current.value.metadata.slug||row.revision!==current.value.metadata.revision||current.value.metadata.revision!==command.expectedDraftRevision||JSON.stringify(current.value)!==JSON.stringify(command.expectedDraft)||JSON.stringify(current.value)!==JSON.stringify(snapshot.post)){
     this.db.exec('ROLLBACK');started=false;return fail('REVISION_CONFLICT','Draft changed before commit');
    }
-   const state=this.legacy.readState(postId);if(!state.ok){this.db.exec('ROLLBACK');started=false;return state;}
+   const state=this.readState(postId);if(!state.ok){this.db.exec('ROLLBACK');started=false;return state;}
    const head=state.value;
    if(head.generation!==command.expectedGeneration){this.db.exec('ROLLBACK');started=false;return fail('PUBLICATION_CONFLICT','Publication generation changed');}
    if(head.generation===Number.MAX_SAFE_INTEGER){this.db.exec('ROLLBACK');started=false;return fail('PUBLICATION_GENERATION_EXHAUSTED','Publication generation exhausted');}
@@ -90,7 +120,7 @@ export class SqlitePublicationAdapter implements PublicationStore{
   let started=false;
   try{
    this.db.exec('BEGIN IMMEDIATE');started=true;
-   const state=this.legacy.readState(command.postId);if(!state.ok){this.db.exec('ROLLBACK');started=false;return state;}
+   const state=this.readState(command.postId);if(!state.ok){this.db.exec('ROLLBACK');started=false;return state;}
    const head=state.value;
    if(head.generation!==command.expectedGeneration){this.db.exec('ROLLBACK');started=false;return fail('PUBLICATION_CONFLICT','Publication generation changed');}
    if(head.snapshotId===null){this.db.exec('ROLLBACK');started=false;return fail('NOT_PUBLISHED','Post is already private');}
