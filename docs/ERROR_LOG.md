@@ -1,5 +1,18 @@
 # 에러 기록
 
+## E111 — 발행 노트 DOM wrapper와 기본 텍스트 span이 원본 구조를 훼손
+
+- 정적 원인(2026-10-23): publisher는 `data-tufte-note` wrapper 아래 label/input/payload를 출력했고, 모든 text를 `tufte-pre-wrap` span으로 감쌌다. 공식 Tufte CSS에서는 세 노트 요소가 직접 형제이며, newthought+인접 sidenote의 label만 newthought 안에 있다. 두 경로가 같은 Lexical 모델을 가져도 DOM 동등성 검사를 통과할 수 없다.
+- 조치: publisher의 세 요소를 직접 형제로 배치하고 문단의 즉시 인접 newthought/sidenote에만 split-parent 출력을 적용. 일반 text span 추가를 중단하고 자연스러운 HTML 공백 처리로 변경. 관련 렌더 테스트와 서버 선택자 갱신.
+- 상태: 코드 수정, 빌드·테스트 **미실행**. 정확한 DOM·시각 차이와 남은 브라우저 실패는 재검증 대기. M102 참조.
+
+## E112 — 숨겨진 주석 체크박스 키보드 포커스 부재 및 허위 통과 테스트
+
+- 원인(2026-10-23): 공식 CSS는 `input.margin-toggle {display:none}`을 사용한다. 출판 접근성 요구에는 키보드 포커스가 필요하며 기존 `tests/note-browser.mjs`의 `[data-tufte-note]` 조회는 wrapper 제거 후 빈 배열에서 `.every()`가 항상 true가 될 수 있었다.
+- 조치: scoped CSS에서 체크박스를 레이아웃을 차지하지 않는 시각적 숨김 형태로 복원해 포커스 가능하게 하고, `:focus-visible` 레이블 강조 추가. 존재 개수·실제 연결/인접/접근 가능한 이름을 검사하도록 브라우저 테스트를 수정.
+- 상태: 코드·검사 수정, 실제 브라우저 포커스·모바일 동작 **재실행 전**. M103 참조.
+
+
 ## 2026-10-23 main 실행 검증
 
 기준 `c081546ee4275129b9f41a1a3012e61371d57271`과 후속 수정. 최종 check403개·package5개 소비·Python16개·HTTP 통과, browser34개 중 19통과/15실패. CI 생략. 이전 작업 브랜치의 실행 결과와 혼합하지 않는다. [검증 보고서](VERIFICATION_MAIN_2026-10-23.ko.md) 및 파일별 결과가 현재 판정이다.
