@@ -70,6 +70,26 @@ try {
  assert.equal(await page.evaluate(()=>localStorage.getItem('lexical-tufte-p1')),canonical);
  assert.ok(await page.evaluate(key=>localStorage.getItem(key)!==null,recoveryKey),
   'Reopening the canonical document must not delete the recovery source');
+ // Deleting recovery data is explicit and must respect both cancellation stages.
+ const deleteButton=page.getByRole('button',{name:'복구본 삭제',exact:true});
+ await deleteButton.waitFor({state:'visible'});
+ const stored=await page.evaluate(key=>localStorage.getItem(key),recoveryKey);
+ page.once('dialog',dialog=>dialog.dismiss());
+ await deleteButton.click();
+ assert.equal(await page.evaluate(key=>localStorage.getItem(key),recoveryKey),stored,
+  'Canceling recovery selection must preserve the recovery copy');
+ page.once('dialog',dialog=>dialog.accept('0'));
+ page.once('dialog',dialog=>dialog.dismiss());
+ await deleteButton.click();
+ assert.equal(await page.evaluate(key=>localStorage.getItem(key),recoveryKey),stored,
+  'Declining the deletion confirmation must preserve the recovery copy');
+ page.once('dialog',dialog=>dialog.accept('0'));
+ page.once('dialog',dialog=>dialog.accept());
+ await deleteButton.click();
+ assert.equal(await page.evaluate(key=>localStorage.getItem(key),recoveryKey),null,
+  'Confirmed deletion must remove the selected recovery copy');
+ assert.equal(await page.evaluate(()=>localStorage.getItem('lexical-tufte-p1')),canonical,
+  'Deleting recovery must never delete the canonical document');
  assert.deepEqual(errors,[]);
  console.log('Recovery reopen: cancellation, explicit open, canonical isolation and canonical restore.');
 }finally{await browser?.close();server?.kill();}
