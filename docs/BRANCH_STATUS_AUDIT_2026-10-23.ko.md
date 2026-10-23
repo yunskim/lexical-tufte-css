@@ -44,6 +44,21 @@ GitHub의 **두 브랜치**와 커밋 비교, main의 현재 파일, 작업 브�
 - [ ] 신규 이관 파일의 실제 실행 수락. 사용자의 일괄 검증 지시로 실행하지 않았다.
 - [ ] main에 임시 추가한 중복 비교 경로 정리. 기존 전체 페이지 오라클과 동등한 커버리지 확보 전 제거하지 않는다.
 
+## 전체 문서 roundtrip 이관 전 인터페이스 대조 — 2026-10-23
+
+두 브랜치의 **실제 소스**(`packages/document/src/{index,schema}.ts`, `packages/lexical/src/{index,nodes}.ts`, `packages/render/src/index.ts`)와 기존 테스트 import를 재확인했다.
+
+| 계약 | main | 기존 테스트 브랜치 | 이관 판정 |
+| --- | --- | --- | --- |
+| `validateDocument`, `migrateStoredDocument`, `validateDocumentV2` | 모두 export | 모두 export | API 이름 호환, 의미론은 별도 확인 |
+| `createHeadlessEditor`, `TUFTE_NODES`, `loadMigratedDocumentIntoEditor`, `exportEditorToDocumentV2` | 모두 export | 모두 export | API 이름 호환, node registry는 **비호환** |
+| note wire type | `tufte-note` | `tufte-sidenote` / `tufte-marginnote` | **직접 이관 차단** |
+| paragraph/quote 확장 | 기존 타입 | `tufteClass` / `cite` 확장 | 원본 문서 재구성의 속성 보존 확인 필요 |
+| 발행 렌더러 | generic `tufte-note` | concrete note, `titleId`, `tufteClass` 지원 | DOM 동일 콘텐츠 비교 전에 조정 필요 |
+| `ReferenceProvider` / HostLink | main에 있음 | 기존 브랜치에는 없음 | 유지하되 공식 예제 재현과 분리 |
+
+**결론:** roundtrip 테스트의 import 경로 자체는 대체로 유지되지만, 재구성기가 만드는 JSON node type과 main의 schema/registry/renderer가 맞지 않는다. 테스트 파일을 그대로 복사하면 검증 실패가 예상되며, 원인을 감추는 호환성 shim을 새로 만들지 않는다. 기존 브랜치의 concrete note 모델과 관련 renderer/schema 변경을 main의 HostLink 계약과 충돌 없이 선별 이관할지 먼저 결정한다. 이전에 이관한 standalone baseline과 fixture builder는 유지한다.
+
 ## 유의사항
 
 이 문서는 GitHub 원격 코드/기록을 근거로 한 **정적 감사**다. 테스트 실행 결과를 새로 생성하지 않았으며, 기록된 2026-10-19 실행 결과는 현재 브랜치 HEAD의 상태가 아니다.
