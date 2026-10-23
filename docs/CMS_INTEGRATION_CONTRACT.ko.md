@@ -1,6 +1,7 @@
 # CMS Integration Contract — draft v0.1
 
-Status: DESIGN ONLY; no runtime implementation or schema migration.
+Status: DESIGN ONLY; **v0.1 superseded for implementation planning pending architectural decisions**. No runtime implementation or schema migration.
+Review: [Independent multi-pass review, 2026-10-23](CMS_INTEGRATION_REVIEW_2026-10-23.ko.md). Critical blockers: asset URL/identity mismatch, host-qualified references, async resolution vs pure renderer, publication ownership. The TypeScript interfaces below are illustrative, NOT a frozen API.
 Purpose: connect lexical-tufte-css to filesystem, Magnolia Works, or third-party CMS hosts without coupling Lexical nodes to storage, network, or authorization.
 Related: [Document schema](DOCUMENT_SCHEMA_V1.ko.md), [Plan](PLAN.ko.md), [Discovery/asset roadmap](document-discovery-and-asset-browser-roadmap.md).
 
