@@ -68,7 +68,7 @@ test('atomically assign and replace managed asset: ID, URL, sizes, alt and other
   });
   assert.deepEqual(noteFrom(editor).children.slice(0,-1),before.children.slice(0,-1));
   assert.equal(noteFrom(editor).noteId,'stable-note');
-  assert.match(check(editor),/src="\/managed-a.png" alt="kept alt"/);
+  assert.match(check(editor),/src="\/managed-a.png" alt="kept alt" width="800" height="600"/);
   editor.dispatchCommand(ASSIGN_TUFTE_NOTE_IMAGE_ASSET_COMMAND,'asset-b');
   editor.update(()=>{},{discrete:true});
   const updated=imageFrom(editor);
@@ -77,7 +77,7 @@ test('atomically assign and replace managed asset: ID, URL, sizes, alt and other
   assert.equal(updated.width,1024);
   assert.equal(updated.height,768);
   assert.equal(updated.alt,'kept alt');
-  assert.match(check(editor),/src="\/managed-b.png" alt="kept alt"/);
+  assert.match(check(editor),/src="\/managed-b.png" alt="kept alt" width="1024" height="768"/);
   assert.deepEqual(diagnostics,[]);
  }finally{dispose();}
 });
@@ -90,9 +90,9 @@ test('detach is explicit: preserves visible image and metadata but clears refere
   editor.dispatchCommand(DETACH_TUFTE_NOTE_IMAGE_ASSET_COMMAND,undefined);
   editor.update(()=>{},{discrete:true});
   const detached=imageFrom(editor);
-  assert.deepEqual(detached,{...managed,assetId:undefined}.assetId===undefined
-   ?Object.fromEntries(Object.entries(managed).filter(([key])=>key!=='assetId'))
-   :null);
+  assert.deepEqual(detached,Object.fromEntries(
+   Object.entries(managed).filter(([key])=>key!=='assetId')
+  ));
   assert.match(check(editor),/src="\/managed-a.png" alt="kept alt"/);
   assert.deepEqual(diagnostics,[]);
  }finally{dispose();}
