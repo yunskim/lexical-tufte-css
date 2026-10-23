@@ -59,13 +59,42 @@ export class SqlitePublicationAdapter implements PublicationStore{
   }catch{if(started)try{this.db.exec('ROLLBACK');}catch{}return fail('PUBLICATION_STORAGE_ERROR','Could not commit publication');}
  }
  async restorePublication(command:PublicationRestoreCommit):Promise<Result<PublicationState>>{
-  if(!command)return fail('INVALID_PUBLICATION_INPUT','Missing restore request');
-  // This low-level port assumes the host already checked authorization and immutable assets.
-  // The legacy implementation performs its own preflight before an atomic pointer change.
-  return this.legacy.restorePublishedSnapshot(command.postId,command.snapshotId,{expectedGeneration:command.expectedGeneration,authorize:async()=>true,assetExists:async()=>true});
+  if(!command||!isIdentifier(command.postId)||!/^[0-9a-f]{64}$/.test(command.snapshotId)||!count(command.expectedGeneration,1))
+   return fail('INVALID_PUBLICATION_INPUT','Invalid restore request');
+  const {postId,snapshotId,expectedGeneration}=command;
+  // Validate immutable snapshot checksum before entering the synchronous transaction.
+  const candidate=await this.readSnapshot(snapshotId);if(!candidate.ok)return candidate;
+  if(candidate.value.snapshot.post.document.id!==postId)return fail('SNAPSHOT_POST_MISMATCH','Snapshot belongs to another post');
+  let started=false;
+  try{
+   this.db.exec('BEGIN IMMEDIATE');started=true;
+   const state=this.legacy.readState(postId);if(!state.ok){this.db.exec('ROLLBACK');started=false;return state;}
+   const head=state.value;
+   if(head.generation!==expectedGeneration){this.db.exec('ROLLBACK');started=false;return fail('PUBLICATION_CONFLICT','Publication generation changed');}
+   if(head.generation===Number.MAX_SAFE_INTEGER){this.db.exec('ROLLBACK');started=false;return fail('PUBLICATION_GENERATION_EXHAUSTED','Publication generation exhausted');}
+   const draft=await this.readDraft(postId);
+   if(!draft.ok){this.db.exec('ROLLBACK');started=false;return draft;}
+   if(candidate.value.snapshot.post.metadata.createdAt!==draft.value.metadata.createdAt){this.db.exec('ROLLBACK');started=false;return fail('CREATED_AT_IMMUTABLE','Creation timestamp differs');}
+   if(candidate.value.snapshot.post.metadata.slug!==draft.value.metadata.slug){this.db.exec('ROLLBACK');started=false;return fail('SLUG_RENAME_REQUIRED','Restoring a different slug requires redirect handling');}
+   if(head.snapshotId===snapshotId){this.db.exec('COMMIT');started=false;return {ok:true,value:head,diagnostics:[]};}
+   this.db.prepare('UPDATE publication_heads_v1 SET generation=generation+1,snapshot_id=?,last_snapshot_id=?,published_revision=? WHERE post_id=?').run(snapshotId,snapshotId,candidate.value.snapshot.publishedRevision,postId);
+   const restored:PublicationState={...head,generation:head.generation+1,snapshotId,lastSnapshotId:snapshotId,publishedRevision:candidate.value.snapshot.publishedRevision};
+   this.db.exec('COMMIT');started=false;return {ok:true,value:restored,diagnostics:[]};
+  }catch{if(started)try{this.db.exec('ROLLBACK');}catch{}return fail('PUBLICATION_STORAGE_ERROR','Could not restore publication');}
  }
  async unpublishPublication(command:PublicationUnpublishCommit):Promise<Result<PublicationState>>{
-  if(!command)return fail('INVALID_PUBLICATION_INPUT','Missing unpublish request');
-  return this.legacy.unpublish(command.postId,command.expectedGeneration);
+  if(!command||!isIdentifier(command.postId)||!count(command.expectedGeneration,1))return fail('INVALID_PUBLICATION_INPUT','Invalid unpublish request');
+  let started=false;
+  try{
+   this.db.exec('BEGIN IMMEDIATE');started=true;
+   const state=this.legacy.readState(command.postId);if(!state.ok){this.db.exec('ROLLBACK');started=false;return state;}
+   const head=state.value;
+   if(head.generation!==command.expectedGeneration){this.db.exec('ROLLBACK');started=false;return fail('PUBLICATION_CONFLICT','Publication generation changed');}
+   if(head.snapshotId===null){this.db.exec('ROLLBACK');started=false;return fail('NOT_PUBLISHED','Post is already private');}
+   if(head.generation===Number.MAX_SAFE_INTEGER){this.db.exec('ROLLBACK');started=false;return fail('PUBLICATION_GENERATION_EXHAUSTED','Publication generation exhausted');}
+   this.db.prepare('UPDATE publication_heads_v1 SET snapshot_id=NULL,generation=generation+1 WHERE post_id=?').run(command.postId);
+   const unpublished:PublicationState={...head,generation:head.generation+1,snapshotId:null};
+   this.db.exec('COMMIT');started=false;return {ok:true,value:unpublished,diagnostics:[]};
+  }catch{if(started)try{this.db.exec('ROLLBACK');}catch{}return fail('PUBLICATION_STORAGE_ERROR','Could not unpublish');}
  }
 }
