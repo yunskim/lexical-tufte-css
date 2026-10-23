@@ -5,7 +5,7 @@ import {validateDocument,documentToEditorJSON,editorJSONToDocument} from '../dis
 
 const fixture=()=>JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document.json',import.meta.url),'utf8'));
 const text=value=>({type:'text',version:1,text:value,format:0});
-const link=props=>({type:'link',version:1,children:[text('Linked title')],...props});
+const link=props=>({type:'host-link',version:1,children:[text('Linked title')],...props});
 const addNode=(doc,node)=>{
  const paragraph={type:'paragraph',version:1,children:[node]};
  doc.lexicalState.root.children[0].children.push(paragraph);
@@ -24,13 +24,13 @@ test('host reference is preserved through editor JSON boundary',()=>{
  assert.deepEqual(restored.document,doc);
 });
 
-test('link must have exactly one target',()=>{
+test('external links reject internal reference fields',()=>{
  const doc=fixture();
- addNode(doc,link({url:'https://example.org',reference:{namespace:'magnolia',kind:'note',id:'note-123'}}));
- assert.equal(has(validateDocument(doc),'INVALID_LINK_TARGET'),true);
+ addNode(doc,{type:'link',version:1,children:[text('External')],url:'https://example.org',reference:{namespace:'magnolia',kind:'note',id:'note-123'}});
+ assert.equal(has(validateDocument(doc),'UNKNOWN_FIELD'),true);
  const missing=fixture();
  addNode(missing,link({}));
- assert.equal(has(validateDocument(missing),'INVALID_LINK_TARGET'),true);
+ assert.equal(has(validateDocument(missing),'INVALID_REFERENCE'),true);
 });
 
 test('invalid host references are rejected',()=>{
