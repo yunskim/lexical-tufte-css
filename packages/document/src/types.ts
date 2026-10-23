@@ -5,13 +5,15 @@ export type ElementFields={direction?:null|'ltr'|'rtl';format?:Alignment;indent?
 interface ElementBase<T extends string> extends ElementFields {type:T;version:1;children:JsonNode[]}
 type Element<T extends string,P={}> = ElementBase<T>&P;
 type Text<T extends string='text',P={}>={type:T;version:1;text:string;format:number;detail?:0|2;mode?:'normal';style?:''}&P;
-export type ImageFields={src:string;alt:string;assetId?:string;width?:number;height?:number};
+export type HostReference={namespace:string;kind:'document'|'note'|'task'|'asset';id:string};
+export type HostAssetLocator={namespace:string;assetId:string;revisionId?:string};
+export type ImageFields={src:string;alt:string;assetId?:string;hostAsset?:HostAssetLocator;width?:number;height?:number};
 export type JsonNode=
  | Element<'root'|'tufte-section'|'paragraph'|'tufte-caption'|'quote'|'tufte-epigraph'|'tufte-attribution'|'tufte-cite'|'tufte-section-footer'|'tufte-definition-list'|'tufte-term'|'tufte-definition'|'tufte-fullwidth'>
  | Element<'heading',{tag:'h2'|'h3'}>
  | Element<'list',{listType:'bullet'|'number';tag:'ul'|'ol';start:number}>
  | Element<'listitem',{value:number;checked?:undefined}>
- | Element<'link',{url:string;rel?:string|null;target?:'_blank'|'_self'|null;title?:string|null}>
+ | Element<'link',{url?:string;reference?:HostReference;rel?:string|null;target?:'_blank'|'_self'|null;title?:string|null}>
  | Element<'tufte-note',{noteId:string;kind:'sidenote'|'marginnote'}>
  | Element<'tufte-span',{kind:'sans'|'newthought'|'numeral'|'danger'}>
  | Element<'tufte-figure',{width:'body'|'fullwidth'}>
