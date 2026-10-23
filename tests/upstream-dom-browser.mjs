@@ -86,6 +86,24 @@ try{
    assert.ok(/(?:^| )(?:sidenote|marginnote)(?: |$)/.test(note.payloadClass??''),name+': wrong note payload');
   }
  }
+ // Optional same-content full-page fixture. Unlike the independent server fixture,
+ // this comparison is allowed to assert section-by-section parity.
+ if(process.env.UPSTREAM_FULL_DOCUMENT){
+  const fullDocument=JSON.parse(readFileSync(process.env.UPSTREAM_FULL_DOCUMENT,'utf8'));
+  const fullResult=renderArticle(fullDocument);
+  assert.equal(fullResult.ok,true,JSON.stringify(fullResult.diagnostics));
+  const full=await inspect(fullResult.html);
+  assert.equal(full.sections,original.sections,'full-page section count differs');
+  for(let i=0;i<original.sectionOutline.length;i++){
+   const expected=original.sectionOutline[i];
+   const actual=full.sectionOutline[i];
+   assert.equal(actual.heading,expected.heading,'section '+(i+1)+' heading differs');
+   assert.deepEqual(actual.directChildren,expected.directChildren,'section '+(i+1)+' direct child structure differs');
+   assert.equal(actual.notes,expected.notes,'section '+(i+1)+' note count differs');
+   assert.equal(actual.figures,expected.figures,'section '+(i+1)+' figure count differs');
+   assert.equal(actual.tables,expected.tables,'section '+(i+1)+' table count differs');
+  }
+ }
  assert.ok(original.notes.some(n=>n.labelInsideNewthought),'upstream newthought/note combination changed');
  assert.ok(published.notes.every(n=>!n.labelInsideNewthought),'known newthought parity gap needs review');
  console.log('P2.2.e DOM comparison:',JSON.stringify({
