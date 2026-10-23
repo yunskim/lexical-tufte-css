@@ -14,7 +14,7 @@
 
 ## Public interface
 
-`@lexical-tufte/editor-ports` exports `ReferenceProvider` with `search`, `resolve`, and `backlinks`. `EditorCapabilities.references` optionally supplies it. `AssetProvider` is a separate optional capability.
+`@lexical-tufte/editor-ports` exports `ReferenceProvider` with `search`, `resolve`, and `backlinks`. `EditorCapabilities.references` optionally supplies it. `EditorCapabilities.assets` is a separate optional `AssetProvider`; its host-qualified identity, transient URL rules, and remaining image-node integration work are documented in [AssetProvider boundary](asset-provider-boundary.md).
 
 The stored `host-link` supports kinds `document | note | task | asset`. `external` may be a discovery result but is not a valid internal-link target. Titles and URLs are **not** persisted as link identity. The provider is not part of the document schema or renderer.
 
