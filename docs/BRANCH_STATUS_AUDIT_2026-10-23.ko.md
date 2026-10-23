@@ -35,6 +35,15 @@ GitHub의 **두 브랜치**와 커밋 비교, main의 현재 파일, 작업 브�
 - 작업 순서: (1) 작업 브랜치 전체 페이지 핵심 코드의 import/API 의존성 확인 → (2) main의 schema·노트·렌더러와 호환성 표 작성 → (3) 선별 이관 또는 충돌 최소 수정 → (4) 중복 계측 정리 → (5) 사용자 지시 시 일괄 검증. 통과 전 체크 완료 금지.
 - Magnolia Works 기능 추가 금지. 호스트 인터페이스 경계만 유지.
 
+## 통합 착수 — 2026-10-23
+
+- [x] 작업 브랜치의 **standalone** `tests/helpers/pinned-upstream-article.mjs`를 내용 변경 없이 main으로 이관. DOMParser 기반 재구성 함수는 브라우저 `page.evaluate` 내부에서 실행되며 패키지 API를 직접 import하지 않는다.
+- [x] 작업 브랜치의 `tests/upstream-full-page-baseline-browser.mjs`를 내용 변경 없이 main으로 이관. 고정 원본 HTML/CSS와 Playwright만 참조하므로 최신 document/lexical/renderer 인터페이스 변경에 영향받지 않는다.
+- [ ] `tests/upstream-full-document-roundtrip-browser.mjs`는 작업 브랜치의 `migrateStoredDocument`, `validateDocumentV2`, `loadMigratedDocumentIntoEditor`, `exportEditorToDocumentV2` API를 import한다. main에서 제공 여부·계약을 확인하기 전 **그대로 복사하지 않는다**.
+- [ ] 실제 editor UI·visual 테스트는 그 다음에 종속성/fixture 계약을 확인하여 선별 이관한다.
+- [ ] 신규 이관 파일의 실제 실행 수락. 사용자의 일괄 검증 지시로 실행하지 않았다.
+- [ ] main에 임시 추가한 중복 비교 경로 정리. 기존 전체 페이지 오라클과 동등한 커버리지 확보 전 제거하지 않는다.
+
 ## 유의사항
 
 이 문서는 GitHub 원격 코드/기록을 근거로 한 **정적 감사**다. 테스트 실행 결과를 새로 생성하지 않았으며, 기록된 2026-10-19 실행 결과는 현재 브랜치 HEAD의 상태가 아니다.
