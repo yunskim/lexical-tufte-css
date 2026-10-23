@@ -186,3 +186,10 @@ GitHub의 **두 브랜치**와 커밋 비교, main의 현재 파일, 작업 브�
 - [x] `packages/document/test/concrete-note-migration.test.mjs`에 복제 불가 중첩 값 및 누락된 kind 회귀 테스트 추가.
 - [ ] 전체 저장소의 fixture 및 테스트 전수 검색은 미완료.
 - [ ] 테스트·빌드·CI 실행 전.
+
+
+## 통합 테스트 사전 준비 — 그림 마진노트 DOM
+
+- [x] 편집기 예제 및 주요 Lexical 노트 처리 파일 8개에서 구형 factory/kind API 참조 재점검.
+- [x] `packages/render/test/figure-margin-note.test.mjs`: 발행 label→input→span 인접 구조 및 편집 전용 속성 부재 검사 추가.
+- [ ] 전체 저장소 전수 검색 및 테스트 실행은 아직 완료하지 않음.
