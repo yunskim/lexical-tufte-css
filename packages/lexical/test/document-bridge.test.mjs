@@ -504,6 +504,31 @@ test('R03 v2 export preserves editor format after migrated import',()=>{
  assert.ok(invalid.diagnostics.some(d=>d.code==='UNSUPPORTED_EDITOR_FORMAT'));
 });
 
+test('E1 versioned import/export preserves upstream title anchor without mutating either envelope',()=>{
+ const source=editor();
+ source.update(()=>$getRoot().append($createSectionNode().append(
+  $createParagraphNode().append($createTextNode('Nine-section document title'))
+ )),{discrete:true});
+ const input={...fixture(),titleId:'tufte-css',lexicalState:source.getEditorState().toJSON()};
+ const original=JSON.stringify(input);
+ const first=editor();
+ const migrated=loadMigratedDocumentIntoEditor(first,input);
+ assert.equal(migrated.ok,true,JSON.stringify(migrated.diagnostics));
+ assert.equal(migrated.value.titleId,'tufte-css');
+ const saved=exportEditorToDocumentV2(first,migrated.value);
+ assert.equal(saved.ok,true,JSON.stringify(saved.diagnostics));
+ assert.equal(saved.value.titleId,'tufte-css');
+ assert.deepEqual(saved.value,migrated.value,'v1->v2 export must not strip titleId');
+ const disk=JSON.parse(JSON.stringify(saved.value));
+ const reopened=editor();
+ const loaded=loadMigratedDocumentIntoEditor(reopened,disk);
+ assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
+ const reopenedSave=exportEditorToDocumentV2(reopened,loaded.value);
+ assert.equal(reopenedSave.ok,true,JSON.stringify(reopenedSave.diagnostics));
+ assert.deepEqual(reopenedSave.value,disk);
+ assert.equal(JSON.stringify(input),original,'Caller document must remain immutable');
+});
+
 test('R03 checked-in v2 golden survives real Lexical import and export',()=>{
  const golden=JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document-v2.json',import.meta.url),'utf8'));
  const destination=editor();
