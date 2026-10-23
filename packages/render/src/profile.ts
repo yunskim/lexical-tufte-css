@@ -12,7 +12,6 @@ export function validateRenderProfile(doc:TufteDocument):Diagnostic[]{
   if(n.type==='code-highlight')add('highlightType','Code syntax highlighting is not yet published');
   if(n.type==='tufte-table-layout'&&n.layout!=='scroll'&&(n.format||n.direction))add('','Unwrapped layout attributes must be defaults');
   if(n.type==='tufte-inline-image')for(const key of ['assetId','width','height'] as const)if(n[key]!==undefined)add(key,'Managed/sized image output is deferred');
-  if(n.type==='tufte-figure'&&(n.children.length>2||n.children.some(c=>c.type==='tufte-marginnote')))add('children','Figure margin note renderer is deferred');
   if(n.type==='table'){
    if(n.rowStriping)add('rowStriping','Table striping is deferred');
    if(n.frozenColumnCount)add('frozenColumnCount','Frozen columns are deferred');
