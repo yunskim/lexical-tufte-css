@@ -378,6 +378,19 @@ function EditorUI(){
   const recoveryKey='lexical-tufte-recovery-v2';
   const recoverySession=useRef<string>(crypto.randomUUID());
   const sessionKey=recoveryKey+':'+recoverySession.current;
+  // Catalog-only changes also need an immediate paired recovery copy.
+  useEffect(()=>{
+    if(assets.length===0)return;
+    try{
+      const raw=JSON.stringify({
+        savedAt:new Date().toISOString(),
+        state:editor.getEditorState().toJSON(),
+        assets:assetsRef.current
+      });
+      localStorage.setItem(sessionKey,raw);
+      setRecoveryAvailable(true);
+    }catch{setAutoSaveState('관리 자산의 복구 저장에 실패했습니다. 문서를 직접 저장하세요.');}
+  },[assets,editor,sessionKey]);
   const legacyRecoveryKey='lexical-tufte-recovery-v1';
   function recoveryKeys(){
     return Object.keys(localStorage).filter(key=>key.startsWith(recoveryKey+':'));
@@ -407,7 +420,10 @@ function EditorUI(){
       if(pending!==undefined){clearTimeout(pending);pending=undefined;}
       if(latest===null)return;
       try{
-        localStorage.setItem(sessionKey,JSON.stringify({savedAt:new Date().toISOString(),state:latest.toJSON()}));
+        localStorage.setItem(sessionKey,JSON.stringify({
+          savedAt:new Date().toISOString(),state:latest.toJSON(),
+          ...(assetsRef.current.length?{assets:assetsRef.current}:{})
+        }));
         latest=null;refresh();setAutoSaveState('이 탭의 편집 상태를 복구용으로 저장했습니다.');
       }catch{
         // Quota pressure must not silently delete older recovery copies.
@@ -482,9 +498,9 @@ function EditorUI(){
           try{
             const raw=localStorage.getItem(key);
             if(raw===null)return null;
-            const value=JSON.parse(raw) as {savedAt?:unknown;state?:unknown};
+            const value=JSON.parse(raw) as {savedAt?:unknown;state?:unknown;assets?:unknown};
             if(typeof value.savedAt!=='string'||!value.state)return null;
-            return {key,savedAt:value.savedAt,state:value.state};
+            return {key,savedAt:value.savedAt,state:value.state,assets:value.assets};
           }catch{return null;}
         }).filter((item):item is NonNullable<typeof item>=>item!==null)
         .sort((a,b)=>b.savedAt.localeCompare(a.savedAt));
@@ -496,9 +512,23 @@ function EditorUI(){
       const selected=/^(0|[1-9][0-9]*)$/.test(choice)?entries[Number(choice)]:undefined;
       if(!selected){setStatus('복구본 선택을 취소했습니다.');return;}
       const state=editor.parseEditorState(JSON.stringify(selected.state));
+      let recoveredAssets:AssetRef[]=[];
+      if(selected.assets!==undefined){
+        if(!Array.isArray(selected.assets)){
+          setStatus('복구본의 자산 목록이 손상되어 복원을 거부했습니다. 원본은 유지합니다.');
+          return;
+        }
+        const candidate=prepareManagedSave(state.toJSON(),selected.assets as AssetRef[]);
+        if(!candidate.ok){
+          setStatus('복구본 자산 검증 실패: '+candidate.diagnostics[0]?.message);
+          return;
+        }
+        recoveredAssets=candidate.document.assets;
+      }
       if(!window.confirm('현재 편집 상태를 선택한 복구본으로 바꾸시겠습니까?'))return;
       replaceEditorDocumentState(editor,state);
-      setStatus('선택한 복구본을 열었습니다. 구조를 확인한 후 정상 저장하세요.');
+      installAssets(recoveredAssets);
+      setStatus('선택한 복구본의 본문과 자산 목록을 불러왔습니다. 구조를 확인한 후 저장하세요.');
     }catch{setStatus('복구용 사본을 열지 못했습니다.');}
   }
   const textarea=useRef<HTMLTextAreaElement>(null);
