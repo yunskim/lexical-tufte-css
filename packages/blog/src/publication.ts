@@ -13,7 +13,10 @@ export type PublicationState={generation:number;snapshotId:string|null;lastSnaps
 export type PublishOptions={expectedRevision:number;expectedGeneration:number;publishedAt:string;assetExists:(src:string)=>Promise<boolean>};
 /** Opt-in no-op policy. Only asset-free documents can be compared safely without an immutable asset manifest. */
 export type PublishIfChangedOptions=PublishOptions;
-export type RestorePublicationOptions={expectedGeneration:number;assetExists:(src:string)=>Promise<boolean>;authorize:()=>Promise<boolean>};
+export type RestorePublicationOptions={expectedGeneration:number;assetExists:(src:string)=>Promise<boolean>;authorize:()=>Promise<boolean>;
+ /** Optional synchronous final guard inside BEGIN IMMEDIATE. Must not return a Promise. */
+ verifyAtCommit?:()=>boolean;
+};
 const fail=(code:string,message:string):Result<never>=>({ok:false,diagnostics:[{code,path:'$.publication',message}]});
 const validCount=(n:number,min=0)=>Number.isSafeInteger(n)&&n>=min;
 const emptyState=():PublicationState=>({generation:0,snapshotId:null,lastSnapshotId:null,firstPublishedAt:null,publishedAt:null,publishedRevision:null});
@@ -102,7 +105,7 @@ export class SqlitePublicationStore{
  }
  /** Re-expose a historical immutable snapshot without changing the current draft. */
  async restorePublishedSnapshot(id:string,snapshotId:string,options:RestorePublicationOptions):Promise<Result<PublicationState>>{
-  if(!isIdentifier(id)||!/^[0-9a-f]{64}$/.test(snapshotId)||!options||!validCount(options.expectedGeneration,1)||typeof options.authorize!=='function'||typeof options.assetExists!=='function')return fail('INVALID_PUBLICATION_INPUT','Invalid restore request');
+  if(!isIdentifier(id)||!/^[0-9a-f]{64}$/.test(snapshotId)||!options||!validCount(options.expectedGeneration,1)||typeof options.authorize!=='function'||typeof options.assetExists!=='function'||(options.verifyAtCommit!==undefined&&typeof options.verifyAtCommit!=='function'))return fail('INVALID_PUBLICATION_INPUT','Invalid restore request');
   let started=false;
   try{
    const before=this.head(id);
@@ -118,6 +121,11 @@ export class SqlitePublicationStore{
    this.db.exec('BEGIN IMMEDIATE');started=true;
    const current=this.head(id);
    if(current.generation!==options.expectedGeneration){this.db.exec('ROLLBACK');started=false;return fail('PUBLICATION_CONFLICT','Publication changed during restore');}
+   if(options.verifyAtCommit){
+    let allowed:boolean;
+    try{const decision:unknown=options.verifyAtCommit();if(typeof decision!=='boolean')throw new TypeError('Commit guard must return boolean synchronously');allowed=decision;}catch{this.db.exec('ROLLBACK');started=false;return fail('PUBLICATION_COMMIT_GUARD_ERROR','Restore commit guard failed');}
+    if(!allowed){this.db.exec('ROLLBACK');started=false;return fail('PUBLICATION_FORBIDDEN','Restore commit guard denied activation');}
+   }
    if(current.snapshotId===snapshotId){this.db.exec('COMMIT');started=false;return {ok:true,value:current,diagnostics:[]};}
    const latest=this.draft(id);if(!latest.ok){this.db.exec('ROLLBACK');started=false;return latest;}
    if(latest.value.metadata.slug!==draft.value.metadata.slug||latest.value.metadata.createdAt!==draft.value.metadata.createdAt){this.db.exec('ROLLBACK');started=false;return fail('REVISION_CONFLICT','Draft identity changed during restore');}
