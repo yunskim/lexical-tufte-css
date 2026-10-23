@@ -132,6 +132,15 @@ GitHub의 **두 브랜치**와 커밋 비교, main의 현재 파일, 작업 브�
 - [ ] 기존 저장 `tufte-note + kind` 문서의 안전한 이전 처리.
 - [ ] 테스트/빌드/CI는 실행하지 않았다.
 
+## Lexical concrete note 등록 — 진행 중
+
+- [x] 실제 `packages/lexical/src/NoteNode.ts`를 기존 브랜치의 추상 구현으로 교체하고 `SidenoteNode.ts`, `MarginnoteNode.ts`를 생성.
+- [x] `nodes.ts` registry와 `index.ts` 공개 API를 두 concrete 타입으로 변경.
+- [x] `noteOperations.ts` split/merge를 타입 기준으로 변경.
+- [ ] **호출부 전체 이관 미완료**: 기존 `$createNoteNode`, `getKind`, `setKind` 의존 코드와 테스트를 갱신해야 한다. 현재 빌드 실패 가능성이 높다.
+- [ ] renderer, legacy stored document migration, 호환성 회귀 검증.
+- [ ] 테스트/빌드/CI 미실행.
+
 ## 유의사항
 
 이 문서는 GitHub 원격 코드/기록을 근거로 한 **정적 감사**다. 테스트 실행 결과를 새로 생성하지 않았으며, 기록된 2026-10-19 실행 결과는 현재 브랜치 HEAD의 상태가 아니다.
