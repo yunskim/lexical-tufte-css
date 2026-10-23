@@ -85,3 +85,11 @@ Restore와 Unpublish는 이제 중립 서비스로 호출 가능하다. 다만 �
 - BEFORE INSERT 트리거로 snapshot insert 실패 및 head insert 실패를 주입하여 원자적 롤백을 확인하는 테스트 작성.
 - BEFORE UPDATE 트리거로 Unpublish 실패를 주입하여 기존 공개 상태 유지 확인 테스트 작성.
 - 테스트·빌드·타입 검사·CI 미실행. SQLite 잠금 타이밍에 따라 다중 연결 경쟁은 PUBLICATION_STORAGE_ERROR를 반환할 가능성도 있으므로 실제 실행 후 오류 분류 및 재시도 정책을 확인해야 한다.
+
+## 2026-10-23 Restore 롤백 및 오류 분류
+
+- Restore UPDATE 장애 주입 시 기존 공개 포인터·generation·스냅샷 개수 유지, 트리거 제거 후 재시도 테스트 작성.
+- 제거된 legacy 참조를 정리하고 Restore·Unpublish 트랜잭션 내부 상태 조회를 동기화.
+- SQLite 예외 code가 SQLITE_BUSY 또는 SQLITE_LOCKED인 경우 PUBLICATION_STORAGE_BUSY로 구분. 호출자는 상태를 다시 읽고 expectedGeneration을 확인한 뒤 재시도를 결정한다. 무조건 자동 재시도하지 않는다.
+- 다중 연결 경쟁 테스트의 기대 오류는 실제 SQLite 잠금 경합에 따라 PUBLICATION_CONFLICT 또는 PUBLICATION_STORAGE_BUSY일 수 있다. 실행 배치에서 관측·조정 필요.
+- 신규 코드와 테스트는 아직 미실행.
