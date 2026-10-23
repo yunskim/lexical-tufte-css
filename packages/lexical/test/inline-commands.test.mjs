@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {createHeadlessEditor} from '@lexical/headless';
 import {$createLinkNode} from '@lexical/link';
 import {$getSelection,$getRoot,$createParagraphNode,$createTextNode,$createRangeSelection,$setSelection} from 'lexical';
-import {TufteSpanNode,$createTufteSpanNode,$createNoteNode,TUFTE_NODES,registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND,WRAP_TUFTE_SPAN_COMMAND,UNWRAP_TUFTE_SPAN_COMMAND} from '../dist/index.js';
+import {TufteSpanNode,$createTufteSpanNode,$createSidenoteNode,$createMarginnoteNode,TUFTE_NODES,registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND,WRAP_TUFTE_SPAN_COMMAND,UNWRAP_TUFTE_SPAN_COMMAND} from '../dist/index.js';
 
 const make=()=>createHeadlessEditor({namespace:'inline-command-test',nodes:[TufteSpanNode],onError(error){throw error;}});
 test('P2.2.b existing span kind command preserves text and rejects invalid payload',()=>{
@@ -104,7 +104,7 @@ test('P2.2.b span creation rejects absent, cross-text and note selections withou
  editor.update(()=>{},{discrete:true});
  assert.equal(JSON.stringify(editor.getEditorState().toJSON()),before);
  editor.update(()=>{
-  const note=$createNoteNode('note-1','sidenote').append($createTextNode('memo'));
+  const note=$createSidenoteNode('note-1').append($createTextNode('memo'));
   $getRoot().getFirstChild().append(note);
   note.getFirstChild().select(0,2);
  },{discrete:true});
@@ -140,7 +140,7 @@ test('P2.2.b wrapping text inside a link preserves its URL and an adjacent note 
  editor.update(()=>{
   const text=$createTextNode('linked term');
   const link=$createLinkNode('https://lexical.dev').append(text);
-  const note=$createNoteNode('stable-note','sidenote').append($createTextNode('Keep me'));
+  const note=$createSidenoteNode('stable-note').append($createTextNode('Keep me'));
   $getRoot().append($createParagraphNode().append(link,$createTextNode(' '),note));
   text.select(0,6);
  },{discrete:true});
@@ -232,7 +232,7 @@ test('P2.2.b.1 cross-parent link selection is rejected without changing link or 
  editor.update(()=>{
   const linked=$createTextNode('linked');
   const plain=$createTextNode('plain');
-  const note=$createNoteNode('cross-note','sidenote').append($createTextNode('memo'));
+  const note=$createSidenoteNode('cross-note').append($createTextNode('memo'));
   $getRoot().append($createParagraphNode().append($createLinkNode('https://lexical.dev').append(linked),plain,note));
   const selection=$createRangeSelection();
   selection.setTextNodeRange(linked,2,plain,3);
@@ -257,7 +257,7 @@ test('P2.2.b.1 unwrapping retains the caret text offset and adjacent note identi
  const dispose=registerInlineCommands(editor,d=>diagnostics.push(d));
  editor.update(()=>{
   const text=$createTextNode('abcdef');
-  const note=$createNoteNode('caret-note','marginnote').append($createTextNode('memo'));
+  const note=$createMarginnoteNode('caret-note').append($createTextNode('memo'));
   $getRoot().append($createParagraphNode().append($createTufteSpanNode('danger').append(text),note));
   text.select(3,3);
  },{discrete:true});
