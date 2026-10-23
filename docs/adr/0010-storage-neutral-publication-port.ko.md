@@ -37,7 +37,7 @@ Magnolia Works는 자체 Task/Asset/Revision과 저장소를 유지한다. Lexic
 - [x] SQLite 직접 제어 코드를 당장 제거하지 않고 레거시로 격리
 - [x] `PublicationService`에 Publish·Restore·Unpublish 오케스트레이션 추가 (레거시 코드 제거는 후속)
 - [x] `SqlitePublicationAdapter implements PublicationStore` 작성 (Restore·Unpublish 트랜잭션 독립 구현, 조회는 레거시 위임)
-- [ ] 공통 포트 계약 테스트를 SQLite 어댑터에 적용
+- [ ] 공통 포트 계약 테스트 전체를 SQLite 어댑터에 적용 (기초 상태/CAS 테스트만 작성)
 - [x] 중립 서비스 Restore·Unpublish 계약 테스트 작성 (미실행)
 - [ ] SQLite 전용 테스트와 기존 공개 API 회귀 확인
 - [ ] Host 인가·에셋 manifest 확장 포인트 정의
@@ -57,3 +57,10 @@ Restore와 Unpublish는 이제 중립 서비스로 호출 가능하다. 다만 �
 - 상태·스냅샷·공개 문서 조회는 아직 레거시 SqlitePublicationStore에 위임한다. 완전한 의존성 제거는 미완료다.
 - 외부 권한 철회와 에셋 변경은 원자화되지 않았다. 호스트의 별도 일관성 계약이 필요하다.
 - 신규 어댑터 경로의 타입 검사 및 테스트는 실행하지 않았다.
+
+## 2026-10-23 조회 의존성 제거
+
+- `SqlitePublicationAdapter`의 `SqlitePublicationStore` 객체 참조 제거.
+- 상태·스냅샷·공개 문서 조회 및 무결성 검사를 어댑터가 직접 수행.
+- 기초 상태·Unpublish CAS 계약 테스트 작성. Publish·Restore 경합과 실제 fixture 통합 계약 테스트는 후속.
+- 타입 검사·테스트·CI 미실행. 새 어댑터를 검증 완료로 간주하지 않는다.
