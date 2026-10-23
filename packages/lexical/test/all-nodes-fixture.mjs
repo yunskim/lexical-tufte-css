@@ -7,7 +7,7 @@ import {$createTableNode as table,$createTableRowNode as row,$createTableCellNod
 import {$createHorizontalRuleNode as hr} from '@lexical/react/LexicalHorizontalRuleNode';
 import {
  TUFTE_NODES,$createTufteCodeHighlightNode as token,$createSectionNode as section,$createSidenoteNode as side,$createMarginnoteNode as margin,$createInlineImageNode as image,$createTufteSpanNode as span,
- $createFigureNode as figure,$createCaptionNode as caption,$createTableLayoutNode as layout,
+ $createHostLinkNode as hostLink,$createFigureNode as figure,$createCaptionNode as caption,$createTableLayoutNode as layout,
  $createDefinitionListNode as dl,$createDefinitionTermNode as dt,$createDefinitionDescriptionNode as dd,
  $createEpigraphNode as epigraph,$createAttributionNode as attribution,$createCiteNode as cite,$createSectionFooterNode as footer,
  $createFullwidthNode as fullwidth,$createTufteCodeNode as code,$createImageQuiltNode as quilt,$createEmbedNode as embed,
@@ -20,6 +20,7 @@ export function createAllNodesDocument(){
    heading('h2').append(t('한글 제목 '),t('code').toggleFormat('code')),
    heading('h3').append(t('작은 제목')),
    p().append(t('본문 & <escape> '),t('bold').toggleFormat('bold'),t('italic').toggleFormat('italic'),t('underline').toggleFormat('underline'),t('strike').toggleFormat('strikethrough'),t('mark').toggleFormat('highlight'),t('sub').toggleFormat('subscript'),t('sup').toggleFormat('superscript'),br(),link('https://lexical.dev',{target:'_blank',rel:'author',title:'문서'}).append(t('링크'))),
+   p().append(t('호스트 '),hostLink({namespace:'magnolia',kind:'note',id:'note-123'}).append(t('참조'))),
    p().append(...['sans','newthought','numeral','danger'].map(kind=>span(kind).append(t(kind)))),
    p().append(t('주석 '),side('golden-side').append(t('번호 있는 주석 '),link('/reference').append(t('참고')),image('/fixture.svg','여백 그림')),margin('golden-margin').append(t('번호 없는 주석'))),
    p().append(image('/fixture.svg','관리 자산','chart',120,48)),
