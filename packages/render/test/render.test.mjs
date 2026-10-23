@@ -343,3 +343,17 @@ test('host references render as non-navigable spans with escaped identifiers',()
  assert.match(result.html,/<span class="tufte-host-link" data-host-reference="note-123" data-host-namespace="workspace" data-host-kind="note">/);
  assert.doesNotMatch(result.html,/href="note-123"/);
 });
+
+test('host reference retains its identity class when aligned',()=>{
+ const d=fixture();
+ const paragraph=d.lexicalState.root.children[0].children[0];
+ paragraph.children.push({
+  type:'host-link',version:1,format:'center',indent:0,direction:null,
+  reference:{namespace:'workspace',kind:'task',id:'task-123'},
+  children:[{type:'text',version:1,text:'Task',format:0,detail:0,mode:'normal',style:''}]
+ });
+ const result=renderArticle(d);
+ assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+ assert.match(result.html,/class="tufte-host-link tufte-align-center" data-host-reference="task-123"/);
+ assert.doesNotMatch(result.html,/<a[^>]*data-host-reference=/);
+});
