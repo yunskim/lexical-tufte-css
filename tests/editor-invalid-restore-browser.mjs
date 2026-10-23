@@ -1,0 +1,54 @@
+import assert from 'node:assert/strict';
+import {chromium} from 'playwright';
+import {spawn} from 'node:child_process';
+import {setTimeout} from 'node:timers/promises';
+
+// Regression: a malformed persisted document must not replace the live editor.
+// Run separately after building; deliberately excluded from CI scripts for now.
+const url=process.env.EDITOR_URL||'http://127.0.0.1:5174/';
+const server=process.env.EDITOR_URL?null:spawn(process.execPath,[
+ 'node_modules/vite/bin/vite.js','--host','127.0.0.1','--port','5174',
+ '--strictPort','--config','../../tests/vite-publication.config.mjs'
+],{cwd:'examples/editor',stdio:'ignore'});
+let browser;
+try {
+ for(let i=0;i<100;i++){
+  try{if((await fetch(url)).ok)break;}catch{}
+  if(i===99)throw Error('Editor server not ready');
+  await setTimeout(100);
+ }
+ browser=await chromium.launch({headless:true,args:['--no-sandbox'],
+  ...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{})});
+ const page=await browser.newPage();page.setDefaultTimeout(6000);
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto(url);
+ const editor=page.locator('.editor');await editor.waitFor();
+ const snapshot=async()=>{
+  await page.getByRole('button',{name:'JSON·HTML 확인',exact:true}).click();
+  return JSON.parse(await page.getByRole('textbox',{name:'문서 JSON',exact:true}).inputValue());
+ };
+ await editor.click();await page.keyboard.press('Control+End');
+ await page.keyboard.insertText('KEEP-LIVE-EDITOR');
+ const before=await snapshot();
+ // The saved-document loader is the actual import boundary. A malformed
+ // JSON payload must be rejected without clearing the current Lexical tree.
+ await page.evaluate(()=>localStorage.setItem('lexical-tufte-p1','{invalid-json'));
+ await page.getByRole('button',{name:'불러오기',exact:true}).click();
+ assert.deepEqual(await snapshot(),before,'Malformed saved JSON replaced live editor');
+ assert.match(await editor.innerText(),/KEEP-LIVE-EDITOR/);
+ // A structurally invalid Lexical root is also an invalid import.
+ await page.evaluate(()=>localStorage.setItem('lexical-tufte-p1',JSON.stringify({
+  root:{type:'unknown-node',version:1,children:[]}
+ })));
+ await page.getByRole('button',{name:'불러오기',exact:true}).click();
+ assert.deepEqual(await snapshot(),before,'Invalid Lexical root replaced live editor');
+ assert.match(await editor.innerText(),/KEEP-LIVE-EDITOR/);
+ // Recovery must remain usable after rejected input.
+ await editor.click();await page.keyboard.press('Control+End');
+ await page.keyboard.insertText(' AFTER-REJECTION');
+ const after=await snapshot();
+ assert.notDeepEqual(after,before);
+ assert.match(await editor.innerText(),/AFTER-REJECTION/);
+ assert.deepEqual(errors,[],'Rejected imports caused uncaught browser exceptions');
+ console.log('Malformed persisted JSON/root: live Lexical state preserved and subsequent editing works.');
+}finally{await browser?.close();server?.kill();}
