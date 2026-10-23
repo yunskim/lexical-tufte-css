@@ -20,6 +20,23 @@ export class InlineImageNode extends DecoratorNode<null> {
   static getType(): string { return 'tufte-inline-image'; }
   static clone(node: InlineImageNode): InlineImageNode { return new InlineImageNode(node.__src,node.__alt,node.__key,node.__assetId,node.__width,node.__height,node.__hostAsset); }
   constructor(src = '', alt = '', key?: NodeKey, assetId?: string, width?: number, height?: number, hostAsset?: HostAssetLocator) { super(key); this.__src=src; this.__alt=alt; this.__assetId=assetId; this.__hostAsset=hostAsset===undefined?undefined:{...hostAsset}; this.__width=width; this.__height=height; }
+  /** Read-only image properties for host/editor inspectors; never return live metadata. */
+  getImageProperties(): Omit<SerializedInlineImage,'type'|'version'> {
+    const node=this.getLatest();
+    return {src:node.__src,alt:node.__alt,
+      ...(node.__assetId===undefined?{}:{assetId:node.__assetId}),
+      ...(node.__hostAsset===undefined?{}:{hostAsset:{...node.__hostAsset}}),
+      ...(node.__width===undefined?{}:{width:node.__width}),
+      ...(node.__height===undefined?{}:{height:node.__height})};
+  }
+  /** Validate both fields before mutation, preserving any asset/host identity. */
+  setImagePresentation(alt:string,width?:number,height?:number):this {
+    const current=this.getLatest();
+    assertImageProperties(current.__src,alt,current.__assetId,width,height,current.__hostAsset);
+    const writable=this.getWritable();
+    writable.__alt=alt;writable.__width=width;writable.__height=height;
+    return this;
+  }
   isInline(): true { return true; }
   decorate(): null { return null; }
   private createImageElement(): HTMLImageElement {
