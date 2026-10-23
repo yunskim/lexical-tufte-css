@@ -18,3 +18,5 @@ export interface AssetProvider{
  resolve(locator:AssetLocator,signal?:AbortSignal):Promise<ResolvedAsset|null>;
 }
 export type EditorCapabilities={references?:ReferenceProvider;assets?:AssetProvider};
+
+export {ReferenceSelection} from './referenceSelection.js';
