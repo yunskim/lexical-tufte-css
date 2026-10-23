@@ -34,7 +34,6 @@
     "@lexical/code": "0.52.0",
     "@lexical/history": "0.52.0",
     "@lexical-tufte/document": "workspace:*",
-    "@lexical-tufte/render": "workspace:*",
     "@lexical-tufte/editor-ports": "workspace:*"
   },
   "peerDependencies": {
