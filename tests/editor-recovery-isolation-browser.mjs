@@ -114,6 +114,21 @@ try {
   'Unselected recovery snapshot must remain unchanged');
  assert.equal(await page.evaluate(()=>localStorage.getItem('lexical-tufte-p1')),canonical,
   'Deleting one of multiple recovery snapshots must preserve canonical save');
+ // The remaining older snapshot must still be openable after deleting
+ // the newer one; opening it must not change the canonical saved bytes.
+ page.once('dialog',dialog=>{
+  assert.equal(dialog.type(),'confirm');
+  dialog.accept();
+ });
+ await button.click();
+ await page.getByRole('status',{name:'편집 작업 상태'}).filter({
+  hasText:'선택한 복구본을 열었습니다.'
+ }).waitFor();
+ assert.match(await editor.innerText(),/RECOVERY-ONLY/);
+ assert.equal(await page.evaluate(key=>localStorage.getItem(key),olderKey),olderBytes,
+  'Opening remaining recovery snapshot must not consume it');
+ assert.equal(await page.evaluate(()=>localStorage.getItem('lexical-tufte-p1')),canonical,
+  'Opening remaining recovery snapshot must preserve canonical save');
  assert.deepEqual(errors,[]);
  console.log('Recovery reopen: cancellation, explicit open, canonical isolation and canonical restore.');
 }finally{await browser?.close();server?.kill();}
