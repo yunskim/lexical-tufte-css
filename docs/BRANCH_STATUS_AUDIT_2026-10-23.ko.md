@@ -154,3 +154,12 @@ GitHub의 **두 브랜치**와 커밋 비교, main의 현재 파일, 작업 브�
 - [ ] 이전 전후 v1/v2 문서와 invalid payload에 대한 회귀 테스트 추가 및 실행.
 - [ ] `inspectStoredDocument()` 단독 호출은 구형 note wire type을 수용하지 않음. 명시적 마이그레이션 경로에서만 변환.
 - [ ] 나머지 편집기 호출부 및 빌드·테스트 검증 미완료. 테스트/빌드/CI 미실행.
+
+
+## 편집기 concrete note 생성 전환
+
+- [x] `examples/editor/src/main.tsx` 기본 노트 및 사용자 삽입에서 concrete node factory 사용.
+- [x] `examples/editor/src/layoutFixture.ts` 여백 주석 factory 전환.
+- [x] `tests/note-editing-browser.mjs` 상태 검사에서 두 concrete note type 인식.
+- [ ] 다른 예제/테스트의 `tufte-note`와 `$createNoteNode` 참조 전수 점검.
+- [ ] 빌드·타입 검사·브라우저 테스트 미실행. 통합 테스트 준비 완료 미선언.
