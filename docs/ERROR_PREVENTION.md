@@ -24,6 +24,8 @@ AGENTS, E103/E104·M095/M096 및 기존 active-editor/fixture/타입 좁히기/�
 
 ## M101 — 실행 실패와 시각 검증 범위 구분
 
+- E110 후속 선별 이관 원칙: upstream 브랜치의 스키마/렌더러 파일을 그대로 덮어쓰지 않고, main의 HostLink/HostAsset·publication/restore 계약과 비교해 필드·노드 단위로 반영한다. 시각 helper는 고정 Git blob 무결성과 명시적 acquisition을 함께 추가한다. 새 코드의 통과 여부는 전체 재실행 후에만 인정한다. [후속 체크리스트](MAIN_BROWSER_PARITY_REMEDIATION_2026-10-23.ko.md) 참조.
+
 - E110: helper import 실패는 visual 검사 미도달로 기록한다. 원본 binary는 고정 출처·manifest·무결성 검사와 acquisition 경로를 함께 이관한 후 준비한다. 단색 pixel 비교기 자체 통과나 원본 inventory를 동일 콘텐츠 전체 시각 parity로 확대하지 않는다.
 - 다른 브랜치의 pass 수와 main의 결과를 합치지 않는다. 최신 보고서에 시작 SHA, 수정 범위, 파일별 실패 원인·차단된 후속 assertion을 기록한다.
 
