@@ -13,6 +13,11 @@
 - [x] 비교 스크립트에 `newthought > sidenote label` 차이가 **known gap**으로 명시되어 있다.
 - [ ] 동일 콘텐츠의 전체 9개 섹션을 사용하는 Lexical 문서 fixture와 렌더 결과를 실제 비교 테스트로 검증한다.
 - [ ] 기존 전체 페이지 fixture/테스트 구현의 정확한 위치와 중복 여부를 조사해 대응표에 연결한다.
+- [x] 기존 DOMParser 비교 코드에 섹션별 heading, 직계 자식 태그 순서, 노트·그림·표 개수를 수집하는 진단 정보를 추가했다. **실행 결과는 아직 없다.**
+
+## 현재 확보한 비교 계측 (미실행)
+
+`tests/upstream-dom-browser.mjs`는 이제 `upstreamSectionOutline`과 `publishedFixtureSectionOutline`을 출력하도록 작성되었다. 각각 section 순번, 첫 직계 heading, 직계 자식 태그 배열, note/figure/table 개수를 담는다. 비교 대상은 여전히 **원본 전체 페이지 대 별도 server-document fixture**이므로 이 수치만으로 전체 페이지 parity를 수락하지 않는다. 다음에는 동일 콘텐츠 fixture의 경로와 생성 흐름을 확인하고 이 계측을 연결한다.
 
 ## 2. DOM 차이 분류 및 해결
 
