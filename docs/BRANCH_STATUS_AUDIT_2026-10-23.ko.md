@@ -59,6 +59,17 @@ GitHub의 **두 브랜치**와 커밋 비교, main의 현재 파일, 작업 브�
 
 **결론:** roundtrip 테스트의 import 경로 자체는 대체로 유지되지만, 재구성기가 만드는 JSON node type과 main의 schema/registry/renderer가 맞지 않는다. 테스트 파일을 그대로 복사하면 검증 실패가 예상되며, 원인을 감추는 호환성 shim을 새로 만들지 않는다. 기존 브랜치의 concrete note 모델과 관련 renderer/schema 변경을 main의 HostLink 계약과 충돌 없이 선별 이관할지 먼저 결정한다. 이전에 이관한 standalone baseline과 fixture builder는 유지한다.
 
+## 확정 결정: 노드 타입으로 주석 구별
+
+사용자 결정에 따라 **기존 작업 브랜치의 concrete node 모델을 정본으로 채택**한다.
+
+- 저장 wire type: `tufte-sidenote`, `tufte-marginnote` 두 가지. `tufte-note + kind` 모델은 최종 정본이 아니다.
+- Lexical: 공통 추상 `NoteNode`를 구현 재사용에만 사용하고 `SidenoteNode`, `MarginnoteNode`를 등록한다. 기존 브랜치의 세 파일을 우선 재사용한다.
+- 문서 계약: schema/types/validator, 노드 registry, renderer profile/switch, editor bridge, golden fixture를 **동일 변경 단위**에서 일치시킨다. 호스트 참조 노드와 `ReferenceProvider`는 유지한다.
+- 기존 `tufte-note` 저장 문서의 이전 정책은 명시적으로 결정·테스트한다. 기존 자료를 묵시적으로 버리거나 손실 변환하지 않는다.
+- `tufte-sidenote` ↔ `tufte-marginnote` 전환 기능은 이번 결정에 포함되지 않는다.
+- 현재 main은 여전히 generic note 코드이므로 **결정 확정 ≠ 구현 완료**. 구조 이전·테스트 수락은 미완료다.
+
 ## 유의사항
 
 이 문서는 GitHub 원격 코드/기록을 근거로 한 **정적 감사**다. 테스트 실행 결과를 새로 생성하지 않았으며, 기록된 2026-10-19 실행 결과는 현재 브랜치 HEAD의 상태가 아니다.
