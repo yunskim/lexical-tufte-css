@@ -13,3 +13,4 @@ export {InMemoryPostRevisionStoreV2,type PostRevisionStoreV2} from './revisionSt
 export {SqlitePostRevisionStoreV2,type SqliteDatabase,type SqliteStatement} from './sqliteRevisionStore.js';
 export {createPostBackupV2,inspectPostBackupV2,restorePostBackupV2,type PostBackupV2} from './backup.js';
 export {readSqlitePostSnapshotV2,type SqliteReadDatabase,type SqliteReadStatement} from './sqliteSnapshot.js';
+export {HOST_REFERENCE_CLASS,HOST_REFERENCE_ATTRIBUTES,hostReferenceAttributes} from './hostReferenceDOM.js';
