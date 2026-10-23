@@ -178,3 +178,11 @@ GitHub의 **두 브랜치**와 커밋 비교, main의 현재 파일, 작업 브�
 - [x] `packages/render/test/figure-margin-note.test.mjs`에 그림 마진노트 발행 성공 및 사이드노트 거부 회귀 테스트 추가.
 - [ ] 렌더링 테스트 전체 및 브라우저 테스트 실행 전.
 - [ ] 다른 fixture의 legacy `tufte-note` 잔여 참조 확인 필요.
+
+
+## 레거시 fixture 및 입력 안전성 점검
+
+- [x] `tests/note-browser.mjs`, `tests/publication-browser.mjs`, `tests/server-browser.mjs`, `packages/render/test/render.test.mjs` 확인: 검사한 테스트 코드에서 `tufte-note` wire type 참조 없음 (`data-tufte-note`는 발행 HTML 속성으로 유지).
+- [x] `packages/document/test/concrete-note-migration.test.mjs`에 복제 불가 중첩 값 및 누락된 kind 회귀 테스트 추가.
+- [ ] 전체 저장소의 fixture 및 테스트 전수 검색은 미완료.
+- [ ] 테스트·빌드·CI 실행 전.
