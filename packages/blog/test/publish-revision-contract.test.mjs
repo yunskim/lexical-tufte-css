@@ -12,12 +12,12 @@ const initial=()=>({document:fixture(),metadata:{slug:'publication',summary:'ori
 const adapter=db=>({prepare(sql){return {bind(...values){return {async run(){return {meta:{changes:db.prepare(sql).run(...values).changes}};}};}};}});
 const ok=r=>{assert.equal(r.ok,true,JSON.stringify(r.diagnostics));return r.value;};
 const opts=(revision,generation,time)=>({expectedRevision:revision,expectedGeneration:generation,publishedAt:time,assetExists:async()=>true});
-async function setup(){
+async function setup(post=initial()){
  const db=new DatabaseSync(':memory:');
  try{
   db.exec(readFileSync(new URL('../../document/sql/001_posts_v2.sql',import.meta.url),'utf8'));
   db.exec(readFileSync(new URL('../sql/001_publications_v1.sql',import.meta.url),'utf8'));
-  const post=initial(),drafts=new SqlitePostRevisionStoreV2(adapter(db));
+  const drafts=new SqlitePostRevisionStoreV2(adapter(db));
   ok(await drafts.insert(post));
   return {db,post,drafts,store:new SqlitePublicationStore(db),id:post.document.id};
  }catch(error){db.close();throw error;}
@@ -124,5 +124,33 @@ test('publishIfChanged never treats an unpublished head as a no-op',async()=>{
   const second=ok(await store.publishIfChanged(id,opts(1,2,'2026-10-16T02:00:00Z')));
   assert.notEqual(second.snapshotId,first.snapshotId);
   assert.equal(ok(store.readState(id)).generation,3);
+ }finally{db.close();}
+});
+
+test('asset-free publishIfChanged returns same immutable snapshot and preserves timestamps',async()=>{
+ const post=initial();
+ const section=post.document.lexicalState.root.children[0];
+ section.children=section.children.filter(node=>node.type!=='tufte-figure');
+ const prune=node=>{
+  if(!node||typeof node!=='object')return;
+  if(Array.isArray(node.children)){
+   node.children=node.children.filter(child=>child.type!=='tufte-inline-image');
+   node.children.forEach(prune);
+  }
+ };
+ prune(section);
+ const {db,store,drafts,id}=await setup(post);
+ try{
+  const first=ok(await store.publishIfChanged(id,opts(1,0,'2026-10-16T01:00:00Z')));
+  const same=ok(await store.publishIfChanged(id,opts(1,1,'2026-10-16T02:00:00Z')));
+  assert.deepEqual(same,first);
+  assert.equal(ok(store.readState(id)).generation,1);
+  assert.equal(db.prepare('SELECT count(*) AS n FROM publication_snapshots_v1').get().n,1);
+  const next=structuredClone(post);
+  next.metadata.revision=2;next.metadata.updatedAt='2026-10-16T02:30:00Z';
+  ok(await drafts.compareAndSwap(next,1));
+  const again=ok(await store.publishIfChanged(id,opts(2,1,'2026-10-16T03:00:00Z')));
+  assert.equal(again.snapshotId,first.snapshotId);
+  assert.equal(ok(store.readState(id)).publishedAt,first.snapshot.publishedAt);
  }finally{db.close();}
 });
