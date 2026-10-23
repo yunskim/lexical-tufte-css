@@ -71,3 +71,10 @@ Restore와 Unpublish는 이제 중립 서비스로 호출 가능하다. 다만 �
 - Publish→Restore→Unpublish와 불변 스냅샷·Draft 독립성 검증 시나리오.
 - stale generation 및 에셋 비동기 검사 중 Draft 변경에 대한 CAS 거부 시나리오.
 - 아직 실행하지 않았으므로 통과를 주장하지 않는다. 다음 테스트 배치에서 타입 검사, fixture 유효성, 오류 코드와 스키마 일치를 확인해야 한다.
+
+## 2026-10-23 실패 경로 계약 테스트
+
+- 동일 expectedGeneration을 사용하는 두 Publish 요청의 단일 성공 및 단일 스냅샷 검증.
+- Restore 에셋 사전 검사 중 publication head 변경 시 CAS 충돌과 불변 스냅샷 보존 검증.
+- 스냅샷 payload 변조 시 해시 불일치로 조회·공개 조회·복원 거부 검증.
+- 모든 신규 테스트는 작성만 했으며 실행하지 않았다. 특히 동시성 테스트는 단일 프로세스 내 interleaving만 검증하므로 다중 연결/프로세스 경쟁 테스트가 별도로 필요하다.
