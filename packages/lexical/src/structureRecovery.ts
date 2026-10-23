@@ -16,7 +16,7 @@ export function $inspectEditorStructure():StructureIssue[]{
   }
   if(type==='tufte-figure'){
    const images=types.filter(t=>t==='tufte-inline-image'||t==='tufte-imagequilt');
-   if(images.length!==1||!['tufte-inline-image','tufte-imagequilt'].includes(types[0]??'')||types.filter(t=>t==='tufte-caption').length>1)add(node,path,'INVALID_FIGURE','그림은 이미지 하나로 시작하고 캡션은 하나까지 허용합니다.');
+   if(images.length!==1||types.filter(t=>t==='tufte-caption').length>1||(types.indexOf('tufte-caption')!==-1&&types.indexOf('tufte-caption')<types.findIndex(t=>t==='tufte-inline-image'||t==='tufte-imagequilt')))add(node,path,'INVALID_FIGURE','그림은 이미지 하나와 이미지 뒤의 캡션 하나까지 허용하며 여백 주석을 포함할 수 있습니다.');
    if(children.some(child=>child.getType()==='tufte-sidenote'))add(node,path,'INVALID_FIGURE_NOTE','그림에 직접 연결하는 주석은 여백 주석이어야 합니다.');
   }
   if(type==='tufte-table-layout'&&(types.length!==1||types[0]!=='table'))add(node,path,'INVALID_TABLE_LAYOUT','표 영역에는 표 하나가 필요합니다.');
