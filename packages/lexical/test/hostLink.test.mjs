@@ -243,3 +243,41 @@ test('host link serialization preserves inline element formatting on reopen',asy
  reopened.setEditorState(reopened.parseEditorState(JSON.stringify(json)));
  assert.deepEqual(reopened.getEditorState().toJSON(),json);
 });
+
+test('host link schema allows inline text but forbids nested links',async()=>{
+ const {NODE_SCHEMA}=await import('@lexical-tufte/document');
+ assert.ok(NODE_SCHEMA.paragraph.children.includes('host-link'));
+ assert.ok(NODE_SCHEMA['host-link'].children.includes('text'));
+ assert.equal(NODE_SCHEMA['host-link'].children.includes('host-link'),false);
+ assert.equal(NODE_SCHEMA['host-link'].children.includes('link'),false);
+ assert.deepEqual(NODE_SCHEMA['host-link'].fields,['reference']);
+});
+
+test('host link DOM update keeps reference identity without creating a URL',async()=>{
+ const e=editor();
+ e.update(()=>{
+  const p=$createParagraphNode();
+  const link=$createHostLinkNode(reference);
+  link.append($createTextNode('Reference'));
+  p.append(link);$getRoot().append(p);
+ });
+ await flush(e);
+ const previousDocument=globalThis.document;
+ globalThis.document={createElement:tag=>({tagName:tag.toUpperCase(),dataset:{},className:''})};
+ try{
+  e.getEditorState().read(()=>{
+   const link=$getRoot().getFirstChild().getFirstChild();
+   const dom=link.createDOM({});
+   assert.equal(link.updateDOM(link,dom),false);
+   assert.deepEqual(dom.dataset,{
+    hostReference:reference.id,
+    hostNamespace:reference.namespace,
+    hostKind:reference.kind
+   });
+   assert.equal(Object.hasOwn(dom,'href'),false);
+  });
+ }finally{
+  if(previousDocument===undefined)delete globalThis.document;
+  else globalThis.document=previousDocument;
+ }
+});
