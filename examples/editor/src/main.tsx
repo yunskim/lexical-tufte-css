@@ -18,8 +18,11 @@ import {
   SELECTION_INSERT_CLIPBOARD_NODES_COMMAND, COPY_COMMAND, CUT_COMMAND, PASTE_COMMAND, KEY_BACKSPACE_COMMAND, KEY_DELETE_COMMAND, HISTORY_PUSH_TAG, UNDO_COMMAND, REDO_COMMAND,
   COMMAND_PRIORITY_HIGH, type LexicalNode, type EditorState, type RangeSelection,
 } from 'lexical';
-import {registerNoteCommands,registerNoteAssetCommands,SET_TUFTE_NOTE_IMAGE_DIMENSIONS_COMMAND,$getSelectedTufteNoteImage,REMOVE_TUFTE_NOTE_COMMAND,UPDATE_TUFTE_NOTE_IMAGE_COMMAND,SELECT_TUFTE_NOTE_IMAGE_COMMAND,$listSelectedTufteNoteImages,type TufteNoteImageChoice,registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,registerQuotationCommands,INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_SECTION_CITE_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,registerListKeyboardCommands,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,SET_TUFTE_LIST_KIND_COMMAND,CHANGE_TUFTE_LIST_INDENT_COMMAND,UNWRAP_TUFTE_LIST_COMMAND,registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND,WRAP_TUFTE_SPAN_COMMAND,UNWRAP_TUFTE_SPAN_COMMAND,registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_PAIR_COMMAND,MOVE_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_LIST_COMMAND,registerSectionCommands,WRAP_TUFTE_ROOT_COMMAND,INSERT_TUFTE_SECTION_COMMAND,SPLIT_TUFTE_SECTION_COMMAND,MERGE_TUFTE_SECTION_COMMAND,SET_TUFTE_BLOCK_COMMAND,inspectEditorStructure,focusStructureIssue,type StructureIssue,replaceEditorDocumentState,TUFTE_NODES,NoteNode, $createSidenoteNode, $createMarginnoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, registerNoteEdgeTypingGuard} from '@lexical-tufte/lexical';
-import {NODE_SCHEMA} from '@lexical-tufte/document';
+import {registerNoteCommands,registerNoteAssetCommands,ASSIGN_TUFTE_NOTE_IMAGE_ASSET_COMMAND,DETACH_TUFTE_NOTE_IMAGE_ASSET_COMMAND,SET_TUFTE_NOTE_IMAGE_DIMENSIONS_COMMAND,$getSelectedTufteNoteImage,REMOVE_TUFTE_NOTE_COMMAND,UPDATE_TUFTE_NOTE_IMAGE_COMMAND,SELECT_TUFTE_NOTE_IMAGE_COMMAND,$listSelectedTufteNoteImages,type TufteNoteImageChoice,registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,registerQuotationCommands,INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_SECTION_CITE_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,registerListKeyboardCommands,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,SET_TUFTE_LIST_KIND_COMMAND,CHANGE_TUFTE_LIST_INDENT_COMMAND,UNWRAP_TUFTE_LIST_COMMAND,registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND,WRAP_TUFTE_SPAN_COMMAND,UNWRAP_TUFTE_SPAN_COMMAND,registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_PAIR_COMMAND,MOVE_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_LIST_COMMAND,registerSectionCommands,WRAP_TUFTE_ROOT_COMMAND,INSERT_TUFTE_SECTION_COMMAND,SPLIT_TUFTE_SECTION_COMMAND,MERGE_TUFTE_SECTION_COMMAND,SET_TUFTE_BLOCK_COMMAND,inspectEditorStructure,focusStructureIssue,type StructureIssue,replaceEditorDocumentState,TUFTE_NODES,NoteNode, $createSidenoteNode, $createMarginnoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, registerNoteEdgeTypingGuard,loadDocumentIntoEditor} from '@lexical-tufte/lexical';
+import {NODE_SCHEMA,type AssetRef} from '@lexical-tufte/document';
+import {renderArticle} from '@lexical-tufte/render';
+import {MANAGED_DOCUMENT_KEY,LEGACY_LEXICAL_KEY,
+ proposeManagedAsset,prepareManagedSave,inspectManagedRestore} from './managedDocument.js';
 import './style.css';
 
 type ToolbarIconName='bold'|'italic'|'code'|'quote'|'epigraph'|'sidenote'|'marginnote'|'rule'|'undo'|'redo'|'list'|'numbered'|'definition'|'attribution'|'figure'|'underline'|'strike'|'highlight';
@@ -329,6 +332,14 @@ function EditorUI(){
   const [status,setStatus]=useState('본문을 선택하고 노트를 삽입하세요.');
   const [html,setHtml]=useState('');
   const [json,setJson]=useState('');
+  const [managedJson,setManagedJson]=useState('');
+  const [assets,setAssets]=useState<AssetRef[]>([]);
+  const assetsRef=useRef<AssetRef[]>([]);
+  function installAssets(next:readonly AssetRef[]){
+    const snapshot=structuredClone(next);
+    assetsRef.current=snapshot;
+    setAssets(snapshot);
+  }
   const [noteImageChoices,setNoteImageChoices]=useState<TufteNoteImageChoice[]|null>(null);
   useEffect(()=>{
     if(!noteImageChoices?.length)return;
@@ -342,9 +353,10 @@ function EditorUI(){
   useEffect(()=>registerDefinitionCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
   useEffect(()=>registerQuotationCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
   useEffect(()=>registerNoteCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
-  // This prototype saves Lexical JSON only: it has no document asset catalog.
-  // Refuse managed asset updates rather than inventing reference metadata.
-  useEffect(()=>registerNoteAssetCommands(editor,()=>[],diagnostic=>setStatus(diagnostic.message)),[editor]);
+  // The exact same catalog is used for commands, save, restore and publication.
+  useEffect(()=>registerNoteAssetCommands(
+    editor,()=>assetsRef.current,diagnostic=>setStatus(diagnostic.message)
+  ),[editor]);
   useEffect(()=>registerFigureCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
   useEffect(()=>registerListCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
   useEffect(()=>registerListKeyboardCommands(editor),[editor]);
@@ -613,6 +625,31 @@ function EditorUI(){
       setStatus(ok?'노트 구조를 변경했습니다.':'이 위치에서 노트 구조를 변경할 수 없습니다.');
     },{tag:HISTORY_PUSH_TAG});editor.focus();
   }
+  function addManagedAsset(){
+    const id=window.prompt('등록할 자산 ID (영문·숫자·하이픈·밑줄)');
+    if(id===null)return;
+    const src=window.prompt('자산 이미지 URL (HTTPS 또는 상대 경로)','/fixture.svg');
+    if(src===null)return;
+    const mimeType=window.prompt('이미지 MIME 유형 (예: image/svg+xml)','image/svg+xml');
+    if(mimeType===null)return;
+    const width=window.prompt('원본 폭(px) — 빈 칸이면 생략','');
+    if(width===null)return;
+    const height=window.prompt('원본 높이(px) — 빈 칸이면 생략','');
+    if(height===null)return;
+    const candidate:AssetRef={
+      id,src,mimeType,
+      ...(width.trim()===''?{}:{width:Number(width)}),
+      ...(height.trim()===''?{}:{height:Number(height)})
+    };
+    const checked=proposeManagedAsset(editor.getEditorState().toJSON(),assetsRef.current,candidate);
+    if(!checked.ok){
+      setStatus('자산 등록 거부: '+(checked.diagnostics[0]?.message??'문서 오류')+
+       ' · 본문을 섹션으로 묶었는지도 확인하세요.');
+      return;
+    }
+    installAssets(checked.document.assets);
+    setStatus('자산 '+id+'를 등록했습니다. 저장 시 본문과 함께 보관합니다.');
+  }
   function editNoteImageDimensions(){
     const selected=editor.getEditorState().read(
       ()=>$getSelectedTufteNoteImage()?.image.exportJSON()
@@ -661,19 +698,76 @@ function EditorUI(){
     });editor.focus();
   }
   function exportDocument(){
-    if(inspectEditorStructure(editor).length){setHtml('');setJson(JSON.stringify(editor.getEditorState().toJSON(),null,2));setStatus('구조를 수정해야 HTML을 생성할 수 있습니다. JSON은 복구용으로 보존합니다.');return;}
-    editor.getEditorState().read(()=>setHtml($generateHtmlFromNodes(editor)));
-    setJson(JSON.stringify(editor.getEditorState().toJSON(),null,2));setStatus('JSON과 HTML을 생성했습니다.');
+    const current=editor.getEditorState().toJSON();
+    if(inspectEditorStructure(editor).length){
+      setHtml('');setManagedJson('');setJson(JSON.stringify(current,null,2));
+      setStatus('구조를 수정해야 HTML을 생성할 수 있습니다. JSON은 복구용으로 보존합니다.');
+      return;
+    }
+    if(assetsRef.current.length){
+      const checked=prepareManagedSave(current,assetsRef.current);
+      if(!checked.ok){
+        setHtml('');setManagedJson('');setJson(JSON.stringify(current,null,2));
+        setStatus('문서 발행 거부: '+checked.diagnostics[0]?.message);return;
+      }
+      const published=renderArticle(checked.document);
+      if(!published.ok){
+        setHtml('');setManagedJson('');
+        setStatus('문서 발행 거부: '+published.diagnostics[0]?.message);return;
+      }
+      setHtml(published.html);
+      setManagedJson(JSON.stringify(checked.document,null,2));
+    }else{
+      editor.getEditorState().read(()=>setHtml($generateHtmlFromNodes(editor)));
+      setManagedJson('');
+    }
+    setJson(JSON.stringify(current,null,2));
+    setStatus('JSON과 HTML을 생성했습니다.');
   }
   function save(){
-    try{const invalid=inspectEditorStructure(editor).length>0;localStorage.setItem(invalid?'lexical-tufte-recovery-v1':'lexical-tufte-p1',JSON.stringify(editor.getEditorState().toJSON()));setStatus(invalid?'구조 오류가 있어 복구용 사본에만 저장했습니다. 마지막 저장 문서는 유지합니다.':'이 브라우저에 저장했습니다.');}
-    catch{setStatus('저장 실패: 저장 공간을 확인하세요.');}
+    try{
+      const state=editor.getEditorState().toJSON();
+      if(inspectEditorStructure(editor).length){
+        localStorage.setItem('lexical-tufte-recovery-v1',JSON.stringify(state));
+        setStatus('구조 오류가 있어 복구용 사본에만 저장했습니다. 마지막 저장 문서는 유지합니다.');
+        return;
+      }
+      if(assetsRef.current.length){
+        const checked=prepareManagedSave(state,assetsRef.current);
+        if(!checked.ok){
+          setStatus('문서 저장 거부: '+checked.diagnostics[0]?.message);return;
+        }
+        localStorage.setItem(MANAGED_DOCUMENT_KEY,JSON.stringify(checked.document));
+        setStatus('관리 자산과 본문을 한 문서로 저장했습니다.');
+      }else{
+        localStorage.setItem(LEGACY_LEXICAL_KEY,JSON.stringify(state));
+        localStorage.removeItem(MANAGED_DOCUMENT_KEY);
+        setStatus('이 브라우저에 저장했습니다.');
+      }
+    }catch{setStatus('저장 실패: 저장 공간을 확인하세요.');}
   }
   function restore(){
     try{
-      const raw=localStorage.getItem('lexical-tufte-p1');if(!raw){setStatus('저장한 문서가 없습니다.');return;}
-      replaceEditorDocumentState(editor,editor.parseEditorState(raw));setStatus('저장한 문서를 불러왔습니다.');
-    }catch{setStatus('문서를 불러오지 못했습니다.');}
+      const managed=localStorage.getItem(MANAGED_DOCUMENT_KEY);
+      if(managed!==null){
+        const checked=inspectManagedRestore(managed);
+        if(!checked.ok){
+          setStatus('관리 문서 검증 실패: '+checked.diagnostics[0]?.message);return;
+        }
+        const installed=loadDocumentIntoEditor(editor,checked.document);
+        if(!installed.ok){
+          setStatus('관리 문서 복원 거부: '+installed.diagnostics[0]?.message);return;
+        }
+        installAssets(installed.value.assets);
+        setStatus('본문과 관리 자산 목록을 함께 불러왔습니다.');
+        return;
+      }
+      const raw=localStorage.getItem(LEGACY_LEXICAL_KEY);
+      if(!raw){setStatus('저장한 문서가 없습니다.');return;}
+      replaceEditorDocumentState(editor,editor.parseEditorState(raw));
+      installAssets([]);
+      setStatus('기존 Lexical 문서를 불러왔습니다.');
+    }catch{setStatus('문서를 불러오지 못했습니다. 기존 상태는 유지합니다.');}
   }
   const preserve=(e:MouseEvent<HTMLButtonElement>)=>e.preventDefault();
   return <>
