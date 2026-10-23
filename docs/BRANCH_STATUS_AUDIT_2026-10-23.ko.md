@@ -193,3 +193,26 @@ GitHub의 **두 브랜치**와 커밋 비교, main의 현재 파일, 작업 브�
 - [x] 편집기 예제 및 주요 Lexical 노트 처리 파일 8개에서 구형 factory/kind API 참조 재점검.
 - [x] `packages/render/test/figure-margin-note.test.mjs`: 발행 label→input→span 인접 구조 및 편집 전용 속성 부재 검사 추가.
 - [ ] 전체 저장소 전수 검색 및 테스트 실행은 아직 완료하지 않음.
+
+## 2026-10-23 — 테스트 실행 전 정적 정리 결과
+
+### 해결한 실행 전 장애(코드 작성, 테스트 실행 전)
+
+- [x] `fixtures/tufte/server-document-v2.json`의 레거시 노트 2건을 구체 타입으로 수정. v1 fixture와 타입 일치.
+- [x] `packages/document/test/document.test.mjs`의 그림 마진노트 및 구형 kind 진단 기대값 수정.
+- [x] `packages/lexical/test/`의 노트·그림·목록·인라인·정의·인용·섹션·문서 브리지 테스트를 concrete factory/serialized type으로 이전.
+- [x] all-node fixture/golden에 `tufte-sidenote`/`tufte-marginnote` 및 main의 `host-link` 포함.
+- [x] `tests/all-nodes-browser.mjs`, `tests/text-format-browser.mjs`의 저장 노트 타입 검사 갱신.
+- [x] 렌더 직렬화기의 `aria-label` 허용 누락 수정 및 회귀 테스트 추가 (E104/M096).
+- [x] `scripts/check-concrete-note-types.mjs` 작성. `pnpm audit:notes`를 루트 `pnpm check`에 선행 연결 (E103/M095).
+- [x] 확인한 활성 코드의 구형 팩터리/API 참조를 새 concrete node API로 전환. 레거시 wire type은 명시적 migration 및 그 테스트에만 남김.
+
+### 실행 대기 — 실행 결과가 아님
+
+- [ ] 의존성 설치 후 `pnpm audit:notes` 실행 및 결과 기록.
+- [ ] `pnpm check` (lint, inventory, font, 타입 검사, 빌드, package 단위 테스트) 실행.
+- [ ] `pnpm test:browser`, `pnpm test:note-assets`, `pnpm test:upstream-sections`, `pnpm test:upstream-full-page` 실행.
+- [ ] 필요 시 `pnpm package:check` 및 Python/HTTP 통합 검사.
+- [ ] 실패 원인 구분 → 수정 → 해당 범위 재실행 → E/M 오류 기록 갱신. CI는 실행하지 않음.
+
+**사전 코드 정리 기준으로 테스트 실행을 시작할 수 있는 상태**이나, 위 검증을 실행하지 않았으므로 통과·호환성·공식 예제 parity는 미확인이다. 이전 문서의 구형 참조 관련 미완료 체크는 이 최신 점검 항목으로 대체한다.
