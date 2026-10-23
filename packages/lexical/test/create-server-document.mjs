@@ -3,13 +3,13 @@ import {createHeadlessEditor} from '@lexical/headless';
 import {$getRoot,$createParagraphNode,$createTextNode} from 'lexical';
 import {LinkNode,$createLinkNode} from '@lexical/link';
 import {TableNode,TableRowNode,TableCellNode,$createTableNode,$createTableRowNode,$createTableCellNode,TableCellHeaderStates} from '@lexical/table';
-import {SectionNode,FigureNode,CaptionNode,TableLayoutNode,NoteNode,InlineImageNode,$createSectionNode,$createFigureNode,$createCaptionNode,$createTableLayoutNode,$createInlineImageNode,$createNoteNode} from '../dist/index.js';
-const e=createHeadlessEditor({namespace:'server-fixture',nodes:[SectionNode,FigureNode,CaptionNode,TableLayoutNode,NoteNode,InlineImageNode,LinkNode,TableNode,TableRowNode,TableCellNode],onError(error){throw error;}});
+import {SectionNode,FigureNode,CaptionNode,TableLayoutNode,SidenoteNode,MarginnoteNode,InlineImageNode,$createSectionNode,$createFigureNode,$createCaptionNode,$createTableLayoutNode,$createInlineImageNode,$createSidenoteNode,$createMarginnoteNode} from '../dist/index.js';
+const e=createHeadlessEditor({namespace:'server-fixture',nodes:[SectionNode,FigureNode,CaptionNode,TableLayoutNode,SidenoteNode,MarginnoteNode,InlineImageNode,LinkNode,TableNode,TableRowNode,TableCellNode],onError(error){throw error;}});
 e.update(()=>{
  const section=$createSectionNode();
- const note=$createNoteNode('server-note').append($createTextNode('주석 <내용>').toggleFormat('bold'),$createLinkNode('https://lexical.dev').append($createTextNode('문서')),$createInlineImageNode('/fixture.svg','주석 그림'));
+ const note=$createSidenoteNode('server-note').append($createTextNode('주석 <내용>').toggleFormat('bold'),$createLinkNode('https://lexical.dev').append($createTextNode('문서')),$createInlineImageNode('/fixture.svg','주석 그림'));
  section.append($createParagraphNode().append($createTextNode('서버 본문 & <script> 금지 '),note,$createTextNode(' 다음 본문')));
- section.append($createParagraphNode().append($createTextNode('여백 '),$createNoteNode('server-margin','marginnote').append($createTextNode('번호 없는 주석'))));
+ section.append($createParagraphNode().append($createTextNode('여백 '),$createMarginnoteNode('server-margin').append($createTextNode('번호 없는 주석'))));
  for(const width of ['body','fullwidth'])section.append($createFigureNode(width).append($createInlineImageNode('/fixture.svg','그림'),$createCaptionNode().append($createTextNode('서버 그림 캡션'))));
  for(const layout of ['body','fullwidth','scroll']){
   const table=$createTableNode();
