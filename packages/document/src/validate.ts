@@ -32,7 +32,7 @@ export function validateDocument(input:unknown):ValidationResult{
   if(a.sha256!==undefined&&(typeof a.sha256!=='string'||! /^[0-9a-f]{64}$/.test(a.sha256)))add('INVALID_CHECKSUM',p+'.sha256','Expected lowercase SHA-256 hex');
   if(isIdentifier(a.id))assets.set(a.id,a as AssetRef);
  }
- const seen=new WeakSet<object>(),notes=new Set<string>();let count=0,textLength=0,exhausted=false;
+ const seen=new WeakSet<object>(),notes=new Set<string>(),headingIds=new Set<string>();let count=0,textLength=0,exhausted=false;
  function visit(raw:unknown,path:string,parent:string|undefined,depth:number,inNote:boolean,inLink:boolean){
   if(exhausted)return;
   if(depth>L.depth||++count>L.nodes){add('LIMIT_EXCEEDED',path,'Depth/node budget exceeded');exhausted=true;return;}
@@ -80,7 +80,11 @@ export function validateDocument(input:unknown):ValidationResult{
   }
   if(type==='paragraph'&&raw.tufteClass!==undefined&&raw.tufteClass!=='sans')add('INVALID_PARAGRAPH_CLASS',path+'.tufteClass','Only sans is supported');
   if(type==='quote'&&raw.cite!==undefined&&!isSafeURL(raw.cite,'link'))add('INVALID_QUOTE_CITE',path+'.cite','Invalid quote cite URL');
-  if(type==='heading'&&raw.id!==undefined&&!isIdentifier(raw.id))add('INVALID_HEADING_ID',path+'.id','Heading ID must be a safe identifier');
+  if(type==='heading'&&raw.id!==undefined){
+   if(!isIdentifier(raw.id))add('INVALID_HEADING_ID',path+'.id','Heading ID must be a safe identifier');
+   else if(headingIds.has(raw.id))add('DUPLICATE_HEADING_ID',path+'.id','Heading anchor ID is already used');
+   else headingIds.add(raw.id);
+  }
   if(type==='heading'&&input.titleId!==undefined&&raw.id===input.titleId)add('DUPLICATE_TITLE_ID',path+'.id','Heading ID conflicts with document title');
   if(type==='heading'&&!enumeration(raw.tag,['h2','h3']))add('INVALID_HEADING',path+'.tag','Only h2/h3 supported');
   if(type==='list'&&(!enumeration(raw.listType,['bullet','number'])||raw.tag!==(raw.listType==='bullet'?'ul':'ol')||!integer(raw.start,1,Number.MAX_SAFE_INTEGER)))add('INVALID_LIST',path,'Invalid list kind/tag/start');
