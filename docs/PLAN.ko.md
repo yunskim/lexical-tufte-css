@@ -303,11 +303,26 @@ P1 gate: 완료. 노트 편집 회귀와 SSR 출력의 실제 브라우저 비�
       다른 노트·삭제된 이미지·진행 중 변경으로 오래된 키가 되면 거부한다.
       headless target/reject·발행 및 브라우저 선택→수정→저장/재열기
       회귀 코드 작성. **실행 전 미완료**.
-    - [ ] P2.3.a.4 **남은 기본 기능**: 관리 자산 참조·크기 변경의
-      원자적 재검증, 특정 노트 ID 선택/이동 UI, 실제 키보드 초점/
-      클릭 후 선택 보존/IME·모바일·스크린리더 및 복수 article 번호 수락.
-      종류 전환은 편의 기능으로 후순위이며 prototype toolbar에서
-      제외했다(내부 명령만 유지).
+    - [ ] P2.3.a.4 **노트 관리 자산/크기 변경**:
+      `registerNoteAssetCommands(editor,getAssets,onDiagnostic)`로
+      호스트 문서의 정본 `assets`를 읽는다. 관리 자산 연결·교체는
+      `assetId` 페이로드만 허용하며 동일한 자산 레코드에서
+      `src/width/height`를 가져와 노드를 원자적으로 교체한다.
+      자산 연결 해제 시 현재 이미지 URL/alt/치수는 유지한다.
+      변경할 폭·높이는 양의 안전 정수, `null`은 선택 필드 해제.
+      문서 스키마의 자산 URL/치수 일치 규칙을 사전 검사하여
+      미존재/중복 ID·유효하지 않은 목록·치수 충돌을 거부한다.
+      순수 renderer에서 일반 inline 이미지의 명시적 width/height만
+      HTML 속성으로 출력하며 생략된 원본 문서 출력은 불변.
+      headless undo/redo·스키마/발행·브라우저 저장/복원 코드 작성.
+      prototype에는 비관리 이미지 크기 UI만 노출하며
+      관리 자산 연결 UI는 문서 envelope `assets` 연동 후 구성한다.
+      **실행 전 수락 미완료**.
+    - [ ] P2.3.a.5 **남은 기본 기능**: 문서 `assets`를 보유하는
+      실제 GUI/자산 선택기를 정본과 연결해 자산 부착 UI 완성,
+      특정 노트 ID 선택·이동 UI 및 키보드/IME·모바일·스크린리더,
+      복수 article 번호 수락. 종류 전환은 비필수 편의 기능으로
+      prototype toolbar에서 제외했다(내부 명령만 유지).
   - [ ] P2.3.b 그림·ImageQuilts F13/F14/F19: src/alt/caption/asset ID 수정 및 body/fullwidth/여백 변환, 자산 유실·삭제 시 진단, schema 유효성 보존.
   - [ ] P2.3.c 표/전체 폭 F15/F16: 셀·헤더·행/열 편집, 스크롤/폭 전환, 병합 거부와 접근 가능한 설명, 좁은 화면 overflow.
   - [ ] P2.3.d 코드/embed F17/F18: code block·language·fullwidth·공백/탭 및 embed의 provider allowlist/title/aspect ratio/서식 편집. 외부 HTML/sanitization 정책과 통합.

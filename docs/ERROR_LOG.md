@@ -1,3 +1,20 @@
+## E132 — 관리 자산의 참조 불일치와 inline image 치수 발행 누락 (정적 발견)
+
+- 문서 스키마는 이미지 `assetId`를 자산 테이블과 대조하며,
+  `src`가 다르거나 양쪽에 있는 `width/height`가 다르면
+  거부한다. 기존 이미지 src 수정 명령이 관리 자산 URL 변경을
+  막아두었기 때문에 정상적인 자산 교체 경로가 없었다.
+- 추가로 순수 renderer의 일반 `tufte-inline-image`는 width/height
+  정보가 있어도 HTML에 출력하지 않았다. 이는 편집기 내 크기와
+  발행 HTML의 표현이 달라질 수 있는 정적 불일치이다.
+- 해결 코드: 호스트의 정본 assets getter를 명시적 의존성으로
+  받아 전체 레코드 검사 후 assetId/src/치수를 한 번에 교체하고,
+  detached 상태는 URL을 유지한다. 순수 HTML renderer는
+  **명시적 치수만** 기록해 dimension-free 원본 출력은 유지한다.
+- 저장 JSON·document validator·pure renderer·undo/redo 및
+  browser 회귀는 작성했으나 **실제 실행 전**, 실측 실패나
+  통과라고 주장하지 않는다. M122 참조.
+
 ## E131 — 여러 노트 이미지의 수정 대상이 명확히 선택되지 않는 UX 결손 (사전 확인)
 
 - 원인: P2.3.a.2는 한 노트에 이미지가 여러 개이면 정확한

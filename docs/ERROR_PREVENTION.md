@@ -1,3 +1,21 @@
+## M122 — assetId는 문서 자산 목록을 통해서만 갱신
+
+- 자산 ID만 수정하거나 URL/치수를 UI 입력값에서 조립하지 않는다.
+  호스트가 실제 저장/발행에 사용할 정본 `assets`를
+  `getAssets()`로 주입하여 ID/중복/URL/MIME/크기/선택 메타데이터
+  검증을 끝낸 뒤 Lexical 이미지를 단일 update로 교체한다.
+- host가 자산 목록을 제공하지 못하면 관리 자산 변경을
+  제공하지 않는다. 현재 standalone GUI는 비관리 이미지 크기
+  변경만 가능하다. `assetId`가 남은 채 오래된 src가 되는
+  상태는 절대로 성공 처리하지 않는다.
+- 폭/높이의 명시적 `null` 해제와
+  `Number.isSafeInteger(value)&&value>0` 조건을 고정한다.
+  managed image의 치수가 자산 레코드와 충돌하면 수정을 막는다.
+- pure renderer에 명시적 치수를 출력하는 회귀를 추가하고,
+  미지정 이미지의 HTML 출력 불변도 확인한다.
+  저장/HTML/undo/redo/브라우저 테스트는 **누적 실행 대기**.
+  수락 전에는 P2.3.a.4 완료로 표시하지 않는다.
+
 ## M121 — 이미지 선택 목록은 세션 내부의 대상 식별자를 매번 검증
 
 - 저장 문서/HTML에 Lexical NodeKey를 쓰지 않는다. 목록은 편집기

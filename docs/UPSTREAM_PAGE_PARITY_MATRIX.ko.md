@@ -197,6 +197,25 @@
 - **누적 테스트 미실행**. 실제 화면의 사용성과 스크린리더
   연동은 실측 증거가 있을 때만 완료 표시한다.
 
+## P2.3.a.4 — 관리 자산 교체와 실제 HTML 치수 (2026-10-23, 실행 대기)
+
+- 서식/문서 정본: 기존 `tufte-inline-image`의
+  `src/alt/assetId/width/height`만 사용하므로 schema 버전 증설
+  없이 관리 자산의 동일 ID, URL, 양쪽에 선언된 크기 일치 규칙을
+  유지한다. 새 `assetId`를 임의 새 URL과 조합하지 않는다.
+- Lexical: 호스트의 `getAssets`에서 검증한 레코드로
+  assetId+src+width+height를 원자적으로 변경. alt·다른 children·
+  noteId는 그대로. detach는 src·alt·치수를 두고 참조만 제거.
+- JSON→HTML: 일반 inline image에서 명시적으로 값이 있는
+  width/height만 `<img>` 속성으로 출력한다.
+  미설정 이미지의 기본 HTML 출력은 변경하지 않는다.
+  sidenote/marginnote의 label + input + span 구조는 보존한다.
+- 회귀 코드: 관리 자산 연결/전환/해제, 목록 부재·중복/잘못된
+  자산/크기 거부, undo/redo, 저장 JSON, HTML 속성, standalone
+  prototype 너비/높이 변경·복원·해제를 포함한다.
+- 실제 정본 문서 자산 목록을 보유한 GUI는 아직 연결되지 않았다.
+  **빌드·단위·브라우저 테스트 실행 전**이며 P2.3.a.4 미수락.
+
 ## 다음 작업 순서
 
 1. 9개 섹션의 단독 동일 콘텐츠 비교 테스트와 Lexical/document/render 회귀를 **한 번에 실행**해

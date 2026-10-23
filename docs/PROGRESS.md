@@ -1,3 +1,33 @@
+## 2026-10-23 — P2.3.a.4 노트 이미지 관리 자산·치수 갱신 (구현/실행 대기)
+
+- `packages/lexical/src/noteAssetCommands.ts`: 세 명령
+  `ASSIGN_TUFTE_NOTE_IMAGE_ASSET_COMMAND`,
+  `DETACH_TUFTE_NOTE_IMAGE_ASSET_COMMAND`,
+  `SET_TUFTE_NOTE_IMAGE_DIMENSIONS_COMMAND`를 추가했다.
+  `registerNoteAssetCommands(editor,getAssets,onDiagnostic)`를 통해
+  정본 문서의 자산 목록을 매 요청 시 조회하며, UI에서 임의 메타데이터를
+  자산 정의로 받아들이지 않는다. 새 자산 부착/교체는 해당 레코드의
+  assetId/src/width/height를 같은 Lexical 수정에서 반영하며 기존 alt/
+  sidenote/marginnote ID 및 주변 children을 유지한다. 연결 해제 시
+  표시 URL과 치수는 유지한다.
+- 관리 자산 URL·치수가 문서 `assets`와 충돌할 때 수정하지 않는다.
+  목록이 없거나 잘못된 형식/중복 ID/허용 한도 초과/조회 실패면
+  안전하게 거부한다. 너비/높이는 양의 정수만 수락하고 `null`로
+  자동(미설정) 복귀할 수 있다. 크기가 지정되지 않은 이미지의
+  기존 HTML은 바꾸지 않는다.
+- 기존 순수 renderer의 `tufte-inline-image`는 폭/높이 필드를
+  HTML로 출력하지 않았으므로, 명시적 `width/height`가 있는
+  경우에만 렌더러 속성을 추가했다. 별도 렌더 단위 회귀와
+  actual Lexical/validateDocument/HTML/real history 회귀 코드.
+- 예제 `examples/editor`는 Lexical 상태만 로컬 저장하고 정본
+  `assets`가 없으므로 빈 자산 목록을 제공해 관리 자산 부착을
+  의도적으로 거부한다. 폭/높이 수정 UI를 추가했다.
+  관리 자산 부착 UI는 실제 envelope의 assets를 연결한 후 제공한다.
+- `tests/note-image-dimensions-browser.mjs` 작성: 이미지
+  크기 입력→HTML/JSON→저장·복원→null 해제 사례.
+  **설치/빌드/타입/단위/브라우저/CI 전부 미실행**.
+  정본 GUI 자산 목록 통합과 실제 화면 수락까지 완료된 것은 아니다.
+
 ## 2026-10-23 — P2.3.a.3 노트 이미지 선택 목록·명령 (작성/실행 대기)
 
 - 기존 `UPDATE_TUFTE_NOTE_IMAGE_COMMAND`는 노트 하나에 이미지가
