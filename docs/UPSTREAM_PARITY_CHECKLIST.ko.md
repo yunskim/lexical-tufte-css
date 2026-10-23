@@ -20,6 +20,24 @@
 
 `tests/upstream-dom-browser.mjs`는 이제 `upstreamSectionOutline`과 `publishedFixtureSectionOutline`을 출력하도록 작성되었다. 각각 section 순번, 첫 직계 heading, 직계 자식 태그 배열, note/figure/table 개수를 담는다. 비교 대상은 여전히 **원본 전체 페이지 대 별도 server-document fixture**이므로 이 수치만으로 전체 페이지 parity를 수락하지 않는다. 기존 코드에서 직접 확인된 발행 입력은 `fixtures/tufte/server-document.json`이며 원본 9개 섹션과 같은 콘텐츠가 아니다. 저장소 검색만으로 전체 페이지용 Lexical fixture의 정확한 경로를 확정하지 못했으므로 **존재한다고 가정하거나 새로 중복 생성하지 않는다**. 다음에는 전체 페이지 변환/fixture 생성 코드를 특정한 뒤 이 계측을 연결한다.
 
+## 공식 원본의 섹션 대응표
+
+고정 HTML의 `article > section` 순서와 직접 `h2` 텍스트를 기준으로 작성했다. 첫 섹션에는 `h2`가 없다. 아래는 **원본 구조 목록**이지 Lexical 재현 완료 표시가 아니다.
+
+| 순서 | 원본 섹션 제목 | 동일 콘텐츠 Lexical fixture 연결 | DOM 차이 판정 |
+| --- | --- | --- | --- |
+| 1 | 도입부 (직계 h2 없음) | [ ] | [ ] |
+| 2 | Getting Started | [ ] | [ ] |
+| 3 | Fundamentals | [ ] | [ ] |
+| 4 | Epigraphs | [ ] | [ ] |
+| 5 | Sidenotes: Footnotes and Marginal Notes | [ ] | [ ] |
+| 6 | Figures | [ ] | [ ] |
+| 7 | Code | [ ] | [ ] |
+| 8 | ImageQuilts | [ ] | [ ] |
+| 9 | Epilogue | [ ] | [ ] |
+
+원본 제목과 순서는 `tests/upstream-dom-browser.mjs`의 assertion에도 고정했다. fixture 연결 후 같은 섹션 번호끼리 직계 자식 구조, note, figure, table을 비교한다.
+
 ## 2. DOM 차이 분류 및 해결
 
 - [ ] 원본 각 section별 heading, paragraph, link, code, list, quote, epigraph, figure, table, note를 구조적으로 대응시킨다.
