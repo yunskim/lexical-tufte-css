@@ -28,7 +28,7 @@ try {
  assert.ok(canonical?.includes('CANONICAL-BASELINE'));
  const recovered=JSON.parse(canonical);
  const textNode=(function find(node){
-  if(node.type==='text')return node;
+  if(node.type==='text'&&node.text?.includes('CANONICAL-BASELINE'))return node;
   for(const child of node.children??[]){const found=find(child);if(found)return found;}
   return null;
  })(recovered.root);
@@ -41,6 +41,11 @@ try {
  },{key:recoveryKey,state:recovered});
  const button=page.getByRole('button',{name:'복구용 사본 열기',exact:true});
  await button.waitFor({state:'visible'});
+ await button.waitFor({state:'attached'});
+ await page.waitForFunction(()=>{
+  const button=[...document.querySelectorAll('button')].find(el=>el.textContent?.trim()==='복구용 사본 열기');
+  return button&&!button.disabled;
+ });
  // Cancellation must not change either the editor or the canonical save.
  page.once('dialog',dialog=>dialog.dismiss());
  await button.click();
