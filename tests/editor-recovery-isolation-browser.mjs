@@ -90,6 +90,30 @@ try {
   'Confirmed deletion must remove the selected recovery copy');
  assert.equal(await page.evaluate(()=>localStorage.getItem('lexical-tufte-p1')),canonical,
   'Deleting recovery must never delete the canonical document');
+ // Multiple recovery snapshots: delete only the selected entry.
+ const olderKey='lexical-tufte-recovery-v2:regression-older';
+ const newerKey='lexical-tufte-recovery-v2:regression-newer';
+ await page.evaluate(({olderKey,newerKey,state})=>{
+  localStorage.setItem(olderKey,JSON.stringify({savedAt:'2098-01-01T00:00:00.000Z',state}));
+  localStorage.setItem(newerKey,JSON.stringify({savedAt:'2099-01-02T00:00:00.000Z',state}));
+ },{olderKey,newerKey,state:recovered});
+ const olderBytes=await page.evaluate(key=>localStorage.getItem(key),olderKey);
+ page.once('dialog',dialog=>{
+  assert.equal(dialog.type(),'prompt');
+  assert.match(dialog.message(),/2099-01-02/);
+  dialog.accept('0');
+ });
+ page.once('dialog',dialog=>{
+  assert.equal(dialog.type(),'confirm');
+  dialog.accept();
+ });
+ await deleteButton.click();
+ assert.equal(await page.evaluate(key=>localStorage.getItem(key),newerKey),null,
+  'Selected newest recovery snapshot must be deleted');
+ assert.equal(await page.evaluate(key=>localStorage.getItem(key),olderKey),olderBytes,
+  'Unselected recovery snapshot must remain unchanged');
+ assert.equal(await page.evaluate(()=>localStorage.getItem('lexical-tufte-p1')),canonical,
+  'Deleting one of multiple recovery snapshots must preserve canonical save');
  assert.deepEqual(errors,[]);
  console.log('Recovery reopen: cancellation, explicit open, canonical isolation and canonical restore.');
 }finally{await browser?.close();server?.kill();}
