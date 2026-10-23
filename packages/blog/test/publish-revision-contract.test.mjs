@@ -303,3 +303,36 @@ test('restore reports the committed state even when a later read changes',async(
   assert.equal(restored.snapshotId,first.snapshotId);
  }finally{db.close();}
 });
+
+test('restore commit guard rejects revoked authorization after asynchronous preflight',async()=>{
+ const {db,store,id}=await setup();
+ try{
+  const first=ok(await store.publish(id,opts(1,0,'2026-10-16T01:00:00Z')));
+  ok(store.unpublish(id,1));
+  let authorized=true;
+  const result=await store.restorePublishedSnapshot(id,first.snapshotId,{
+   expectedGeneration:2,authorize:async()=>true,
+   assetExists:async()=>{authorized=false;return true;},
+   verifyAtCommit:()=>authorized
+  });
+  assert.equal(result.ok,false);
+  assert.ok(result.diagnostics.some(d=>d.code==='PUBLICATION_FORBIDDEN'));
+  assert.equal(ok(store.readState(id)).generation,2);
+  assert.equal(ok(store.readState(id)).snapshotId,null);
+ }finally{db.close();}
+});
+test('restore rejects an asynchronous commit guard without changing the head',async()=>{
+ const {db,store,id}=await setup();
+ try{
+  const first=ok(await store.publish(id,opts(1,0,'2026-10-16T01:00:00Z')));
+  ok(store.unpublish(id,1));
+  const result=await store.restorePublishedSnapshot(id,first.snapshotId,{
+   expectedGeneration:2,authorize:async()=>true,assetExists:async()=>true,
+   verifyAtCommit:async()=>true
+  });
+  assert.equal(result.ok,false);
+  assert.ok(result.diagnostics.some(d=>d.code==='PUBLICATION_COMMIT_GUARD_ERROR'));
+  assert.equal(ok(store.readState(id)).snapshotId,null);
+  assert.equal(ok(store.readState(id)).generation,2);
+ }finally{db.close();}
+});
