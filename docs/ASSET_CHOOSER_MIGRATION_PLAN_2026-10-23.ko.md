@@ -13,13 +13,23 @@
 
 | 순서 | 현재 실제 작업 | 상태 |
 | --- | --- | --- |
-| E1 | 현행 브랜치 정적 코드 검토: Lexical 입력·저장·재열기, 발행 DOM, 실제 공식 Tufte CSS fixture와 테스트 계약 대조 | 진행 대기 · 최우선 |
+| E1 | 현행 브랜치 정적 코드 검토: Lexical 입력·저장·재열기, 발행 DOM, 실제 공식 Tufte CSS fixture와 테스트 계약 대조 | **진행 중** — titleId 누락·중복 heading anchor 수정, 전체 코드 점검·실행 검증 대기 |
 | E2 | 노트·newthought·heading·figure·quote 등 **편집기 고유** 기능의 미검증 수정 점검 및 실제 DOM/HTML 불일치 수정 | 진행 대기 · 최우선 |
 | E3 | 공식 Tufte CSS **9개 섹션 전체**의 동일 콘텐츠 저장→열기→발행→DOM·시각/픽셀 패리티 확보 | 진행 대기 · 최우선 |
 | E4 | 기존 작업 브랜치의 빌드·타입 검사·단위·브라우저 테스트를 한 번에 실행해 결과 보고, 실패 원인 수정·재검증 | 사용자 요청 시 일괄 실행; CI 미실행 |
 | A0~A5 | 문서 전체 자산 카탈로그, 이미지 등록·재사용·발행, canonical 저장·복구, Wagtail식 chooser 확대 | **보류** |
 | A6~A7 | AssetProvider 어댑터, Bynder식 외부 DAM, Magnolia Works 연결 | **후순위 보류** |
 | A8 자산 범위 | 자산 기능 확장 이후 별도 통합 검증·이관 | **보류** |
+
+**E1 세부 체크리스트 (수정 코드 작성, 실행은 모아서 진행)**
+
+- [x] `packages/document/src/editorBoundary.ts`, `validateV2.ts`, `migrateStoredDocument.ts`, `packages/lexical/src/documentBridge.ts`의 v1/v2 저장·재열기 투영을 대조.
+- [x] `documentBridge.ts`: 선택적 `titleId`가 v2 export 시 누락되는 부분 수정 및 v1→v2→JSON→재열기 회귀 테스트 추가(E114).
+- [x] `validate.ts`: 섹션 간 중복된 heading ID를 거부하고 title ID 충돌 계약을 보존하는 검사·테스트 추가(E115).
+- [x] `packages/blog/src` publication/recovery, `packages/document/src` canonical/backup/revision/SQLite 경계의 제목 필드 수작업 투영 여부 **정적 표본 점검**. 새로운 필드 누락 수정 사항은 위 bridge 1곳만 발견.
+- [ ] 공식 9개 섹션 fixture의 실제 Lexical 파서 호환성, 저장/재열기 결과 및 `h1#tufte-css` 검증을 실행.
+- [ ] Lexical 노드 등록(heading/quote/paragraph 교체) 및 React 실제 에디터 경로를 브라우저에서 재검증하고 오류를 수정.
+- [ ] 검증 결과를 파일별로 기록해 E1 완료 게이트 판단. 현재 체크 완료는 **작성/정적 검토**만 의미하며 테스트 통과가 아니다.
 
 **분리 원칙:** 기존 19/34 browser 통과·15실패는 이전 검증 브랜치의 수치이며 이후 코드의 재검증 결과가 아니다. 자산 기능 미구현으로 실패하는 테스트는 **알려진 미완료 기능**으로 유지한다. 테스트를 제거·무력화·skip하여 전체 통과로 보고하지 않는다. 편집기 패리티를 검증할 때는 실패를 “편집기 오류 / 자산 확장 미구현 / 환경·시각 helper”로 분류한다.
 
