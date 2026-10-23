@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {createHeadlessEditor} from '@lexical/headless';
 import {$getRoot,$createParagraphNode,$createTextNode,$getNodeByKey,KEY_ENTER_COMMAND,KEY_BACKSPACE_COMMAND,KEY_TAB_COMMAND,COMMAND_PRIORITY_EDITOR} from 'lexical';
 import {$createListNode,$createListItemNode} from '@lexical/list';
-import {TUFTE_NODES,$createSectionNode,registerListKeyboardCommands,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,SET_TUFTE_LIST_KIND_COMMAND,CHANGE_TUFTE_LIST_INDENT_COMMAND,UNWRAP_TUFTE_LIST_COMMAND,$createNoteNode} from '../dist/index.js';
+import {TUFTE_NODES,$createSectionNode,registerListKeyboardCommands,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,SET_TUFTE_LIST_KIND_COMMAND,CHANGE_TUFTE_LIST_INDENT_COMMAND,UNWRAP_TUFTE_LIST_COMMAND,$createSidenoteNode,$createMarginnoteNode} from '../dist/index.js';
 
 for(const [name,command]of [['Enter',KEY_ENTER_COMMAND],['Backspace',KEY_BACKSPACE_COMMAND]])test(`list ${name} boundary precedes an earlier editor-priority handler but delegates normal text`,()=>{
  const {editor,dispose}=setup();let fallback=0;
@@ -69,7 +69,7 @@ test('P2.2.b switch bullet/number keeps nested content, note ID and list item id
  let itemKey;
  editor.update(()=>{
   const text=$createTextNode('One');
-  const note=$createNoteNode('list-note-1','marginnote').append($createTextNode('Note stays'));
+  const note=$createMarginnoteNode('list-note-1').append($createTextNode('Note stays'));
   const item=$createListItemNode().append(text,note);
   const other=$createListItemNode().append($createTextNode('Two'));
   const list=$createListNode('bullet').append(item,other);
@@ -91,7 +91,7 @@ test('P2.2.b switch bullet/number keeps nested content, note ID and list item id
   assert.equal(list.getLastChild().getTextContent(),'Two');
  });
  assert.equal(changed.root.children[0].children[0].listType,'number');
- assert.deepEqual(changed.root.children[0].children[0].children.map(i=>i.children.map(n=>n.type)),[['text','tufte-note'],['text']]);
+ assert.deepEqual(changed.root.children[0].children[0].children.map(i=>i.children.map(n=>n.type)),[['text','tufte-marginnote'],['text']]);
  assert.equal(editor.dispatchCommand(SET_TUFTE_LIST_KIND_COMMAND,'bullet'),true);
  editor.update(()=>{},{discrete:true});
  const reversed=editor.getEditorState().toJSON();
@@ -149,7 +149,7 @@ test('P2.2.b structural indent/outdent keeps the same list item and note ID',()=
  editor.update(()=>{
   const first=$createListItemNode().append($createTextNode('First'));
   const secondText=$createTextNode('Second');
-  const second=$createListItemNode().append(secondText,$createNoteNode('nested-note','marginnote').append($createTextNode('Nested note')));
+  const second=$createListItemNode().append(secondText,$createMarginnoteNode('nested-note').append($createTextNode('Nested note')));
   itemKey=second.getKey();
   const list=$createListNode('bullet').append(first,second,$createListItemNode().append($createTextNode('Third')));
   $getRoot().append($createSectionNode().append(list));
@@ -162,7 +162,7 @@ test('P2.2.b structural indent/outdent keeps the same list item and note ID',()=
   assert.ok(item);
   assert.equal(item.getIndent(),1);
   assert.match(item.getTextContent(),/Second[\s\S]*Nested note/);
-  assert.equal(item.getChildren().find(n=>n.getType()==='tufte-note')?.getNoteId(),'nested-note');
+  assert.equal(item.getChildren().find(n=>(n.getType()==='tufte-sidenote'||n.getType()==='tufte-marginnote'))?.getNoteId(),'nested-note');
   assert.equal($getRoot().getFirstChild().getFirstChild().getTextContent().includes('Third'),true);
  });
  editor.dispatchCommand(CHANGE_TUFTE_LIST_INDENT_COMMAND,'outdent');
@@ -173,7 +173,7 @@ test('P2.2.b structural indent/outdent keeps the same list item and note ID',()=
   assert.ok(item);
   assert.equal(item.getIndent(),0);
   assert.deepEqual(list.getChildren().map(n=>n.getTextContent().replace('Nested note','').trim()),['First','Second','Third']);
-  assert.equal(item.getChildren().find(n=>n.getType()==='tufte-note')?.getNoteId(),'nested-note');
+  assert.equal(item.getChildren().find(n=>(n.getType()==='tufte-sidenote'||n.getType()==='tufte-marginnote'))?.getNoteId(),'nested-note');
  });
  assert.deepEqual(diagnostics,[]);
  dispose();
@@ -204,7 +204,7 @@ test('P2.2.b flat list unwrap creates paragraphs at the same position without lo
  const {editor,diagnostics,dispose}=setup();
  editor.update(()=>{
   const itemText=$createTextNode('First');
-  const withNote=$createListItemNode().append(itemText,$createNoteNode('unwrap-note','sidenote').append($createTextNode('Note text')));
+  const withNote=$createListItemNode().append(itemText,$createSidenoteNode('unwrap-note').append($createTextNode('Note text')));
   const second=$createListItemNode().append($createTextNode('Second'));
   $getRoot().append($createSectionNode().append(
    $createParagraphNode().append($createTextNode('Before')),
@@ -365,7 +365,7 @@ test('P2.2.b Backspace removes empty first item without changing later note payl
  const {editor,dispose}=setup();const stop=registerListKeyboardCommands(editor);
  editor.update(()=>{
   const empty=$createListItemNode();
-  const other=$createListItemNode().append($createTextNode('Kept'),$createNoteNode('backspace-note','marginnote').append($createTextNode('Annotation')));
+  const other=$createListItemNode().append($createTextNode('Kept'),$createMarginnoteNode('backspace-note').append($createTextNode('Annotation')));
   $getRoot().append($createSectionNode().append($createListNode('bullet').append(empty,other)));
   empty.selectStart();
  },{discrete:true});
@@ -420,7 +420,7 @@ test('P2.2.b Backspace leaves nonempty and nonfirst items, IME and outside parag
 test('P2.2.b nested empty item Backspace delegates to Lexical without deleting sibling notes',()=>{
  const {editor,dispose}=setup();const stop=registerListKeyboardCommands(editor);
  editor.update(()=>{
-  const note=$createNoteNode('nested-backspace-note','marginnote').append($createTextNode('Payload'));
+  const note=$createMarginnoteNode('nested-backspace-note').append($createTextNode('Payload'));
   const parent=$createListItemNode().append($createTextNode('Parent'),note);
   const nested=$createListNode('bullet').append($createListItemNode());
   parent.append(nested);
@@ -435,7 +435,7 @@ test('P2.2.b nested empty item Backspace delegates to Lexical without deleting s
  assert.equal(JSON.stringify(editor.getEditorState().toJSON()),before);
  editor.getEditorState().read(()=>{
   const parent=$getRoot().getFirstChild().getFirstChild().getFirstChild();
-  assert.equal(parent.getChildren().find(n=>n.getType()==='tufte-note').getNoteId(),'nested-backspace-note');
+  assert.equal(parent.getChildren().find(n=>(n.getType()==='tufte-sidenote'||n.getType()==='tufte-marginnote')).getNoteId(),'nested-backspace-note');
  });
  stop();dispose();
 });
@@ -503,7 +503,7 @@ test('append list item inserts after selected middle item without moving trailin
 test('append after annotated list item retains note identity and trailing item',()=>{
  const {editor,dispose}=setup();
  editor.update(()=>{
-  const note=$createNoteNode('append-note','marginnote').append($createTextNode('Annotation'));
+  const note=$createMarginnoteNode('append-note').append($createTextNode('Annotation'));
   const first=$createListItemNode().append($createTextNode('First'),note);
   const last=$createListItemNode().append($createTextNode('Last'));
   $getRoot().append($createSectionNode().append($createListNode('bullet').append(first,last)));
@@ -514,7 +514,7 @@ test('append after annotated list item retains note identity and trailing item',
  editor.getEditorState().read(()=>{
   const list=$getRoot().getFirstChild().getFirstChild();
   assert.deepEqual(list.getChildren().map(item=>item.getTextContent()),['FirstAnnotation','','Last']);
-  assert.equal(list.getFirstChild().getChildren().find(n=>n.getType()==='tufte-note').getNoteId(),'append-note');
+  assert.equal(list.getFirstChild().getChildren().find(n=>(n.getType()==='tufte-sidenote'||n.getType()==='tufte-marginnote')).getNoteId(),'append-note');
  });
  dispose();
 });
@@ -547,7 +547,7 @@ test('append inside nested list does not modify its outer siblings',()=>{
 test('nested outdent preserves note identity and unaffected outer sibling',()=>{
  const {editor,dispose}=setup();
  editor.update(()=>{
-  const note=$createNoteNode('outdent-note','marginnote').append($createTextNode('Note body'));
+  const note=$createMarginnoteNode('outdent-note').append($createTextNode('Note body'));
   const nestedItem=$createListItemNode().append($createTextNode('Child'),note);
   const nested=$createListNode('bullet').append(nestedItem);
   const parent=$createListItemNode().append($createTextNode('Parent'),nested);
