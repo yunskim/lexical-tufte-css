@@ -20,3 +20,5 @@ export interface AssetProvider{
 export type EditorCapabilities={references?:ReferenceProvider;assets?:AssetProvider};
 
 export {ReferenceSelection} from './referenceSelection.js';
+
+export {mountReferencePicker,type ReferencePickerOptions} from './referencePicker.js';
