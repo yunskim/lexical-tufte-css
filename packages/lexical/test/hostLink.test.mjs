@@ -21,7 +21,7 @@ test('host link JSON preserves stable reference without URL',async()=>{
  const saved=json.root.children[0].children[0];
  assert.equal(saved.type,'host-link');
  assert.deepEqual(saved.reference,reference);
- assert.equal(Object.hasOwn(saved,'url'),false);
+ for(const field of ['url','target','rel','title'])assert.equal(Object.hasOwn(saved,field),false);
  const reopened=editor();
  const state=reopened.parseEditorState(JSON.stringify(json));
  reopened.setEditorState(state);
@@ -99,7 +99,7 @@ test('host link rejects URL-bearing or unsupported-version JSON on reopen',async
  });
  await flush(e);
  const original=e.getEditorState().toJSON();
- for(const patch of [{url:'#'},{version:2},{type:'link'}]){
+ for(const patch of [{url:'#'},{target:'_blank'},{rel:'noopener'},{title:'Injected'},{version:2},{type:'link'}]){
   const invalid=structuredClone(original);
   Object.assign(invalid.root.children[0].children[0],patch);
   const reopened=editor();
