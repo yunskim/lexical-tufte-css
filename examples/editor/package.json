@@ -19,7 +19,8 @@
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "@lexical/table": "0.52.0",
-    "@lexical/rich-text": "0.52.0"
+    "@lexical/rich-text": "0.52.0",
+    "@lexical-tufte/render": "workspace:*"
   },
   "devDependencies": {
     "typescript": "6.0.2",

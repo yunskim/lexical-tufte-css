@@ -844,12 +844,23 @@ function EditorUI(){
         if(src!==null)editor.dispatchCommand(UPDATE_TUFTE_NOTE_IMAGE_COMMAND,{src});
        }}>노트 이미지 URL 수정</button>
       <button onMouseDown={preserve} onClick={editNoteImageDimensions}>노트 이미지 크기 수정</button>
+      <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(DETACH_TUFTE_NOTE_IMAGE_ASSET_COMMAND,undefined)}>노트 이미지 자산 연결 해제</button>
       <button onMouseDown={preserve} onClick={()=>noteOperation('split')}>노트 나누기</button>
       <button onMouseDown={preserve} onClick={()=>noteOperation('merge')}>다음 노트와 합치기</button>
       <button onMouseDown={preserve} onClick={()=>noteOperation('previous')}>노트 앞으로 이동</button>
       <button onMouseDown={preserve} onClick={()=>noteOperation('next')}>노트 뒤로 이동</button>
       <IconButton name="undo" label="실행 취소" onMouseDown={preserve} onClick={()=>editor.dispatchCommand(UNDO_COMMAND,undefined)}/>
       <IconButton name="redo" label="다시 실행" onMouseDown={preserve} onClick={()=>editor.dispatchCommand(REDO_COMMAND,undefined)}/>
+    </div>
+    <div className="managed-assets" role="group" aria-label="문서 이미지 자산">
+      <button type="button" onClick={addManagedAsset}>문서 이미지 자산 등록</button>
+      <span>문서 자산 {assets.length}개 · URL 참조만 등록하며 파일은 업로드하지 않습니다.</span>
+      {assets.length>0&&<ul>{assets.map(asset=><li key={asset.id}>
+        <button type="button" onMouseDown={preserve} onClick={()=>
+          editor.dispatchCommand(ASSIGN_TUFTE_NOTE_IMAGE_ASSET_COMMAND,asset.id)
+        }>선택한 노트 이미지에 {asset.id} 연결</button>
+        <code>{asset.src}</code>
+      </li>)}</ul>}
     </div>
     {noteImageChoices!==null&&<div id="tufte-note-image-choices" className="note-image-choices" role="group" aria-label="현재 노트의 이미지 선택" onKeyDown={event=>{
       if(event.key==='Escape'){event.preventDefault();setNoteImageChoices(null);editor.focus();}
@@ -871,7 +882,7 @@ function EditorUI(){
     <p role="status" aria-label="편집 작업 상태">{status}</p><p role="status" aria-label="자동 복구 저장 상태">{autoSaveState}</p>
     {structureIssues.length>0&&<aside role="alert" aria-label="문서 구조 복구"><p>문서 구조를 수정하세요. 내용은 자동 삭제하지 않으며 HTML 생성은 차단됩니다.</p><ul>{structureIssues.map((issue,i)=><li key={`${issue.key}-${i}`}><button onClick={()=>focusStructureIssue(editor,issue.key)}>{issue.message}</button> <code>{issue.path}</code></li>)}</ul><button onClick={()=>editor.dispatchCommand(UNDO_COMMAND,undefined)}>구조 변경 실행 취소</button><button onClick={recoverStructure} disabled={!checkpoint.current}>마지막 정상 구조로 복구</button></aside>}
     <div className="actions"><button onClick={save}>저장</button><button onClick={restore}>불러오기</button><button onClick={restoreRecovery} disabled={!recoveryAvailable}>복구용 사본 열기</button><button onClick={exportRecovery} disabled={!recoveryAvailable}>복구본 JSON 내보내기</button><button onClick={deleteRecovery} disabled={!recoveryAvailable}>복구본 정리</button><button onClick={exportDocument}>JSON·HTML 확인</button><button onClick={()=>{editor.update($loadLayoutFixture,{tag:HISTORY_PUSH_TAG});setStatus('레이아웃 예제를 불러왔습니다. 실행 취소할 수 있습니다.');}}>레이아웃 예제 불러오기</button></div>
-    <details><summary>JSON과 발행 HTML 검사</summary><label>JSON<textarea ref={textarea} aria-label="문서 JSON" value={json} readOnly/></label><label>HTML<textarea aria-label="발행 HTML" value={html} readOnly/></label></details>
+    <details><summary>JSON과 발행 HTML 검사</summary><label>JSON<textarea ref={textarea} aria-label="문서 JSON" value={json} readOnly/></label><label>HTML<textarea aria-label="발행 HTML" value={html} readOnly/></label>{managedJson&&<label>관리 문서 JSON<textarea aria-label="관리 문서 JSON" value={managedJson} readOnly/></label>}</details>
     <p className="notice">프로토타입: 공개 발행·모바일 여백 배치·OS별 실제 IME와 다른 브라우저 검증은 후속 단계에서 진행합니다. 한글 웹폰트 자산 연결은 P4 대상입니다.</p>
   </>;
 }
