@@ -99,7 +99,11 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
     src:String(n.src),alt:String(n.alt),class:'imagequilt',
     width:String(n.width),height:String(n.height)
    },[],true)];
-   case 'tufte-inline-image':return [element('img',{src:String(n.src),alt:String(n.alt)},[],true)];
+   case 'tufte-inline-image':return [element('img',{
+     src:String(n.src),alt:String(n.alt),
+     ...(n.width===undefined?{}:{width:String(n.width)}),
+     ...(n.height===undefined?{}:{height:String(n.height)})
+    },[],true)];
    case 'tufte-sidenote':
    case 'tufte-marginnote':
    {
