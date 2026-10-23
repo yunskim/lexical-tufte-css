@@ -129,6 +129,23 @@ try {
   'Opening remaining recovery snapshot must not consume it');
  assert.equal(await page.evaluate(()=>localStorage.getItem('lexical-tufte-p1')),canonical,
   'Opening remaining recovery snapshot must preserve canonical save');
+ // A corrupted recovery entry must not block access to valid snapshots.
+ const corruptKey='lexical-tufte-recovery-v2:regression-corrupt';
+ await page.evaluate(key=>localStorage.setItem(key,'{corrupt-json'),corruptKey);
+ page.once('dialog',dialog=>{
+  assert.equal(dialog.type(),'confirm');
+  dialog.accept();
+ });
+ await button.click();
+ await page.getByRole('status',{name:'편집 작업 상태'}).filter({
+  hasText:'선택한 복구본을 열었습니다.'
+ }).waitFor();
+ assert.equal(await page.evaluate(key=>localStorage.getItem(key),corruptKey),'{corrupt-json',
+  'Unreadable recovery entry must be retained for manual inspection');
+ assert.equal(await page.evaluate(key=>localStorage.getItem(key),olderKey),olderBytes,
+  'Valid recovery entry must survive a corrupted sibling');
+ assert.equal(await page.evaluate(()=>localStorage.getItem('lexical-tufte-p1')),canonical,
+  'Corrupted recovery entry must not affect canonical storage');
  assert.deepEqual(errors,[]);
  console.log('Recovery reopen: cancellation, explicit open, canonical isolation and canonical restore.');
 }finally{await browser?.close();server?.kill();}
