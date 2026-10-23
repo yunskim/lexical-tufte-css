@@ -85,3 +85,44 @@ test('opt-in publishIfChanged conservatively republishes documents with unpinned
   assert.equal(ok(store.readState(id)).generation,2);
  }finally{db.close();}
 });
+
+test('publishIfChanged rejects a stale generation even if content is unchanged',async()=>{
+ const {db,store,id}=await setup();
+ try{
+  const first=ok(await store.publishIfChanged(id,opts(1,0,'2026-10-16T01:00:00Z')));
+  const stale=await store.publishIfChanged(id,opts(1,0,'2026-10-16T02:00:00Z'));
+  assert.equal(stale.ok,false);
+  assert.ok(stale.diagnostics.some(d=>d.code==='PUBLICATION_CONFLICT'));
+  assert.equal(ok(await store.readPublic(id)).snapshotId,first.snapshotId);
+  assert.equal(ok(store.readState(id)).generation,1);
+ }finally{db.close();}
+});
+test('publishIfChanged rejects a concurrent draft update during asynchronous asset checks',async()=>{
+ const {db,store,drafts,post,id}=await setup();
+ try{
+  const first=ok(await store.publish(id,opts(1,0,'2026-10-16T01:00:00Z')));
+  const next=structuredClone(post);
+  next.metadata.revision=2;next.metadata.updatedAt='2026-10-16T01:30:00Z';
+  next.document.title='Concurrent edit';
+  let changed=false;
+  const result=await store.publishIfChanged(id,{
+   ...opts(1,1,'2026-10-16T02:00:00Z'),
+   assetExists:async()=>{if(!changed){changed=true;ok(await drafts.compareAndSwap(next,1));}return true;}
+  });
+  assert.equal(changed,true);
+  assert.equal(result.ok,false);
+  assert.ok(result.diagnostics.some(d=>d.code==='REVISION_CONFLICT'));
+  assert.equal(ok(await store.readPublic(id)).snapshotId,first.snapshotId);
+  assert.equal(ok(store.readState(id)).generation,1);
+ }finally{db.close();}
+});
+test('publishIfChanged never treats an unpublished head as a no-op',async()=>{
+ const {db,store,id}=await setup();
+ try{
+  const first=ok(await store.publishIfChanged(id,opts(1,0,'2026-10-16T01:00:00Z')));
+  ok(store.unpublish(id,1));
+  const second=ok(await store.publishIfChanged(id,opts(1,2,'2026-10-16T02:00:00Z')));
+  assert.notEqual(second.snapshotId,first.snapshotId);
+  assert.equal(ok(store.readState(id)).generation,3);
+ }finally{db.close();}
+});
