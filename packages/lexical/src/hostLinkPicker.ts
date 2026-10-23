@@ -1,4 +1,4 @@
-import {$getSelection,$isRangeSelection,$isTextNode,$setSelection,type LexicalEditor,RangeSelection} from 'lexical';
+import {$getSelection,$isRangeSelection,$isTextNode,$setSelection,type LexicalEditor,type RangeSelection} from 'lexical';
 import {mountReferencePicker,type ReferenceProvider} from '@lexical-tufte/editor-ports';
 import {INSERT_HOST_LINK_COMMAND,registerHostLinkCommands} from './hostLinkCommands.js';
 import {HostLinkNode} from './HostLinkNode.js';
@@ -17,6 +17,7 @@ export function mountHostLinkPicker({editor,container,provider,onError}:HostLink
  let saved:RangeSelection|null=null;
  let selectedText:string|null=null;
  let capturedState:ReturnType<LexicalEditor['getEditorState']>|null=null;
+ let selectionGeneration=0;
  let disposed=false;
  const capture=()=>{
   editor.getEditorState().read(()=>{
@@ -27,20 +28,30 @@ export function mountHostLinkPicker({editor,container,provider,onError}:HostLink
    if($isTextNode(node)&&node.isSimpleText()){
     saved=selection.clone();
     capturedState=editor.getEditorState();
+    selectionGeneration++;
     selectedText=node.getTextContent().slice(Math.min(selection.anchor.offset,selection.focus.offset),Math.max(selection.anchor.offset,selection.focus.offset));
    }
   });
  };
  capture();
+ const unregisterUpdate=editor.registerUpdateListener(({editorState,prevEditorState})=>{
+  if(disposed||!saved)return;
+  // Selection-only changes caused by focusing the picker must not invalidate the snapshot.
+  // Actual document edits invalidate it, even when the selected text happens to match.
+  if(JSON.stringify(editorState.toJSON().root)!==JSON.stringify(prevEditorState.toJSON().root)){
+   saved=null;selectedText=null;capturedState=null;selectionGeneration++;
+  }
+ });
  const detach=mountReferencePicker({
   container,provider,onError,
   onSelect:reference=>{
    if(disposed||!saved||selectedText===null)return;
    const selected=saved.clone();
    const expectedText=selectedText;
-   const originalState=capturedState;
-   if(editor.getEditorState()!==originalState)return;
+   const generation=selectionGeneration;
+   if(!capturedState)return;
    editor.update(()=>{
+    if(disposed||generation!==selectionGeneration)return;
     const anchor=selected.anchor.getNode();
     const focus=selected.focus.getNode();
     if(!anchor.isAttached()||!focus.isAttached()||!$isTextNode(anchor)||!anchor.isSimpleText()||
@@ -53,5 +64,5 @@ export function mountHostLinkPicker({editor,container,provider,onError}:HostLink
    });
   }
  });
- return ()=>{disposed=true;saved=null;selectedText=null;capturedState=null;detach();unregister();};
+ return ()=>{disposed=true;saved=null;selectedText=null;capturedState=null;detach();unregisterUpdate();unregister();};
 }
