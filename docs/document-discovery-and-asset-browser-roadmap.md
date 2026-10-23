@@ -1,5 +1,7 @@
 # Document discovery and asset browsing roadmap
 
+Integration API draft: [CMS Integration Contract](CMS_INTEGRATION_CONTRACT.ko.md).
+
 Status: Planned (not implemented)
 Priority: Deferred — after Tufte CSS sample parity, round-trip stability, and core editor stabilization.
 Scope: lexical-tufte-css reusable editor integration, not a built-in CMS.
