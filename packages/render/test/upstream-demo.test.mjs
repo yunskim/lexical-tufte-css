@@ -39,14 +39,39 @@ test('published notes preserve the upstream label/input/payload relationship, wi
  assert.match(upstream,/<span class="sidenote">/);
 });
 
-test('upstream newthought embeds a note label inside span: known schema/DOM fidelity gap',()=>{
- // The current renderer wraps note markup in a data-tufte-note span.
- // This upstream nesting cannot yet be reproduced by the current note-in-span schema.
- assert.match(upstream,/<span class="newthought">[^<]*<label\b[^>]*class="margin-toggle sidenote-number"/);
- const result=renderArticle(documentFixture());
+test('newthought followed by sidenote publishes split-parent markup without a note wrapper',()=>{
+ assert.match(upstream,/<span class="newthought">[^<]*<label\\b[^>]*class="margin-toggle sidenote-number"/);
+ const doc=documentFixture(),section=doc.lexicalState.root.children[0];
+ const text=value=>({type:'text',version:1,text:value,format:0});
+ const node=(type,children,fields={})=>({type,version:1,children,...fields});
+ section.children.push(node('paragraph',[
+  node('tufte-span',[text('Later books')],{kind:'newthought'}),
+  node('tufte-sidenote',[text('Reference')],{noteId:'split-parent-check'}),
+  text(' remain readable.')
+ ]));
+ const result=renderArticle(doc);
  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
- assert.match(result.html,/<span data-tufte-note="/);
- // Do not mark F05/F10 upstream DOM parity complete until this difference is resolved.
+ assert.match(result.html,/<span class="newthought">Later books<label for="([^"]+)" class="margin-toggle sidenote-number"><\\/label><\\/span><input id="\\1" type="checkbox" class="margin-toggle" aria-label="Toggle sidenote"><span class="sidenote">Reference<\\/span>/);
+ assert.doesNotMatch(result.html,/data-tufte-note=|tufte-note-editor/);
+});
+
+test('other adjacent notes and intervening text do not steal a newthought label',()=>{
+ const doc=documentFixture(),section=doc.lexicalState.root.children[0];
+ const text=value=>({type:'text',version:1,text:value,format:0});
+ const node=(type,children,fields={})=>({type,version:1,children,...fields});
+ section.children.push(node('paragraph',[
+  node('tufte-span',[text('A new thought')],{kind:'newthought'}),
+  text(' and then '),
+  node('tufte-sidenote',[text('Unpaired')],{noteId:'unpaired-side'})
+ ]));
+ section.children.push(node('paragraph',[
+  node('tufte-span',[text('Another thought')],{kind:'newthought'}),
+  node('tufte-marginnote',[text('Margin')],{noteId:'ordinary-margin'})
+ ]));
+ const result=renderArticle(doc);
+ assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+ assert.match(result.html,/<span class="newthought">A new thought<\\/span> and then <label for="([^"]+)" class="margin-toggle sidenote-number"><\\/label><input id="\\1"/);
+ assert.match(result.html,/<span class="newthought">Another thought<\\/span><label for="([^"]+)" class="margin-toggle">⊕<\\/label><input id="\\1"/);
 });
 
 test('upstream margin toggles have matching labels and adjacent payloads',()=>{
