@@ -1,12 +1,8 @@
-import {LinkNode,type LinkAttributes} from '@lexical/link';
-import {$applyNodeReplacement,type DOMExportOutput,type NodeKey} from 'lexical';
+import {$applyNodeReplacement,ElementNode,type EditorConfig,type NodeKey,type SerializedElementNode} from 'lexical';
 import type {HostReference} from '@lexical-tufte/document';
 
-/** Internal links are not URLs: their target is resolved by the host. */
-export type SerializedHostLink={
- type:'host-link';version:1;reference:HostReference;children:unknown[];
- direction?:null|'ltr'|'rtl';format?:string;indent?:number;textFormat?:number;textStyle?:string;
-};
+/** A host reference is not a URL and must not inherit LinkNode URL behavior. */
+export type SerializedHostLink=SerializedElementNode&{type:'host-link';version:1;reference:HostReference};
 
 function validateReference(reference:HostReference):void{
  if(!reference||typeof reference!=='object'||Array.isArray(reference)||
@@ -17,47 +13,39 @@ function validateReference(reference:HostReference):void{
   throw Error('Invalid host reference');
 }
 
-/** LinkNode-compatible editor behavior with a separate, URL-free serialized node. */
-export class HostLinkNode extends LinkNode {
+/** Inline, non-navigable reference element with an independent JSON contract. */
+export class HostLinkNode extends ElementNode{
  __reference:HostReference;
  static getType():string{return 'host-link';}
- static clone(node:HostLinkNode):HostLinkNode{
-  return new HostLinkNode(node.__reference,node.__key);
- }
- constructor(reference:HostReference,key?:NodeKey){
-  super('#',{} as LinkAttributes,key);
-  this.__reference={...reference};
- }
+ static clone(node:HostLinkNode):HostLinkNode{return new HostLinkNode(node.__reference,node.__key);}
+ constructor(reference:HostReference,key?:NodeKey){super(key);validateReference(reference);this.__reference={...reference};}
+ isInline():true{return true;}
  getReference():HostReference{return {...this.getLatest().__reference};}
- createDOM():HTMLElement{
+ createDOM(_config:EditorConfig):HTMLElement{
   const span=document.createElement('span');
-  span.dataset.hostReference=this.__reference.id;
-  span.dataset.hostNamespace=this.__reference.namespace;
-  span.dataset.hostKind=this.__reference.kind;
+  const reference=this.getReference();
+  span.dataset.hostReference=reference.id;
+  span.dataset.hostNamespace=reference.namespace;
+  span.dataset.hostKind=reference.kind;
   span.className='tufte-host-link';
   return span;
  }
- exportDOM():DOMExportOutput{
-  // An unresolved host reference is not a navigable URL. Never export the inherited href="#".
-  return {element:this.createDOM()};
- }
- updateDOM(_previous:HostLinkNode,dom:HTMLElement):boolean{
+ updateDOM(_previous:HostLinkNode,dom:HTMLElement):false{
   const reference=this.getReference();
   dom.dataset.hostReference=reference.id;
   dom.dataset.hostNamespace=reference.namespace;
   dom.dataset.hostKind=reference.kind;
   return false;
  }
- exportJSON():ReturnType<LinkNode['exportJSON']>{
-  const base=super.exportJSON();
-  const {url,target,rel,title,...rest}=base;
-  return {...rest,type:'host-link',version:1,reference:{...this.getLatest().__reference}} as ReturnType<LinkNode['exportJSON']>;
+ exportJSON():SerializedHostLink{
+  return {...super.exportJSON(),type:'host-link',version:1,reference:this.getReference()};
  }
- static importJSON(serialized:ReturnType<LinkNode['exportJSON']>):HostLinkNode{
-  const value=serialized as typeof serialized&{reference:HostReference};
-  if(value.type!=='host-link'||value.version!==1||['url','target','rel','title'].some(key=>Object.hasOwn(value,key)))throw Error('Invalid host link serialization');
+ static importJSON(value:SerializedHostLink):HostLinkNode{
+  if(value.type!=='host-link'||value.version!==1||
+    ['url','target','rel','title'].some(key=>Object.hasOwn(value,key)))
+   throw Error('Invalid host link serialization');
   validateReference(value.reference);
-  return $createHostLinkNode(value.reference);
+  return $createHostLinkNode(value.reference).updateFromJSON(value);
  }
 }
 export function $createHostLinkNode(reference:HostReference):HostLinkNode{
