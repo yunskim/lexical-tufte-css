@@ -46,13 +46,19 @@ try {
  await staticPage.setViewportSize({width:375,height:1100});
  await staticPage.setContent(`<style>${css}</style>${result.html}${second.html}`);
  assert.equal(await staticPage.locator('script').count(),0);
- const firstNote=staticPage.locator('#server-fixture-article [data-tufte-note="server-note"]');
- const secondNote=staticPage.locator('#second-article [data-tufte-note="server-note"]');
- const firstId=await firstNote.locator('input').getAttribute('id'),secondId=await secondNote.locator('input').getAttribute('id');
+ const firstNote=staticPage.locator('#server-fixture-article input.margin-toggle[id$="-server-note"]');
+ const secondNote=staticPage.locator('#second-article input.margin-toggle[id$="-server-note"]');
+ assert.equal(await firstNote.count(),1);
+ assert.equal(await secondNote.count(),1);
+ const firstId=await firstNote.getAttribute('id'),secondId=await secondNote.getAttribute('id');
  assert.notEqual(firstId,secondId);assert.match(firstId,/^tufte-14-server-fixture-/);assert.match(secondId,/^tufte-6-second-/);
- assert.equal(await firstNote.locator('input').isChecked(),false);
- await firstNote.locator('label').click();assert.equal(await firstNote.locator('input').isChecked(),true);
- assert.equal(await secondNote.locator('input').isChecked(),false);
- assert.equal(await firstNote.locator('.sidenote').isVisible(),true);assert.equal(await secondNote.locator('.sidenote').isVisible(),false);
+ assert.equal(await firstNote.isChecked(),false);
+ await staticPage.locator('label[for="'+firstId+'"]').click();
+ assert.equal(await firstNote.isChecked(),true);
+ assert.equal(await secondNote.isChecked(),false);
+ assert.equal(await firstNote.locator('xpath=following-sibling::span[1]').isVisible(),true);
+ assert.equal(await secondNote.locator('xpath=following-sibling::span[1]').isVisible(),false);
+ assert.equal(await staticPage.locator('#server-fixture-article [data-tufte-note]').count(),0,
+  'Published notes must not leak a non-upstream wrapper');
  console.log('Server/browser semantic and geometry parity: 5 widths; no-JS mobile toggles and article namespaces passed.');
 } finally {await browser.close();server?.kill();}
