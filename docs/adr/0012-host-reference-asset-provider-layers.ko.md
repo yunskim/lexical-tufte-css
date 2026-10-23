@@ -1,6 +1,6 @@
 # ADR-0012 — 편집기 Reference·Asset 포트와 호스트 어댑터
 
-상태: 채택. TypeScript 포트 타입은 부분 구현(2026-10-23), 실제 asset UI·호스트 연동·검증은 후속. ADR-0010 Publication 저장소 포트, ADR-0011 FastAPI HTTP 경계와 병행한다.
+상태: 채택. TypeScript 포트 타입은 부분 구현(2026-10-23). **자산 UI·호스트 연동·스키마 전환은 보류하고 Tufte CSS 편집기 구현을 우선한다.** ADR-0010 Publication 저장소 포트, ADR-0011 FastAPI HTTP 경계와 병행한다.
 
 ## 목적과 경계
 
@@ -41,6 +41,8 @@ interface AssetProvider {
   resolve(locator: AssetLocator, signal?: AbortSignal): Promise<ResolvedAsset | null>;
 }
 ```
+
+**위 코드는 현재 구현된 타입의 정확한 형태다.** `AssetRevision.id`를 `revisionId`로 바꾸는 일은 다음 자산 작업 재개 시 진행할 후속 정리이며, 이번에는 인터페이스 코드를 변경하지 않는다. 새 자산 선택 UX는 **pinned revision을 기본값**으로 하고 floating은 명시적 선택으로만 저장한다. 화면에서 선택 전에 검색한 revision을 무조건 신뢰하지 않고 저장/발행 전에 호스트 권한과 실제 revision을 다시 확인해야 한다.
 
 자산 검색 결과와 resolved object 모두 namespace를 포함한다. `resolve`는 임시 미리보기/다운로드 URL을 제공할 뿐 문서 정본이나 불변 발행 아티팩트를 생성하지 않는다. 참조 검색과 UI는 별도 `ReferenceProvider`로 유지한다. 브라우저 HTTP 경로는 선택 사항이며, HTTP/FastAPI/Magnolia 어댑터는 구현되지 않았다.
 
@@ -96,10 +98,14 @@ interface AssetProvider {
 - [x] HTTP 경로 후보와 보안·일관성 불변 조건 문서화
 - [x] 현행 link/asset 노드와 `src` 필수 제약 조사 — [AssetProvider 계약](../asset-provider-boundary.md)의 제약·후속 작업 참고
 - [x] TypeScript `ReferenceProvider`/`AssetProvider` 포트 타입 추가 및 namespace 보완 — `packages/editor-ports/src/index.ts`
-- [ ] 에셋 capabilities 실제 주입과 chooser UI 연결 (reference picker는 별도 구현)
+- [ ] `AssetRevision.id` → `revisionId` 명칭 통일 (재개 시, 포트 타입/소비 예제/계약 테스트를 동시에 변경)
+- [ ] pinned 기본 선택, floating 명시적 선택, 발행 시 immutable pin 테스트 (재개 시)
+- [ ] 에셋 capabilities 실제 주입과 chooser UI 연결 (reference picker는 별도 구현, **현재 보류**)
 - [ ] TypeScript HTTP 어댑터 및 FastAPI 라우터 구현
 - [ ] Python 호스트 포트 및 SQLite 참조 인덱스/에셋 카탈로그 어댑터
 - [ ] Magnolia 로컬 브리지 예제 (별도 저장소 변경 없이)
 - [ ] 스키마 버전 이전·floating/pinned·broken link 회귀 테스트
 - [ ] 접근권, 인덱스 일관성, 에셋 URL 만료, 경쟁 상태 테스트
-- [ ] 테스트·빌드·CI 실행 (사용자 지시에 따라 보류)
+- [ ] 재개 후 타입 소비·빌드·단위·브라우저 검증을 묶어 실행 (CI는 사용자 지시에 따라 보류)
+
+**진행 순서 변경(2026-10-23):** 현재 `AssetProvider` 타입을 안정된 인터페이스 초안으로 보존한 채, 공식 Tufte CSS 전체 페이지의 편집/발행 DOM 일치 및 기존 브라우저 실패 수정부터 진행한다. 에셋 UX 및 provider 구현은 **후순위**로 유지하며, 보류된 체크를 편집기 출시를 막는 선행조건으로 세지 않는다. [자산 경계 설계의 운영 체크리스트](../asset-provider-boundary.md) 참조.
