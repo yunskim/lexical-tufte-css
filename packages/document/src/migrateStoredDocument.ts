@@ -18,7 +18,8 @@ function normalizeLegacyNotes(input:unknown):unknown{
  // Never invoke user-defined accessors during migration.
  if(Object.getOwnPropertySymbols(input).length||
   Object.values(Object.getOwnPropertyDescriptors(input)).some(d=>!('value' in d)))return input;
- const copy=structuredClone(input);
+ let copy:Record<string,unknown>;
+ try{copy=structuredClone(input);}catch{return input;}
  const seen=new WeakSet<object>();
  const visit=(node:unknown):void=>{
   if(!isRecord(node)||seen.has(node))return;
