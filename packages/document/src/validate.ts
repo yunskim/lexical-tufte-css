@@ -65,7 +65,7 @@ export function validateDocument(input:unknown):ValidationResult{
     const attributions=raw.children.map((n,i)=>plain(n)&&n.type==='tufte-attribution'?i:-1).filter(i=>i>=0);
     if(attributions.length>1||(attributions.length===1&&attributions[0]!==raw.children.length-1)||!raw.children.some(n=>plain(n)&&n.type!=='tufte-attribution'))add('INVALID_QUOTE',path,'Quote needs content then optional attribution');
    }
-   for(const [i,n]of raw.children.entries()){if(exhausted)break;visit(n,`${path}.children[${i}]`,type,depth+1,inNote||type==='tufte-note',inLink||type==='link');}
+   for(const [i,n]of raw.children.entries()){if(exhausted)break;visit(n,`${path}.children[${i}]`,type,depth+1,inNote||type==='tufte-note',inLink||type==='link'||type==='host-link');}
   }
   if(['text','tab','code-highlight'].includes(type)){
    if(typeof raw.text!=='string')add('INVALID_TEXT',path+'.text','Expected text');else textLength+=raw.text.length;
@@ -84,18 +84,17 @@ export function validateDocument(input:unknown):ValidationResult{
   if(type==='tufte-span'&&!enumeration(raw.kind,['sans','newthought','numeral','danger']))add('INVALID_SPAN_KIND',path+'.kind','Unsupported Tufte inline class');
   if(type==='link'){
    if(inLink)add('NESTED_LINK',path,'Links cannot be nested through inline wrappers');
-   const hasUrl=raw.url!==undefined,hasReference=raw.reference!==undefined;
-   if(hasUrl===hasReference)add('INVALID_LINK_TARGET',path,'Exactly one of url or reference is required');
-   if(hasUrl&&!isSafeURL(raw.url,'link'))add('UNSAFE_URL',path+'.url','Unsupported link URL');
-   if(hasReference){
-    const ref=raw.reference;
-    if(!plain(ref)||Object.keys(ref).some(k=>!['namespace','kind','id'].includes(k))||
-       !nonempty(ref.namespace,128)||!nonempty(ref.id,256)||
-       !enumeration(ref.kind,['document','note','task','asset']))
-     add('INVALID_REFERENCE',path+'.reference','Invalid host reference');
-   }
+   if(!isSafeURL(raw.url,'link'))add('UNSAFE_URL',path+'.url','Unsupported link URL');
    if(raw.target!==undefined&&!enumeration(raw.target,[null,'_blank','_self']))add('INVALID_TARGET',path+'.target','Invalid link target');
    for(const key of ['rel','title'])if(raw[key]!==undefined&&raw[key]!==null&&typeof raw[key]!=='string')add('INVALID_LINK',path+'.'+key,'Expected string or null');
+  }
+  if(type==='host-link'){
+   if(inLink)add('NESTED_LINK',path,'Links cannot be nested');
+   const ref=raw.reference;
+   if(!plain(ref)||Object.keys(ref).some(k=>!['namespace','kind','id'].includes(k))||
+      !nonempty(ref.namespace,128)||!nonempty(ref.id,256)||
+      !enumeration(ref.kind,['document','note','task','asset']))
+    add('INVALID_REFERENCE',path+'.reference','Invalid host reference');
   }
   if(type==='tufte-inline-image'||type==='tufte-imagequilt'){
    if(!isSafeURL(raw.src,'image'))add('UNSAFE_URL',path+'.src','Unsupported image URL');
