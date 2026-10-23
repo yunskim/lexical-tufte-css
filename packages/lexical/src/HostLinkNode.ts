@@ -1,5 +1,5 @@
 import {LinkNode,type LinkAttributes} from '@lexical/link';
-import {$applyNodeReplacement,type NodeKey} from 'lexical';
+import {$applyNodeReplacement,type DOMExportOutput,type NodeKey} from 'lexical';
 import type {HostReference} from '@lexical-tufte/document';
 
 /** Internal links are not URLs: their target is resolved by the host. */
@@ -29,7 +29,7 @@ export class HostLinkNode extends LinkNode {
   this.__reference={...reference};
  }
  getReference():HostReference{return {...this.getLatest().__reference};}
- createDOM(config:Parameters<LinkNode['createDOM']>[0]):HTMLElement{
+ createDOM():HTMLElement{
   const span=document.createElement('span');
   span.dataset.hostReference=this.__reference.id;
   span.dataset.hostNamespace=this.__reference.namespace;
@@ -37,7 +37,11 @@ export class HostLinkNode extends LinkNode {
   span.className='tufte-host-link';
   return span;
  }
- updateDOM(previous:HostLinkNode,dom:HTMLElement):boolean{
+ exportDOM():DOMExportOutput{
+  // An unresolved host reference is not a navigable URL. Never export the inherited href="#".
+  return {element:this.createDOM()};
+ }
+ updateDOM(_previous:HostLinkNode,dom:HTMLElement):boolean{
   const reference=this.getReference();
   dom.dataset.hostReference=reference.id;
   dom.dataset.hostNamespace=reference.namespace;
