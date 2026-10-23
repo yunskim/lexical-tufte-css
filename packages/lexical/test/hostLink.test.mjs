@@ -372,3 +372,41 @@ test('invalid saved host reference does not replace the open editor document',as
  assert.ok(result.diagnostics.some(d=>d.code==='INVALID_REFERENCE'));
  assert.deepEqual(e.getEditorState().toJSON(),before,'rejected import must leave the editor untouched');
 });
+
+test('multiple host namespaces survive strict document export and reload',async()=>{
+ const {$createSectionNode,exportEditorToDocument,loadDocumentIntoEditor}=await import('../dist/index.js');
+ const {renderArticle}=await import('../../render/dist/index.js');
+ const references=[
+  {namespace:'magnolia',kind:'note',id:'shared-id'},
+  {namespace:'commonplace',kind:'note',id:'shared-id'},
+  {namespace:'magnolia',kind:'task',id:'shared-id'}
+ ];
+ const source=editor();
+ source.update(()=>{
+  const section=$createSectionNode(),paragraph=$createParagraphNode();
+  for(const [index,ref] of references.entries()){
+   const link=$createHostLinkNode(ref);
+   link.append($createTextNode('Target '+index));
+   paragraph.append(link);
+   if(index!==references.length-1)paragraph.append($createTextNode(' | '));
+  }
+  section.append(paragraph);$getRoot().append(section);
+ });
+ await flush(source);
+ const base={schemaVersion:1,id:'multiple_host_namespaces',locale:'en-US',title:'Multiple references',assets:[],lexicalState:source.getEditorState().toJSON()};
+ const saved=exportEditorToDocument(source,base);
+ assert.equal(saved.ok,true,JSON.stringify(saved.diagnostics));
+ const reopened=editor();
+ const loaded=loadDocumentIntoEditor(reopened,JSON.parse(JSON.stringify(saved.value)));
+ assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
+ const children=reopened.getEditorState().toJSON().root.children[0].children[0].children;
+ const links=children.filter(child=>child.type==='host-link');
+ assert.deepEqual(links.map(link=>link.reference),references);
+ assert.deepEqual(links.map(link=>link.children[0].text),['Target 0','Target 1','Target 2']);
+ const published=renderArticle(saved.value);
+ assert.equal(published.ok,true,JSON.stringify(published.diagnostics));
+ assert.equal((published.html.match(/data-host-reference="shared-id"/g)??[]).length,3);
+ assert.equal((published.html.match(/data-host-namespace="magnolia"/g)??[]).length,2);
+ assert.equal((published.html.match(/data-host-namespace="commonplace"/g)??[]).length,1);
+ assert.equal((published.html.match(/data-host-kind="task"/g)??[]).length,1);
+});
