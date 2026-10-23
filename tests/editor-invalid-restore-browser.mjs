@@ -35,6 +35,8 @@ try {
  await page.evaluate(()=>localStorage.setItem('lexical-tufte-p1','{invalid-json'));
  await page.getByRole('button',{name:'불러오기',exact:true}).click();
  assert.deepEqual(await snapshot(),before,'Malformed saved JSON replaced live editor');
+ assert.equal(await page.evaluate(()=>localStorage.getItem('lexical-tufte-p1')),'{invalid-json',
+  'Rejected data must remain available for manual recovery');
  assert.match(await editor.innerText(),/KEEP-LIVE-EDITOR/);
  // A structurally invalid Lexical root is also an invalid import.
  await page.evaluate(()=>localStorage.setItem('lexical-tufte-p1',JSON.stringify({
@@ -49,6 +51,13 @@ try {
  const after=await snapshot();
  assert.notDeepEqual(after,before);
  assert.match(await editor.innerText(),/AFTER-REJECTION/);
+ // After failed imports the editor must still save a valid canonical state.
+ await page.getByRole('button',{name:'저장',exact:true}).click();
+ const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('lexical-tufte-p1')??'null'));
+ assert.deepEqual(saved,after,'Saving after rejected imports must persist current editor state');
+ await page.reload();await page.locator('.editor').waitFor();
+ await page.getByRole('button',{name:'불러오기',exact:true}).click();
+ assert.deepEqual(await snapshot(),after,'Saved document must reopen after rejected imports');
  assert.deepEqual(errors,[],'Rejected imports caused uncaught browser exceptions');
  console.log('Malformed persisted JSON/root: live Lexical state preserved and subsequent editing works.');
 }finally{await browser?.close();server?.kill();}
