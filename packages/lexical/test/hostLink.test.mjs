@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {createHeadlessEditor,HostLinkNode,TUFTE_NODES,$createHostLinkNode,INSERT_HOST_LINK_COMMAND,registerHostLinkCommands} from '../dist/index.js';
+import {createHeadlessEditor,HostLinkNode,TUFTE_NODES,$createHostLinkNode,INSERT_HOST_LINK_COMMAND,registerHostLinkCommands,hasDocumentChanged} from '../dist/index.js';
 import {$getRoot,$createParagraphNode,$createTextNode} from 'lexical';
 
 const reference={namespace:'magnolia',kind:'note',id:'note-123'};
@@ -73,4 +73,18 @@ test('host link JSON reopen preserves two distinct namespaces',async()=>{
  const links=reopened.getEditorState().toJSON().root.children[0].children;
  assert.deepEqual(links.map(link=>link.reference.namespace),['magnolia','commonplace']);
  assert.ok(links.every(link=>!Object.hasOwn(link,'url')));
+});
+
+test('picker ignores selection-only changes but invalidates changed document content',()=>{
+ const root={type:'root',children:[{type:'paragraph',children:[{type:'text',text:'hello'}]}]};
+ assert.equal(hasDocumentChanged(root,structuredClone(root)),false);
+ const changed=structuredClone(root);
+ changed.children[0].children[0].text='world';
+ assert.equal(hasDocumentChanged(changed,root),true);
+});
+
+test('picker invalidates a structural edit even when text is unchanged',()=>{
+ const before={type:'root',children:[{type:'paragraph',children:[{type:'text',text:'same'}]}]};
+ const after={type:'root',children:[{type:'paragraph',children:[{type:'host-link',reference,children:[{type:'text',text:'same'}]}]}]};
+ assert.equal(hasDocumentChanged(after,before),true);
 });
