@@ -8,6 +8,15 @@
 - **분기 관리:** `design/host-asset-provider-20261023`에 존재하는 호스트 중립 AssetProvider 타입은 보존한다. `revisionId` 명칭 통일, pinned 기본 UX, floating 명시적 선택은 **후속 설계 체크리스트**에만 추가되어 있으며 실제 코드/노드/발행 스키마 변경은 없다.
 - **정본:** 세부 우선순위·재개 조건·완료 게이트는 [이미지 자산 관리 이행 계획](ASSET_CHOOSER_MIGRATION_PLAN_2026-10-23.ko.md)의 *2026-10-23 우선순위 변경*을 따른다. 이 문서 아래에 남은 과거 자산 UI 구현 체크는 이력이며 즉시 진행 지시가 아니다.
 
+## E1 정적 점검 추가 수정 (실행 대기)
+
+- [x] `packages/lexical/src/documentBridge.ts`: v1/v2 투영 시 `titleId` 소실 방지. `packages/lexical/test/document-bridge.test.mjs`에 v1→v2→저장→재열기 회귀 추가 (E114/M105).
+- [x] `packages/document/src/validate.ts`: 서로 다른 섹션에서 중복된 `heading.id`를 거부. `packages/document/test/document.test.mjs`에 섹션 간/문서 제목 충돌 테스트 추가 (E115/M106).
+- [ ] `pnpm check`, 원본 9개 섹션 roundtrip/실제 React 편집기 테스트 및 h1/heading 앵커 검증 실행.
+- [ ] 통과/실패 기록 갱신 및 재발 방지 문서의 실제 결과 반영. **현재 19/34 브라우저 수치는 과거 기준만 의미**한다.
+
+자산 관리 확장은 계속 보류한다. 본 체크의 E1 완료는 코드 작성이 아니라 실제 검증 통과 후 판정한다.
+
 ## 검증 기준과 작업 범위
 
 기준은 `test/main-verification-20261023`의 커밋 `2ec9b4e5f83baa47c0b78177a0120b40f7f736ab`이다. 해당 기준에서 unit 403 통과, package 소비 5 통과, Python16 및 실제 HTTP/SQLite 통과, **브라우저 34개 중 19 통과/15 실패**를 기록했다. 이 문서의 후속 코드는 `fix/main-browser-parity-20261023`에서만 수정한다. 기존 `main`과 검증 증거 브랜치는 수정하지 않는다.
