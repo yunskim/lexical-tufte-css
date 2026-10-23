@@ -1,5 +1,5 @@
 import {$applyNodeReplacement,ElementNode,type EditorConfig,type NodeKey,type SerializedElementNode} from 'lexical';
-import type {HostReference} from '@lexical-tufte/document';
+import {HOST_REFERENCE_CLASS,HOST_REFERENCE_ATTRIBUTES,type HostReference} from '@lexical-tufte/document';
 
 /** A host reference is not a URL and must not inherit LinkNode URL behavior. */
 export type SerializedHostLink=SerializedElementNode&{type:'host-link';version:1;reference:HostReference};
@@ -24,17 +24,17 @@ export class HostLinkNode extends ElementNode{
  createDOM(_config:EditorConfig):HTMLElement{
   const span=document.createElement('span');
   const reference=this.getReference();
-  span.dataset.hostReference=reference.id;
-  span.dataset.hostNamespace=reference.namespace;
-  span.dataset.hostKind=reference.kind;
-  span.className='tufte-host-link';
+  span.setAttribute(HOST_REFERENCE_ATTRIBUTES.id,reference.id);
+  span.setAttribute(HOST_REFERENCE_ATTRIBUTES.namespace,reference.namespace);
+  span.setAttribute(HOST_REFERENCE_ATTRIBUTES.kind,reference.kind);
+  span.className=HOST_REFERENCE_CLASS;
   return span;
  }
  updateDOM(_previous:HostLinkNode,dom:HTMLElement):false{
   const reference=this.getReference();
-  dom.dataset.hostReference=reference.id;
-  dom.dataset.hostNamespace=reference.namespace;
-  dom.dataset.hostKind=reference.kind;
+  dom.setAttribute(HOST_REFERENCE_ATTRIBUTES.id,reference.id);
+  dom.setAttribute(HOST_REFERENCE_ATTRIBUTES.namespace,reference.namespace);
+  dom.setAttribute(HOST_REFERENCE_ATTRIBUTES.kind,reference.kind);
   return false;
  }
  exportJSON():SerializedHostLink{
