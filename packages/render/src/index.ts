@@ -67,11 +67,10 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
      ...(n.title?{title:String(n.title)}:{}),...(rel.size?{rel:[...rel].join(' ')}:{}),...attrs(n)},inner())];
    }
    case 'host-link':return [element('span',{
-    class:'tufte-host-link',
+    ...withClass(n,'tufte-host-link'),
     'data-host-reference':n.reference.id,
     'data-host-namespace':n.reference.namespace,
-    'data-host-kind':n.reference.kind,
-    ...attrs(n)
+    'data-host-kind':n.reference.kind
    },inner())];
    case 'tufte-imagequilt':return [element('img',{
     src:String(n.src),alt:String(n.alt),class:'imagequilt',
