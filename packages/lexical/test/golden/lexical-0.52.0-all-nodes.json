@@ -315,10 +315,9 @@
                   "direction": null,
                   "format": "",
                   "indent": 0,
-                  "type": "tufte-note",
+                  "type": "tufte-sidenote",
                   "version": 1,
-                  "noteId": "golden-side",
-                  "kind": "sidenote"
+                  "noteId": "golden-side"
                 },
                 {
                   "children": [
@@ -335,10 +334,9 @@
                   "direction": null,
                   "format": "",
                   "indent": 0,
-                  "type": "tufte-note",
+                  "type": "tufte-marginnote",
                   "version": 1,
-                  "noteId": "golden-margin",
-                  "kind": "marginnote"
+                  "noteId": "golden-margin"
                 }
               ],
               "direction": null,
@@ -595,10 +593,9 @@
                       "direction": null,
                       "format": "",
                       "indent": 0,
-                      "type": "tufte-note",
+                      "type": "tufte-sidenote",
                       "version": 1,
-                      "noteId": "golden-quote",
-                      "kind": "sidenote"
+                      "noteId": "golden-quote"
                     }
                   ],
                   "direction": null,
@@ -887,10 +884,9 @@
                   "direction": null,
                   "format": "",
                   "indent": 0,
-                  "type": "tufte-note",
+                  "type": "tufte-marginnote",
                   "version": 1,
-                  "noteId": "golden-figure",
-                  "kind": "marginnote"
+                  "noteId": "golden-figure"
                 }
               ],
               "direction": null,
