@@ -171,7 +171,7 @@ test('restore reactivates historical snapshot without modifying draft or creatin
   assert.equal(ok(await store.readSnapshot(p2.snapshotId)).snapshotId,p2.snapshotId);
  }finally{db.close();}
 });
-test('restore rejects unauthorized, missing assets, wrong document and stale generation',async()=>{
+test('restore rejects unauthorized, missing assets and stale generation',async()=>{
  const {db,store,id}=await setup();
  try{
   const p1=ok(await store.publish(id,opts(1,0,'2026-10-16T01:00:00Z')));
@@ -239,5 +239,39 @@ test('restore preserves original snapshot timestamps and last new-publication ti
   }));
   assert.deepEqual(repeat,restored);
   assert.equal(db.prepare('SELECT count(*) AS n FROM publication_snapshots_v1').get().n,2);
+ }finally{db.close();}
+});
+
+test('restore refuses a snapshot belonging to a different post',async()=>{
+ const a=await setup(),b=await setup();
+ try{
+  const first=ok(await a.store.publish(a.id,opts(1,0,'2026-10-16T01:00:00Z')));
+  // A snapshot hash must exist in the target store to exercise ownership validation.
+  const row=a.db.prepare('SELECT snapshot_id,post_id,source_revision,payload FROM publication_snapshots_v1 WHERE snapshot_id=?').get(first.snapshotId);
+  const foreign=structuredClone(b.post);
+  foreign.document.id='foreign-post-id';
+  // Ownership is checked against the requested post, not against the current draft.
+  const result=await a.store.restorePublishedSnapshot('other-post',first.snapshotId,{
+   expectedGeneration:1,authorize:async()=>true,assetExists:async()=>true
+  });
+  assert.equal(result.ok,false);
+  assert.ok(result.diagnostics.some(d=>d.code==='PUBLICATION_CONFLICT'||d.code==='SNAPSHOT_POST_MISMATCH'));
+  assert.equal(ok(a.store.readState(a.id)).generation,1);
+ }finally{a.db.close();b.db.close();}
+});
+test('restore aborts when publication head changes during async asset preflight',async()=>{
+ const {db,store,id}=await setup();
+ try{
+  const first=ok(await store.publish(id,opts(1,0,'2026-10-16T01:00:00Z')));
+  let switched=false;
+  const result=await store.restorePublishedSnapshot(id,first.snapshotId,{
+   expectedGeneration:1,authorize:async()=>true,
+   assetExists:async()=>{if(!switched){switched=true;ok(store.unpublish(id,1));}return true;}
+  });
+  assert.equal(switched,true);
+  assert.equal(result.ok,false);
+  assert.ok(result.diagnostics.some(d=>d.code==='PUBLICATION_CONFLICT'));
+  assert.equal(ok(store.readState(id)).generation,2);
+  assert.equal(ok(store.readState(id)).snapshotId,null);
  }finally{db.close();}
 });
