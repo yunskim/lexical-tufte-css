@@ -18,7 +18,7 @@ import {
   SELECTION_INSERT_CLIPBOARD_NODES_COMMAND, COPY_COMMAND, CUT_COMMAND, PASTE_COMMAND, KEY_BACKSPACE_COMMAND, KEY_DELETE_COMMAND, HISTORY_PUSH_TAG, UNDO_COMMAND, REDO_COMMAND,
   COMMAND_PRIORITY_HIGH, type LexicalNode, type EditorState, type RangeSelection,
 } from 'lexical';
-import {registerNoteCommands,REMOVE_TUFTE_NOTE_COMMAND,UPDATE_TUFTE_NOTE_IMAGE_COMMAND,SELECT_TUFTE_NOTE_IMAGE_COMMAND,$listSelectedTufteNoteImages,type TufteNoteImageChoice,registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,registerQuotationCommands,INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_SECTION_CITE_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,registerListKeyboardCommands,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,SET_TUFTE_LIST_KIND_COMMAND,CHANGE_TUFTE_LIST_INDENT_COMMAND,UNWRAP_TUFTE_LIST_COMMAND,registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND,WRAP_TUFTE_SPAN_COMMAND,UNWRAP_TUFTE_SPAN_COMMAND,registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_PAIR_COMMAND,MOVE_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_LIST_COMMAND,registerSectionCommands,WRAP_TUFTE_ROOT_COMMAND,INSERT_TUFTE_SECTION_COMMAND,SPLIT_TUFTE_SECTION_COMMAND,MERGE_TUFTE_SECTION_COMMAND,SET_TUFTE_BLOCK_COMMAND,inspectEditorStructure,focusStructureIssue,type StructureIssue,replaceEditorDocumentState,TUFTE_NODES,NoteNode, $createSidenoteNode, $createMarginnoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, registerNoteEdgeTypingGuard} from '@lexical-tufte/lexical';
+import {registerNoteCommands,registerNoteAssetCommands,SET_TUFTE_NOTE_IMAGE_DIMENSIONS_COMMAND,$getSelectedTufteNoteImage,REMOVE_TUFTE_NOTE_COMMAND,UPDATE_TUFTE_NOTE_IMAGE_COMMAND,SELECT_TUFTE_NOTE_IMAGE_COMMAND,$listSelectedTufteNoteImages,type TufteNoteImageChoice,registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,registerQuotationCommands,INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_SECTION_CITE_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,registerListKeyboardCommands,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,SET_TUFTE_LIST_KIND_COMMAND,CHANGE_TUFTE_LIST_INDENT_COMMAND,UNWRAP_TUFTE_LIST_COMMAND,registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND,WRAP_TUFTE_SPAN_COMMAND,UNWRAP_TUFTE_SPAN_COMMAND,registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_PAIR_COMMAND,MOVE_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_LIST_COMMAND,registerSectionCommands,WRAP_TUFTE_ROOT_COMMAND,INSERT_TUFTE_SECTION_COMMAND,SPLIT_TUFTE_SECTION_COMMAND,MERGE_TUFTE_SECTION_COMMAND,SET_TUFTE_BLOCK_COMMAND,inspectEditorStructure,focusStructureIssue,type StructureIssue,replaceEditorDocumentState,TUFTE_NODES,NoteNode, $createSidenoteNode, $createMarginnoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, registerNoteEdgeTypingGuard} from '@lexical-tufte/lexical';
 import {NODE_SCHEMA} from '@lexical-tufte/document';
 import './style.css';
 
@@ -342,6 +342,9 @@ function EditorUI(){
   useEffect(()=>registerDefinitionCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
   useEffect(()=>registerQuotationCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
   useEffect(()=>registerNoteCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
+  // This prototype saves Lexical JSON only: it has no document asset catalog.
+  // Refuse managed asset updates rather than inventing reference metadata.
+  useEffect(()=>registerNoteAssetCommands(editor,()=>[],diagnostic=>setStatus(diagnostic.message)),[editor]);
   useEffect(()=>registerFigureCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
   useEffect(()=>registerListCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
   useEffect(()=>registerListKeyboardCommands(editor),[editor]);
@@ -610,6 +613,23 @@ function EditorUI(){
       setStatus(ok?'노트 구조를 변경했습니다.':'이 위치에서 노트 구조를 변경할 수 없습니다.');
     },{tag:HISTORY_PUSH_TAG});editor.focus();
   }
+  function editNoteImageDimensions(){
+    const selected=editor.getEditorState().read(
+      ()=>$getSelectedTufteNoteImage()?.image.exportJSON()
+    );
+    if(!selected){
+      setStatus('노트의 수정할 이미지를 먼저 선택하세요.');
+      return;
+    }
+    const width=window.prompt('이미지 폭 (px, 비우면 자동)',String(selected.width??''));
+    if(width===null)return;
+    const height=window.prompt('이미지 높이 (px, 비우면 자동)',String(selected.height??''));
+    if(height===null)return;
+    const parse=(value:string)=>value.trim()===''?null:Number(value);
+    editor.dispatchCommand(SET_TUFTE_NOTE_IMAGE_DIMENSIONS_COMMAND,{
+      width:parse(width),height:parse(height)
+    });
+  }
   function openNoteImageChoices(){
     const choices=editor.getEditorState().read(()=>$listSelectedTufteNoteImages());
     if(choices.length===0){
@@ -729,6 +749,7 @@ function EditorUI(){
         const src=window.prompt('선택한 노트 이미지의 새 URL (HTTP(S) 또는 상대 경로)');
         if(src!==null)editor.dispatchCommand(UPDATE_TUFTE_NOTE_IMAGE_COMMAND,{src});
        }}>노트 이미지 URL 수정</button>
+      <button onMouseDown={preserve} onClick={editNoteImageDimensions}>노트 이미지 크기 수정</button>
       <button onMouseDown={preserve} onClick={()=>noteOperation('split')}>노트 나누기</button>
       <button onMouseDown={preserve} onClick={()=>noteOperation('merge')}>다음 노트와 합치기</button>
       <button onMouseDown={preserve} onClick={()=>noteOperation('previous')}>노트 앞으로 이동</button>
