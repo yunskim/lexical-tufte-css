@@ -98,8 +98,7 @@ export class SqlitePublicationAdapter implements PublicationStore{
   let started=false;
   try{
    this.db.exec('BEGIN IMMEDIATE');started=true;
-   const state=this.legacy.readState(postId);if(!state.ok){this.db.exec('ROLLBACK');started=false;return state;}
-   const head=state.value;
+   const head=this.head(postId);
    if(head.generation!==expectedGeneration){this.db.exec('ROLLBACK');started=false;return fail('PUBLICATION_CONFLICT','Publication generation changed');}
    if(head.generation===Number.MAX_SAFE_INTEGER){this.db.exec('ROLLBACK');started=false;return fail('PUBLICATION_GENERATION_EXHAUSTED','Publication generation exhausted');}
    const draftRow=this.db.prepare('SELECT id,slug,revision,payload FROM posts_v2 WHERE id=?').get(postId) as Record<string,unknown>|undefined;
@@ -120,8 +119,7 @@ export class SqlitePublicationAdapter implements PublicationStore{
   let started=false;
   try{
    this.db.exec('BEGIN IMMEDIATE');started=true;
-   const state=this.readState(command.postId);if(!state.ok){this.db.exec('ROLLBACK');started=false;return state;}
-   const head=state.value;
+   const head=this.head(command.postId);
    if(head.generation!==command.expectedGeneration){this.db.exec('ROLLBACK');started=false;return fail('PUBLICATION_CONFLICT','Publication generation changed');}
    if(head.snapshotId===null){this.db.exec('ROLLBACK');started=false;return fail('NOT_PUBLISHED','Post is already private');}
    if(head.generation===Number.MAX_SAFE_INTEGER){this.db.exec('ROLLBACK');started=false;return fail('PUBLICATION_GENERATION_EXHAUSTED','Publication generation exhausted');}
