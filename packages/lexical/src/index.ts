@@ -39,3 +39,5 @@ export {registerCodeCommands,INSERT_TUFTE_CODE_COMMAND,type InsertTufteCode} fro
 export {HostLinkNode,$createHostLinkNode,type SerializedHostLink} from './HostLinkNode.js';
 
 export {INSERT_HOST_LINK_COMMAND,registerHostLinkCommands} from './hostLinkCommands.js';
+
+export {mountHostLinkPicker,type HostLinkPickerOptions} from './hostLinkPicker.js';
