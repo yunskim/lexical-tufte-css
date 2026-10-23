@@ -46,7 +46,7 @@ try {
   const after=await page.locator('[data-note-id]').innerText();
   assert.equal(after,'Z'+before);
   const json=await state(page);
-  const note=json.root.children[0].children.find(n=>n.type==='tufte-note');
+  const note=json.root.children[0].children.find(n=>(n.type==='tufte-sidenote'||n.type==='tufte-marginnote'));
   assert.ok(note,'note remains in paragraph');
   assert.equal(note.children.map(n=>n.text??'').join('').startsWith('Z'),true);
  });
@@ -75,7 +75,7 @@ try {
  await scenario('Enter inside note keeps phrasing-only structure',async page=>{
   await enter(page);await page.keyboard.press('ArrowRight');await page.keyboard.press('Enter');
   const json=await state(page);
-  const notes=[];function scan(n){if(n.type==='tufte-note')notes.push(n);n.children?.forEach(scan);}scan(json.root);
+  const notes=[];function scan(n){if((n.type==='tufte-sidenote'||n.type==='tufte-marginnote'))notes.push(n);n.children?.forEach(scan);}scan(json.root);
   assert.equal(notes.length,1);assert.equal(await page.locator('[data-note-id] p,[data-note-id] div').count(),0);
   assert.equal(await page.locator('[data-note-id] br').count(),1,'Enter inserts phrasing line break');
  });
