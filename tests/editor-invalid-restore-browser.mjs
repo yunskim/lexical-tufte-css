@@ -49,6 +49,8 @@ try {
  })));
  await page.getByRole('button',{name:'불러오기',exact:true}).click();
  assert.deepEqual(await snapshot(),historyState,'Invalid Lexical root replaced live editor');
+ // Both failures must be observable to users rather than falsely reported as successful.
+ assert.match(await page.getByRole('status',{name:'편집 작업 상태'}).innerText(),/불러오지 못했습니다/);
  assert.match(await editor.innerText(),/KEEP-LIVE-EDITOR/);
  // Rejected imports must not silently clear the undo/redo history.
  await page.getByRole('button',{name:'실행 취소',exact:true}).click();
@@ -66,6 +68,7 @@ try {
  await page.getByRole('button',{name:'저장',exact:true}).click();
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('lexical-tufte-p1')??'null'));
  assert.deepEqual(saved,after,'Saving after rejected imports must persist current editor state');
+ assert.match(await page.getByRole('status',{name:'편집 작업 상태'}).innerText(),/저장했습니다/);
  await page.reload();await page.locator('.editor').waitFor();
  await page.getByRole('button',{name:'불러오기',exact:true}).click();
  assert.deepEqual(await snapshot(),after,'Saved document must reopen after rejected imports');
