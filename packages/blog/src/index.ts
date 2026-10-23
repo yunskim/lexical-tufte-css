@@ -4,3 +4,4 @@ export {AuthorizedRecoveryService,type RecoveryOperation,type RecoveryAccess,typ
 export {handleRecoveryRequest,type RecoveryHttpRequest,type RecoveryHttpResponse,type RecoveryRequestGuard} from './recoveryHttp.js';
 export {handleRecoveryFetch,type RecoveryFetchSecurity} from './recoveryFetch.js';
 export {type PublicationStore,type PublicationCommit,type PublicationRestoreCommit,type PublicationUnpublishCommit,type PublicationCommitResult} from './publicationStore.js';
+export {PublicationService} from './publicationService.js';
