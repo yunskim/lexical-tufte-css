@@ -13,7 +13,8 @@ export type JsonNode=
  | Element<'heading',{tag:'h2'|'h3'}>
  | Element<'list',{listType:'bullet'|'number';tag:'ul'|'ol';start:number}>
  | Element<'listitem',{value:number;checked?:undefined}>
- | Element<'link',{url?:string;reference?:HostReference;rel?:string|null;target?:'_blank'|'_self'|null;title?:string|null}>
+ | Element<'link',{url:string;rel?:string|null;target?:'_blank'|'_self'|null;title?:string|null}>
+ | Element<'host-link',{reference:HostReference}>
  | Element<'tufte-note',{noteId:string;kind:'sidenote'|'marginnote'}>
  | Element<'tufte-span',{kind:'sans'|'newthought'|'numeral'|'danger'}>
  | Element<'tufte-figure',{width:'body'|'fullwidth'}>
