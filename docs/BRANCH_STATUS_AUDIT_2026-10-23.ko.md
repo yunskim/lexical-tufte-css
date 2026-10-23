@@ -87,6 +87,14 @@ GitHub의 **두 브랜치**와 커밋 비교, main의 현재 파일, 작업 브�
 - [ ] concrete note 런타임 전환 및 그에 따른 회귀 테스트 업데이트.
 - [ ] 배치 실행, 실패 수정 및 재실행. 사용자 지시에 따라 아직 실행하지 않았다.
 
+## 추가 테스트 복원 및 실행 명령
+
+- [x] 기존 브랜치의 **신규 파일로 분류된** 섹션별/geometry/newthought 테스트 9개와 note asset 관련 테스트 4개를 main으로 복원.
+- [x] 명시적 명령 `pnpm test:upstream-sections`, `pnpm test:note-assets` 등록. 기존 일반 테스트/CI에는 자동 추가하지 않음.
+- [ ] 기존 브랜치에서 **수정된** 기존 테스트 파일(예: `note-browser`, `note-editing-browser`, `publication-browser`, `upstream-dom-browser`)의 변경점은 아직 선별 병합되지 않았다.
+- [ ] 현재 main의 generic note 런타임과 복원된 concrete note 기대치 불일치 해결.
+- [ ] 빌드·테스트·CI 미실행. 파일 복원과 스크립트 등록만 완료.
+
 ## 유의사항
 
 이 문서는 GitHub 원격 코드/기록을 근거로 한 **정적 감사**다. 테스트 실행 결과를 새로 생성하지 않았으며, 기록된 2026-10-19 실행 결과는 현재 브랜치 HEAD의 상태가 아니다.
