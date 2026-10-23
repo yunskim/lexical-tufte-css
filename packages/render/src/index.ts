@@ -34,7 +34,24 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
   switch(n.type){
    case 'root':return inner();
    case 'tufte-section':return [element('section',attrs(n),inner())];
-   case 'paragraph':return [element('p',n.tufteClass==='sans'?withClass(n,'sans'):attrs(n),inner())];
+   case 'paragraph':{
+    const output:RenderChild[]=[];
+    for(let i=0;i<n.children.length;i++){
+     const child=n.children[i]!;
+     const next=n.children[i+1];
+     // Upstream Tufte CSS places the toggle label inside newthought, but its
+     // checkbox and sidenote content remain direct siblings of that span.
+     // Preserve two distinct Lexical nodes; only publication HTML is composed.
+     if(child.type==='tufte-span'&&child.kind==='newthought'&&next?.type==='tufte-sidenote'){
+      const noteParts=render(next);
+      output.push(element('span',withClass(child,'newthought'),[
+       ...child.children.flatMap(render),noteParts[0]!,
+      ]),...noteParts.slice(1));
+      i++;
+     }else output.push(...render(child));
+    }
+    return [element('p',n.tufteClass==='sans'?withClass(n,'sans'):attrs(n),output)];
+   }
    case 'heading':return [element(n.tag,{...attrs(n),...(n.id?{id:n.id}:{})},inner())];
    case 'horizontalrule':return [element('hr',{},[],true)];
    case 'list':return [element(n.tag,{...attrs(n),...(n.tag==='ol'&&n.start!==1?{start:String(n.start)}:{})},
@@ -89,11 +106,12 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
    case 'tufte-sidenote':
    case 'tufte-marginnote':{
     const id=`tufte-${prefix.length}-${prefix}-${n.noteId}`,kind=n.type==='tufte-sidenote'?'sidenote':'marginnote';
-    return [element('span',{'data-tufte-note':String(n.noteId)},[
+    // Tufte CSS uses adjacent siblings, never a containing note wrapper.
+    return [
      element('label',{for:id,class:`margin-toggle${kind==='sidenote'?' sidenote-number':''}`},kind==='marginnote'?['⊕']:[]),
-     element('input',{id,type:'checkbox',class:'margin-toggle', 'aria-label':NOTE_TOGGLE_ACCESSIBLE_NAME[kind]},[],true),
+     element('input',{id,type:'checkbox',class:'margin-toggle','aria-label':NOTE_TOGGLE_ACCESSIBLE_NAME[kind]},[],true),
      element('span',withClass(n,kind),inner()),
-    ])];
+    ];
    }
    case 'tufte-embed':{
     const wrapper=n.wrapper==='figure'?'figure':'div';
