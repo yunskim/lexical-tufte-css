@@ -1,3 +1,11 @@
+## 2026-10-23 remediation 재검증 — 편집기 등록 충돌 미해결
+
+- `fix/main-browser-parity-20261023`의 `383d25c`를 기준으로 frozen 설치·build/typecheck·단위·34개 browser·공식 원본 비교·package·Python/HTTP 실행. CI 생략.
+- build/typecheck 통과. document57/render49/blog77/editor-ports2 통과. Lexical 파일별 runner62통과/77실패/2취소(두 파일 timeout), 전체 단위 완료 아님.
+- browser 최종12통과/20실패/2시간초과. Python16개·실제 HTTP/SQLite 통과. packed JS15초 timeout, 선언 검사는 미도달.
+- TS18046과 구형 accessible-name 기대를 수정·재검증했다. paragraph/quote same-type 교체 등록 충돌(E117), iframe DOM 차이(E120)는 미해결. 자산 확장 보류 유지.
+- [최신 재검증 보고서](VERIFICATION_BROWSER_REMEDIATION_2026-10-23.ko.md), [파일별 결과](verification/browser-remediation-20261023.json). 아래 수치는 각 과거 기준의 이력이며 현재 결과로 재사용하지 않는다.
+
 ## 2026-10-23 main 실제 검증 — browser 통합 미완료
 
 - main `c081546` 기준 별도 worktree에서 설치/빌드/단위/브라우저/package/Python 검사를 실행했다. 수정·증거는 `test/main-verification-20261023`에 보존한다. CI 생략.

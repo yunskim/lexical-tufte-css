@@ -1,5 +1,16 @@
 # main 브라우저 불일치 보완 — 2026-10-23
 
+## 최신 실행 판정 — 383d25c 기준 재검증
+
+- [실행 보고서](VERIFICATION_BROWSER_REMEDIATION_2026-10-23.ko.md), [파일별 JSON](verification/browser-remediation-20261023.json)이 현재 증거다. 아래 작성/미실행 표시는 과거 이력으로 보존한다.
+- [x] frozen 설치, 고정 원본 시각 자산9개 무결성 검증·동기화, build/typecheck 실행. TS18046 수정 후 통과.
+- [x] 단위·34개 browser·package·Python/HTTP 실행 및 실패 원인/미도달 단계 기록. CI 생략.
+- [x] 구형 marginnote accessible-name 기대 수정 및 두 섹션 browser 재실행 통과.
+- [ ] E117 paragraph/quote 동일 type 교체 등록 충돌 수정. Lexical62통과/77실패/2취소, root check 미완료.
+- [ ] E114 bridge 시간 초과 해소 후 titleId 저장/재열기 회귀 검증. E115 document57개 회귀는 통과.
+- [ ] browser12통과/20실패/2시간초과 해소. E120 iframe 구조 불일치로 공식 전체 pixel 검증 미도달.
+- [ ] packed JS15초 timeout 해소 후 선언/왕복 소비까지 완료. E1/E2/E3 완료 아님, 자산 확장 보류 유지.
+
 ## 2026-10-23 실행 우선순위 변경
 
 - **현재 P0:** 공식 Tufte CSS 샘플 전 영역(9개 섹션)을 Lexical 문서로 구성·저장·재열기·발행한 결과의 **DOM·구조·시각 패리티**를 확보한다. note/newthought, heading ID, figure, quote, 본문 공백 등 기존 수정 코드의 미검증 부분을 우선한다.

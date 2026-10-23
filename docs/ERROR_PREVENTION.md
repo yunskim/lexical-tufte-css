@@ -1,5 +1,28 @@
 # 재발 방지 대책 및 정기 점검
 
+## 2026-10-23 remediation 실행 종료 점검
+
+E109/M100의 오래된 accessible-name 오류가 섹션 테스트에 재발해 E119/M110을 추가했다. E114는 bridge timeout으로 미검증, E115/E116은 document57개와 build/typecheck로 검증했다. E117/E120 및 자산 미구현은 미해결로 유지한다. 다음 점검은 노드 등록 설계 수정 직후이며, 기본 paragraph 생성→command→v1/v2 왕복→React mount→전체 브라우저 순서다. CI는 실행하지 않는다.
+
+## M107 — 좁혀진 입력은 중첩 순회 전에 안전하게 캡처
+
+- E116: unknown 객체의 타입 가드를 통과한 필드를 closure에서 참조할 때 안정적인 지역 상수를 사용한다. 빌드 성공 전 후속 브라우저 실행 금지. 실제 전체 build/typecheck 및 validator 회귀로 확인.
+
+## M108 — registry의 type·klass·replacement 경로를 함께 검증
+
+- E117: 노드 getType 중복과 withKlass 경로의 순환 가능성을 점검한다. 단순 importJSON 성공은 기본 factory/transform 호환성의 증거가 아니다.
+- 기본 $createParagraphNode/$createQuoteNode, 교체 생성자, command, 등록 transform, JSON 저장/재열기, HostLink/HostAsset 보존 및 React mount를 작은 회귀부터 검증한다. wire type 변경은 schema/bridge 호환성 결정을 분리하고 암묵적으로 적용하지 않는다.
+
+## M109 — 장시간 대기는 실패로 회수하고 후속 검증을 분리
+
+- E118: packed consumer에 JS15초/tsc30초 실행 제한을 실제 반영했다. 임의의 성공 처리나 retry로 숨기지 않는다. 제한이 느린 환경에서 부족한지 판단할 때는 실행 단계 로그와 별도 재현 증거를 먼저 확보한다.
+- 집계 시 timeout/cancelled/후속 미도달을 fail·skip과 구분한다. 파일별 제한 실행은 선언된 모든 내부 assertion 실행을 뜻하지 않는다. check 또는 package 중단 뒤 결과를 전체 통과로 승격하지 않는다.
+
+## M110 — 원본 대조의 구조·접근성·시각 게이트를 구분
+
+- E119/E120: 동일 marginnote 접근성 계약을 검사하는 모든 테스트를 검색하고 함께 재검증한다. 제품 문자열만 따라가는 무조건 정규화는 금지한다.
+- 전체 시각 테스트의 iframe/snippet 사전 검증, 자산 무결성, geometry, pixel 단계를 따로 보고한다. 보조 comparator self-test와 공식 페이지 parity를 혼동하지 않는다. renderer DOM 변경 때 Figures와 전체 페이지를 함께 재검증한다.
+
 ## M105 — 문서 envelope의 선택 필드는 모든 versioned bridge에서 보존
 
 - E114: 새로운 루트 필드(`titleId` 등)는 문서 스키마만 수정하지 말고 `validateDocumentV2`, `migrateStoredDocument`, `loadMigratedDocumentIntoEditor`, `exportEditorToDocumentV2`를 순서대로 점검한다. v1 투영/검증 후 v2 복원에서 필드가 사라지는 수작업 destructuring을 회귀 테스트로 탐지한다.

@@ -17,6 +17,7 @@ export function validateDocument(input:unknown):ValidationResult{
  if(!locale)add('INVALID_LOCALE','$.locale','Expected BCP 47 locale');
  if(!nonempty(input.title,1000))add('INVALID_TITLE','$.title','Expected title up to 1000 characters');
  if(input.titleId!==undefined&&!isIdentifier(input.titleId))add('INVALID_TITLE_ID','$.titleId','Title anchor must be a safe HTML identifier');
+ const titleId=input.titleId;
  if(input.subtitle!==undefined&&(typeof input.subtitle!=='string'||input.subtitle.length>2000))add('INVALID_SUBTITLE','$.subtitle','Invalid subtitle');
  const assets=new Map<string,AssetRef>();
  if(!Array.isArray(input.assets)||input.assets.length>L.assets)add('INVALID_ASSETS','$.assets','Expected at most 1000 assets');
@@ -85,7 +86,7 @@ export function validateDocument(input:unknown):ValidationResult{
    else if(headingIds.has(raw.id))add('DUPLICATE_HEADING_ID',path+'.id','Heading anchor ID is already used');
    else headingIds.add(raw.id);
   }
-  if(type==='heading'&&input.titleId!==undefined&&raw.id===input.titleId)add('DUPLICATE_TITLE_ID',path+'.id','Heading ID conflicts with document title');
+  if(type==='heading'&&titleId!==undefined&&raw.id===titleId)add('DUPLICATE_TITLE_ID',path+'.id','Heading ID conflicts with document title');
   if(type==='heading'&&!enumeration(raw.tag,['h2','h3']))add('INVALID_HEADING',path+'.tag','Only h2/h3 supported');
   if(type==='list'&&(!enumeration(raw.listType,['bullet','number'])||raw.tag!==(raw.listType==='bullet'?'ul':'ol')||!integer(raw.start,1,Number.MAX_SAFE_INTEGER)))add('INVALID_LIST',path,'Invalid list kind/tag/start');
   if(type==='listitem'&&raw.checked!==undefined)add('UNSUPPORTED_PROPERTY',path+'.checked','Checklist semantics are outside this schema');

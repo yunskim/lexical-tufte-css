@@ -193,7 +193,7 @@ try{
    // label/input/span hierarchy while naming the modern focusable checkbox.
    const kind=origNotes[i].nextElementSibling?.classList.contains('sidenote')
     ?'sidenote':'marginnote';
-   const accessibleName=kind==='sidenote'?'Toggle sidenote':'Toggle margin note';
+   const accessibleName=kind==='sidenote'?'Toggle sidenote':'Toggle marginnote';
    if(outputNotes[i].getAttribute('aria-label')!==accessibleName)
     throw Error('Missing modern accessible note name');
    origNotes[i].setAttribute('aria-label',accessibleName);

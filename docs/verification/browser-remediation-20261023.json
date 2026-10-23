@@ -1,0 +1,379 @@
+{
+  "date": "2026-10-23",
+  "repository": "yunskim/lexical-tufte-css",
+  "branch": "fix/main-browser-parity-20261023",
+  "baseCommit": "383d25cff185c7a56a21a856d042780ccc78bf30",
+  "ci": "not-run-by-user-request",
+  "installation": "pass-frozen-lockfile",
+  "build": "pass-after-TS18046-fix",
+  "typecheck": "pass",
+  "staticChecks": "pass",
+  "units": {
+    "otherPackages": {
+      "document": 57,
+      "render": 49,
+      "blog": 77,
+      "editorPorts": 2,
+      "pass": 185,
+      "fail": 0,
+      "skip": 0
+    },
+    "lexical": {
+      "rows": [
+        {
+          "file": "all-nodes.test.mjs",
+          "tests": 1,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 1,
+          "skipped": 0
+        },
+        {
+          "file": "definition-commands.test.mjs",
+          "tests": 10,
+          "pass": 0,
+          "fail": 10,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        {
+          "file": "document-bridge.test.mjs",
+          "tests": 1,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 1,
+          "skipped": 0
+        },
+        {
+          "file": "document-contract.test.mjs",
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        {
+          "file": "figure-commands.test.mjs",
+          "tests": 9,
+          "pass": 6,
+          "fail": 3,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        {
+          "file": "heading-id.test.mjs",
+          "tests": 3,
+          "pass": 2,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        {
+          "file": "hostLink.test.mjs",
+          "tests": 20,
+          "pass": 5,
+          "fail": 15,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        {
+          "file": "inline-commands.test.mjs",
+          "tests": 13,
+          "pass": 9,
+          "fail": 4,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        {
+          "file": "layout.test.mjs",
+          "tests": 2,
+          "pass": 2,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        {
+          "file": "list-commands.test.mjs",
+          "tests": 30,
+          "pass": 15,
+          "fail": 15,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        {
+          "file": "nested-comparison.test.mjs",
+          "tests": 2,
+          "pass": 2,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        {
+          "file": "note.test.mjs",
+          "tests": 15,
+          "pass": 15,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        {
+          "file": "quotation-commands.test.mjs",
+          "tests": 13,
+          "pass": 0,
+          "fail": 13,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        {
+          "file": "section-commands.test.mjs",
+          "tests": 13,
+          "pass": 0,
+          "fail": 13,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        {
+          "file": "server-comparison.test.mjs",
+          "tests": 2,
+          "pass": 2,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        {
+          "file": "structure-recovery.test.mjs",
+          "tests": 6,
+          "pass": 3,
+          "fail": 3,
+          "cancelled": 0,
+          "skipped": 0
+        }
+      ],
+      "total": {
+        "tests": 141,
+        "pass": 62,
+        "fail": 77,
+        "cancelled": 2,
+        "skipped": 0
+      },
+      "files": {
+        "pass": 5,
+        "fail": 9,
+        "timeout": 2
+      },
+      "limitsSeconds": 15,
+      "complete": false
+    }
+  },
+  "browser": {
+    "total": 34,
+    "pass": 12,
+    "fail": 20,
+    "timeout": 2,
+    "skip": 0,
+    "remainingFileLimitSeconds": 40,
+    "killGraceSeconds": 3,
+    "rows": [
+      {
+        "file": "all-nodes-browser.mjs",
+        "exitCode": 1,
+        "status": "fail"
+      },
+      {
+        "file": "contextual-ui-browser.mjs",
+        "exitCode": 1,
+        "status": "fail"
+      },
+      {
+        "file": "definition-pairs-browser.mjs",
+        "exitCode": 1,
+        "status": "fail"
+      },
+      {
+        "file": "font-proof-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "full-page-pixel-parity-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "inline-span-browser.mjs",
+        "exitCode": 1,
+        "status": "fail"
+      },
+      {
+        "file": "layout-browser.mjs",
+        "exitCode": 1,
+        "status": "fail"
+      },
+      {
+        "file": "list-kind-browser.mjs",
+        "exitCode": 1,
+        "status": "fail"
+      },
+      {
+        "file": "managed-note-assets-browser.mjs",
+        "exitCode": 1,
+        "status": "fail"
+      },
+      {
+        "file": "note-browser.mjs",
+        "exitCode": 1,
+        "status": "fail"
+      },
+      {
+        "file": "note-dom-browser.mjs",
+        "exitCode": 1,
+        "status": "fail"
+      },
+      {
+        "file": "note-editing-browser.mjs",
+        "exitCode": 1,
+        "status": "fail"
+      },
+      {
+        "file": "note-export-parity-browser.mjs",
+        "exitCode": 124,
+        "status": "timeout"
+      },
+      {
+        "file": "note-image-chooser-browser.mjs",
+        "exitCode": 1,
+        "status": "fail"
+      },
+      {
+        "file": "note-image-dimensions-browser.mjs",
+        "exitCode": 1,
+        "status": "fail"
+      },
+      {
+        "file": "publication-browser.mjs",
+        "exitCode": 1,
+        "status": "fail"
+      },
+      {
+        "file": "recovery-browser.mjs",
+        "exitCode": 1,
+        "status": "fail"
+      },
+      {
+        "file": "section-commands-browser.mjs",
+        "exitCode": 1,
+        "status": "fail"
+      },
+      {
+        "file": "server-browser.mjs",
+        "exitCode": 1,
+        "status": "fail"
+      },
+      {
+        "file": "text-format-browser.mjs",
+        "exitCode": 1,
+        "status": "fail"
+      },
+      {
+        "file": "upstream-dom-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-full-document-editor-browser.mjs",
+        "exitCode": 1,
+        "status": "fail"
+      },
+      {
+        "file": "upstream-full-document-roundtrip-browser.mjs",
+        "exitCode": 137,
+        "status": "timeout"
+      },
+      {
+        "file": "upstream-full-document-visual-browser.mjs",
+        "exitCode": 1,
+        "status": "fail"
+      },
+      {
+        "file": "upstream-full-page-baseline-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-geometry-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-newthought-sidenote-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-same-content-epigraphs-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-same-content-figures-browser.mjs",
+        "exitCode": 1,
+        "status": "fail"
+      },
+      {
+        "file": "upstream-same-content-final-sections-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-same-content-fundamentals-browser.mjs",
+        "exitCode": 0,
+        "status": "pass",
+        "initialExitCode": 1,
+        "rerun": true
+      },
+      {
+        "file": "upstream-same-content-getting-started-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-same-content-opening-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-same-content-sidenotes-browser.mjs",
+        "exitCode": 0,
+        "status": "pass",
+        "initialExitCode": 1,
+        "rerun": true
+      }
+    ]
+  },
+  "python": {
+    "pass": 16,
+    "fail": 0,
+    "skip": 0,
+    "warnings": 1
+  },
+  "httpSqlite": "pass",
+  "package": {
+    "status": "timeout-fail",
+    "stage": "packed-JS-editor-roundtrip",
+    "timeoutSeconds": 15,
+    "declarations": "not-reached",
+    "licenseInspection": "five-tarballs-inspected-before-JS",
+    "publish": "not-run"
+  },
+  "upstreamAssets": {
+    "count": 9,
+    "status": "pass-byte-size-and-Git-blob-SHA",
+    "commit": "b5d7b7bbe5ce9c4c50fcfad4f19ee3646cfd7ae1"
+  },
+  "knownUnresolved": [
+    "E117 same-wire-type paragraph/quote replacement registration",
+    "E120 published iframe structure differs before full-page pixel gate",
+    "asset expansion deferred; no completion claim"
+  ],
+  "rootCheck": "interrupted-after-Lexical-stall-not-pass"
+}

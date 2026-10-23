@@ -1,5 +1,39 @@
 # 에러 기록
 
+## 2026-10-23 remediation 브랜치 재검증
+
+기준 `383d25c`, 현재 판정은 [재검증 보고서](VERIFICATION_BROWSER_REMEDIATION_2026-10-23.ko.md). browser **12통과/20실패/2시간초과**, 전체 통과 아님. 아래 main의 19/15는 과거 별도 tree 결과다. E115 문서 회귀는 57개 패키지 테스트에서 통과했지만 E114 bridge 회귀는 파일 시간 초과로 미검증이다.
+
+## E116 — unknown 입력의 closure 내부 타입 좁히기 유실
+
+- 최초 빌드: validate.ts의 중첩 visit에서 input.titleId 접근이 TS18046으로 실패.
+- 수정: 객체 검사 이후 titleId를 지역 상수에 캡처해 기존 충돌 검사에 사용. validator 규칙 변경 없음.
+- 검증: 수정 후 전체 build/typecheck 및 document57개 통과. 해결. M107.
+
+## E117 — 동일 wire type을 사용하는 Lexical 교체 노드 등록 충돌 (미해결)
+
+- 확인: TufteParagraphNode/ParagraphNode는 paragraph, TufteQuoteNode/QuoteNode는 quote type을 공유한다. TUFTE_NODES의 마지막 replace 항목이 Lexical0.52 registry의 해당 type을 기본 klass로 덮어쓴다.
+- 재현: heading-id.test.mjs의 block command 테스트가 `$createParagraphNode()` → replacement 생성에서 `Type paragraph in node TufteParagraphNode does not match registered node ParagraphNode with the same type`으로 실패. 다수 편집기 브라우저는 .editor 생성 이전 실패.
+- 정적 근거: Lexical의 resolveRegisteredNodeAfterReplacements는 withKlass의 getType으로 다음 registry를 찾는다. 같은 type이면 자기 자신을 반복할 위험이 있다. 각 대기 프로세스의 스택을 확보한 것은 아니므로 모든 시간 초과의 직접 원인으로 단정하지 않는다.
+- 조치/잔여: 강제 등록 우회, node_modules 변경, wire type의 임의 변경, metadata 제거로 숨기지 않았다. 기본 factory/transform, paragraph sans·quote cite, 기존 JSON/v2 bridge를 함께 보존하는 등록 설계 수정 후 전체 회귀 필요. M108.
+
+## E118 — 멈춘 테스트/packed consumer의 무제한 대기
+
+- pnpm check가 Lexical 테스트에서, package:check가 packed JS consumer에서 진행되지 않아 해당 실행을 중단했다. 완료 통과로 기록하지 않음.
+- 조치: 단위 파일별 15초, 잔여 브라우저 파일별 40초+종료 유예3초로 결과를 독립 회수. packed JS 15초/선언30초 제한을 스크립트에 반영.
+- 재실행: packed JS가 ETIMEDOUT으로 명확히 실패, 후속 선언 검사는 도달하지 못함. all-nodes/document-bridge 단위 파일과 note-export/full-document-roundtrip 브라우저 시간 초과 유지. 제한 시간은 제품 수정이 아니다. M109.
+
+## E119 — 공식 섹션 테스트에 오래된 marginnote 접근성 이름 잔류
+
+- fundamentals/sidenotes가 `Toggle margin note`를 기대했지만 현재 renderer의 고정 이름은 `Toggle marginnote`다(E109와 같은 원인 재발).
+- 세 기대값만 수정하고 접근 가능한 이름·연결·모바일 toggle 수락은 유지. 두 파일 독립 재실행 통과. M100/M110.
+
+## E120 — iframe 발행 DOM과 공식 전체 페이지 수락 계약 차이 (미해결)
+
+- 자산9개 무결성 검증·동기화 후 실제 시각 테스트를 실행했다. published iframe은 `figure.tufte-embed` + 보조 svg이며 수락 계약은 단일 iframe을 가진 `figure.iframe-wrapper`다.
+- visual은 `Modernized published iframe/snippet changed`에서 실패하여 픽셀 비교에 도달하지 못했다. Figures 섹션은 svg 부재 검사에서 실패. screenshot이 생성됐다는 이유로 parity 통과라고 하지 않는다.
+- 공식 구조, responsive 비율, 안전한 iframe 속성 계약을 함께 정리해 renderer/회귀를 수정해야 한다. 원본·golden·수락 조건을 완화하지 않았다. M110.
+
 ## E114 — v2 문서 브리지에서 문서 제목 앵커(titleId) 소실 위험
 
 - 발견(2026-10-23, E1 정적 점검): `packages/lexical/src/documentBridge.ts`의 `loadMigratedDocumentIntoEditor` 및 `exportEditorToDocumentV2`가 문서 envelope의 `titleId`를 v1 strict bridge로 전달하지 않았다. 특히 v2 export는 `titleId`를 제거하므로 공식 Tufte CSS의 `h1#tufte-css` 앵커가 저장·재열기 후 사라질 수 있었다.

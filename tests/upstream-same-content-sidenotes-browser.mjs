@@ -177,7 +177,7 @@ try{
   for(let i=0;i<sourceNotes.length;i++){
    const kind=sourceNotes[i].nextElementSibling?.classList.contains('sidenote')
     ?'sidenote':'marginnote';
-   const accessibleName=kind==='sidenote'?'Toggle sidenote':'Toggle margin note';
+   const accessibleName=kind==='sidenote'?'Toggle sidenote':'Toggle marginnote';
    if(publishedNotes[i].getAttribute('aria-label')!==accessibleName)
     throw Error('Published note missing its fixed accessible name');
    sourceNotes[i].setAttribute('aria-label',accessibleName);
@@ -251,7 +251,7 @@ try{
      await label.click();
      assert.equal(await payload.evaluate(e=>getComputedStyle(e).display),'none',
       kind+': mobile label closes note');
-     const expectedName=i===0?'Toggle sidenote':'Toggle margin note';
+     const expectedName=i===0?'Toggle sidenote':'Toggle marginnote';
      const accessible=page.getByRole('checkbox',{name:expectedName,exact:true});
      assert.equal(await accessible.count(),1,
       kind+': mobile toggle has a unique discoverable accessible name');
