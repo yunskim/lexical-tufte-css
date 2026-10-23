@@ -4,6 +4,13 @@ import type {PublicationStore,PublicationCommit,PublicationCommitResult,Publicat
 
 const fail=(code:string,message:string):Result<never>=>({ok:false,diagnostics:[{code,path:'$.publication',message}]});
 const count=(n:number,min=0)=>Number.isSafeInteger(n)&&n>=min;
+/** Retryable SQLite lock contention is distinct from an integrity/storage failure. */
+const storageFailure=(error:unknown,message:string):Result<never>=>{
+ const code=error&&typeof error==='object'&&'code' in error?(error as {code?:unknown}).code:null;
+ return code==='SQLITE_BUSY'||code==='SQLITE_LOCKED'
+  ?fail('PUBLICATION_STORAGE_BUSY','SQLite publication storage is busy; retry after re-reading state')
+  :fail('PUBLICATION_STORAGE_ERROR',message);
+};
 
 /**
  * SQLite implementation of the storage-neutral PublicationStore contract.
@@ -19,7 +26,7 @@ export class SqlitePublicationAdapter implements PublicationStore{
    const checked=validatePostRecordV2(JSON.parse(String(row.payload)));if(!checked.ok)return checked;
    if(checked.value.document.id!==row.id||checked.value.metadata.slug!==row.slug||checked.value.metadata.revision!==row.revision)return fail('STORAGE_ROW_MISMATCH','Draft row does not match payload');
    return checked;
-  }catch{return fail('PUBLICATION_STORAGE_ERROR','Could not read draft');}
+  }catch(error){return storageFailure(error,'Could not read draft');}
  }
  private head(postId:string):PublicationState{
   const row=this.db.prepare('SELECT generation,snapshot_id,last_snapshot_id,first_published_at,last_published_at,published_revision FROM publication_heads_v1 WHERE post_id=?').get(postId) as Record<string,unknown>|undefined;
@@ -27,7 +34,7 @@ export class SqlitePublicationAdapter implements PublicationStore{
  }
  async readState(postId:string):Promise<Result<PublicationState>>{
   if(!isIdentifier(postId))return fail('INVALID_POST_ID','Invalid post id');
-  try{return {ok:true,value:this.head(postId),diagnostics:[]};}catch{return fail('PUBLICATION_STORAGE_ERROR','Could not read publication state');}
+  try{return {ok:true,value:this.head(postId),diagnostics:[]};}catch(error){return storageFailure(error,'Could not read publication state');}
  }
  private async decode(snapshotId:string,payload:unknown,postId:unknown,revision:unknown):Promise<Result<PublishedSnapshot>>{
   if(typeof payload!=='string')return fail('SNAPSHOT_INTEGRITY_ERROR','Snapshot payload missing');
@@ -46,14 +53,14 @@ export class SqlitePublicationAdapter implements PublicationStore{
   try{
    const row=this.db.prepare('SELECT payload,post_id,source_revision FROM publication_snapshots_v1 WHERE snapshot_id=?').get(snapshotId) as Record<string,unknown>|undefined;
    return row?await this.decode(snapshotId,row.payload,row.post_id,row.source_revision):fail('SNAPSHOT_NOT_FOUND','Snapshot not found');
-  }catch{return fail('PUBLICATION_STORAGE_ERROR','Could not read snapshot');}
+  }catch(error){return storageFailure(error,'Could not read snapshot');}
  }
  async readPublic(postId:string):Promise<Result<PublishedSnapshot>>{
   if(!isIdentifier(postId))return fail('INVALID_POST_ID','Invalid post id');
   try{
    const row=this.db.prepare('SELECT s.snapshot_id,s.payload,s.post_id,s.source_revision FROM publication_heads_v1 h JOIN publication_snapshots_v1 s ON s.snapshot_id=h.snapshot_id AND s.post_id=h.post_id WHERE h.post_id=?').get(postId) as Record<string,unknown>|undefined;
    return row?await this.decode(String(row.snapshot_id),row.payload,row.post_id,row.source_revision):fail('NOT_PUBLISHED','No active public snapshot');
-  }catch{return fail('PUBLICATION_STORAGE_ERROR','Could not read public snapshot');}
+  }catch(error){return storageFailure(error,'Could not read public snapshot');}
  }
  async commitPublication(command:PublicationCommit):Promise<Result<PublicationCommitResult>>{
   if(!command||!isIdentifier(command.postId)||!count(command.expectedDraftRevision,1)||!count(command.expectedGeneration)||!(/^[0-9a-f]{64}$/.test(command.snapshotId)))return fail('INVALID_PUBLICATION_INPUT','Invalid commit request');
@@ -86,7 +93,7 @@ export class SqlitePublicationAdapter implements PublicationStore{
    const updated:PublicationState={generation:snapshot.generation,snapshotId,lastSnapshotId:snapshotId,firstPublishedAt:snapshot.firstPublishedAt,publishedAt:snapshot.publishedAt,publishedRevision:snapshot.publishedRevision};
    this.db.exec('COMMIT');started=false;
    return {ok:true,value:{state:updated,publication:{snapshotId,snapshot:structuredClone(snapshot)}},diagnostics:[]};
-  }catch{if(started)try{this.db.exec('ROLLBACK');}catch{}return fail('PUBLICATION_STORAGE_ERROR','Could not commit publication');}
+  }catch(error){if(started)try{this.db.exec('ROLLBACK');}catch{}return storageFailure(error,'Could not commit publication');}
  }
  async restorePublication(command:PublicationRestoreCommit):Promise<Result<PublicationState>>{
   if(!command||!isIdentifier(command.postId)||!/^[0-9a-f]{64}$/.test(command.snapshotId)||!count(command.expectedGeneration,1))
@@ -112,7 +119,7 @@ export class SqlitePublicationAdapter implements PublicationStore{
    this.db.prepare('UPDATE publication_heads_v1 SET generation=generation+1,snapshot_id=?,last_snapshot_id=?,published_revision=? WHERE post_id=?').run(snapshotId,snapshotId,candidate.value.snapshot.publishedRevision,postId);
    const restored:PublicationState={...head,generation:head.generation+1,snapshotId,lastSnapshotId:snapshotId,publishedRevision:candidate.value.snapshot.publishedRevision};
    this.db.exec('COMMIT');started=false;return {ok:true,value:restored,diagnostics:[]};
-  }catch{if(started)try{this.db.exec('ROLLBACK');}catch{}return fail('PUBLICATION_STORAGE_ERROR','Could not restore publication');}
+  }catch(error){if(started)try{this.db.exec('ROLLBACK');}catch{}return storageFailure(error,'Could not restore publication');}
  }
  async unpublishPublication(command:PublicationUnpublishCommit):Promise<Result<PublicationState>>{
   if(!command||!isIdentifier(command.postId)||!count(command.expectedGeneration,1))return fail('INVALID_PUBLICATION_INPUT','Invalid unpublish request');
@@ -126,6 +133,6 @@ export class SqlitePublicationAdapter implements PublicationStore{
    this.db.prepare('UPDATE publication_heads_v1 SET snapshot_id=NULL,generation=generation+1 WHERE post_id=?').run(command.postId);
    const unpublished:PublicationState={...head,generation:head.generation+1,snapshotId:null};
    this.db.exec('COMMIT');started=false;return {ok:true,value:unpublished,diagnostics:[]};
-  }catch{if(started)try{this.db.exec('ROLLBACK');}catch{}return fail('PUBLICATION_STORAGE_ERROR','Could not unpublish');}
+  }catch(error){if(started)try{this.db.exec('ROLLBACK');}catch{}return storageFailure(error,'Could not unpublish');}
  }
 }
