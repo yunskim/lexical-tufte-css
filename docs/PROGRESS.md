@@ -1,3 +1,16 @@
+### P2.3.a.5 추가 안전 경계 (2026-10-23, 코드·회귀 미실행)
+
+- 이미 존재하는 정본 저장본을 신규 managed/raw 저장으로
+  덮어쓰거나 지우려면 사용자 명시 확인을 받도록 변경.
+  최초 로드한 문서와 별도 신규 문서/복구본으로 구분되는 경우
+  `loadedManagedRef`가 false이므로 덮어쓰기 경고를 표시한다.
+- raw Lexical 저장 경로에서 참조 자산 `assetId`가 남아 있는데
+  catalog가 비어 있으면 저장을 거부한다. 잘못된 raw fallback을
+  통해 비정상적인 managed ID를 보존하지 않는다.
+- 브라우저 회귀에 신규 문서에서 오래된 정본을 실수로 대체하는
+  두 경우(빈 자산 raw 경로 및 신규 관리 자산 경로) 거부 사례 추가.
+  **실제 실행 미판정**.
+
 ## 2026-10-23 — P2.3.a.5 정본 assets와 실제 GUI 저장 경계 (코드 작성, 미실행)
 
 - `examples/editor/src/managedDocument.ts`를 추가해 `validateDocument`
