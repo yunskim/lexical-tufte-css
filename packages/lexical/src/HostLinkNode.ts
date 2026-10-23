@@ -50,12 +50,12 @@ export class HostLinkNode extends LinkNode {
  }
  exportJSON():ReturnType<LinkNode['exportJSON']>{
   const base=super.exportJSON();
-  const {url,...rest}=base;
+  const {url,target,rel,title,...rest}=base;
   return {...rest,type:'host-link',version:1,reference:{...this.getLatest().__reference}} as ReturnType<LinkNode['exportJSON']>;
  }
  static importJSON(serialized:ReturnType<LinkNode['exportJSON']>):HostLinkNode{
   const value=serialized as typeof serialized&{reference:HostReference};
-  if(value.type!=='host-link'||value.version!==1||Object.hasOwn(value,'url'))throw Error('Invalid host link serialization');
+  if(value.type!=='host-link'||value.version!==1||['url','target','rel','title'].some(key=>Object.hasOwn(value,key)))throw Error('Invalid host link serialization');
   validateReference(value.reference);
   return $createHostLinkNode(value.reference);
  }
