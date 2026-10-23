@@ -106,3 +106,59 @@ test('host link rejects URL-bearing or unsupported-version JSON on reopen',async
   assert.throws(()=>reopened.parseEditorState(JSON.stringify(invalid)));
  }
 });
+
+test('host link command rejects collapsed selection without changing document',async()=>{
+ const e=editor();
+ const diagnostics=[];
+ const unregister=registerHostLinkCommands(e,d=>diagnostics.push(d));
+ e.update(()=>{
+  const p=$createParagraphNode();
+  const text=$createTextNode('Example');
+  p.append(text);$getRoot().append(p);
+  text.select(3,3);
+  e.dispatchCommand(INSERT_HOST_LINK_COMMAND,reference);
+ });
+ await flush(e);
+ const paragraph=e.getEditorState().toJSON().root.children[0];
+ assert.deepEqual(paragraph.children.map(node=>node.type),['text']);
+ assert.equal(diagnostics[0]?.code,'INVALID_LINK_SELECTION');
+ unregister();
+});
+
+test('host link command rejects nesting inside another host link',async()=>{
+ const e=editor();
+ const diagnostics=[];
+ const unregister=registerHostLinkCommands(e,d=>diagnostics.push(d));
+ e.update(()=>{
+  const p=$createParagraphNode();
+  const outer=$createHostLinkNode(reference);
+  const text=$createTextNode('Nested');
+  outer.append(text);p.append(outer);$getRoot().append(p);
+  text.select(0,6);
+  e.dispatchCommand(INSERT_HOST_LINK_COMMAND,{...reference,id:'other'});
+ });
+ await flush(e);
+ const children=e.getEditorState().toJSON().root.children[0].children;
+ assert.equal(children.length,1);
+ assert.equal(children[0].type,'host-link');
+ assert.deepEqual(children[0].reference,reference);
+ assert.equal(diagnostics[0]?.code,'NESTED_LINK');
+ unregister();
+});
+
+test('host link command rejects invalid reference without mutation',async()=>{
+ const e=editor();
+ const diagnostics=[];
+ const unregister=registerHostLinkCommands(e,d=>diagnostics.push(d));
+ e.update(()=>{
+  const p=$createParagraphNode();
+  const text=$createTextNode('Example');
+  p.append(text);$getRoot().append(p);
+  text.select(0,7);
+  e.dispatchCommand(INSERT_HOST_LINK_COMMAND,{...reference,kind:'external'});
+ });
+ await flush(e);
+ assert.deepEqual(e.getEditorState().toJSON().root.children[0].children.map(node=>node.type),['text']);
+ assert.equal(diagnostics[0]?.code,'INVALID_REFERENCE');
+ unregister();
+});
