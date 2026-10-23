@@ -5,3 +5,4 @@ export {handleRecoveryRequest,type RecoveryHttpRequest,type RecoveryHttpResponse
 export {handleRecoveryFetch,type RecoveryFetchSecurity} from './recoveryFetch.js';
 export {type PublicationStore,type PublicationCommit,type PublicationRestoreCommit,type PublicationUnpublishCommit,type PublicationCommitResult} from './publicationStore.js';
 export {PublicationService} from './publicationService.js';
+export {SqlitePublicationAdapter} from './sqlitePublicationAdapter.js';
