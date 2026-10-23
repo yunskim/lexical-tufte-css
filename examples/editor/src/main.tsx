@@ -335,6 +335,7 @@ function EditorUI(){
   const [managedJson,setManagedJson]=useState('');
   const [assets,setAssets]=useState<AssetRef[]>([]);
   const assetsRef=useRef<AssetRef[]>([]);
+  const loadedManagedRef=useRef(false);
   function installAssets(next:readonly AssetRef[]){
     const snapshot=next.map(asset=>structuredClone(asset));
     assetsRef.current=snapshot;
@@ -528,6 +529,7 @@ function EditorUI(){
       if(!window.confirm('현재 편집 상태를 선택한 복구본으로 바꾸시겠습니까?'))return;
       replaceEditorDocumentState(editor,state);
       installAssets(recoveredAssets);
+      loadedManagedRef.current=false;
       setStatus('선택한 복구본의 본문과 자산 목록을 불러왔습니다. 구조를 확인한 후 저장하세요.');
     }catch{setStatus('복구용 사본을 열지 못했습니다.');}
   }
@@ -767,7 +769,13 @@ function EditorUI(){
         if(!checked.ok){
           setStatus('문서 저장 거부: '+checked.diagnostics[0]?.message);return;
         }
+        if(!loadedManagedRef.current&&localStorage.getItem(MANAGED_DOCUMENT_KEY)!==null&&
+           !window.confirm('이미 저장된 관리 문서가 있습니다. 현재 새 문서로 덮어쓰시겠습니까?')){
+          setStatus('기존 관리 문서 저장본을 유지했습니다.');
+          return;
+        }
         localStorage.setItem(MANAGED_DOCUMENT_KEY,JSON.stringify(checked.document));
+        loadedManagedRef.current=true;
         setStatus('관리 자산과 본문을 한 문서로 저장했습니다.');
       }else{
         // Never write a raw-only snapshot with unresolved managed references.
@@ -783,6 +791,7 @@ function EditorUI(){
         // Legacy path is only used when no asset references need a catalog.
         localStorage.setItem(LEGACY_LEXICAL_KEY,JSON.stringify(state));
         localStorage.removeItem(MANAGED_DOCUMENT_KEY);
+        loadedManagedRef.current=false;
         setStatus('이 브라우저에 저장했습니다.');
       }
     }catch{setStatus('저장 실패: 저장 공간을 확인하세요.');}
@@ -800,6 +809,7 @@ function EditorUI(){
           setStatus('관리 문서 복원 거부: '+installed.diagnostics[0]?.message);return;
         }
         installAssets(installed.value.assets);
+        loadedManagedRef.current=true;
         setStatus('본문과 관리 자산 목록을 함께 불러왔습니다.');
         return;
       }
@@ -807,6 +817,7 @@ function EditorUI(){
       if(!raw){setStatus('저장한 문서가 없습니다.');return;}
       replaceEditorDocumentState(editor,editor.parseEditorState(raw));
       installAssets([]);
+      loadedManagedRef.current=false;
       setStatus('기존 Lexical 문서를 불러왔습니다.');
     }catch{setStatus('문서를 불러오지 못했습니다. 기존 상태는 유지합니다.');}
   }
@@ -922,7 +933,7 @@ function EditorUI(){
     </main>
     <p role="status" aria-label="편집 작업 상태">{status}</p><p role="status" aria-label="자동 복구 저장 상태">{autoSaveState}</p>
     {structureIssues.length>0&&<aside role="alert" aria-label="문서 구조 복구"><p>문서 구조를 수정하세요. 내용은 자동 삭제하지 않으며 HTML 생성은 차단됩니다.</p><ul>{structureIssues.map((issue,i)=><li key={`${issue.key}-${i}`}><button onClick={()=>focusStructureIssue(editor,issue.key)}>{issue.message}</button> <code>{issue.path}</code></li>)}</ul><button onClick={()=>editor.dispatchCommand(UNDO_COMMAND,undefined)}>구조 변경 실행 취소</button><button onClick={recoverStructure} disabled={!checkpoint.current}>마지막 정상 구조로 복구</button></aside>}
-    <div className="actions"><button onClick={save}>저장</button><button onClick={restore}>불러오기</button><button onClick={restoreRecovery} disabled={!recoveryAvailable}>복구용 사본 열기</button><button onClick={exportRecovery} disabled={!recoveryAvailable}>복구본 JSON 내보내기</button><button onClick={deleteRecovery} disabled={!recoveryAvailable}>복구본 정리</button><button onClick={exportDocument}>JSON·HTML 확인</button><button onClick={()=>{editor.update($loadLayoutFixture,{tag:HISTORY_PUSH_TAG});setStatus('레이아웃 예제를 불러왔습니다. 실행 취소할 수 있습니다.');}}>레이아웃 예제 불러오기</button></div>
+    <div className="actions"><button onClick={save}>저장</button><button onClick={restore}>불러오기</button><button onClick={restoreRecovery} disabled={!recoveryAvailable}>복구용 사본 열기</button><button onClick={exportRecovery} disabled={!recoveryAvailable}>복구본 JSON 내보내기</button><button onClick={deleteRecovery} disabled={!recoveryAvailable}>복구본 정리</button><button onClick={exportDocument}>JSON·HTML 확인</button><button onClick={()=>{editor.update($loadLayoutFixture,{tag:HISTORY_PUSH_TAG});loadedManagedRef.current=false;setStatus('레이아웃 예제를 불러왔습니다. 실행 취소할 수 있습니다.');}}>레이아웃 예제 불러오기</button></div>
     <details><summary>JSON과 발행 HTML 검사</summary><label>JSON<textarea ref={textarea} aria-label="문서 JSON" value={json} readOnly/></label><label>HTML<textarea aria-label="발행 HTML" value={html} readOnly/></label>{managedJson&&<label>관리 문서 JSON<textarea aria-label="관리 문서 JSON" value={managedJson} readOnly/></label>}</details>
     <p className="notice">프로토타입: 공개 발행·모바일 여백 배치·OS별 실제 IME와 다른 브라우저 검증은 후속 단계에서 진행합니다. 한글 웹폰트 자산 연결은 P4 대상입니다.</p>
   </>;
