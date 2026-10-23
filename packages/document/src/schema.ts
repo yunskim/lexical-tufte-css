@@ -4,11 +4,11 @@ const inline=phrasing.filter(t=>t!=='tufte-sidenote'&&t!=='tufte-marginnote');
 const blocks=['paragraph','heading','list','tufte-definition-list','horizontalrule','quote','tufte-epigraph','tufte-figure','tufte-table-layout','tufte-code','tufte-embed','tufte-fullwidth','tufte-section-footer'];
 export const NODE_SCHEMA:Readonly<Record<string,{readonly fields:readonly string[];readonly children?:readonly string[]}>>=Object.freeze({
  root:{fields:[],children:['tufte-section']},'tufte-section':{fields:[],children:blocks},
- paragraph:{fields:[],children:phrasing},heading:{fields:['tag'],children:inline},
+ paragraph:{fields:['tufteClass'],children:phrasing},heading:{fields:['tag','id'],children:inline},
  list:{fields:['listType','tag','start'],children:['listitem']},listitem:{fields:['value','checked'],children:[...phrasing,'list']},
  'tufte-definition-list':{fields:[],children:['tufte-term','tufte-definition']},
  'tufte-term':{fields:[],children:inline},'tufte-definition':{fields:[],children:['paragraph','list']},
- horizontalrule:{fields:[]},quote:{fields:[],children:[...phrasing,'paragraph','tufte-attribution']},
+ horizontalrule:{fields:[]},quote:{fields:['cite'],children:[...phrasing,'paragraph','tufte-attribution']},
  'tufte-epigraph':{fields:[],children:['quote']},'tufte-attribution':{fields:[],children:[...inline,'tufte-cite']},
  'tufte-cite':{fields:[],children:inline},'tufte-section-footer':{fields:[],children:[...inline,'tufte-cite']},
  'tufte-span':{fields:['kind'],children:inline},link:{fields:['url','target','rel','title'],children:['text','linebreak','tufte-inline-image','tufte-span']},
@@ -34,6 +34,9 @@ export const isRecord=(value:unknown):value is Record<string,unknown>=>typeof va
 export function isSafeURL(value:unknown,kind:'image'|'link'):value is string{
  if(typeof value!=='string'||!value||value.length>4096||/[\u0000-\u0020\u007f\\]/.test(value)||value.startsWith('//'))return false;
  if(value.startsWith('/')||value.startsWith('./')||value.startsWith('../')||(kind==='link'&&value.startsWith('#')))return true;
+ // Allow simple path-relative image URLs used by the pinned Tufte sample.
+ // Never treat a scheme, authority, query or traversal as an ordinary path.
+ if(/^[A-Za-z0-9][A-Za-z0-9._~/-]*$/.test(value)&&value.split('/').every(part=>part!==''&&part!=='.'&&part!=='..'))return true;
  try{const u=new URL(value);return (kind==='image'?['http:','https:']:['http:','https:','mailto:','tel:','sms:']).includes(u.protocol)&&!u.username&&!u.password;}catch{return false;}
 }
 export function isEmbedURL(value:unknown,provider:unknown):value is string{
