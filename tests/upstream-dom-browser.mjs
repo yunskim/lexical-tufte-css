@@ -105,11 +105,12 @@ try{
   }
  }
  assert.ok(original.notes.some(n=>n.labelInsideNewthought),'upstream newthought/note combination changed');
- assert.ok(published.notes.every(n=>!n.labelInsideNewthought),'known newthought parity gap needs review');
+ assert.ok(published.notes.every(n=>!n.labelInsideNewthought),
+  'Independent server fixture has no newthought/sidenote pairing; do not infer same-content parity');
  console.log('P2.2.e DOM comparison:',JSON.stringify({
   upstream:{sections:original.sections,notes:original.notes.length,epigraphs:original.epigraphs,fullwidthFigures:original.fullwidthFigures},
   published:{sections:published.sections,notes:published.notes.length,epigraphs:published.epigraphs,fullwidthFigures:published.fullwidthFigures},
-  knownGap:'newthought > sidenote label',
+  comparisonLimitation:'Independent server fixture does not contain an upstream newthought/sidenote pairing',
   upstreamSectionOutline:original.sectionOutline,
   publishedFixtureSectionOutline:published.sectionOutline,
   comparisonScope:'upstream page vs independent server-document fixture; not same-content parity'
