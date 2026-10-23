@@ -1,6 +1,6 @@
 import {$addUpdateTag,createCommand,COMMAND_PRIORITY_EDITOR,HISTORY_PUSH_TAG,
  type LexicalCommand,type LexicalEditor} from 'lexical';
-import {isIdentifier,isSafeURL,type AssetRef,type Diagnostic} from '@lexical-tufte/document';
+import {DOCUMENT_LIMITS,isIdentifier,isSafeURL,type AssetRef,type Diagnostic} from '@lexical-tufte/document';
 import {$createInlineImageNode} from './InlineImageNode.js';
 import {$getSelectedTufteNoteImage} from './noteCommands.js';
 
@@ -22,12 +22,18 @@ export const SET_TUFTE_NOTE_IMAGE_DIMENSIONS_COMMAND:LexicalCommand<TufteNoteIma
 const validDimension=(value:unknown):value is number=>
  typeof value==='number'&&Number.isSafeInteger(value)&&value>0;
 const validAsset=(value:unknown):value is AssetRef=>{
- if(!value||typeof value!=='object'||Array.isArray(value))return false;
+ if(!value||typeof value!=='object'||Array.isArray(value)||
+    Object.getPrototypeOf(value)!==Object.prototype&&Object.getPrototypeOf(value)!==null)return false;
  const a=value as Record<string,unknown>;
- return isIdentifier(a.id)&&isSafeURL(a.src,'image')&&
+ const fields=['id','src','mimeType','alt','width','height','byteLength','sha256'];
+ return Object.keys(a).every(key=>fields.includes(key))&&
+  isIdentifier(a.id)&&isSafeURL(a.src,'image')&&
   typeof a.mimeType==='string'&&/^image\/[a-zA-Z0-9.+-]+$/.test(a.mimeType)&&
+  (a.alt===undefined||typeof a.alt==='string')&&
   (a.width===undefined||validDimension(a.width))&&
-  (a.height===undefined||validDimension(a.height));
+  (a.height===undefined||validDimension(a.height))&&
+  (a.byteLength===undefined||validDimension(a.byteLength))&&
+  (a.sha256===undefined||typeof a.sha256==='string'&&/^[0-9a-f]{64}$/.test(a.sha256));
 };
 
 /** All asset metadata must come from the containing document, not from UI forms. */
@@ -47,7 +53,7 @@ export function registerNoteAssetCommands(
  const catalog=():readonly AssetRef[]|null=>{
   try{
    const entries=getAssets();
-   if(!Array.isArray(entries))return null;
+   if(!Array.isArray(entries)||entries.length>DOCUMENT_LIMITS.assets)return null;
    const ids=new Set<string>();
    for(const asset of entries){
     if(!validAsset(asset)||ids.has(asset.id))return null;
