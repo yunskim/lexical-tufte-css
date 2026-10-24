@@ -54,10 +54,38 @@ try {
  await page.getByRole('button',{name:'저장',exact:true}).click();
  assert.equal(await page.evaluate(()=>localStorage.getItem('lexical-tufte-p1')),original,
   'Invalid live structure must not overwrite last valid save');
- const recovery=await page.evaluate(()=>localStorage.getItem('lexical-tufte-recovery-v1'));
- assert.ok(recovery?.includes('INVALID-STRUCTURE'),
-  'Invalid live structure must be preserved in recovery storage');
+ const manual=await page.evaluate(()=>Object.entries(localStorage).filter(
+  ([key,value])=>key.startsWith('lexical-tufte-recovery-v2:manual-')&&value.includes('INVALID-STRUCTURE')
+ ));
+ assert.equal(manual.length,1,'Invalid live structure should create one manual recovery snapshot');
+ const [manualKey,manualRaw]=manual[0];
+ assert.deepEqual(JSON.parse(manualRaw).state,invalid,
+  'Manual recovery snapshot must preserve the invalid serialized state');
  assert.match(await page.getByRole('status',{name:'편집 작업 상태'}).innerText(),/복구용 사본/);
+ // The freshly created snapshot must be openable *in the current tab*
+ // without a reload or legacy-key migration.
+ const reopen=page.getByRole('button',{name:'복구용 사본 열기',exact:true});
+ assert.equal(await reopen.isEnabled(),true,'Manual recovery must be immediately discoverable');
+ const chooseManual=dialog=>{
+  if(dialog.type()==='prompt'){
+   const line=dialog.message().split('\\n').find(row=>row.includes('· '+manualKey.slice(-8)));
+   assert.ok(line,'Recovery picker must include the new manual snapshot');
+   const index=line.match(/^\\s*(\\d+):/)?.[1];
+   assert.ok(index,'Recovery picker must expose the manual snapshot index');
+   return dialog.accept(index);
+  }
+  assert.equal(dialog.type(),'confirm');
+  page.off('dialog',chooseManual);
+  return dialog.accept();
+ };
+ page.on('dialog',chooseManual);
+ await reopen.click();
+ await page.getByRole('status',{name:'편집 작업 상태'}).filter({
+  hasText:'선택한 복구본을 열었습니다.'
+ }).waitFor();
+ assert.match(await editor.innerText(),/INVALID-STRUCTURE/);
+ assert.equal(await page.evaluate(()=>localStorage.getItem('lexical-tufte-p1')),original,
+  'Opening an invalid manual recovery snapshot must preserve the canonical save');
  assert.deepEqual(errors,[]);
  console.log('Invalid structure save isolation: valid document protected.');
 }finally{await browser?.close();server?.kill();}
