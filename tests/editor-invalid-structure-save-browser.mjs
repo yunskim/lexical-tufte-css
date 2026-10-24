@@ -68,9 +68,9 @@ try {
  assert.equal(await reopen.isEnabled(),true,'Manual recovery must be immediately discoverable');
  const chooseManual=dialog=>{
   if(dialog.type()==='prompt'){
-   const line=dialog.message().split('\\n').find(row=>row.includes('· '+manualKey.slice(-8)));
+   const line=dialog.message().split('\n').find(row=>row.includes('· '+manualKey.slice(-8)));
    assert.ok(line,'Recovery picker must include the new manual snapshot');
-   const index=line.match(/^\\s*(\\d+):/)?.[1];
+   const index=line.match(/^\s*(\d+):/)?.[1];
    assert.ok(index,'Recovery picker must expose the manual snapshot index');
    return dialog.accept(index);
   }
