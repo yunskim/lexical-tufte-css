@@ -781,3 +781,9 @@ E001–E049/M001–M042를 검토했다. E024의 경계 입력은 실제 Chromiu
 - 처리: 수동 무효 구조 저장과 정상 checkpoint 복구 직전 보존 경로를 공유 `storeManualRecoverySnapshot()`으로 통일했다. 새 복구본은 고유 `v2:manual-<uuid>` 키에 `{savedAt,state}`로 저장하고 UI 사용 가능 상태를 즉시 갱신한다. 기존 v1 데이터는 초기 이관 경로로 호환 유지한다.
 - 회귀: `editor-invalid-structure-save-browser.mjs`에서 유효 정본 불변성, 이미지 없는 figure 내용 보존, 즉시 복구 버튼 사용과 같은 탭 재열기를 검사한다. Lexical의 역직렬화 결과를 입력 JSON과 무조건 deep-equal로 비교하지 않는다.
 - 상태: **코드 반영, 실제 브라우저 미검증.** CI 미실행. 로컬 환경의 저장소/DNS 및 의존성 설치 차단으로 실행 결과는 아직 없다.
+
+## E076 — 편집기 기본 문서가 섹션이라는 회귀 fixture 가정
+
+- 발견: 2026-10-25 신규 복구 회귀 정적 검토. `examples/editor/src/main.tsx`의 `seed()`는 root 아래 paragraph를 만들지만, `editor-invalid-structure-save-browser.mjs`는 `root.children.find(type==='tufte-section')`로 섹션을 바로 기대했다. 테스트가 구조 진단에 도달하기 전 fixture assertion에서 실패할 수 있었다.
+- 처리: 실제 '레이아웃 예제 불러오기' 버튼으로 section/figure/table-layout이 있는 유효 편집기 문서를 먼저 설치하고, 그 섹션에 이미지 없는 figure를 추가하도록 수정했다.
+- 상태: 코드 수정, **브라우저 미실행**. fixture 존재와 invalid figure 경고는 일괄 실행에서 확인해야 한다.
