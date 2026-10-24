@@ -59,8 +59,15 @@ try {
  ));
  assert.equal(manual.length,1,'Invalid live structure should create one manual recovery snapshot');
  const [manualKey,manualRaw]=manual[0];
- assert.deepEqual(JSON.parse(manualRaw).state,invalid,
-  'Manual recovery snapshot must preserve the invalid serialized state');
+ const manualState=JSON.parse(manualRaw).state;
+ const persistedSection=manualState.root.children.find(child=>child.type==='tufte-section');
+ const malformedFigure=persistedSection?.children.find(child=>child.type==='tufte-figure'&&
+  child.children.some(item=>item.type==='tufte-caption'));
+ assert.ok(malformedFigure,'Manual recovery must retain the malformed figure');
+ assert.equal(malformedFigure.children.filter(child=>child.type==='tufte-inline-image'||
+  child.type==='tufte-imagequilt').length,0,
+  'Manual recovery must not fabricate an image to repair invalid input');
+ assert.ok(manualRaw.includes('INVALID-STRUCTURE'),'Manual recovery must retain invalid contents');
  assert.match(await page.getByRole('status',{name:'편집 작업 상태'}).innerText(),/복구용 사본/);
  // The freshly created snapshot must be openable *in the current tab*
  // without a reload or legacy-key migration.
