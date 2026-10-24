@@ -39,6 +39,7 @@ try {
  // JSON payload must be rejected without clearing the current Lexical tree.
  await page.evaluate(()=>localStorage.setItem('lexical-tufte-p1','{invalid-json'));
  await page.getByRole('button',{name:'불러오기',exact:true}).click();
+ assert.match(await page.getByRole('status',{name:'편집 작업 상태'}).innerText(),/불러오지 못했습니다/);
  assert.deepEqual(await snapshot(),historyState,'Malformed saved JSON replaced live editor');
  assert.equal(await page.evaluate(()=>localStorage.getItem('lexical-tufte-p1')),'{invalid-json',
   'Rejected data must remain available for manual recovery');
@@ -48,9 +49,9 @@ try {
   root:{type:'unknown-node',version:1,children:[]}
  })));
  await page.getByRole('button',{name:'불러오기',exact:true}).click();
- assert.deepEqual(await snapshot(),historyState,'Invalid Lexical root replaced live editor');
- // Both failures must be observable to users rather than falsely reported as successful.
+ // Snapshot export updates the UI status. Assert the failure diagnostic first.
  assert.match(await page.getByRole('status',{name:'편집 작업 상태'}).innerText(),/불러오지 못했습니다/);
+ assert.deepEqual(await snapshot(),historyState,'Invalid Lexical root replaced live editor');
  assert.match(await editor.innerText(),/KEEP-LIVE-EDITOR/);
  // Rejected imports must not silently clear the undo/redo history.
  await page.getByRole('button',{name:'실행 취소',exact:true}).click();
