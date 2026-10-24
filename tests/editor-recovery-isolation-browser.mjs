@@ -39,6 +39,15 @@ try {
   localStorage.setItem(key,JSON.stringify({savedAt:'2099-01-01T00:00:00.000Z',state}));
   window.dispatchEvent(new StorageEvent('storage',{key}));
  },{key:recoveryKey,state:recovered});
+ // Remove autosaved session copies before the controlled recovery fixtures.
+ // The editor may create them after the initial text edit.
+ await page.waitForTimeout(1000);
+ await page.evaluate(()=>{
+  for(const key of Object.keys(localStorage)){
+   if(key.startsWith('lexical-tufte-recovery-v2:')&&
+      !key.endsWith(':regression-isolation'))localStorage.removeItem(key);
+  }
+ });
  const button=page.getByRole('button',{name:'복구용 사본 열기',exact:true});
  await button.waitFor({state:'visible'});
  await button.waitFor({state:'attached'});
