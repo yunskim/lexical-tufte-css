@@ -123,6 +123,12 @@ try {
   'Confirmed deletion must remove the selected recovery copy');
  assert.equal(await page.evaluate(()=>localStorage.getItem('lexical-tufte-p1')),canonical,
   'Deleting recovery must never delete the canonical document');
+ // The deleted snapshot must remain absent after the next autosave cycle.
+ // A new session snapshot may appear, but it must never resurrect a
+ // specifically deleted recovery key.
+ await page.waitForTimeout(900);
+ assert.equal(await page.evaluate(key=>localStorage.getItem(key),recoveryKey),null,
+  'Autosave must not resurrect an explicitly deleted recovery snapshot');
  // Multiple recovery snapshots: delete only the selected entry.
  const olderKey='lexical-tufte-recovery-v2:regression-older';
  const newerKey='lexical-tufte-recovery-v2:regression-newer';
