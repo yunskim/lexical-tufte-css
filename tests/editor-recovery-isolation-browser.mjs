@@ -73,32 +73,30 @@ try {
  assert.ok(await page.evaluate(key=>localStorage.getItem(key)!==null,recoveryKey),
   'Reopening the canonical document must not delete the recovery source');
  // Deleting recovery data is explicit and must respect both cancellation stages.
- const deleteButton=page.getByRole('button',{name:'복구본 삭제',exact:true});
+ const deleteButton=page.getByRole('button',{name:'복구본 정리',exact:true});
  await deleteButton.waitFor({state:'visible'});
  const stored=await page.evaluate(key=>localStorage.getItem(key),recoveryKey);
  page.once('dialog',dialog=>dialog.dismiss());
  await deleteButton.click();
  assert.equal(await page.evaluate(key=>localStorage.getItem(key),recoveryKey),stored,
   'Canceling recovery selection must preserve the recovery copy');
- page.once('dialog',dialog=>{
-  assert.equal(dialog.type(),'prompt');
-  dialog.accept('0');
- });
- page.once('dialog',dialog=>{
+ const declineDeletion=dialog=>{
+  if(dialog.type()==='prompt')return dialog.accept('0');
   assert.equal(dialog.type(),'confirm');
-  dialog.dismiss();
- });
+  page.off('dialog',declineDeletion);
+  return dialog.dismiss();
+ };
+ page.on('dialog',declineDeletion);
  await deleteButton.click();
  assert.equal(await page.evaluate(key=>localStorage.getItem(key),recoveryKey),stored,
   'Declining the deletion confirmation must preserve the recovery copy');
- page.once('dialog',dialog=>{
-  assert.equal(dialog.type(),'prompt');
-  dialog.accept('0');
- });
- page.once('dialog',dialog=>{
+ const confirmDeletion=dialog=>{
+  if(dialog.type()==='prompt')return dialog.accept('0');
   assert.equal(dialog.type(),'confirm');
-  dialog.accept();
- });
+  page.off('dialog',confirmDeletion);
+  return dialog.accept();
+ };
+ page.on('dialog',confirmDeletion);
  await deleteButton.click();
  assert.equal(await page.evaluate(key=>localStorage.getItem(key),recoveryKey),null,
   'Confirmed deletion must remove the selected recovery copy');
@@ -112,15 +110,16 @@ try {
   localStorage.setItem(newerKey,JSON.stringify({savedAt:'2099-01-02T00:00:00.000Z',state}));
  },{olderKey,newerKey,state:recovered});
  const olderBytes=await page.evaluate(key=>localStorage.getItem(key),olderKey);
- page.once('dialog',dialog=>{
-  assert.equal(dialog.type(),'prompt');
-  assert.match(dialog.message(),/2099-01-02/);
-  dialog.accept('0');
- });
- page.once('dialog',dialog=>{
+ const selectNewest=dialog=>{
+  if(dialog.type()==='prompt'){
+   assert.match(dialog.message(),/2099-01-02/);
+   return dialog.accept('0');
+  }
   assert.equal(dialog.type(),'confirm');
-  dialog.accept();
- });
+  page.off('dialog',selectNewest);
+  return dialog.accept();
+ };
+ page.on('dialog',selectNewest);
  await deleteButton.click();
  assert.equal(await page.evaluate(key=>localStorage.getItem(key),newerKey),null,
   'Selected newest recovery snapshot must be deleted');
