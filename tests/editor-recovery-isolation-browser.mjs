@@ -81,6 +81,19 @@ try {
  assert.ok(await page.evaluate(key=>localStorage.getItem(key)!==null,recoveryKey),
   'Reopening the canonical document must not delete the recovery source');
  // Deleting recovery data is explicit and must respect both cancellation stages.
+ // Loading the canonical document may schedule a fresh session autosave.
+ // Wait for that debounce and remove only unrelated session snapshots so
+ // deletion assertions use deterministic, explicitly created fixtures.
+ await page.waitForFunction(()=>Object.entries(localStorage).some(([key,value])=>
+  key.startsWith('lexical-tufte-recovery-v2:')&&
+  key!=='lexical-tufte-recovery-v2:regression-isolation'&&
+  value.includes('CANONICAL-BASELINE')
+ ),null,{timeout:10000});
+ await page.evaluate(keep=>{
+  for(const key of Object.keys(localStorage)){
+   if(key.startsWith('lexical-tufte-recovery-v2:')&&key!==keep)localStorage.removeItem(key);
+  }
+ },recoveryKey);
  const deleteButton=page.getByRole('button',{name:'복구본 정리',exact:true});
  await deleteButton.waitFor({state:'visible'});
  const stored=await page.evaluate(key=>localStorage.getItem(key),recoveryKey);
