@@ -345,7 +345,7 @@ function EditorUI(){
   function recoverStructure(){
     if(!checkpoint.current){setStatus('복구할 정상 구조가 없습니다. 문제 위치를 수정하거나 실행 취소하세요.');return;}
     try{
-      localStorage.setItem('lexical-tufte-recovery-v1',JSON.stringify(editor.getEditorState().toJSON()));
+      storeManualRecoverySnapshot(editor.getEditorState());
       editor.setEditorState(checkpoint.current,{tag:HISTORY_PUSH_TAG});setStatus('복구용 사본을 보존하고 마지막 정상 구조로 돌아왔습니다.');
     }catch{setStatus('복구용 사본 저장에 실패했습니다. 현재 내용은 유지합니다.');}
   }
@@ -355,6 +355,11 @@ function EditorUI(){
   const recoverySession=useRef<string>(crypto.randomUUID());
   const sessionKey=recoveryKey+':'+recoverySession.current;
   const legacyRecoveryKey='lexical-tufte-recovery-v1';
+  function storeManualRecoverySnapshot(state:EditorState):void{
+    const key=recoveryKey+':manual-'+crypto.randomUUID();
+    localStorage.setItem(key,JSON.stringify({savedAt:new Date().toISOString(),state:state.toJSON()}));
+    setRecoveryAvailable(true);
+  }
   function recoveryKeys(){
     return Object.keys(localStorage).filter(key=>key.startsWith(recoveryKey+':'));
   }
@@ -616,8 +621,15 @@ function EditorUI(){
     setJson(JSON.stringify(editor.getEditorState().toJSON(),null,2));setStatus('JSON과 HTML을 생성했습니다.');
   }
   function save(){
-    try{const invalid=inspectEditorStructure(editor).length>0;localStorage.setItem(invalid?'lexical-tufte-recovery-v1':'lexical-tufte-p1',JSON.stringify(editor.getEditorState().toJSON()));setStatus(invalid?'구조 오류가 있어 복구용 사본에만 저장했습니다. 마지막 저장 문서는 유지합니다.':'이 브라우저에 저장했습니다.');}
-    catch{setStatus('저장 실패: 저장 공간을 확인하세요.');}
+    try{
+      if(inspectEditorStructure(editor).length>0){
+        storeManualRecoverySnapshot(editor.getEditorState());
+        setStatus('구조 오류가 있어 복구용 사본에만 저장했습니다. 마지막 저장 문서는 유지합니다.');
+      }else{
+        localStorage.setItem('lexical-tufte-p1',JSON.stringify(editor.getEditorState().toJSON()));
+        setStatus('이 브라우저에 저장했습니다.');
+      }
+    }catch{setStatus('저장 실패: 저장 공간을 확인하세요.');}
   }
   function restore(){
     try{
