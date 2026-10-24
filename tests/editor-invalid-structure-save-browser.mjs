@@ -21,6 +21,10 @@ try {
  const errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto(url);
  const editor=page.locator('.editor');await editor.waitFor();
+ // The default editor seed is a root paragraph, not a section document.
+ // Load the real section fixture before inserting the malformed figure.
+ await page.getByRole('button',{name:'레이아웃 예제 불러오기',exact:true}).click();
+ await page.locator('[data-tufte-editor="section"]').waitFor();
  await editor.click();await page.keyboard.press('Control+End');
  await page.keyboard.insertText('KNOWN-GOOD-SAVE');
  await page.getByRole('button',{name:'저장',exact:true}).click();
