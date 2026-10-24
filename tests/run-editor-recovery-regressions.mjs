@@ -4,7 +4,8 @@ const suites=[
  'tests/editor-invalid-restore-browser.mjs',
  'tests/editor-invalid-structure-save-browser.mjs',
  'tests/editor-recovery-isolation-browser.mjs',
- 'tests/editor-autosave-isolation-browser.mjs'
+ 'tests/editor-autosave-isolation-browser.mjs',
+ 'tests/editor-legacy-recovery-migration-browser.mjs'
 ];
 for(const suite of suites){
  console.log('\n=== '+suite+' ===');
