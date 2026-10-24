@@ -1,3 +1,10 @@
+## 2026-10-24 잔여 자동 테스트 재실행 완료
+
+- 검증 기준 `7636a98`, `fix/main-browser-parity-20261023`. 제품 코드·golden·기대값 변경 없이 frozen 설치 → check425개 → package5개 → browser35개 → Python16/HTTP 및 별도 발행 제안 모델12그룹을 회수했다. build/typecheck/static 및 모든 단위 통과, browser34통과/보류 자산 등록1실패, 파일timeout·skip0. CI 생략.
+- 공식9섹션/60블록/7노트의 저장/재열기·실제 편집·DOM 및375/759/760/761/1024/1440px pixel 대조 통과. 검증 iframe mask 밖 RGBA 차이0. `note-dom-browser.mjs`도 통과했다.
+- E004 CDN ZIP 오류와 E005 일반 Chromium singleton socket 오류가 재발했다. 공식 설치기 fallback 및 기본 headless shell smoke 후 전체 실행으로 환경을 완화했고 M004 실행 순서를 강화했다. 같은 venv를 pytest/HTTP에 지정해 E124 재발을 방지했다.
+- [이번 실행 보고서](VERIFICATION_REMAINING_TESTS_2026-10-24.ko.md), [파일별 결과·핵심 출력](verification/remaining-tests-20261024.json). 보류 자산1개 실패와 실제 OS IME/P6는 남아 있다. P2.2.b.2/A0–A8은 완료 처리하지 않는다.
+
 ## 2026-10-23 P2.2.b.1 인라인 속성 지원 범위 검증 완료
 
 - TufteSpanNode의 span4종 HTML 복원과 정렬 class export를 구현했다. 링크/글자 서식/방향·정렬을 native/publisher 인라인 HTML 왕복에서 보존하고 malformed 속성12종은 기존 편집 상태를 유지하며 거부한다.

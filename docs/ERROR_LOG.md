@@ -1,5 +1,13 @@
 # 에러 기록
 
+## 2026-10-24 잔여 회귀 실행 및 E004/E005 재발 점검
+
+검증 기준 `7636a98`: check425개·package5개·Python16/HTTP·발행 제안 모델12그룹 통과. browser34/35 통과, 유일한 실패는 기존 보류된 문서 이미지 자산 등록 버튼 부재다. 파일timeout·skip0. 공식6폭 pixel 대조와 note-dom 통과. [실행 증거](VERIFICATION_REMAINING_TESTS_2026-10-24.ko.md), [JSON](verification/remaining-tests-20261024.json). CI 생략.
+
+- **E004 재발:** 최초 CDN 응답의 ZIP central-directory 오류 후 공식 설치기 Microsoft fallback이 고정 Chromium134/headless shell 설치에 성공했다. 네트워크/캐시의 상세 원인은 미확정이며 일반 다운로드 문제를 해결 처리하지 않는다.
+- **E005 재발:** 설치 완료 전 일반 Chromium 경로를 지정한 smoke에서 singleton socket() Operation not permitted로 종료했다. 기존 기본 shell 대책을 지키지 않은 절차 실수다. 설치 완료를 회수한 뒤 기본 headless shell smoke 및35개 파일 실행으로 검증했다. 권한 변경 없이 환경 완화 상태를 유지한다.
+- 두 문서 전체 기록/상태를 점검하고 M004를 설치 완료→기본 shell smoke→전체 회귀의 순서로 강화했다. 보류 자산·실제 OS IME·이전 환경의 한계는 해결 처리하지 않는다. 다음 점검: P2.2.b.2 시작/완료 또는 브라우저 환경 변경 시.
+
 ## E126 — Tufte span HTML 복원 누락 및 native export의 정렬 소실 (해결)
 
 - 발견(2026-10-23, P2.2.b.1): TufteSpanNode에 importDOM이 없어서 HTML에서 sans/newthought/numeral/danger 의미를 복원할 수 없었다. 새 실제 브라우저 왕복에서 native export 후 format:right가 빈 값으로 바뀌는 실패도 재현했다.

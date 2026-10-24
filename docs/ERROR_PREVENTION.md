@@ -1,5 +1,13 @@
 # 재발 방지 대책 및 정기 점검
 
+## 2026-10-24 E004/E005 재발 후 전체 기록 점검 및 M004 보강
+
+두 문서의 전체 기록/상태를 점검했다. 기존 단위·브라우저 결과가 이전 환경의 open/mitigated 범위를 일괄 해결하지 않도록 과거 이력은 유지한다. E004 설치기 fallback 성공과 E005 실행 경로 실패를 구분했고, E124/M113에 따라 pytest와 HTTP에 같은 venv를 지정했다. check425·package5·Python16/HTTP·모델12그룹 통과, browser34/35통과(보류 자산1실패, 파일timeout·skip0), 공식6폭 pixel·note-dom 통과. [실행 보고서](VERIFICATION_REMAINING_TESTS_2026-10-24.ko.md). CI 생략.
+
+M004의 **기본 shell** 원칙을 실제 실행 순서로 강화한다. 브라우저 캐시 부재 시 `pnpm exec playwright install chromium --only-shell` 같은 고정 설치기의 shell 설치 결과를 먼저 회수한다. `CHROMIUM_PATH`를 임의 일반 Chrome으로 지정해 부재를 우회하지 않는다. 기본 경로의 `node tests/full-page-pixel-parity-browser.mjs` smoke가 성공한 뒤 전체 browser 파일을 실행한다. 이번에는 기본 shell smoke와35파일 실행으로 이 순서를 확인했다. 다운로드 fallback은 공식 설치기에 맡기고 ZIP 실패와 launch 실패를 각각 기록한다. 실패한 빌드 산출물 사용·CI 실행·권한 변경은 하지 않는다.
+
+다음 점검은 P2.2.b.2 시작/완료 또는 브라우저 환경 변경 시다. 보류된 자산 등록 테스트 실패를 skip이나 기대값 완화로 가리지 않는다.
+
 ## 2026-10-23 P2.2.b.1 시작·종료 점검
 
 E120/E123/E125와 M114/M115를 시작 시 확인하고, JSON만 보존된 상태를 HTML 왕복 완료로 해석하지 않도록 E126/M116을 추가했다. P2.2.b.1의 명시된 지원/거부 범위만 완료 체크하며 P2.2.b·F03/F05 전체와 P2.4/P6는 유지한다. 다음 점검은 P2.2.b.2 목록/키보드 경계 작업 시작·완료 시점이다. CI 생략.
@@ -344,7 +352,7 @@ E069–E071/M062–M065 및 이전 비동기 commit·빈 NoteNode·검증 의존
 | M001 | E001 | package.json과 pnpm-workspace.yaml이 있는 repo root를 workdir로 지정 | README 명령, 작업 시작 전 root 확인; frozen install 통과 | 적용, 매 명령 묶음 시작 시 확인 |
 | M002 | E002 | 재사용 smoke는 즉석 문자열 대신 저장된 테스트 파일로 실행 | packages/lexical/test/note.test.mjs; pnpm test | 적용, 새 검증 추가 시 검토 |
 | M003 | E003 | 소비자 typecheck에 소스 해석 경로/Vite CSS types 설정, 공유 document declaration 선행 build; 브라우저 검증 전에 build | examples/editor/tsconfig.json, 루트 typecheck/test:browser | 적용, package export 변경 시 typecheck+build |
-| M004 | E004/E005 | 검증 가능한 Playwright/browser 기준 고정, 공식 설치기 사용, 기본 headless shell. 실패 원인별로 분류하고 무한 재시도하지 않음 | lockfile, DEPENDENCIES, tests/note-browser.mjs | 환경 완화, P6에서 최신·다른 브라우저 재검증 |
+| M004 | E004/E005 | 고정 공식 설치기 완료 회수 → 기본 headless shell smoke → 전체 회귀. 일반 Chrome 강제 경로 우회 금지. ZIP/launch 실패 구분, 원인 없는 재시도 금지 | lockfile, DEPENDENCIES, tests/full-page-pixel-parity-browser.mjs, 2026-10-24 실행 보고서 | 환경 완화, 다음 환경 변경/P6에서 재검증 |
 | M005 | E006 | 테스트가 서버 생명주기를 소유하고 HTTP readiness를 확인한 후 브라우저 시작 | tests/note-browser.mjs | 적용, 서버 테스트 수정 시 재실행 |
 | M006 | E007 | 일반 경계 입력 guard와 실제 키보드 회귀 검사. canInsert 정책만 바꿔 해결했다고 가정하지 않음 | examples/editor/src/main.tsx, tests/note-browser.mjs | 일반 입력 및 P1.2 Chromium 확장 검증, OS IME는 P6·구조 비교는 P1.3 |
 | M007 | E008 | 숨겨진 UI는 먼저 사용자가 여는 동작을 수행한 후 role로 검사; timeout으로 원인 은폐 금지 | tests/note-browser.mjs summary click | 적용, UI 변경 시 검사 |

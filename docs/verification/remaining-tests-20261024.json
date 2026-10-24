@@ -1,0 +1,551 @@
+{
+  "reportingDate": "2026-10-24",
+  "timezone": "Asia/Seoul",
+  "repository": "yunskim/lexical-tufte-css",
+  "branch": "fix/main-browser-parity-20261023",
+  "testedCommit": "7636a987b51b8f6585f95c28ba0da05e78db2291",
+  "scope": "Existing branch regression verification only; no product code, golden, or acceptance changes.",
+  "installation": {
+    "pnpm": "11.25.0",
+    "node": "24.19.0",
+    "frozenLockfile": "pass",
+    "playwright": "1.51.1",
+    "browser": "Chromium 134.0.6998.35 headless shell v1161",
+    "python": "3.12.14",
+    "pythonPackages": {
+      "fastapi": "0.162.0",
+      "starlette": "1.9.0",
+      "httpx": "0.28.1",
+      "uvicorn": "0.54.0",
+      "pytest": "9.1.1",
+      "pydantic": "2.14.1"
+    }
+  },
+  "check": {
+    "status": "pass",
+    "build": "pass",
+    "typecheck": "pass",
+    "auditFiles": 183,
+    "unit": {
+      "document": 57,
+      "render": 51,
+      "blog": 77,
+      "editorPorts": 2,
+      "lexical": 238,
+      "total": 425,
+      "fail": 0,
+      "cancelled": 0,
+      "skip": 0
+    },
+    "output": [
+      "packages/editor-ports test: ℹ tests 2",
+      "packages/editor-ports test: ℹ pass 2",
+      "packages/editor-ports test: ℹ fail 0",
+      "packages/editor-ports test: ℹ cancelled 0",
+      "packages/editor-ports test: ℹ skipped 0",
+      "packages/document test: ℹ tests 57",
+      "packages/document test: ℹ pass 57",
+      "packages/document test: ℹ fail 0",
+      "packages/document test: ℹ cancelled 0",
+      "packages/document test: ℹ skipped 0",
+      "packages/render test: ℹ tests 51",
+      "packages/render test: ℹ pass 51",
+      "packages/render test: ℹ fail 0",
+      "packages/render test: ℹ cancelled 0",
+      "packages/render test: ℹ skipped 0",
+      "packages/blog test: ℹ tests 77",
+      "packages/blog test: ℹ pass 77",
+      "packages/blog test: ℹ fail 0",
+      "packages/blog test: ℹ cancelled 0",
+      "packages/blog test: ℹ skipped 0",
+      "packages/lexical test: ℹ tests 238",
+      "packages/lexical test: ℹ pass 238",
+      "packages/lexical test: ℹ fail 0",
+      "packages/lexical test: ℹ cancelled 0",
+      "packages/lexical test: ℹ skipped 0"
+    ]
+  },
+  "package": {
+    "status": "pass",
+    "tarballs": 5,
+    "published": false
+  },
+  "browser": {
+    "total": 35,
+    "pass": 34,
+    "fail": 1,
+    "fileTimeout": 0,
+    "skip": 0,
+    "perFileLimitSeconds": 60,
+    "killAfterSeconds": 3,
+    "rows": [
+      {
+        "file": "all-nodes-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "contextual-ui-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "definition-pairs-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "font-proof-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "full-page-pixel-parity-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "inline-span-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "inline-span-html-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "layout-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "list-kind-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "managed-note-assets-browser.mjs",
+        "exitCode": 1,
+        "status": "fail"
+      },
+      {
+        "file": "note-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "note-dom-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "note-editing-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "note-export-parity-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "note-image-chooser-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "note-image-dimensions-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "publication-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "recovery-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "section-commands-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "server-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "text-format-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-dom-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-full-document-editor-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-full-document-roundtrip-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-full-document-visual-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-full-page-baseline-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-geometry-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-newthought-sidenote-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-same-content-epigraphs-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-same-content-figures-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-same-content-final-sections-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-same-content-fundamentals-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-same-content-getting-started-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-same-content-opening-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      },
+      {
+        "file": "upstream-same-content-sidenotes-browser.mjs",
+        "exitCode": 0,
+        "status": "pass"
+      }
+    ],
+    "failure": {
+      "file": "managed-note-assets-browser.mjs",
+      "reason": "Missing document image asset registration button; deferred A0-A8 UI.",
+      "locatorTimeoutMs": 5000,
+      "output": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nlocator.click: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: '문서 이미지 자산 등록', exact: true })\u001b[22m\n\n    at registerAsset (/workspace/scratch/484e46557938/lexical-tufte-css-test-20261023/tests/managed-note-assets-browser.mjs:47:36)\n    at /workspace/scratch/484e46557938/lexical-tufte-css-test-20261023/tests/managed-note-assets-browser.mjs:51:8 {\n  name: 'TimeoutError'\n}\n\nNode.js v24.19.0\n"
+    }
+  },
+  "official": {
+    "status": "pass",
+    "sections": 9,
+    "blocks": 60,
+    "notes": 7,
+    "widths": [
+      375,
+      759,
+      760,
+      761,
+      1024,
+      1440
+    ],
+    "unmaskedMismatchPixels": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "mask": "Single validated external iframe viewport only",
+    "output": "Pinned full-page pixel parity 375px: exact outside iframe, 9 sections, 5 images, 4 ET Book faces, 7 notes.\nPinned full-page pixel parity 759px: exact outside iframe, 9 sections, 5 images, 4 ET Book faces, 7 notes.\nPinned full-page pixel parity 760px: exact outside iframe, 9 sections, 5 images, 4 ET Book faces, 7 notes.\nPinned full-page pixel parity 761px: exact outside iframe, 9 sections, 5 images, 4 ET Book faces, 7 notes.\nPinned full-page pixel parity 1024px: exact outside iframe, 9 sections, 5 images, 4 ET Book faces, 7 notes.\nPinned full-page pixel parity 1440px: exact outside iframe, 9 sections, 5 images, 4 ET Book faces, 7 notes.\nFull-page RGBA parity asserted beyond one verified iframe mask.\n"
+  },
+  "python": {
+    "status": "pass",
+    "pass": 16,
+    "fail": 0,
+    "skip": 0,
+    "warnings": 1,
+    "output": "============================= test session starts ==============================\nplatform linux -- Python 3.12.14, pytest-9.1.1, pluggy-1.7.0\nrootdir: /workspace/scratch/484e46557938/lexical-tufte-css-test-20261023/apps/recovery-server\nconfigfile: pyproject.toml\nplugins: anyio-4.15.1\ncollected 16 items\n\napps/recovery-server/tests/test_contract.py .........                    [ 56%]\napps/recovery-server/tests/test_host.py ...                              [ 75%]\napps/recovery-server/tests/test_security.py ...                          [ 93%]\napps/recovery-server/tests/test_shared_contract.py .                     [100%]\n\n=============================== warnings summary ===============================\n.venv/lib/python3.12/site-packages/fastapi/testclient.py:1\n  /workspace/scratch/484e46557938/lexical-tufte-css-test-20261023/.venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.\n    from starlette.testclient import TestClient as TestClient  # noqa\n\n-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html\n======================== 16 passed, 1 warning in 0.39s =========================\n"
+  },
+  "http": {
+    "status": "pass",
+    "output": "Actual TypeScript client -> Python HTTP -> SQLite: save/read/list/checksum/CAS/denied access/CSRF/delete PASS.\n"
+  },
+  "publishRevisionProposalModel": {
+    "status": "pass",
+    "groups": 12,
+    "productionStoreCoverage": false,
+    "output": "Publish revision model: 12 assertions groups passed (pure proposal model, NOT production store).\n"
+  },
+  "environmentalAttempts": [
+    {
+      "error": "E004",
+      "result": "Primary CDN returned an invalid ZIP; official installer fallback succeeded."
+    },
+    {
+      "error": "E005",
+      "result": "Explicit full Chromium path failed at singleton socket with Operation not permitted; default pinned headless shell smoke and all browser regressions then ran."
+    }
+  ],
+  "limits": [
+    "Deferred managed asset registration remains one failing test; no test was removed or skipped.",
+    "Physical OS IME, other browsers/screenreaders and external iframe playback were not verified.",
+    "Other branches were fetched for visibility but were not merged or included in this tested commit."
+  ],
+  "ci": "not-run-by-request",
+  "localLogDirectory": "/workspace/scratch/484e46557938/lexical-tufte-verification-20261024",
+  "logs": [
+    {
+      "file": "all-nodes-browser.mjs.log",
+      "bytes": 168,
+      "sha256": "85e730a38c4d22f1cbab86bc533121f9855751ca2b80b65560fc7527cd7b2c46"
+    },
+    {
+      "file": "browser-install.log",
+      "bytes": 10274,
+      "sha256": "a00f7cf2bad243813f560dbc288d6c90f40a95a273ba8346d2ece4a6e7b10ed1"
+    },
+    {
+      "file": "browser-smoke-default.log",
+      "bytes": 63,
+      "sha256": "97833aaf9e806e649fb45c3daa294444ed0906b8094d7e78d13aa0f801bee1b8"
+    },
+    {
+      "file": "browser-smoke.log",
+      "bytes": 4331,
+      "sha256": "258598007f86f75a75c4124ac0d78203a9db54be1628650b4aec9e710b3ca67a"
+    },
+    {
+      "file": "check.log",
+      "bytes": 53863,
+      "sha256": "097dd6768b42e5b45a3272414f51a08c15f01380b28325f6f4ce4c3b61ae4e63"
+    },
+    {
+      "file": "contextual-ui-browser.mjs.log",
+      "bytes": 142,
+      "sha256": "acb046ad3909544ac14d647e186cee4964328326bdfe4578c0ae36a8a42b5cb7"
+    },
+    {
+      "file": "definition-pairs-browser.mjs.log",
+      "bytes": 117,
+      "sha256": "dcbe607645e2be7795a46c293ae808b2ddbfdb655d426b860595e4adb5b21a22"
+    },
+    {
+      "file": "font-proof-browser.mjs.log",
+      "bytes": 1383,
+      "sha256": "9bdc915b36876721e126abe4c1cf9f3cb3ef2e48b85df874721fb8cac1a73885"
+    },
+    {
+      "file": "full-page-pixel-parity-browser.mjs.log",
+      "bytes": 63,
+      "sha256": "97833aaf9e806e649fb45c3daa294444ed0906b8094d7e78d13aa0f801bee1b8"
+    },
+    {
+      "file": "http.log",
+      "bytes": 111,
+      "sha256": "34ec031e9067e8b718f3ebfd97d72270893a0bace86b16fa302ecea8a64612a7"
+    },
+    {
+      "file": "inline-span-browser.mjs.log",
+      "bytes": 217,
+      "sha256": "3e82a821e4d30db4e0394c41b6edcd3c45c6cd342945f4fdbd53aa7828e9465d"
+    },
+    {
+      "file": "inline-span-html-browser.mjs.log",
+      "bytes": 141,
+      "sha256": "c2b97c4b792c48a808a76d86413f7626e0b6307166fb405ddf426a6d6ea2de78"
+    },
+    {
+      "file": "install.log",
+      "bytes": 929,
+      "sha256": "a44cb526d184089bd16c6828d58df6aa1b2bfa25f1c2ac71e2db97477d3564cc"
+    },
+    {
+      "file": "layout-browser.mjs.log",
+      "bytes": 147,
+      "sha256": "bfe3fe2116b3ebaeb57ae2cd05ddc159cc4da26b77ca662d408075e64237fedc"
+    },
+    {
+      "file": "list-kind-browser.mjs.log",
+      "bytes": 124,
+      "sha256": "15c4c1c405ab871c7e0f9732e16ec7bb84ce4ad1c51833b1b4772b3aa97e13ed"
+    },
+    {
+      "file": "managed-note-assets-browser.mjs.log",
+      "bytes": 515,
+      "sha256": "08191e115dee521890f0cd508651ab0763a5d7d89f6329193a4caa1d0db4c1b4"
+    },
+    {
+      "file": "note-browser.mjs.log",
+      "bytes": 138,
+      "sha256": "ea308fc1f545bf643dc89b2a0190e29a067ed7cedca63ee7a3b66b6d2703ae54"
+    },
+    {
+      "file": "note-dom-browser.mjs.log",
+      "bytes": 148,
+      "sha256": "b1e3d6c38aff1c5570195530692acf72a20f8e7eba9e20ab9a880b4221cc1c2b"
+    },
+    {
+      "file": "note-editing-browser.mjs.log",
+      "bytes": 1728,
+      "sha256": "7bbbe929d9ffcf9e137cbf3594577bc515d752629b7c8c2e044d26711bc4827b"
+    },
+    {
+      "file": "note-export-parity-browser.mjs.log",
+      "bytes": 145,
+      "sha256": "1e68ffc10d91409d14879233c64e03965f5cc958499d782040fe5971a7317b1d"
+    },
+    {
+      "file": "note-image-chooser-browser.mjs.log",
+      "bytes": 111,
+      "sha256": "fe35d72fb5bd3e67a55e0157d2dfffe940138db46795dbccc2e1bfaa424994f3"
+    },
+    {
+      "file": "note-image-dimensions-browser.mjs.log",
+      "bytes": 82,
+      "sha256": "b4453e50271770e99ddc48d4f442e27c67b34ae6e1d6671f05b6d403d58d0b1f"
+    },
+    {
+      "file": "package.log",
+      "bytes": 1803,
+      "sha256": "de1125b44d62d019b3951f1f8781848fecc398d0623a5668f103ec524044b583"
+    },
+    {
+      "file": "publication-browser.mjs.log",
+      "bytes": 193,
+      "sha256": "5b37f55c5dedbaad42113d8a8fbfb6a1b14bcd152d93367d4b6af0844630f053"
+    },
+    {
+      "file": "publish-revision-model.log",
+      "bytes": 97,
+      "sha256": "0335599f3a53a5ca42eae6a88f038e8925de7b8552d77628ece28183ba0f090a"
+    },
+    {
+      "file": "python-install.log",
+      "bytes": 7035,
+      "sha256": "fa6b0a29de0143d6518c0b46d6da89d16e3cf56315c6356781561eda22aa25c8"
+    },
+    {
+      "file": "python.log",
+      "bytes": 1228,
+      "sha256": "0511a5d00bd48f18eda372214b86a11c7fcc121fd11f5754576ea1ede9c996e0"
+    },
+    {
+      "file": "recovery-browser.mjs.log",
+      "bytes": 139,
+      "sha256": "8a7b9067c2149c25021b422d5865fe9d5c4d8855594394dde950d7fffceffd09"
+    },
+    {
+      "file": "section-commands-browser.mjs.log",
+      "bytes": 156,
+      "sha256": "7390a1b6f861903338bc65574c727590a51222decaa33d6b14a8c73faf06e799"
+    },
+    {
+      "file": "server-browser.mjs.log",
+      "bytes": 107,
+      "sha256": "32ed579cb7488fa866ea1b85063ac7ff2d7ff89e549268779758ae2383ae7772"
+    },
+    {
+      "file": "text-format-browser.mjs.log",
+      "bytes": 133,
+      "sha256": "2e8122698430c69772c62b70ed180fb8b1eae734836bfa964d3770cc4268af5a"
+    },
+    {
+      "file": "upstream-dom-browser.mjs.log",
+      "bytes": 1660,
+      "sha256": "f42c9b689143c776d0f325d1aa426f2c3f1f87b96d05c1a97635683733a3d071"
+    },
+    {
+      "file": "upstream-full-document-editor-browser.mjs.log",
+      "bytes": 132,
+      "sha256": "a577eb05499e38c136fc832ebe0c601f1c748137ec3a7b8006e2d371168b2683"
+    },
+    {
+      "file": "upstream-full-document-roundtrip-browser.mjs.log",
+      "bytes": 173,
+      "sha256": "e8dd0d52fbf7e0388446b5f42b108c06888ca7c15985f2e6d787430c3a16bb4c"
+    },
+    {
+      "file": "upstream-full-document-visual-browser.mjs.log",
+      "bytes": 708,
+      "sha256": "6b0365da6d5fd56efc7bc4259a43ce70e297559b4ace2c1f15cbd0ef796c9304"
+    },
+    {
+      "file": "upstream-full-page-baseline-browser.mjs.log",
+      "bytes": 2712,
+      "sha256": "bd4eda65eff6993aec1df52b39cf0b266a240bc9c96fd3969eba28696a24e94d"
+    },
+    {
+      "file": "upstream-geometry-browser.mjs.log",
+      "bytes": 5156,
+      "sha256": "afbcf842b1c100f8f74968abe835bf159598a467ee5d3aff1a0ed1a03d74b726"
+    },
+    {
+      "file": "upstream-newthought-sidenote-browser.mjs.log",
+      "bytes": 97,
+      "sha256": "02ac853f7789de63ff8329b25369c625c7aab0d81335f475243ab024838d9100"
+    },
+    {
+      "file": "upstream-same-content-epigraphs-browser.mjs.log",
+      "bytes": 137,
+      "sha256": "9392144922f7b983c71de03768e5ed78cb7f9249960673f59c56cc67d42e74da"
+    },
+    {
+      "file": "upstream-same-content-figures-browser.mjs.log",
+      "bytes": 143,
+      "sha256": "10e159b95d98382bda19e9bad6977208ee72f9c2590d2fc21cbd8e8c9733f65b"
+    },
+    {
+      "file": "upstream-same-content-final-sections-browser.mjs.log",
+      "bytes": 142,
+      "sha256": "dde6932b05ce965e7483cae4c34729eaf5ab9926104015d898bcc4ec51b8ffd6"
+    },
+    {
+      "file": "upstream-same-content-fundamentals-browser.mjs.log",
+      "bytes": 155,
+      "sha256": "8534ed7de271c6101f52419a71ba851f8b486d0b6da1683d9994a2f925a8c686"
+    },
+    {
+      "file": "upstream-same-content-getting-started-browser.mjs.log",
+      "bytes": 99,
+      "sha256": "443c9a02c83e85b53ab54313eb7a995c4902f0630488aae22b1e5e8f1b7b24f9"
+    },
+    {
+      "file": "upstream-same-content-opening-browser.mjs.log",
+      "bytes": 79,
+      "sha256": "ea45882015ab1712ab8e0b34c329649f818355e8ba644cb65c7a6e8d7de81779"
+    },
+    {
+      "file": "upstream-same-content-sidenotes-browser.mjs.log",
+      "bytes": 222,
+      "sha256": "dce51c3af4be98f1b660261a57ee354078c76b7cc07941dd50fa9b0c4a3df318"
+    }
+  ]
+}
