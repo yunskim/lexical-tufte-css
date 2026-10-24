@@ -20,7 +20,7 @@ Run locally as one coordinated verification batch; do **not** trigger CI.
 ## Added regression
 
 - `tests/editor-invalid-restore-browser.mjs`: malformed persisted JSON, invalid Lexical root, unchanged live state, undo/redo, continued editing, save and reopen.
-- `tests/editor-invalid-structure-save-browser.mjs`: malformed live structure cannot overwrite the canonical saved document; verify the fixture truly reaches the inspector.
+- `tests/editor-invalid-structure-save-browser.mjs`: image-less figure must reach the live structure inspector; manual invalid Save must preserve canonical bytes, create a v2:manual recovery snapshot, expose it immediately, and allow reopening in the same tab.
 - `tests/editor-recovery-isolation-browser.mjs`: explicit restore, cancel, selective delete, remaining copy, and corrupted sibling isolation.
 - `tests/editor-autosave-isolation-browser.mjs`: debounced automatic recovery does not overwrite manual canonical storage.
 - `tests/run-editor-recovery-regressions.mjs`: opt-in runner for all four recovery suites.
@@ -46,4 +46,4 @@ As of this branch, `examples/editor/src/main.tsx` exposes a read-only JSON/HTML 
 - The undo/redo assertions in the invalid-restore test may depend on Lexical history grouping. Confirm history boundaries in the real browser before treating a failure as an application defect.
 - The auto-save test depends on an 800 ms debounce; wait for the specific saved marker rather than assuming a fixed delay.
 
-On 2026-10-24, this chat environment has Node 22 but no pnpm or checkout; GitHub clone failed with DNS resolution error (`Could not resolve host: github.com`). GitHub connector permitted code review and fixes only. **No local build/browser tests or CI were executed**. Current work remains unverified until a checkout with dependencies is available.
+On 2026-10-24/25, this chat environment has Node 22 but no pnpm or checkout; GitHub clone failed with DNS resolution error (`Could not resolve host: github.com`). GitHub connector permitted code review and fixes only. **No local build/browser tests or CI were executed**. Current work remains unverified until a checkout with dependencies is available.
