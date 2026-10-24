@@ -26,35 +26,38 @@ try {
  await page.getByRole('button',{name:'저장',exact:true}).click();
  const original=await page.evaluate(()=>localStorage.getItem('lexical-tufte-p1'));
  assert.ok(original?.includes('KNOWN-GOOD-SAVE'));
- // Load a deliberately invalid but parseable document, with a paragraph at
- // the root of a section-only document. This exercises the actual structure
- // inspector and the Save action rather than a mocked storage implementation.
+ // The structure inspector checks children of sections, figures and table
+ // layouts, not arbitrary root children. Create a parseable figure with a
+ // caption but no image: this must report INVALID_FIGURE.
  const invalid=JSON.parse(original);
- invalid.root.children.push({
-  type:'tufte-sidenote',version:1,noteId:'invalid-root-note',
-  children:[{type:'text',version:1,text:'INVALID-STRUCTURE',
-   format:0,detail:0,mode:'normal',style:''}],
-  direction:null,format:'',indent:0
+ const section=invalid.root.children.find(child=>child.type==='tufte-section');
+ assert.ok(section,'Fixture requires a serialized section');
+ section.children.push({
+  type:'tufte-figure',version:1,width:'body',
+  direction:null,format:'',indent:0,
+  children:[{
+   type:'tufte-caption',version:1,direction:null,format:'',indent:0,
+   children:[{type:'text',version:1,text:'INVALID-STRUCTURE',
+    format:0,detail:0,mode:'normal',style:''}]
+  }]
  });
  await page.evaluate(value=>localStorage.setItem('lexical-tufte-p1',value),JSON.stringify(invalid));
  await page.getByRole('button',{name:'불러오기',exact:true}).click();
- // Restore the known-good saved bytes before exercising Save on the bad
- // live state. A rejected invalid document is also an acceptable outcome.
- await page.evaluate(value=>localStorage.setItem('lexical-tufte-p1',value),original);
+ // This test specifically covers invalid *live* structure. A rejected parse
+ // is covered by editor-invalid-restore-browser.mjs and is not a pass here.
  const alert=page.getByRole('alert',{name:'문서 구조 복구'});
- if(await alert.count()){
-  await page.getByRole('button',{name:'저장',exact:true}).click();
-  assert.equal(await page.evaluate(()=>localStorage.getItem('lexical-tufte-p1')),original,
-   'Invalid live structure must not overwrite last valid save');
-  const recovery=await page.evaluate(()=>localStorage.getItem('lexical-tufte-recovery-v1'));
-  assert.ok(recovery?.includes('INVALID-STRUCTURE'),
-   'Invalid live structure must be preserved in recovery storage');
-  assert.match(await page.getByRole('status',{name:'편집 작업 상태'}).innerText(),/복구용 사본/);
- }else{
-  assert.equal(await page.evaluate(()=>localStorage.getItem('lexical-tufte-p1')),original);
-  assert.doesNotMatch(await editor.innerText(),/INVALID-STRUCTURE/,
-   'Invalid import must be rejected if no structure warning is shown');
- }
+ await alert.waitFor({state:'visible'});
+ assert.match(await alert.innerText(),/그림은 이미지 하나로 시작/);
+ assert.match(await editor.innerText(),/INVALID-STRUCTURE/);
+ // Restore the canonical bytes in storage without changing the live document.
+ await page.evaluate(value=>localStorage.setItem('lexical-tufte-p1',value),original);
+ await page.getByRole('button',{name:'저장',exact:true}).click();
+ assert.equal(await page.evaluate(()=>localStorage.getItem('lexical-tufte-p1')),original,
+  'Invalid live structure must not overwrite last valid save');
+ const recovery=await page.evaluate(()=>localStorage.getItem('lexical-tufte-recovery-v1'));
+ assert.ok(recovery?.includes('INVALID-STRUCTURE'),
+  'Invalid live structure must be preserved in recovery storage');
+ assert.match(await page.getByRole('status',{name:'편집 작업 상태'}).innerText(),/복구용 사본/);
  assert.deepEqual(errors,[]);
  console.log('Invalid structure save isolation: valid document protected.');
 }finally{await browser?.close();server?.kill();}
