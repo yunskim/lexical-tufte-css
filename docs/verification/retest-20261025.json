@@ -1,0 +1,569 @@
+{
+  "date": "2026-10-25",
+  "timezone": "Asia/Seoul",
+  "testedCommit": "25d899540dabe36c6aa5dd164ce09b73424a195b",
+  "branch": "fix/main-browser-parity-20261023",
+  "node": "24.22.1",
+  "pnpm": "11.25.0",
+  "ci": "not-run",
+  "frozenInstall": "pass",
+  "build": "pass",
+  "typecheck": "pass",
+  "unit": {
+    "pass": 425,
+    "fail": 0,
+    "skip": 0
+  },
+  "package": {
+    "tarballs": 5,
+    "status": "pass"
+  },
+  "python": {
+    "pass": 16,
+    "fail": 0,
+    "skip": 0,
+    "warnings": 1
+  },
+  "http": "pass",
+  "proposalModel": {
+    "groups": 12,
+    "status": "pass",
+    "productionStoreCoverage": false
+  },
+  "browser": {
+    "pass": 34,
+    "fail": 1,
+    "skip": 0,
+    "fileTimeout": 0,
+    "rows": [
+      {
+        "file": "all-nodes-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "contextual-ui-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "definition-pairs-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "font-proof-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "full-page-pixel-parity-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "inline-span-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "inline-span-html-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "layout-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "list-kind-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "managed-note-assets-browser.mjs",
+        "exitCode": 1
+      },
+      {
+        "file": "note-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "note-dom-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "note-editing-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "note-export-parity-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "note-image-chooser-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "note-image-dimensions-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "publication-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "recovery-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "section-commands-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "server-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "text-format-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-dom-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-full-document-editor-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-full-document-roundtrip-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-full-document-visual-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-full-page-baseline-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-geometry-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-newthought-sidenote-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-same-content-epigraphs-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-same-content-figures-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-same-content-final-sections-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-same-content-fundamentals-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-same-content-getting-started-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-same-content-opening-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-same-content-sidenotes-browser.mjs",
+        "exitCode": 0
+      }
+    ]
+  },
+  "pixels": [
+    {
+      "width": 375,
+      "mask": {
+        "x": 30,
+        "y": 12188.046875,
+        "width": 283.5,
+        "height": 202.1875
+      },
+      "dimensions": {
+        "upstream": [
+          375,
+          15247
+        ],
+        "published": [
+          375,
+          15247
+        ]
+      },
+      "dimensionsMatch": true,
+      "totalPixels": 5717625,
+      "maskedPixels": 56883,
+      "maskedMismatchPixels": 0,
+      "unmaskedMismatchPixels": 0,
+      "maxChannelDelta": 0,
+      "mismatchBounds": null,
+      "firstDifferences": []
+    },
+    {
+      "width": 759,
+      "mask": {
+        "x": 60.71875,
+        "y": 7897.890625,
+        "width": 573.78125,
+        "height": 383.609375
+      },
+      "dimensions": {
+        "upstream": [
+          759,
+          10948
+        ],
+        "published": [
+          759,
+          10948
+        ]
+      },
+      "dimensionsMatch": true,
+      "totalPixels": 8309532,
+      "maskedPixels": 219459,
+      "maskedMismatchPixels": 0,
+      "unmaskedMismatchPixels": 0,
+      "maxChannelDelta": 0,
+      "mismatchBounds": null,
+      "firstDifferences": []
+    },
+    {
+      "width": 760,
+      "mask": {
+        "x": 60.796875,
+        "y": 7898.8125,
+        "width": 574.546875,
+        "height": 384.09375
+      },
+      "dimensions": {
+        "upstream": [
+          760,
+          10950
+        ],
+        "published": [
+          760,
+          10950
+        ]
+      },
+      "dimensionsMatch": true,
+      "totalPixels": 8322000,
+      "maskedPixels": 219842,
+      "maskedMismatchPixels": 0,
+      "unmaskedMismatchPixels": 0,
+      "maxChannelDelta": 0,
+      "mismatchBounds": null,
+      "firstDifferences": []
+    },
+    {
+      "width": 761,
+      "mask": {
+        "x": 95.125,
+        "y": 10855.0625,
+        "width": 366.21875,
+        "height": 399.546875
+      },
+      "dimensions": {
+        "upstream": [
+          761,
+          14211
+        ],
+        "published": [
+          761,
+          14211
+        ]
+      },
+      "dimensionsMatch": true,
+      "totalPixels": 10814571,
+      "maskedPixels": 145270,
+      "maskedMismatchPixels": 0,
+      "unmaskedMismatchPixels": 0,
+      "maxChannelDelta": 0,
+      "mismatchBounds": null,
+      "firstDifferences": []
+    },
+    {
+      "width": 1024,
+      "mask": {
+        "x": 128,
+        "y": 9166.453125,
+        "width": 492.796875,
+        "height": 529
+      },
+      "dimensions": {
+        "upstream": [
+          1024,
+          12587
+        ],
+        "published": [
+          1024,
+          12587
+        ]
+      },
+      "dimensionsMatch": true,
+      "totalPixels": 12889088,
+      "maskedPixels": 259776,
+      "maskedMismatchPixels": 0,
+      "unmaskedMismatchPixels": 0,
+      "maxChannelDelta": 0,
+      "mismatchBounds": null,
+      "firstDifferences": []
+    },
+    {
+      "width": 1440,
+      "mask": {
+        "x": 180,
+        "y": 7842.96875,
+        "width": 693,
+        "height": 733.75
+      },
+      "dimensions": {
+        "upstream": [
+          1440,
+          11630
+        ],
+        "published": [
+          1440,
+          11630
+        ]
+      },
+      "dimensionsMatch": true,
+      "totalPixels": 16747200,
+      "maskedPixels": 507969,
+      "maskedMismatchPixels": 0,
+      "unmaskedMismatchPixels": 0,
+      "maxChannelDelta": 0,
+      "mismatchBounds": null,
+      "firstDifferences": []
+    }
+  ],
+  "environment": "Pinned Playwright 1.51.1 shell v1161 installed via official fallback after E004 invalid ZIP; default smoke passed; E005 not repeated.",
+  "unresolved": "Deferred document image asset registration UI missing; 5000ms locator timeout; test retained unchanged.",
+  "logs": [
+    {
+      "file": "all-nodes-browser.mjs.log",
+      "sha256": "85e730a38c4d22f1cbab86bc533121f9855751ca2b80b65560fc7527cd7b2c46",
+      "bytes": 168
+    },
+    {
+      "file": "browser-install.log",
+      "sha256": "57074ada3ed3b5f0cd77ede0e82f2e391f683424f6645ad68796a81a58280a74",
+      "bytes": 6932
+    },
+    {
+      "file": "check.log",
+      "sha256": "a8f366a0c960573eea8e8e7b7fb086a801adcb984c3945890740de0332570401",
+      "bytes": 53858
+    },
+    {
+      "file": "contextual-ui-browser.mjs.log",
+      "sha256": "acb046ad3909544ac14d647e186cee4964328326bdfe4578c0ae36a8a42b5cb7",
+      "bytes": 142
+    },
+    {
+      "file": "definition-pairs-browser.mjs.log",
+      "sha256": "dcbe607645e2be7795a46c293ae808b2ddbfdb655d426b860595e4adb5b21a22",
+      "bytes": 117
+    },
+    {
+      "file": "font-proof-browser.mjs.log",
+      "sha256": "9bdc915b36876721e126abe4c1cf9f3cb3ef2e48b85df874721fb8cac1a73885",
+      "bytes": 1383
+    },
+    {
+      "file": "full-page-pixel-parity-browser.mjs.log",
+      "sha256": "97833aaf9e806e649fb45c3daa294444ed0906b8094d7e78d13aa0f801bee1b8",
+      "bytes": 63
+    },
+    {
+      "file": "http.log",
+      "sha256": "34ec031e9067e8b718f3ebfd97d72270893a0bace86b16fa302ecea8a64612a7",
+      "bytes": 111
+    },
+    {
+      "file": "inline-span-browser.mjs.log",
+      "sha256": "3e82a821e4d30db4e0394c41b6edcd3c45c6cd342945f4fdbd53aa7828e9465d",
+      "bytes": 217
+    },
+    {
+      "file": "inline-span-html-browser.mjs.log",
+      "sha256": "c2b97c4b792c48a808a76d86413f7626e0b6307166fb405ddf426a6d6ea2de78",
+      "bytes": 141
+    },
+    {
+      "file": "install.log",
+      "sha256": "c4f1115a63d0eacf43cbb05bc7431b6d177c4f21c6710d2afc45ded4abac47c0",
+      "bytes": 929
+    },
+    {
+      "file": "layout-browser.mjs.log",
+      "sha256": "bfe3fe2116b3ebaeb57ae2cd05ddc159cc4da26b77ca662d408075e64237fedc",
+      "bytes": 147
+    },
+    {
+      "file": "list-kind-browser.mjs.log",
+      "sha256": "15c4c1c405ab871c7e0f9732e16ec7bb84ce4ad1c51833b1b4772b3aa97e13ed",
+      "bytes": 124
+    },
+    {
+      "file": "managed-note-assets-browser.mjs.log",
+      "sha256": "73551277edf51c54d2ba7d0287db4fb7f3b63b5b0cfa40667ac353ed3b93842a",
+      "bytes": 515
+    },
+    {
+      "file": "model.log",
+      "sha256": "0335599f3a53a5ca42eae6a88f038e8925de7b8552d77628ece28183ba0f090a",
+      "bytes": 97
+    },
+    {
+      "file": "note-browser.mjs.log",
+      "sha256": "ea308fc1f545bf643dc89b2a0190e29a067ed7cedca63ee7a3b66b6d2703ae54",
+      "bytes": 138
+    },
+    {
+      "file": "note-dom-browser.mjs.log",
+      "sha256": "b1e3d6c38aff1c5570195530692acf72a20f8e7eba9e20ab9a880b4221cc1c2b",
+      "bytes": 148
+    },
+    {
+      "file": "note-editing-browser.mjs.log",
+      "sha256": "7bbbe929d9ffcf9e137cbf3594577bc515d752629b7c8c2e044d26711bc4827b",
+      "bytes": 1728
+    },
+    {
+      "file": "note-export-parity-browser.mjs.log",
+      "sha256": "1e68ffc10d91409d14879233c64e03965f5cc958499d782040fe5971a7317b1d",
+      "bytes": 145
+    },
+    {
+      "file": "note-image-chooser-browser.mjs.log",
+      "sha256": "fe35d72fb5bd3e67a55e0157d2dfffe940138db46795dbccc2e1bfaa424994f3",
+      "bytes": 111
+    },
+    {
+      "file": "note-image-dimensions-browser.mjs.log",
+      "sha256": "b4453e50271770e99ddc48d4f442e27c67b34ae6e1d6671f05b6d403d58d0b1f",
+      "bytes": 82
+    },
+    {
+      "file": "package.log",
+      "sha256": "0b4fffcb08ba2ef5c7ac10feef19bfa536effc13d8b5181b3618480a8d347d67",
+      "bytes": 1803
+    },
+    {
+      "file": "publication-browser.mjs.log",
+      "sha256": "5b37f55c5dedbaad42113d8a8fbfb6a1b14bcd152d93367d4b6af0844630f053",
+      "bytes": 193
+    },
+    {
+      "file": "python-install.log",
+      "sha256": "4e759ed7a1b15714b8aa7d7635ba866a57e983bcc8c68b84e70b181a445b12e5",
+      "bytes": 5028
+    },
+    {
+      "file": "python.log",
+      "sha256": "a02eb9bd6369241a21205e1ba65e7967566117bfcc6b3aedba3fae79b1b19db2",
+      "bytes": 1228
+    },
+    {
+      "file": "recovery-browser.mjs.log",
+      "sha256": "8a7b9067c2149c25021b422d5865fe9d5c4d8855594394dde950d7fffceffd09",
+      "bytes": 139
+    },
+    {
+      "file": "section-commands-browser.mjs.log",
+      "sha256": "7390a1b6f861903338bc65574c727590a51222decaa33d6b14a8c73faf06e799",
+      "bytes": 156
+    },
+    {
+      "file": "server-browser.mjs.log",
+      "sha256": "32ed579cb7488fa866ea1b85063ac7ff2d7ff89e549268779758ae2383ae7772",
+      "bytes": 107
+    },
+    {
+      "file": "smoke.log",
+      "sha256": "97833aaf9e806e649fb45c3daa294444ed0906b8094d7e78d13aa0f801bee1b8",
+      "bytes": 63
+    },
+    {
+      "file": "text-format-browser.mjs.log",
+      "sha256": "2e8122698430c69772c62b70ed180fb8b1eae734836bfa964d3770cc4268af5a",
+      "bytes": 133
+    },
+    {
+      "file": "upstream-dom-browser.mjs.log",
+      "sha256": "f42c9b689143c776d0f325d1aa426f2c3f1f87b96d05c1a97635683733a3d071",
+      "bytes": 1660
+    },
+    {
+      "file": "upstream-full-document-editor-browser.mjs.log",
+      "sha256": "a577eb05499e38c136fc832ebe0c601f1c748137ec3a7b8006e2d371168b2683",
+      "bytes": 132
+    },
+    {
+      "file": "upstream-full-document-roundtrip-browser.mjs.log",
+      "sha256": "e8dd0d52fbf7e0388446b5f42b108c06888ca7c15985f2e6d787430c3a16bb4c",
+      "bytes": 173
+    },
+    {
+      "file": "upstream-full-document-visual-browser.mjs.log",
+      "sha256": "6b0365da6d5fd56efc7bc4259a43ce70e297559b4ace2c1f15cbd0ef796c9304",
+      "bytes": 708
+    },
+    {
+      "file": "upstream-full-page-baseline-browser.mjs.log",
+      "sha256": "bd4eda65eff6993aec1df52b39cf0b266a240bc9c96fd3969eba28696a24e94d",
+      "bytes": 2712
+    },
+    {
+      "file": "upstream-geometry-browser.mjs.log",
+      "sha256": "afbcf842b1c100f8f74968abe835bf159598a467ee5d3aff1a0ed1a03d74b726",
+      "bytes": 5156
+    },
+    {
+      "file": "upstream-newthought-sidenote-browser.mjs.log",
+      "sha256": "02ac853f7789de63ff8329b25369c625c7aab0d81335f475243ab024838d9100",
+      "bytes": 97
+    },
+    {
+      "file": "upstream-same-content-epigraphs-browser.mjs.log",
+      "sha256": "9392144922f7b983c71de03768e5ed78cb7f9249960673f59c56cc67d42e74da",
+      "bytes": 137
+    },
+    {
+      "file": "upstream-same-content-figures-browser.mjs.log",
+      "sha256": "10e159b95d98382bda19e9bad6977208ee72f9c2590d2fc21cbd8e8c9733f65b",
+      "bytes": 143
+    },
+    {
+      "file": "upstream-same-content-final-sections-browser.mjs.log",
+      "sha256": "dde6932b05ce965e7483cae4c34729eaf5ab9926104015d898bcc4ec51b8ffd6",
+      "bytes": 142
+    },
+    {
+      "file": "upstream-same-content-fundamentals-browser.mjs.log",
+      "sha256": "8534ed7de271c6101f52419a71ba851f8b486d0b6da1683d9994a2f925a8c686",
+      "bytes": 155
+    },
+    {
+      "file": "upstream-same-content-getting-started-browser.mjs.log",
+      "sha256": "443c9a02c83e85b53ab54313eb7a995c4902f0630488aae22b1e5e8f1b7b24f9",
+      "bytes": 99
+    },
+    {
+      "file": "upstream-same-content-opening-browser.mjs.log",
+      "sha256": "ea45882015ab1712ab8e0b34c329649f818355e8ba644cb65c7a6e8d7de81779",
+      "bytes": 79
+    },
+    {
+      "file": "upstream-same-content-sidenotes-browser.mjs.log",
+      "sha256": "dce51c3af4be98f1b660261a57ee354078c76b7cc07941dd50fa9b0c4a3df318",
+      "bytes": 222
+    }
+  ]
+}

@@ -1,5 +1,11 @@
 # 재발 방지 대책 및 정기 점검
 
+## 2026-10-25 전체 회귀 재실행 점검
+
+기준 `25d8995`: check425·package5·Python16/HTTP·제안 모델12그룹 통과. browser34/35통과(보류 자산 등록1실패, 파일timeout·skip0), 공식6폭 mask 밖 pixel차이0. E004는 공식 설치기 fallback으로 완화, M004의 설치 완료→기본 shell smoke→전체 회귀를 적용해 E005 재발 없음. E124/M113의 동일 venv 지정 적용. 두 오류 문서 전체 기록·상태를 재점검했고 미구현 자산/OS IME 등의 제한은 유지한다. [실행 보고서](VERIFICATION_RETEST_2026-10-25.ko.md). 다음 기능 작업 시작·완료 및 환경 변경 시 재점검. CI 생략.
+
+
+
 ## 2026-10-24 E004/E005 재발 후 전체 기록 점검 및 M004 보강
 
 두 문서의 전체 기록/상태를 점검했다. 기존 단위·브라우저 결과가 이전 환경의 open/mitigated 범위를 일괄 해결하지 않도록 과거 이력은 유지한다. E004 설치기 fallback 성공과 E005 실행 경로 실패를 구분했고, E124/M113에 따라 pytest와 HTTP에 같은 venv를 지정했다. check425·package5·Python16/HTTP·모델12그룹 통과, browser34/35통과(보류 자산1실패, 파일timeout·skip0), 공식6폭 pixel·note-dom 통과. [실행 보고서](VERIFICATION_REMAINING_TESTS_2026-10-24.ko.md). CI 생략.

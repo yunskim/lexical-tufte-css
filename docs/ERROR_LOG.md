@@ -1,5 +1,11 @@
 # 에러 기록
 
+## 2026-10-25 전체 회귀 재실행 점검
+
+기준 `25d8995`: check425·package5·Python16/HTTP·제안 모델12그룹 통과. browser34/35통과(보류 자산 등록1실패, 파일timeout·skip0), 공식6폭 mask 밖 pixel차이0. E004는 공식 설치기 fallback으로 완화, M004의 설치 완료→기본 shell smoke→전체 회귀를 적용해 E005 재발 없음. E124/M113의 동일 venv 지정 적용. 두 오류 문서 전체 기록·상태를 재점검했고 미구현 자산/OS IME 등의 제한은 유지한다. [실행 보고서](VERIFICATION_RETEST_2026-10-25.ko.md). 다음 기능 작업 시작·완료 및 환경 변경 시 재점검. CI 생략.
+
+
+
 ## 2026-10-24 잔여 회귀 실행 및 E004/E005 재발 점검
 
 검증 기준 `7636a98`: check425개·package5개·Python16/HTTP·발행 제안 모델12그룹 통과. browser34/35 통과, 유일한 실패는 기존 보류된 문서 이미지 자산 등록 버튼 부재다. 파일timeout·skip0. 공식6폭 pixel 대조와 note-dom 통과. [실행 증거](VERIFICATION_REMAINING_TESTS_2026-10-24.ko.md), [JSON](verification/remaining-tests-20261024.json). CI 생략.
