@@ -774,3 +774,10 @@ E001–E049/M001–M042를 검토했다. E024의 경계 입력은 실제 Chromiu
 - 발견: 잘못된 JSON/루트 불러오기 회귀에서 `JSON·HTML 확인` 버튼을 누르는 snapshot 헬퍼가 `status`를 덮어쓴 뒤 `불러오지 못했습니다`를 기대했다. E068/M061과 같은 관측 순서 오류 재발이다.
 - 처리: 각 불러오기 실패 직후 사용자 오류 메시지를 먼저 확인하고, 그 다음 export snapshot을 비교한다.
 - 상태: 코드 수정, 브라우저 **미실행**. 테스트 결과로 성공을 주장하지 않는다.
+
+## E075 — 수동 무효 구조 저장본이 현재 복구 UI에서 바로 보이지 않음
+
+- 발견: 2026-10-25 저장 경로 정적 대조. `save()`와 `recoverStructure()`는 `lexical-tufte-recovery-v1`에 JSON을 저장했으나, `restoreRecovery()`와 `deleteRecovery()`는 `lexical-tufte-recovery-v2:` 접두사만 조회했다. v1→v2 이관은 초기 mount에서만 실행되므로, 같은 탭에서 수동 저장한 복구본이 선택 목록에 즉시 나타나지 않았다.
+- 처리: 수동 무효 구조 저장과 정상 checkpoint 복구 직전 보존 경로를 공유 `storeManualRecoverySnapshot()`으로 통일했다. 새 복구본은 고유 `v2:manual-<uuid>` 키에 `{savedAt,state}`로 저장하고 UI 사용 가능 상태를 즉시 갱신한다. 기존 v1 데이터는 초기 이관 경로로 호환 유지한다.
+- 회귀: `editor-invalid-structure-save-browser.mjs`에서 유효 정본 불변성, 이미지 없는 figure 내용 보존, 즉시 복구 버튼 사용과 같은 탭 재열기를 검사한다. Lexical의 역직렬화 결과를 입력 JSON과 무조건 deep-equal로 비교하지 않는다.
+- 상태: **코드 반영, 실제 브라우저 미검증.** CI 미실행. 로컬 환경의 저장소/DNS 및 의존성 설치 차단으로 실행 결과는 아직 없다.
