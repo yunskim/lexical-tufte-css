@@ -44,10 +44,10 @@ try {
  const acceptRecoveryDialog=(selectedKey,confirm=true)=>{
   const handler=dialog=>{
    if(dialog.type()==='prompt'){
-    const line=dialog.message().split('\\n')
+    const line=dialog.message().split('\n')
      .find(row=>row.includes('· '+selectedKey.slice(-8)));
     assert.ok(line,'Recovery picker did not contain '+selectedKey);
-    const index=line.match(/^\\s*(\\d+):/)?.[1];
+    const index=line.match(/^\s*(\d+):/)?.[1];
     assert.ok(index,'Recovery picker did not display a valid index');
     return dialog.accept(index);
    }
