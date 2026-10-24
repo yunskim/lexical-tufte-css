@@ -40,10 +40,10 @@ As of this branch, `examples/editor/src/main.tsx` exposes a read-only JSON/HTML 
 
 ## Known pre-run review risks
 
-- The invalid-structure fixture uses a synthetic `tufte-sidenote` root child. Confirm that Lexical parsing accepts it and that the structure inspector reports an issue. A rejected import alone does **not** prove the invalid-live-save branch; replace the fixture if necessary.
-- The recovery isolation test injects a synthetic storage event. Verify that the UI refresh listener responds and that no unrelated automatic session snapshot changes the ordering or count of recovery entries.
-- The first recovery cancel path may have only a confirmation dialog when one snapshot exists. Ensure the test distinguishes confirmation cancellation from multi-snapshot selection cancellation.
+- The invalid-structure fixture now inserts an image-less figure in a section and requires the inspector warning. Verify actual Lexical parsing, UI diagnostics, and recovery-only persistence. Import rejection alone does **not** pass this test.
+- The recovery isolation test injects a synthetic storage event and selects snapshots by their displayed key suffix, regardless of unrelated automatic session snapshots. Verify browser dialog handling and the storage refresh listener.
+- The first recovery cancel path may show a single confirmation or a multi-snapshot prompt. Both cancellation paths must preserve the document.
 - The undo/redo assertions in the invalid-restore test may depend on Lexical history grouping. Confirm history boundaries in the real browser before treating a failure as an application defect.
 - The auto-save test depends on an 800 ms debounce; wait for the specific saved marker rather than assuming a fixed delay.
 
-No tests, build, or CI have been executed as part of this preparation.
+On 2026-10-24, this chat environment has Node 22 but no pnpm or checkout; GitHub clone failed with DNS resolution error (`Could not resolve host: github.com`). GitHub connector permitted code review and fixes only. **No local build/browser tests or CI were executed**. Current work remains unverified until a checkout with dependencies is available.
