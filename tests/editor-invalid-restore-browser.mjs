@@ -30,7 +30,9 @@ try {
  await editor.click();await page.keyboard.press('Control+End');
  await page.keyboard.insertText('KEEP-LIVE-EDITOR');
  const before=await snapshot();
- // Establish an actual undoable edit before attempting rejected imports.
+ // Establish a separate history step before rejected imports. Lexical may
+ // merge nearby text insertions within its default 1-second history window.
+ await page.waitForTimeout(1200);
  await editor.click();await page.keyboard.press('Control+End');
  await page.keyboard.insertText(' HISTORY-MARKER');
  const historyState=await snapshot();
