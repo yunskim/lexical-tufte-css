@@ -32,3 +32,9 @@
 - 정본 renderer: 세 구조의 무효 JSON에 대해 전체 발행 차단과 원본 불변성.
 
 2026-10-16 실행: check187/187(document47·lexical112·render28, 실패·skip0), browser7, diff check 통과. CI는 생략했다. OS 실제 IME/다른 브라우저/전체 접근성 검증은 P6에 남는다.
+
+## 2026-10-25 호환성 보완 (실행 검증 대기)
+
+위의 `lexical-tufte-recovery-v1` 및 마지막 사본 하나의 설명은 R05 최초 구현 시점의 계약이다. 현재는 자동 복구 저장의 다중 `lexical-tufte-recovery-v2:<session>` 형식을 사용한다. 수동 무효 구조 저장과 '마지막 정상 구조로 복구' 직전 보존도 `lexical-tufte-recovery-v2:manual-<uuid>`에 `{savedAt,state}`로 남긴다. 이로써 같은 탭에서 즉시 복구본을 선택할 수 있게 한다. 기존 v1 데이터는 초기 진입 시 `v2:legacy`로 이관하는 호환 경로를 유지한다.
+
+정본인 `lexical-tufte-p1`은 무효 구조 저장으로 덮어쓰지 않는다. 새 동작의 브라우저 회귀는 추가했으나 **이 변경에 대한 실행 결과는 아직 없다**.
