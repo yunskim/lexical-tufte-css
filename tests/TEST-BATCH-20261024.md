@@ -20,10 +20,11 @@ Run locally as one coordinated verification batch; do **not** trigger CI.
 ## Added regression
 
 - `tests/editor-invalid-restore-browser.mjs`: malformed persisted JSON, invalid Lexical root, unchanged live state, undo/redo, continued editing, save and reopen.
-- `tests/editor-invalid-structure-save-browser.mjs`: image-less figure must reach the live structure inspector; manual invalid Save must preserve canonical bytes, create a v2:manual recovery snapshot, expose it immediately, and allow reopening in the same tab.
+- `tests/editor-invalid-structure-save-browser.mjs`: load the real section layout fixture first (the default editor seed is a root paragraph), then inject an image-less figure. The inspector must report INVALID_FIGURE; manual invalid Save must preserve canonical bytes, create a v2:manual snapshot, expose it immediately, and allow reopening in the same tab.
 - `tests/editor-recovery-isolation-browser.mjs`: explicit restore, cancel, selective delete, remaining copy, and corrupted sibling isolation.
 - `tests/editor-autosave-isolation-browser.mjs`: debounced automatic recovery does not overwrite manual canonical storage.
-- `tests/run-editor-recovery-regressions.mjs`: opt-in runner for all four recovery suites.
+- `tests/editor-legacy-recovery-migration-browser.mjs`: verify old v1 snapshots migrate once to v2:legacy, retain their exact payload, remain selectable, and leave canonical storage untouched.
+- `tests/run-editor-recovery-regressions.mjs`: opt-in runner for all five recovery suites.
 - These tests are intentionally not part of `package.json`'s automatic scripts yet. Review failures before wiring it into the regular browser suite.
 - The persisted JSON restore boundary is **not** an HTML import boundary.
 
