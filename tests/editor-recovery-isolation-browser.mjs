@@ -34,19 +34,29 @@ try {
  })(recovered.root);
  assert.ok(textNode,'Fixture requires an editable text node');
  textNode.text+=' RECOVERY-ONLY';
- // Wait for the initial editor update's debounced autosave to complete
- // before installing deterministic recovery fixtures.
- await page.waitForFunction(()=>Object.entries(localStorage).some(([key,value])=>
-  key.startsWith('lexical-tufte-recovery-v2:')&&value.includes('CANONICAL-BASELINE')
- ),null,{timeout:10000});
+ // Recovery fixtures use future timestamps and an explicit key selection.
+ // Keep automatic session snapshots intact: tests must work with them present.
  const recoveryKey='lexical-tufte-recovery-v2:regression-isolation';
  await page.evaluate(({key,state})=>{
-  for(const existing of Object.keys(localStorage)){
-   if(existing.startsWith('lexical-tufte-recovery-v2:'))localStorage.removeItem(existing);
-  }
   localStorage.setItem(key,JSON.stringify({savedAt:'2099-01-01T00:00:00.000Z',state}));
   window.dispatchEvent(new StorageEvent('storage',{key}));
  },{key:recoveryKey,state:recovered});
+ const acceptRecoveryDialog=(selectedKey,confirm=true)=>{
+  const handler=dialog=>{
+   if(dialog.type()==='prompt'){
+    const line=dialog.message().split('\\n')
+     .find(row=>row.includes('· '+selectedKey.slice(-8)));
+    assert.ok(line,'Recovery picker did not contain '+selectedKey);
+    const index=line.match(/^\\s*(\\d+):/)?.[1];
+    assert.ok(index,'Recovery picker did not display a valid index');
+    return dialog.accept(index);
+   }
+   assert.equal(dialog.type(),'confirm');
+   page.off('dialog',handler);
+   return confirm?dialog.accept():dialog.dismiss();
+  };
+  page.on('dialog',handler);
+ };
  const button=page.getByRole('button',{name:'복구용 사본 열기',exact:true});
  await button.waitFor({state:'visible'});
  await button.waitFor({state:'attached'});
@@ -60,10 +70,8 @@ try {
  assert.doesNotMatch(await editor.innerText(),/RECOVERY-ONLY/);
  assert.equal(await page.evaluate(()=>localStorage.getItem('lexical-tufte-p1')),canonical);
  // Confirmation opens the recovery copy but does not implicitly save it.
- page.once('dialog',dialog=>{
-  assert.equal(dialog.type(),'confirm');
-  dialog.accept();
- });
+ acceptRecoveryDialog(recoveryKey);
+
  await button.click();
  await page.getByRole('status',{name:'편집 작업 상태'}).filter({
   hasText:'선택한 복구본을 열었습니다.'
@@ -81,19 +89,6 @@ try {
  assert.ok(await page.evaluate(key=>localStorage.getItem(key)!==null,recoveryKey),
   'Reopening the canonical document must not delete the recovery source');
  // Deleting recovery data is explicit and must respect both cancellation stages.
- // Loading the canonical document may schedule a fresh session autosave.
- // Wait for that debounce and remove only unrelated session snapshots so
- // deletion assertions use deterministic, explicitly created fixtures.
- await page.waitForFunction(()=>Object.entries(localStorage).some(([key,value])=>
-  key.startsWith('lexical-tufte-recovery-v2:')&&
-  key!=='lexical-tufte-recovery-v2:regression-isolation'&&
-  value.includes('CANONICAL-BASELINE')
- ),null,{timeout:10000});
- await page.evaluate(keep=>{
-  for(const key of Object.keys(localStorage)){
-   if(key.startsWith('lexical-tufte-recovery-v2:')&&key!==keep)localStorage.removeItem(key);
-  }
- },recoveryKey);
  const deleteButton=page.getByRole('button',{name:'복구본 정리',exact:true});
  await deleteButton.waitFor({state:'visible'});
  const stored=await page.evaluate(key=>localStorage.getItem(key),recoveryKey);
@@ -101,23 +96,11 @@ try {
  await deleteButton.click();
  assert.equal(await page.evaluate(key=>localStorage.getItem(key),recoveryKey),stored,
   'Canceling recovery selection must preserve the recovery copy');
- const declineDeletion=dialog=>{
-  if(dialog.type()==='prompt')return dialog.accept('0');
-  assert.equal(dialog.type(),'confirm');
-  page.off('dialog',declineDeletion);
-  return dialog.dismiss();
- };
- page.on('dialog',declineDeletion);
+ acceptRecoveryDialog(recoveryKey,false);
  await deleteButton.click();
  assert.equal(await page.evaluate(key=>localStorage.getItem(key),recoveryKey),stored,
   'Declining the deletion confirmation must preserve the recovery copy');
- const confirmDeletion=dialog=>{
-  if(dialog.type()==='prompt')return dialog.accept('0');
-  assert.equal(dialog.type(),'confirm');
-  page.off('dialog',confirmDeletion);
-  return dialog.accept();
- };
- page.on('dialog',confirmDeletion);
+ acceptRecoveryDialog(recoveryKey);
  await deleteButton.click();
  assert.equal(await page.evaluate(key=>localStorage.getItem(key),recoveryKey),null,
   'Confirmed deletion must remove the selected recovery copy');
@@ -137,16 +120,7 @@ try {
   localStorage.setItem(newerKey,JSON.stringify({savedAt:'2099-01-02T00:00:00.000Z',state}));
  },{olderKey,newerKey,state:recovered});
  const olderBytes=await page.evaluate(key=>localStorage.getItem(key),olderKey);
- const selectNewest=dialog=>{
-  if(dialog.type()==='prompt'){
-   assert.match(dialog.message(),/2099-01-02/);
-   return dialog.accept('0');
-  }
-  assert.equal(dialog.type(),'confirm');
-  page.off('dialog',selectNewest);
-  return dialog.accept();
- };
- page.on('dialog',selectNewest);
+ acceptRecoveryDialog(newerKey);
  await deleteButton.click();
  assert.equal(await page.evaluate(key=>localStorage.getItem(key),newerKey),null,
   'Selected newest recovery snapshot must be deleted');
@@ -156,10 +130,7 @@ try {
   'Deleting one of multiple recovery snapshots must preserve canonical save');
  // The remaining older snapshot must still be openable after deleting
  // the newer one; opening it must not change the canonical saved bytes.
- page.once('dialog',dialog=>{
-  assert.equal(dialog.type(),'confirm');
-  dialog.accept();
- });
+ acceptRecoveryDialog(olderKey);
  await button.click();
  await page.getByRole('status',{name:'편집 작업 상태'}).filter({
   hasText:'선택한 복구본을 열었습니다.'
@@ -172,10 +143,7 @@ try {
  // A corrupted recovery entry must not block access to valid snapshots.
  const corruptKey='lexical-tufte-recovery-v2:regression-corrupt';
  await page.evaluate(key=>localStorage.setItem(key,'{corrupt-json'),corruptKey);
- page.once('dialog',dialog=>{
-  assert.equal(dialog.type(),'confirm');
-  dialog.accept();
- });
+ acceptRecoveryDialog(olderKey);
  await button.click();
  await page.getByRole('status',{name:'편집 작업 상태'}).filter({
   hasText:'선택한 복구본을 열었습니다.'
