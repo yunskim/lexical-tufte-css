@@ -1,5 +1,29 @@
 # 에러 기록
 
+## 2026-10-27 K1·K2 종료 검증
+
+E127/E128의 명시된 지원·거부 경계에서 수정 검증 완료. 최종 check458개·package5개·1440/375px 목록 UI 통과. 전체 browser34/35(보류 자산1실패), 공식6폭 pixel mask 밖 차이0이며 마지막 체크리스트 제외 조건 이후의 집중 재검증은 [보고서](VERIFICATION_LIST_KEYBOARD_2026-10-27.ko.md)에 구분했다. E127의 모든 일반 혼합 구조 편집을 구현한 것은 아니며 K3/K4는 미완료다. 두 오류 문서의 전체 기록/상태를 재점검했고 환경·실기기 IME·스크린리더·보류 자산 한계는 유지한다. CI 생략.
+
+## E128 — 실제 중첩 목록 저장 JSON을 발행기가 거부 (검증 범위 해결)
+
+- 2026-10-27 새 목록 UI 회귀: Enter/Undo/Redo/저장·재열기는 성공했으나 renderArticle이 nested listitem.indent:1을 UNSUPPORTED_RENDER_PROPERTY로 거부했다.
+- 원인: Lexical은 ListItemNode.getIndent()에서 구조적 깊이를 계산해 exportJSON에 넣는다. renderer profile은 모든 nonzero indent를 임의 서식으로 간주했다. 기존 목록 UI는 중첩 상태의 실제 JSON을 발행하지 않아 발견하지 못했다.
+- 조치: listitem의 nonzero indent가 목록 조상 깊이와 일치할 때만 허용한다. 불일치 값과 다른 노드의 임의 들여쓰기는 계속 거부한다. 저장 JSON이나 golden을 지우거나 정규화하지 않았다. render 독립 회귀와 실제 nested Enter 저장·발행 UI로 검증한다. M118.
+
+## 2026-10-27 목록 테스트 작성 중 E097/M088 가정 재발
+
+- `section ul`의 동적 last()가 중첩 후 내부 UL을 가리켜 3개 외부 항목을 1개로 오판했다. 최종 section의 직접 자식 UL로 선택자를 제한했다.
+- 빈 LI의 innerText는 BR 때문에 줄바꿈이지만 textContent는 빈 문자열이다. 빈 내용 검사는 textContent로 변경하고 실제 항목 수·구조·JSON assertion은 유지했다. 제품 오류와 테스트 오류를 구분한다. M117/M118의 실제 저장·발행 비교를 적용한다.
+- Enter 끝 위치의 회귀 초안은 list-only 빈 wrapper도 계속 남을 것으로 기대했다. 실제 wrapper는 자식이 없어지면 제거되는 계약이므로 해당 기대만 수정했고 텍스트 있는 부모와 노트 보존 검사는 유지했다.
+- 축약한 import 행 컨텍스트의 patch가 거부됐다. 파일 무변경을 확인하고 실제 완전한 컨텍스트로 재적용했다(M113). 실행 실패를 성공으로 취급하지 않았다.
+
+## E127 — 중첩 항목 내어쓰기에서 텍스트 있는 부모 소실 (안전한 지원/거부 경계 검증)
+
+- 2026-10-27 P2.2.b.2: 실제 registerRichText와 Tufte 핸들러의 등록 순서/ul·ol 교차 회귀에서 빈 중첩 항목 Enter 후 부모 Beta/Parent가 사라졌다(최초 집중35개 중5실패).
+- 원인: Lexical0.52.0 ListItemNode.setIndent의 outdent는 부모 항목이 중첩 목록 전용 wrapper라는 가정 아래 그 부모를 제거한다. 문서에 허용된 텍스트+중첩 목록 혼합 부모에는 안전하지 않다. 기존 테스트는 Child/Tail만 확인해 부모 손실을 놓쳤다.
+- 조치: 빈 항목 Enter는 앞쪽 부모 내용·뒤쪽 목록·메타데이터를 보존하며 직접 한 단계 이동한다. 일반 outdent의 혼합 부모는 진단 거부, Tab은 기본 탐색에 위임한다. 실제 RichText 등록 순서 두 가지와 ul/ol 교차 회귀를 추가했다. 최종 검증은 LIST_KEYBOARD_P22B2.ko.md에 기록한다. M117.
+- K3 후속 재현: 실제 registerRichText의 Backspace→DELETE_CHARACTER→collapseAtStart도 같은 내부 outdent를 호출해 Parent와 backspace-parent 노트를 제거했다(ul/ol 두 회귀 모두 실패). toolbar/Tab 거부만으로 이 경로를 보호하지 못하므로 키보드의 항목 시작 경계까지 검사한다. 일반 문자 삭제와 안전한 병합은 위임한다.
+
 ## 2026-10-25 전체 회귀 재실행 점검
 
 기준 `25d8995`: check425·package5·Python16/HTTP·제안 모델12그룹 통과. browser34/35통과(보류 자산 등록1실패, 파일timeout·skip0), 공식6폭 mask 밖 pixel차이0. E004는 공식 설치기 fallback으로 완화, M004의 설치 완료→기본 shell smoke→전체 회귀를 적용해 E005 재발 없음. E124/M113의 동일 venv 지정 적용. 두 오류 문서 전체 기록·상태를 재점검했고 미구현 자산/OS IME 등의 제한은 유지한다. [실행 보고서](VERIFICATION_RETEST_2026-10-25.ko.md). 다음 기능 작업 시작·완료 및 환경 변경 시 재점검. CI 생략.

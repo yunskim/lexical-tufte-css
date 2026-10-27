@@ -4,10 +4,15 @@ const supported=new Set(['root','tufte-section','paragraph','heading','horizonta
 /** Called only after shared structural validation succeeds. */
 export function validateRenderProfile(doc:TufteDocument):Diagnostic[]{
  const diagnostics:Diagnostic[]=[];
- function visit(n:JsonNode,path:string){
+ function visit(n:JsonNode,path:string,listDepth=0){
   const add=(key:string,message:string)=>{if(diagnostics.length<100)diagnostics.push({code:'UNSUPPORTED_RENDER_PROPERTY',path:path+(key?'.'+key:''),message});};
   if(!supported.has(n.type)){if(diagnostics.length<100)diagnostics.push({code:'UNSUPPORTED_RENDER_NODE',path:path+'.type',message:`${n.type} has schema but no ${RENDER_PROFILE} renderer`});return;}
-  if('children'in n){if(n.indent)add('indent','Indent output is deferred');for(const [i,child]of n.children.entries())visit(child,`${path}.children[${i}]`);}
+  if('children'in n){
+   // Lexical serializes structural list depth as listitem.indent. Nesting
+   // already expresses that depth in HTML; other indentation stays unsupported.
+   if(n.indent&&!(n.type==='listitem'&&n.indent===listDepth-1))add('indent','Indent output is deferred or inconsistent with list nesting');
+   for(const [i,child]of n.children.entries())visit(child,`${path}.children[${i}]`,listDepth+(n.type==='list'?1:0));
+  }
   if(n.type==='tufte-code'&&n.language!==undefined&&n.language!==null)add('language','Code language metadata is not yet published');
   if(n.type==='code-highlight')add('highlightType','Code syntax highlighting is not yet published');
   if(n.type==='tufte-table-layout'&&n.layout!=='scroll'&&(n.format||n.direction))add('','Unwrapped layout attributes must be defaults');

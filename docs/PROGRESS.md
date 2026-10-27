@@ -1,3 +1,9 @@
+## 2026-10-27 목록 K1·K2 완료, K3 손실 경계 차단
+
+- 실제 RichText와 목록 키보드 소유권(K1), 일반 Enter 분할·최종 빈 항목 종료·nested 빈 항목 outdent(K2)를 구현·검증했다. 혼합 부모의 텍스트/노트 소실(E127)과 실제 중첩 JSON의 발행 거부(E128)를 수정했다. 위험한 일반 outdent/시작 Backspace는 진단·무변경 거부한다.
+- 최종 check458개(build/typecheck/static 포함, 실패·skip0), package5개, 실제1440/375px 목록 UI/history/저장·재열기/발행 통과. 전체 browser34/35 및 공식6폭 mask 밖 pixel차이0; 마지막 checklist 소유권 제외 조건 이후 check/package/목록 UI 집중 재검증 범위는 보고서에 구분했다. 실패1개는 기존 보류 자산 등록이다. CI 생략.
+- [지원 계약](LIST_KEYBOARD_P22B2.ko.md), [실행 보고서](VERIFICATION_LIST_KEYBOARD_2026-10-27.ko.md), [소스 해시·파일별 결과](verification/list-keyboard-20261027.json). K1·K2만 체크하고 K3/K4/K5 및 상위 P2.2.b.2는 유지했다. 다음은 K3 일반 Backspace의 안전한 병합/해제·history/노트 경계 행렬이다.
+
 ## 2026-10-25 전체 회귀 재실행 점검
 
 기준 `25d8995`: check425·package5·Python16/HTTP·제안 모델12그룹 통과. browser34/35통과(보류 자산 등록1실패, 파일timeout·skip0), 공식6폭 mask 밖 pixel차이0. E004는 공식 설치기 fallback으로 완화, M004의 설치 완료→기본 shell smoke→전체 회귀를 적용해 E005 재발 없음. E124/M113의 동일 venv 지정 적용. 두 오류 문서 전체 기록·상태를 재점검했고 미구현 자산/OS IME 등의 제한은 유지한다. [실행 보고서](VERIFICATION_RETEST_2026-10-25.ko.md). 다음 기능 작업 시작·완료 및 환경 변경 시 재점검. CI 생략.

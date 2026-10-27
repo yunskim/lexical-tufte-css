@@ -1,0 +1,423 @@
+{
+  "date": "2026-10-27",
+  "timezone": "Asia/Seoul",
+  "baseCommit": "1c2365810c12699e68484ed88d0bdf76e8234bf4",
+  "branch": "fix/main-browser-parity-20261023",
+  "tasks": {
+    "K1": "complete",
+    "K2": "complete-with-explicit-supported-and-rejected-boundaries",
+    "K3": "partial-mixed-parent-backspace-safety-only",
+    "K4": "partial-section-and-outdent-guards",
+    "K5": "pending"
+  },
+  "sourceHashes": [
+    {
+      "path": "packages/lexical/src/listCommands.ts",
+      "sha256": "e76b0e2f4dff49e237879c8c512145322e08bc35bcc6d3441e229fd353cd98ad"
+    },
+    {
+      "path": "packages/lexical/test/list-commands.test.mjs",
+      "sha256": "786b5cb819e3ea5ce2814451bc12debef875d152ce46d9019a8ff917161cc3a6"
+    },
+    {
+      "path": "packages/lexical/test/list-keyboard-ownership.test.mjs",
+      "sha256": "37463badbd3ed4b76862daa55b24465456ae206a2881598e6b59534cc1b71d03"
+    },
+    {
+      "path": "packages/render/src/profile.ts",
+      "sha256": "1bcc3889833da376e3218771e95fd1bb31b6d161e3f226d75540c393171f3b7a"
+    },
+    {
+      "path": "packages/render/test/render.test.mjs",
+      "sha256": "8c7757f2f4e8b3ebe08720e0d564df97f8c30b05b5283d2296e0c0f62d1d417c"
+    },
+    {
+      "path": "tests/list-kind-browser.mjs",
+      "sha256": "7a22d56fc07ff198f57f37873062473b1280015ba89acecd2c9a7572bdf4ab9f"
+    }
+  ],
+  "finalCheck": {
+    "status": "pass",
+    "unit": {
+      "total": 458,
+      "document": 57,
+      "render": 52,
+      "blog": 77,
+      "editorPorts": 2,
+      "lexical": 270,
+      "fail": 0,
+      "skip": 0,
+      "cancelled": 0
+    },
+    "output": [
+      "packages/editor-ports test: ℹ tests 2",
+      "packages/editor-ports test: ℹ pass 2",
+      "packages/editor-ports test: ℹ fail 0",
+      "packages/editor-ports test: ℹ cancelled 0",
+      "packages/editor-ports test: ℹ skipped 0",
+      "packages/document test: ℹ tests 57",
+      "packages/document test: ℹ pass 57",
+      "packages/document test: ℹ fail 0",
+      "packages/document test: ℹ cancelled 0",
+      "packages/document test: ℹ skipped 0",
+      "packages/render test: ℹ tests 52",
+      "packages/render test: ℹ pass 52",
+      "packages/render test: ℹ fail 0",
+      "packages/render test: ℹ cancelled 0",
+      "packages/render test: ℹ skipped 0",
+      "packages/blog test: ℹ tests 77",
+      "packages/blog test: ℹ pass 77",
+      "packages/blog test: ℹ fail 0",
+      "packages/blog test: ℹ cancelled 0",
+      "packages/blog test: ℹ skipped 0",
+      "packages/lexical test: ℹ tests 270",
+      "packages/lexical test: ℹ pass 270",
+      "packages/lexical test: ℹ fail 0",
+      "packages/lexical test: ℹ cancelled 0",
+      "packages/lexical test: ℹ skipped 0"
+    ]
+  },
+  "package": {
+    "status": "pass",
+    "tarballs": 5
+  },
+  "browser": {
+    "phase": "full suite after mixed-parent Backspace fix, before final checklist exclusion",
+    "pass": 34,
+    "fail": 1,
+    "skip": 0,
+    "fileTimeout": 0,
+    "rows": [
+      {
+        "file": "list-kind-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "all-nodes-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "contextual-ui-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "definition-pairs-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "font-proof-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "full-page-pixel-parity-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "inline-span-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "inline-span-html-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "layout-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "managed-note-assets-browser.mjs",
+        "exitCode": 1
+      },
+      {
+        "file": "note-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "note-dom-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "note-editing-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "note-export-parity-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "note-image-chooser-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "note-image-dimensions-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "publication-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "recovery-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "section-commands-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "server-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "text-format-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-dom-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-full-document-editor-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-full-document-roundtrip-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-full-document-visual-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-full-page-baseline-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-geometry-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-newthought-sidenote-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-same-content-epigraphs-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-same-content-figures-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-same-content-final-sections-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-same-content-fundamentals-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-same-content-getting-started-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-same-content-opening-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-same-content-sidenotes-browser.mjs",
+        "exitCode": 0
+      }
+    ],
+    "failure": "node:internal/modules/run_main:107\n    triggerUncaughtException(\n    ^\n\nlocator.click: Timeout 5000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: '문서 이미지 자산 등록', exact: true })\u001b[22m\n\n    at registerAsset (/workspace/scratch/484e46557938/lexical-tufte-css-test-20261023/tests/managed-note-assets-browser.mjs:47:36)\n    at /workspace/scratch/484e46557938/lexical-tufte-css-test-20261023/tests/managed-note-assets-browser.mjs:51:8 {\n  name: 'TimeoutError'\n}\n\nNode.js v24.22.1\n"
+  },
+  "finalScopeDelta": {
+    "change": "Exclude unsupported checklists from mixed-parent Backspace guard.",
+    "reverified": [
+      "pnpm check: 458 units and build/typecheck/static",
+      "package:check: 5 tarballs",
+      "list-kind-browser:1440px",
+      "list-kind-browser:375px"
+    ],
+    "fullSuiteRerun": false
+  },
+  "pixels": [
+    {
+      "width": 375,
+      "mask": {
+        "x": 30,
+        "y": 12188.046875,
+        "width": 283.5,
+        "height": 202.1875
+      },
+      "dimensions": {
+        "upstream": [
+          375,
+          15247
+        ],
+        "published": [
+          375,
+          15247
+        ]
+      },
+      "dimensionsMatch": true,
+      "totalPixels": 5717625,
+      "maskedPixels": 56883,
+      "maskedMismatchPixels": 0,
+      "unmaskedMismatchPixels": 0,
+      "maxChannelDelta": 0,
+      "mismatchBounds": null,
+      "firstDifferences": []
+    },
+    {
+      "width": 759,
+      "mask": {
+        "x": 60.71875,
+        "y": 7897.890625,
+        "width": 573.78125,
+        "height": 383.609375
+      },
+      "dimensions": {
+        "upstream": [
+          759,
+          10948
+        ],
+        "published": [
+          759,
+          10948
+        ]
+      },
+      "dimensionsMatch": true,
+      "totalPixels": 8309532,
+      "maskedPixels": 219459,
+      "maskedMismatchPixels": 0,
+      "unmaskedMismatchPixels": 0,
+      "maxChannelDelta": 0,
+      "mismatchBounds": null,
+      "firstDifferences": []
+    },
+    {
+      "width": 760,
+      "mask": {
+        "x": 60.796875,
+        "y": 7898.8125,
+        "width": 574.546875,
+        "height": 384.09375
+      },
+      "dimensions": {
+        "upstream": [
+          760,
+          10950
+        ],
+        "published": [
+          760,
+          10950
+        ]
+      },
+      "dimensionsMatch": true,
+      "totalPixels": 8322000,
+      "maskedPixels": 219842,
+      "maskedMismatchPixels": 0,
+      "unmaskedMismatchPixels": 0,
+      "maxChannelDelta": 0,
+      "mismatchBounds": null,
+      "firstDifferences": []
+    },
+    {
+      "width": 761,
+      "mask": {
+        "x": 95.125,
+        "y": 10855.0625,
+        "width": 366.21875,
+        "height": 399.546875
+      },
+      "dimensions": {
+        "upstream": [
+          761,
+          14211
+        ],
+        "published": [
+          761,
+          14211
+        ]
+      },
+      "dimensionsMatch": true,
+      "totalPixels": 10814571,
+      "maskedPixels": 145270,
+      "maskedMismatchPixels": 0,
+      "unmaskedMismatchPixels": 0,
+      "maxChannelDelta": 0,
+      "mismatchBounds": null,
+      "firstDifferences": []
+    },
+    {
+      "width": 1024,
+      "mask": {
+        "x": 128,
+        "y": 9166.453125,
+        "width": 492.796875,
+        "height": 529
+      },
+      "dimensions": {
+        "upstream": [
+          1024,
+          12587
+        ],
+        "published": [
+          1024,
+          12587
+        ]
+      },
+      "dimensionsMatch": true,
+      "totalPixels": 12889088,
+      "maskedPixels": 259776,
+      "maskedMismatchPixels": 0,
+      "unmaskedMismatchPixels": 0,
+      "maxChannelDelta": 0,
+      "mismatchBounds": null,
+      "firstDifferences": []
+    },
+    {
+      "width": 1440,
+      "mask": {
+        "x": 180,
+        "y": 7842.96875,
+        "width": 693,
+        "height": 733.75
+      },
+      "dimensions": {
+        "upstream": [
+          1440,
+          11630
+        ],
+        "published": [
+          1440,
+          11630
+        ]
+      },
+      "dimensionsMatch": true,
+      "totalPixels": 16747200,
+      "maskedPixels": 507969,
+      "maskedMismatchPixels": 0,
+      "unmaskedMismatchPixels": 0,
+      "maxChannelDelta": 0,
+      "mismatchBounds": null,
+      "firstDifferences": []
+    }
+  ],
+  "environment": {
+    "node": "24.22.1",
+    "pnpm": "11.25.0",
+    "lexical": "0.52.0",
+    "playwright": "1.51.1",
+    "browser": "Chromium134 headless shell"
+  },
+  "errors": [
+    "E127/M117",
+    "E128/M118",
+    "E097/M088 test selector recurrence"
+  ],
+  "ci": "not-run-by-request",
+  "python": "not-rerun-no-Python-changes",
+  "logDirectory": "/workspace/scratch/484e46557938/lexical-tufte-list-20261027"
+}

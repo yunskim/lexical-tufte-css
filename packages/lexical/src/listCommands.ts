@@ -1,4 +1,5 @@
 import {canonicalBlockType} from './blockSerialization.js';
+import {$copyNode} from 'lexical';
 import {$addUpdateTag,$createParagraphNode,$getSelection,$isRangeSelection,createCommand,COMMAND_PRIORITY_EDITOR,COMMAND_PRIORITY_HIGH,KEY_ENTER_COMMAND,KEY_BACKSPACE_COMMAND,KEY_TAB_COMMAND,HISTORY_PUSH_TAG,type LexicalCommand,type LexicalEditor,type LexicalNode} from 'lexical';
 import {$createListNode,$createListItemNode,ListNode,ListItemNode} from '@lexical/list';
 import {SectionNode} from './LayoutNodes.js';
@@ -85,6 +86,8 @@ export function registerListCommands(editor:LexicalEditor,onDiagnostic?:(diagnos
     return reject('첫 목록 항목은 들여쓸 수 없으며 최대 중첩 깊이는 20입니다.');
    if(direction==='outdent'&&depth===0)
     return reject('최상위 목록에서는 내어쓰기를 할 수 없습니다.');
+   if(direction==='outdent'&&list.getParent() instanceof ListItemNode&&list.getParent()!.getChildrenSize()!==1)
+    return reject('텍스트와 중첩 목록이 함께 있는 부모 항목은 내용 보존을 위해 내어쓰지 않습니다.');
    $addUpdateTag(HISTORY_PUSH_TAG);
    item.setIndent(depth+(direction==='indent'?1:-1));
    return true;
@@ -119,6 +122,18 @@ export function registerListCommands(editor:LexicalEditor,onDiagnostic?:(diagnos
  return ()=>registrations.forEach(unregister=>unregister());
 }
 
+/** Only lists reached through list/listitem ancestors of a root-level section. */
+function isSectionList(list:ListNode):boolean{
+ let current:LexicalNode=list;
+ while(current.getParent() instanceof ListItemNode){
+  const parent=current.getParent()!.getParent();
+  if(!(parent instanceof ListNode)||parent.getListType()==='check')return false;
+  current=parent;
+ }
+ const section=current.getParent();
+ return section instanceof SectionNode&&section.getParent()?.getType()==='root';
+}
+
 /** Opt-in keyboard binding: only consume Tab when a valid list nesting edit is possible.
  * All other Tab presses retain native focus navigation, including toolbars and notes. */
 export function registerListKeyboardCommands(editor:LexicalEditor):()=>void{
@@ -131,10 +146,25 @@ export function registerListKeyboardCommands(editor:LexicalEditor):()=>void{
   while(node&&!(node instanceof ListItemNode))node=node.getParent();
   if(!(node instanceof ListItemNode)||node.getChildrenSize()!==0||node.getTextContent()!==''||selection.anchor.type!=='element'||!selection.anchor.getNode().is(node))return false;
   const list=node.getParent();
+  if(list instanceof ListNode&&list.getListType()!=='check'&&isSectionList(list)&&node.getIndent()>0){
+   event.preventDefault();
+   $addUpdateTag(HISTORY_PUSH_TAG);
+   // ListItemNode.setIndent assumes a list-only wrapper and can delete a
+   // mixed parent's text. Move the empty item explicitly, preserving both sides.
+   const parent=list.getParent() as ListItemNode;
+   const following=node.getNextSiblings();
+   const tail=following.length?$copyNode(list).append(...following):null;
+   parent.insertAfter(node);
+   if(tail)node.insertAfter($createListItemNode().append(tail));
+   if(list.getChildrenSize()===0)list.remove();
+   if(parent.getChildrenSize()===0)parent.remove();
+   node.selectStart();
+   return true;
+  }
   if(!(list instanceof ListNode)||list.getListType()==='check'||!(list.getParent() instanceof SectionNode)||
      list.getParent()?.getParent()?.getType()!=='root'||!node.is(list.getLastChild())||node.getIndent()!==0)return false;
   // Only the empty final item of a top-level list is ours. Lexical handles all
-  // other Enter behavior, including splitting text and nested-list boundaries.
+  // other Enter behavior, including splitting nonempty text.
   event.preventDefault();
   $addUpdateTag(HISTORY_PUSH_TAG);
   const paragraph=$createParagraphNode();
@@ -150,6 +180,21 @@ export function registerListKeyboardCommands(editor:LexicalEditor):()=>void{
   if(!$isRangeSelection(selection)||!selection.isCollapsed()||$getContainingNote(selection.anchor.getNode()))return false;
   let node:LexicalNode|null=selection.anchor.getNode();
   while(node&&!(node instanceof ListItemNode))node=node.getParent();
+  if(node instanceof ListItemNode){
+   const parentList=node.getParent();
+   let atStart=selection.anchor.offset===0;
+   for(let current=selection.anchor.getNode();atStart&&!current.is(node);current=current.getParent()!){
+    if(current.getPreviousSibling())atStart=false;
+   }
+   if(atStart&&parentList instanceof ListNode&&parentList.getListType()!=='check'&&isSectionList(parentList)&&
+      parentList.getParent() instanceof ListItemNode&&parentList.getParent()!.getChildrenSize()!==1){
+    // RichText's collapseAtStart calls the same unsafe outdent as the toolbar.
+    // Reuse its diagnostic refusal instead of deleting a text-bearing parent.
+    event.preventDefault();
+    editor.dispatchCommand(CHANGE_TUFTE_LIST_INDENT_COMMAND,'outdent');
+    return true;
+   }
+  }
   if(!(node instanceof ListItemNode)||node.getChildrenSize()!==0||node.getTextContent()!==''||selection.anchor.type!=='element'||!selection.anchor.getNode().is(node))return false;
   const list=node.getParent();
   if(!(list instanceof ListNode)||list.getListType()==='check'||!(list.getParent() instanceof SectionNode)||
@@ -177,11 +222,12 @@ export function registerListKeyboardCommands(editor:LexicalEditor):()=>void{
   while(node&&!(node instanceof ListItemNode))node=node.getParent();
   if(!(node instanceof ListItemNode))return false;
   const list=node.getParent();
-  if(!(list instanceof ListNode)||list.getListType()==='check'||!list.getParent()||
+  if(!(list instanceof ListNode)||list.getListType()==='check'||!isSectionList(list)||!list.getParent()||
      !NODE_SCHEMA[list.getParent()!.getType()]?.children?.includes('list'))return false;
   const depth=node.getIndent(),direction=event.shiftKey?'outdent':'indent';
   if(direction==='indent'&&(!node.getPreviousSibling()||depth>=20))return false;
   if(direction==='outdent'&&depth===0)return false;
+  if(direction==='outdent'&&list.getParent() instanceof ListItemNode&&list.getParent()!.getChildrenSize()!==1)return false;
   // The structural command owns the mutation and history boundary.
   event.preventDefault();
   editor.dispatchCommand(CHANGE_TUFTE_LIST_INDENT_COMMAND,direction);

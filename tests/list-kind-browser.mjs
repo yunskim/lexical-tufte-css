@@ -13,7 +13,7 @@ try{
   if(i===99)throw Error('Editor server not ready');await setTimeout(100);
  }
  browser=await chromium.launch({headless:true,args:['--no-sandbox']});
- const page=await browser.newPage();page.setDefaultTimeout(6000);
+ const page=await browser.newPage({viewport:{width:Number(process.env.LIST_VIEWPORT_WIDTH||1440),height:1000}});page.setDefaultTimeout(6000);
  const errors=[];page.on('pageerror',error=>errors.push(error.message));
  await page.goto(url);
  const editor=page.locator('.editor');await editor.waitFor();
@@ -104,12 +104,18 @@ try{
  await page.waitForFunction(()=>[...document.querySelectorAll('.editor section ul > li')].some(li=>li.textContent?.includes('Keyboard second')));
  await keyboardList.locator('li').last().click();
  await action('목록 항목 추가').click();
+ const beforeExit=await snapshot();
+ await keyboardList.locator(':scope > li').last().click();
  await page.keyboard.press('Enter');
  await page.waitForFunction(()=>[...document.querySelectorAll('.editor section p')].some(p=>p.previousElementSibling?.tagName==='UL'));
  const afterEnter=await snapshot();
  assert.ok(extractList(afterEnter),'Other lists remain after keyboard exit');
  assert.match(JSON.stringify(afterEnter),/Keyboard first/);
  assert.match(JSON.stringify(afterEnter),/Keyboard second/);
+ await page.getByRole('button',{name:'실행 취소',exact:true}).click();
+ assert.deepEqual(await snapshot(),beforeExit,'One Undo restores the final empty item');
+ await page.getByRole('button',{name:'다시 실행',exact:true}).click();
+ assert.deepEqual(await snapshot(),afterEnter,'Redo restores exit paragraph');
  // Browser Backspace: empty first item must be removed without touching the next.
  await editor.focus();await page.keyboard.press('Control+End');
  await action('다음 섹션 추가').click();
@@ -127,6 +133,7 @@ try{
  await action('글머리표 목록 삽입').click();
  await page.keyboard.insertText('AlphaBeta');
  const splitList=editor.locator('section ul').last();
+ const beforeSplit=await snapshot();
  await splitList.locator('li').first().click();
  await page.keyboard.press('End');
  await page.keyboard.press('ArrowLeft');
@@ -139,6 +146,10 @@ try{
  const splitState=await snapshot();
  assert.match(JSON.stringify(splitState),/Alpha/);
  assert.match(JSON.stringify(splitState),/Beta/);
+ await page.getByRole('button',{name:'실행 취소',exact:true}).click();
+ assert.deepEqual(await snapshot(),beforeSplit,'One Undo restores the native Enter split');
+ await page.getByRole('button',{name:'다시 실행',exact:true}).click();
+ assert.deepEqual(await snapshot(),splitState,'Redo restores native Enter');
  await splitList.locator('li').last().click();
  await page.keyboard.press('Home');
  await page.keyboard.press('Backspace');
@@ -155,7 +166,7 @@ try{
  await page.keyboard.insertText('Parent item');
  await action('목록 항목 추가').click();
  await page.keyboard.insertText('Nested item');
- const nestedKeyboardList=editor.locator('section ul').last();
+ const nestedKeyboardList=editor.locator('section').last().locator(':scope > ul');
  await nestedKeyboardList.locator('li').last().click();
  const beforeNestedTab=await snapshot();
  await nestedKeyboardList.locator('li').last().click();
@@ -177,22 +188,25 @@ try{
  assert.match(JSON.stringify(afterNestedEnter),/Parent item/);
  assert.match(JSON.stringify(afterNestedEnter),/Nested item/);
  assert.ok(afterNestedEnter.root.children.flatMap(section=>section.children).some(block=>block.type==='list'), 'Nested Enter must retain a list block');
- // Nested empty-item Backspace: record actual browser behavior without assuming
- // Lexical will outdent, merge, or remove the item. Parent content must survive.
+ assert.equal(await editor.locator('section ul ul li').count(),2,'Nonempty nested Enter splits into a new empty item');
+ // Enter on the empty nested item must outdent exactly one level.
  await editor.locator('section ul ul li').last().click();
- await page.keyboard.press('End');
  await page.keyboard.press('Enter');
- const beforeNestedBackspace=await snapshot();
- // snapshot() opens an inspection panel and may steal keyboard focus.
- // Explicitly restore the editor selection before dispatching Backspace.
- await editor.locator('section ul ul li').last().click();
- await page.keyboard.press('Home');
- await page.keyboard.press('Backspace');
- const afterNestedBackspace=await snapshot();
- assert.match(JSON.stringify(afterNestedBackspace),/Parent item/);
- assert.match(JSON.stringify(afterNestedBackspace),/Nested item/);
- assert.ok(afterNestedBackspace.root.children.flatMap(section=>section.children).some(block=>block.type==='list'));
- assert.ok(beforeNestedBackspace.root.children.length>0);
+ const afterEmptyEnter=await snapshot();
+ assert.equal(await editor.locator('section ul ul li').count(),1);
+ assert.equal(await nestedKeyboardList.locator(':scope > li').count(),3);
+ assert.equal(await nestedKeyboardList.locator(':scope > li').last().textContent(),'');
+ await page.getByRole('button',{name:'실행 취소',exact:true}).click();
+ assert.deepEqual(await snapshot(),afterNestedEnter,'One Undo restores the nested empty item');
+ await page.getByRole('button',{name:'다시 실행',exact:true}).click();
+ assert.deepEqual(await snapshot(),afterEmptyEnter,'Redo restores the one-level outdent');
+ await page.getByRole('button',{name:'저장',exact:true}).click();
+ await page.reload();await editor.waitFor();
+ await page.getByRole('button',{name:'불러오기',exact:true}).click();
+ assert.deepEqual(await snapshot(),afterEmptyEnter,'Save/reopen preserves nested Enter');
+ const nestedPublished=renderArticle({schemaVersion:1,id:'nested-enter',locale:'ko-KR',title:'Nested Enter',assets:[],lexicalState:afterEmptyEnter});
+ assert.equal(nestedPublished.ok,true,JSON.stringify(nestedPublished.diagnostics));
+ assert.match(nestedPublished.html,/Parent item/);assert.match(nestedPublished.html,/Nested item/);
  assert.deepEqual(errors,[]);
  console.log('P2.2.b list browser: ul/ol conversion, structural indent/outdent, safe unwrap, history, save/reopen, renderer, reject PASS.');
 }finally{await browser?.close();server.kill();}

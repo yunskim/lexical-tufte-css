@@ -1,5 +1,23 @@
 # 재발 방지 대책 및 정기 점검
 
+## 2026-10-27 목록 K1·K2 종료 점검
+
+E127/M117·E128/M118, E097/M088 재발과 M004/M113 절차를 코드·실제 RichText 단위·모바일/데스크톱 UI·발행 검사에 반영했다. 두 문서의 전체 기록/상태를 재점검했다. 최종 check458·package5·목록1440/375px 통과, 전체 browser34/35 및 공식6폭 pixel차이0. 마지막 checklist guard 이후 집중 재검증과 이전 전수 범위를 [보고서](VERIFICATION_LIST_KEYBOARD_2026-10-27.ko.md)에 분리했다. 일반 혼합 부모 outdent는 구현 완료로 바꾸지 않고 진단 거부, K3/K4/K5는 남긴다. 다음 점검: K3 일반 병합/해제 및 K4 깊이·focus 경계 시작·완료. CI 생략.
+
+## M118 — 목록 JSON의 파생 깊이와 발행 서식을 구분
+
+- E128: headless 수제 fixture만 사용하지 말고 실제 GUI에서 중첩→Enter→Undo/Redo→저장/재열기한 JSON을 순수 renderer에 전달한다. listitem.indent는 구조 깊이와 일치하는 값만 허용하며 다른 nonzero indent의 거부를 유지한다.
+- E097 재발: 중첩을 생성하는 테스트에서 descendant UL의 last()를 외부 목록 참조로 재사용하지 않는다. section과 직접 자식 목록을 고정한다. 빈 편집 노드의 BR은 textContent 및 canonical children으로 검사하고 innerText의 줄바꿈을 내용 손실로 해석하지 않는다.
+- 완료 점검은 최종 실행 결과와 LIST_KEYBOARD_P22B2.ko.md에 연결한다. 다음 점검은 K2 나머지 경계·K3 및 목록 발행 범위 확대 시다. CI 없음.
+
+## M117 — 목록 이동은 선택 항목뿐 아니라 제거 가능한 조상까지 검사
+
+- E127: setIndent 같은 구조 변경 API의 입력 전제와 제거 조상을 고정 버전 소스에서 확인한다. Text+list 혼합 부모와 list-only wrapper를 별도로 검사하고 부모 텍스트·노트 ID·앞뒤 형제·선택·저장 상태를 함께 비교한다.
+- headless의 가짜 fallback만으로 우선순위를 증명하지 않는다. 실제 registerRichText를 앞/뒤로 등록한 ul/ol 회귀와 실제 브라우저 키 입력을 함께 사용한다. ListPlugin을 호스트에 암묵적으로 추가하지 않는다.
+- 같은 구조 변경 API를 직접 부르는 toolbar뿐 아니라 Enter/Backspace→기본 RichText→노드 메서드의 간접 경로도 조사한다. 특히 혼합 부모의 시작 Backspace는 부모 노트가 사라지지 않는지 별도 회귀한다.
+- 손실 가능성이 있는 일반 outdent는 명시적 진단과 무변경 거부, Tab은 preventDefault 전에 지원 여부를 확인한다. 빈 항목 Enter의 지원 경로는 꼬리 목록과 조상 payload 보존을 검사한다.
+- 시작 시 E096/M089, E091/M085, E004/E005/M004, E124/M113을 점검했다. 다음 점검은 이번 실행 종료와 K3/일반 목록 명령 확대 시다. CI 생략.
+
 ## 2026-10-25 전체 회귀 재실행 점검
 
 기준 `25d8995`: check425·package5·Python16/HTTP·제안 모델12그룹 통과. browser34/35통과(보류 자산 등록1실패, 파일timeout·skip0), 공식6폭 mask 밖 pixel차이0. E004는 공식 설치기 fallback으로 완화, M004의 설치 완료→기본 shell smoke→전체 회귀를 적용해 E005 재발 없음. E124/M113의 동일 venv 지정 적용. 두 오류 문서 전체 기록·상태를 재점검했고 미구현 자산/OS IME 등의 제한은 유지한다. [실행 보고서](VERIFICATION_RETEST_2026-10-25.ko.md). 다음 기능 작업 시작·완료 및 환경 변경 시 재점검. CI 생략.

@@ -417,7 +417,7 @@ test('P2.2.b Backspace leaves nonempty and nonfirst items, IME and outside parag
  stop();dispose();
 });
 
-test('P2.2.b nested empty item Backspace delegates to Lexical without deleting sibling notes',()=>{
+test('P2.2.b mixed-parent empty item Backspace refuses without deleting sibling notes',()=>{
  const {editor,dispose}=setup();const stop=registerListKeyboardCommands(editor);
  editor.update(()=>{
   const note=$createMarginnoteNode('nested-backspace-note').append($createTextNode('Payload'));
@@ -429,8 +429,8 @@ test('P2.2.b nested empty item Backspace delegates to Lexical without deleting s
  },{discrete:true});
  const before=JSON.stringify(editor.getEditorState().toJSON());
  const event={isComposing:false,shiftKey:false,ctrlKey:false,metaKey:false,altKey:false,prevented:false,preventDefault(){this.prevented=true;}};
- assert.equal(editor.dispatchCommand(KEY_BACKSPACE_COMMAND,event),false);
- assert.equal(event.prevented,false);
+ assert.equal(editor.dispatchCommand(KEY_BACKSPACE_COMMAND,event),true);
+ assert.equal(event.prevented,true);
  editor.update(()=>{},{discrete:true});
  assert.equal(JSON.stringify(editor.getEditorState().toJSON()),before);
  editor.getEditorState().read(()=>{
@@ -440,7 +440,7 @@ test('P2.2.b nested empty item Backspace delegates to Lexical without deleting s
  stop();dispose();
 });
 
-test('P2.2.b nested empty item Enter delegates to Lexical without modifying parent',()=>{
+test('P2.2.b nested empty item Enter outdents one level without removing parent text',()=>{
  const {editor,dispose}=setup();const stop=registerListKeyboardCommands(editor);
  editor.update(()=>{
   const nested=$createListNode('number').append($createListItemNode());
@@ -448,12 +448,15 @@ test('P2.2.b nested empty item Enter delegates to Lexical without modifying pare
   $getRoot().append($createSectionNode().append($createListNode('bullet').append(parent)));
   nested.getFirstChild().selectStart();
  },{discrete:true});
- const before=JSON.stringify(editor.getEditorState().toJSON());
  const event={isComposing:false,shiftKey:false,ctrlKey:false,metaKey:false,altKey:false,prevented:false,preventDefault(){this.prevented=true;}};
- assert.equal(editor.dispatchCommand(KEY_ENTER_COMMAND,event),false);
- assert.equal(event.prevented,false);
+ assert.equal(editor.dispatchCommand(KEY_ENTER_COMMAND,event),true);
+ assert.equal(event.prevented,true);
  editor.update(()=>{},{discrete:true});
- assert.equal(JSON.stringify(editor.getEditorState().toJSON()),before);
+ editor.getEditorState().read(()=>{
+  const list=$getRoot().getFirstChild().getFirstChild();
+  assert.deepEqual(list.getChildren().map(item=>item.getTextContent()),['Parent','']);
+  assert.equal(list.getLastChild().getIndent(),0);
+ });
  stop();dispose();
 });
 

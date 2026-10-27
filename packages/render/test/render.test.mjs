@@ -4,6 +4,16 @@ import {readFileSync} from 'node:fs';
 import {renderArticle,validateDocument} from '../dist/index.js';
 const fixture=()=>JSON.parse(readFileSync(new URL('../../../fixtures/tufte/server-document.json',import.meta.url),'utf8'));
 const note=d=>d.lexicalState.root.children[0].children[0].children[1];
+test('structural list indent renders only at the matching nested depth',()=>{
+ const d=fixture();
+ const text={type:'text',version:1,text:'Nested payload',format:0,style:'',mode:'normal',detail:0};
+ const child={type:'listitem',version:1,value:1,indent:1,children:[text]};
+ d.lexicalState.root.children[0].children=[{type:'list',version:1,listType:'bullet',tag:'ul',start:1,children:[{type:'listitem',version:1,value:1,children:[{type:'list',version:1,listType:'number',tag:'ol',start:1,children:[child]}]}]}];
+ const before=structuredClone(d),r=renderArticle(d);
+ assert.equal(r.ok,true,JSON.stringify(r.diagnostics));assert.match(r.html,/Nested payload/);assert.deepEqual(d,before);
+ child.indent=2;const invalid=renderArticle(d);assert.equal(invalid.ok,false);
+ assert.ok(invalid.diagnostics.some(x=>x.path.endsWith('.indent')));
+});
 test('pure renderer works without browser/editor globals and is deterministic without mutation',()=>{
  assert.equal(typeof document,'undefined');assert.equal(typeof window,'undefined');
  const d=fixture(),before=JSON.stringify(d);const a=renderArticle(d),b=renderArticle(d);

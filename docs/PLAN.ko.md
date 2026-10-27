@@ -177,9 +177,10 @@ P1 gate: 완료. 노트 편집 회귀와 SSR 출력의 실제 브라우저 비�
     - [x] P2.2.b.0 editor prototype의 직접 import가 package.json과 pnpm-lock에 명시되는지 확인하고 workspace frozen install/package 경계를 검증한다. 2026-10-18 frozen/check297개/package4개 통과, [실행 보고서](VERIFICATION_2026-10-18.ko.md). E087 실행 검증 완료.
     - [x] P2.2.b.1 선택 텍스트 span 생성·기존 kind 변경·해제의 지원/거부 경계 및 atomic undo/redo, JSON/인라인 HTML 왕복 검증. 한 TextNode 부분 선택·링크·rich text·인접 note identity를 보존하고 cross-node/부모·노트 내부·IME는 명시적 거부. [지원 계약](INLINE_SPAN_P22B1.ko.md), [실행 증거](VERIFICATION_INLINE_SPAN_2026-10-23.ko.md): check425개, browser35개 중34통과/보류 자산1실패, 모바일/데스크톱·키보드·CDP IME 검증. 전체 문서 HTML importer는 P2.4, 실제 OS IME/스크린리더는 P6.
     - [ ] P2.2.b.2 ul/ol 항목 생성·추가·형태 변경·중첩·들여쓰기·내어쓰기/해제·키보드 Enter/Backspace/Tab 경계(필요한 정책 포함)를 설계·구현한다. 빈 목록/최초·최종 항목, 혼합/중첩 목록, 선택 범위, note payload/ID 보존을 검사한다.
-      - [ ] P2.2.b.2-K1 키보드 소유권 확인: Lexical 기본 Enter/Backspace 명령과 별도 Tufte 목록 명령의 충돌 여부를 headless/browser로 증명한다. Tufte 섹션 안의 ul/ol만 개입하고 note/IME/선택 범위는 우선 보존한다.
-      - [ ] P2.2.b.2-K2 Enter: 일반 항목의 중간/끝에서 분할·추가, 빈 최종 항목에서 목록 종료, 중첩 목록의 빈 항목에서 한 단계 내어쓰기. 이력 한 단계·노트 ID·저장/발행 구조를 각각 검증한다.
+      - [x] P2.2.b.2-K1 키보드 소유권 확인: 실제 registerRichText 앞/뒤와 Tufte HIGH 경계 및 기본 EDITOR 분할을 headless/browser로 검증. root-level Tufte 섹션의 ul/ol에 한정하고 note/IME/범위·수정키·미지원 체크리스트는 자체 변경 없이 위임. [계약](LIST_KEYBOARD_P22B2.ko.md), [실행 결과](VERIFICATION_LIST_KEYBOARD_2026-10-27.ko.md): 최종 check458·package5·목록1440/375px 통과, 전체 browser34/35(보류 자산1실패; 마지막 checklist guard 이후 집중 재검증 범위 명시).
+      - [x] P2.2.b.2-K2 Enter: 처음/중간/끝 native 분할, 최종 빈 항목 종료, nested 빈 항목 한 단계 outdent를 구현·검증. 혼합 부모 텍스트/노트 ID·앞뒤 형제·목록 metadata 보존, 각각 한 Undo/Redo·저장/재열기·실제 nested JSON 발행을1440/375px에서 검사. [계약](LIST_KEYBOARD_P22B2.ko.md), [실행 결과](VERIFICATION_LIST_KEYBOARD_2026-10-27.ko.md). 실제 OS IME/스크린리더는 P6.
       - [ ] P2.2.b.2-K3 Backspace: 항목 시작에서 앞 항목과 병합 또는 첫 항목의 안전한 목록 해제; 일반 문자 삭제와 다른 키보드 경계만 개입. 선택 범위와 inline note 경계는 기본 Lexical 동작을 방해하지 않는다.
+        - 2026-10-27 일부 구현/검증: 혼합 부모의 시작 Backspace가 부모 텍스트/노트를 삭제하는 E127 경로를 진단·무변경 거부로 차단. 일반 안전한 병합/첫 항목 해제의 전체 history·note·selection 행렬은 남아 있어 K3는 미완료.
       - [ ] P2.2.b.2-K4 Tab/Shift+Tab: 목록 내부에서만 indent/outdent, 최상위·첫 항목·최대 깊이 거부 시 브라우저 기본 포커스 이동을 무조건 막지 않는다. 툴바/컨텍스트 메뉴의 Tab 이동과 별도 취급한다.
       - [ ] P2.2.b.2-K5 수락: 키보드 조합별 최초·중간·최종·빈·중첩 항목, 다른 블록/노트/IME, undo/redo, JSON→HTML, 포커스/접근성, 기존 테스트 재실행. 검증 전 완료 금지.
     - [ ] P2.2.b.3 dl/dt/dd의 추가·수정·삭제·항목 순서 보존을 검증하고 기존 문서·editor·renderer 3경로의 JSON/HTML 왕복을 연결한다.
