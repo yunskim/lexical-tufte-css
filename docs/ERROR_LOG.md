@@ -1,5 +1,13 @@
 # 에러 기록
 
+## E130 — 중첩 목록 컨테이너의 변경 없는 Tab 소비 (지원/거부 경계 검증 완료)
+
+- 2026-10-31 K4: list-only wrapper 자체의 element 선택에서 setIndent는 아무 작업도 하지 않는데 keyboard handler가 preventDefault와 true를 반환했다. 명시적 wrapper 선택을 만든 ul/ol 단위2개에서 재현했다.
+- 원인: Lexical의 nested-list 컨테이너는 일반 항목의 indent/outdent 대상이 아니다. 기존 경계 검사는 이전 형제/깊이만 확인했다.
+- 조치: 첫 자식이 ListNode인 컨테이너는 Tab/Shift+Tab을 기본 탐색에 위임하고 toolbar 명령은 진단·무변경 거부한다. UI 두 폭의 실제 기본 focus와 깊이19/20, 상태/노트 보존을 검사한다. M120 및 최종 K4 보고서 참조.
+- 테스트 준비 오류: wrapper.selectStart()는 내부 텍스트로 내려가 최초 테스트가 컨테이너 선택을 검사하지 않았다. 공개 RangeSelection API로 wrapper element0을 선택하고 실제 anchor key를 확인한 뒤 재현·수정 검증했다. 통과했다는 사실만으로 입력 경계를 검증했다고 간주하지 않는다.
+- 종료: check475·집중10개·포커스/목록 두 폭·contextual UI 및 package5개 통과. 기본 탐색·JSON/depth·노트 보존을 함께 확인했다. [실행 보고서](VERIFICATION_TAB_FOCUS_2026-10-31.ko.md), M120. 다음 K5에서 재점검한다. CI 생략.
+
 ## E129 — 첫 비어 있지 않은 목록 항목 Backspace 해제 누락 (지원/거부 범위 검증 완료)
 
 - 2026-10-31 K3 실제 browser: 첫 항목 시작에서 Backspace 후 UL이 남아 문단 해제 수락 검사가 실패했다. 기존 native 위임만으로 이 경계의 제품 동작을 보장할 수 없었다.

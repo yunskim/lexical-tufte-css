@@ -80,6 +80,8 @@ export function registerListCommands(editor:LexicalEditor,onDiagnostic?:(diagnos
    if(!(list instanceof ListNode)||list.getListType()==='check'||!list.getParent()||
       !NODE_SCHEMA[list.getParent()!.getType()]?.children?.includes('list'))
     return reject('지원하지 않는 목록 구조에서는 들여쓰기를 변경할 수 없습니다.');
+   if(item.getFirstChild() instanceof ListNode)
+    return reject('중첩 목록 컨테이너 자체의 들여쓰기는 변경하지 않습니다. 내부 항목을 선택하세요.');
    // Lexical's setIndent performs structural nesting; never set CSS-only indentation on a list.
    const depth=item.getIndent();
    if(direction==='indent'&&(!item.getPreviousSibling()||depth>=20))
@@ -241,6 +243,7 @@ export function registerListKeyboardCommands(editor:LexicalEditor):()=>void{
   let node:LexicalNode|null=selection.anchor.getNode();
   while(node&&!(node instanceof ListItemNode))node=node.getParent();
   if(!(node instanceof ListItemNode))return false;
+  if(node.getFirstChild() instanceof ListNode)return false;
   const list=node.getParent();
   if(!(list instanceof ListNode)||list.getListType()==='check'||!isSectionList(list)||!list.getParent()||
      !NODE_SCHEMA[list.getParent()!.getType()]?.children?.includes('list'))return false;

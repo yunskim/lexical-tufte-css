@@ -1,0 +1,140 @@
+{
+  "date": "2026-10-31",
+  "baseCommit": "fe5449e7a10424f306c2194d999a75cfe07998f0",
+  "branch": "fix/main-browser-parity-20261023",
+  "task": "P2.2.b.2-K4",
+  "status": "complete-with-documented-supported-and-rejected-boundaries",
+  "check": {
+    "build": "pass",
+    "typecheck": "pass",
+    "unit": {
+      "total": 475,
+      "document": 57,
+      "render": 52,
+      "blog": 77,
+      "editorPorts": 2,
+      "lexical": 287,
+      "fail": 0,
+      "skip": 0
+    }
+  },
+  "focusedUnit": {
+    "pass": 10,
+    "fail": 0,
+    "skip": 0,
+    "includedInTotal": true
+  },
+  "browser": {
+    "files": [
+      "list-tab-focus-browser.mjs",
+      "list-kind-browser.mjs",
+      "contextual-ui-browser.mjs"
+    ],
+    "processRuns": 4,
+    "status": "pass",
+    "focusWidths": [
+      1440,
+      375
+    ],
+    "listWidths": [
+      1440,
+      375
+    ],
+    "rejectFocusCases": 36,
+    "validDepthKeys": 8,
+    "externalButtonCases": 4
+  },
+  "package": {
+    "pass": 5
+  },
+  "sourceHashes": [
+    {
+      "path": "package.json",
+      "sha256": "1b7023aca952b3dfd4799b89c8851fb1a63e8e46714667d7670ba653373e08ca"
+    },
+    {
+      "path": "packages/lexical/src/listCommands.ts",
+      "sha256": "c1f867300db2ff023959a0dc649bfd4b47b83928a8c1b6f8b69f565f8776edc5"
+    },
+    {
+      "path": "packages/lexical/test/list-tab.test.mjs",
+      "sha256": "4d01106e08d5e8481fce2b506591e0675657f47d2c84ffc1107a380ec139db89"
+    },
+    {
+      "path": "packages/lexical/test/tab-browser-harness.mjs",
+      "sha256": "a947179dc4c3b547f58d388f06746ba49edb3a3cc4deac83aafe452ee717f301"
+    },
+    {
+      "path": "tests/list-tab-focus-browser.mjs",
+      "sha256": "53955868d8de7f3e8656e0ba9b6dffa40d2c37021a989f6e3bfec9f55ef0ea20"
+    },
+    {
+      "path": "tests/vite-publication.config.mjs",
+      "sha256": "b0c145fe32216f50b33d15d13e275caf9ec5ef57ec0461d82aee4f355655d094"
+    }
+  ],
+  "logs": [
+    {
+      "file": "check.log",
+      "sha256": "40d1c73d5eb68a82413a198fea9795e88c4e721ccdd12d03373df8ca35a79c78",
+      "tail": [
+        "packages/lexical test: ℹ duration_ms 1740.764663",
+        "packages/lexical test: Done"
+      ]
+    },
+    {
+      "file": "unit-complete.log",
+      "sha256": "d3e3836ffb8dd0c9964c0c91c19d62d4a81b2bb1e86f67a8099128d412932c84",
+      "tail": [
+        "ℹ todo 0",
+        "ℹ duration_ms 272.80462"
+      ]
+    },
+    {
+      "file": "tab-browser-complete.log",
+      "sha256": "b3d073dd38f17793b93873704f5190cd6593ac0495ca957d8b2b9cd118e5863f",
+      "tail": [
+        "K4 1440px: ul/ol depth19/20, reject focus, payload and external button navigation PASS",
+        "K4 375px: ul/ol depth19/20, reject focus, payload and external button navigation PASS"
+      ]
+    },
+    {
+      "file": "list1440.log",
+      "sha256": "15c4c1c405ab871c7e0f9732e16ec7bb84ce4ad1c51833b1b4772b3aa97e13ed",
+      "tail": [
+        "P2.2.b list browser: ul/ol conversion, structural indent/outdent, safe unwrap, history, save/reopen, renderer, reject PASS."
+      ]
+    },
+    {
+      "file": "list375.log",
+      "sha256": "15c4c1c405ab871c7e0f9732e16ec7bb84ce4ad1c51833b1b4772b3aa97e13ed",
+      "tail": [
+        "P2.2.b list browser: ul/ol conversion, structural indent/outdent, safe unwrap, history, save/reopen, renderer, reject PASS."
+      ]
+    },
+    {
+      "file": "contextual.log",
+      "sha256": "acb046ad3909544ac14d647e186cee4964328326bdfe4578c0ae36a8a42b5cb7",
+      "tail": [
+        "Contextual UI: formatting, selection snapshot restoration, Escape and Tab focus targets, schema-filtered inserts, undo and 375px bounds PASS."
+      ]
+    },
+    {
+      "file": "pack.log",
+      "sha256": "0db51b0fca40e7709cbac5198c03d3431bf2fbb4fdd2acb4086f4faf428e8a73",
+      "tail": [
+        "Checking packed JS imports and editor roundtrip (15s limit).",
+        "R13 five tarballs: full LICENSE/notices/OFL, packed JS imports, fresh declarations, strict editor roundtrip, renderer/blog and SQL exports PASS. No publishing."
+      ]
+    }
+  ],
+  "notRun": [
+    "full 36-file browser suite",
+    "official full-page pixel parity",
+    "Python",
+    "CI"
+  ],
+  "knownDeferred": "Managed asset registration remains unimplemented; no test deleted/skipped.",
+  "next": "P2.2.b.2-K5",
+  "logDirectory": "/workspace/scratch/484e46557938/lexical-tufte-tab-20261031"
+}

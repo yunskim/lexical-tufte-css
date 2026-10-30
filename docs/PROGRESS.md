@@ -1,3 +1,9 @@
+## 2026-10-31 K4 Tab 깊이·포커스 검증 완료
+
+- 깊이19↔20 및 거부 경계의 실제 기본 focus 이동을 ul/ol·1440/375px에서 검증했다. list-only 컨테이너 자체가 변형 없이 Tab을 소비하던 E130을 keyboard 위임/toolbar 진단으로 수정했다.
+- check475개, 집중 Tab10개, 포커스/목록 browser 두 폭 및 contextual UI, package5개 소비 통과. 전체36파일/공식 pixel/Python은 이번에 전수 재실행하지 않았다. 보류 자산 실패는 유지하며 CI는 생략했다.
+- [보고서](VERIFICATION_TAB_FOCUS_2026-10-31.ko.md), [소스·로그 해시](verification/tab-focus-20261031.json). K4만 체크했고 다음은 K5 통합 수락이다. 상위 목록 작업 전체는 아직 미완료다.
+
 ## 2026-10-31 K3 Backspace 지원/거부 범위 검증 완료
 
 - 첫 nonempty 목록 항목의 실제 Backspace 해제 누락(E129)을 구현했다. 방향·정렬·노트/내용을 paragraph로 옮기고 나머지 목록을 보존한다. nested payload 및 위험한 혼합 부모는 진단 거부한다.

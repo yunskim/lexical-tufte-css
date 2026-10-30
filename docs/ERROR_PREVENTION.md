@@ -1,5 +1,13 @@
 # 재발 방지 대책 및 정기 점검
 
+## M120 — 거부 반환값과 실제 포커스 이동을 함께 검사
+
+2026-10-31 종료: check475·집중10·포커스/목록1440/375px·contextual UI·package5개 통과. E130의 재현 선택 및 실제 focus/문서 보존을 검증했다. [실행 보고서](VERIFICATION_TAB_FOCUS_2026-10-31.ko.md). 관련 기존 M117–M119/M088/M004를 다시 대조하고 전체 전수·OS IME·자산 한계는 유지했다. 다음 점검은 K5 시작·완료다.
+
+- E130: false/preventDefault 미호출만으로 기본 탐색 보존을 완료 처리하지 않는다. 실제 browser에서 editor 앞/뒤 focus 대상을 두고 Tab/Shift+Tab의 activeElement와 문서 무변경을 함께 검사한다.
+- 컨테이너·첫 항목·깊이20 등 fixture가 의도한 논리 선택인지 anchor key/type을 검사한다. selectStart()가 자손으로 내려가는 동작과 element 선택을 구분한다. no-op 구조 컨테이너는 keyboard 위임/toolbar 진단으로 분리한다.
+- 깊이19→20→19의 정본 JSON/노트 보존, 깊이20 추가 변경 거부와 toolbar 진단, 외부 버튼 및 컨텍스트 메뉴 탐색을 각각 검사한다. 시작 시 M117–M119/M088/M004를 검토했다. 종료 실행과 다음 K5 점검은 K4 보고서에 연결한다. CI 생략.
+
 ## M119 — 위임 반환값과 실제 Backspace 결과를 분리
 
 2026-10-31 종료: check465·package5·목록 두 폭과 note browser3개 통과. 실제 첫 항목 해제 누락을 수정하고 nested payload의 문단 변환은 진단 거부했다. 기존 위임 테스트를 문자 내부와 시작 경계로 나눴다. [실행 결과](VERIFICATION_BACKSPACE_2026-10-31.ko.md). 시작에 검토한 관련 기록을 종료 시 다시 대조했고 이전 전체 pixel·자산·OS IME 한계를 유지한다. 다음 점검은 K4 및 K5 시작·완료다.
