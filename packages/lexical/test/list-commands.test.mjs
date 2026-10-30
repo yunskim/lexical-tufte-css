@@ -396,7 +396,7 @@ test('P2.2.b Backspace on sole empty first list item replaces list with paragrap
  stop();dispose();
 });
 
-test('P2.2.b Backspace leaves nonempty and nonfirst items, IME and outside paragraph to Lexical',()=>{
+test('P2.2.b Backspace delegates inside nonempty text, nonfirst items, IME and outside paragraph',()=>{
  const {editor,dispose}=setup();const stop=registerListKeyboardCommands(editor);
  editor.update(()=>{
   const outside=$createTextNode('Outside');
@@ -405,7 +405,7 @@ test('P2.2.b Backspace leaves nonempty and nonfirst items, IME and outside parag
    $createParagraphNode().append(outside),
    $createListNode('bullet').append($createListItemNode().append(first),$createListItemNode())
   ));
-  first.select(0,0);
+  first.select(1,1);
  },{discrete:true});
  const event=(isComposing=false)=>({isComposing,shiftKey:false,ctrlKey:false,metaKey:false,altKey:false,prevented:false,preventDefault(){this.prevented=true;}});
  const nonempty=event();assert.equal(editor.dispatchCommand(KEY_BACKSPACE_COMMAND,nonempty),false);assert.equal(nonempty.prevented,false);

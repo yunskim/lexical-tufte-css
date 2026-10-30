@@ -186,6 +186,26 @@ export function registerListKeyboardCommands(editor:LexicalEditor):()=>void{
    for(let current=selection.anchor.getNode();atStart&&!current.is(node);current=current.getParent()!){
     if(current.getPreviousSibling())atStart=false;
    }
+   if(atStart&&parentList instanceof ListNode&&parentList.getListType()!=='check'&&
+      parentList.getParent() instanceof SectionNode&&parentList.getParent()?.getParent()?.getType()==='root'&&
+      node.is(parentList.getFirstChild())&&node.getChildrenSize()>0&&
+      node.getChildren().every(child=>NODE_SCHEMA.paragraph!.children!.includes(canonicalBlockType(child.getType())))){
+    event.preventDefault();$addUpdateTag(HISTORY_PUSH_TAG);
+    const paragraph=$createParagraphNode();
+    paragraph.setDirection(node.getDirection()).setFormat(node.getFormatType())
+      .setTextFormat(node.getTextFormat()).setTextStyle(node.getTextStyle());
+    parentList.insertBefore(paragraph);paragraph.append(...node.getChildren());node.remove();
+    if(parentList.getChildrenSize()===0)parentList.remove();
+    paragraph.selectStart();return true;
+   }
+   if(atStart&&parentList instanceof ListNode&&parentList.getListType()!=='check'&&
+      parentList.getParent() instanceof SectionNode&&parentList.getParent()?.getParent()?.getType()==='root'&&
+      node.is(parentList.getFirstChild())&&node.getChildrenSize()>0){
+    // A paragraph cannot contain nested lists or other non-phrasing payloads.
+    event.preventDefault();
+    editor.dispatchCommand(UNWRAP_TUFTE_LIST_COMMAND,undefined);
+    return true;
+   }
    if(atStart&&parentList instanceof ListNode&&parentList.getListType()!=='check'&&isSectionList(parentList)&&
       parentList.getParent() instanceof ListItemNode&&parentList.getParent()!.getChildrenSize()!==1){
     // RichText's collapseAtStart calls the same unsafe outdent as the toolbar.

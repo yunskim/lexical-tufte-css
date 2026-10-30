@@ -1,3 +1,9 @@
+## 2026-10-31 K3 Backspace 지원/거부 범위 검증 완료
+
+- 첫 nonempty 목록 항목의 실제 Backspace 해제 누락(E129)을 구현했다. 방향·정렬·노트/내용을 paragraph로 옮기고 나머지 목록을 보존한다. nested payload 및 위험한 혼합 부모는 진단 거부한다.
+- 최종 check465개, package5개, 목록1440/375px 문자 삭제·병합·첫 항목 해제·nested outdent history/저장/발행 및 note browser3개 통과. 전체35파일/공식 pixel/Python은 이번에 재실행하지 않았고 기존 보류 자산 실패는 유지한다. CI 생략.
+- [보고서](VERIFICATION_BACKSPACE_2026-10-31.ko.md), [소스·로그 해시](verification/backspace-20261031.json). K3를 명시한 지원/거부 범위에서 체크했으며 다음은 K4 깊이·포커스 행렬, 이어서 K5다.
+
 ## 2026-10-27 목록 K1·K2 완료, K3 손실 경계 차단
 
 - 실제 RichText와 목록 키보드 소유권(K1), 일반 Enter 분할·최종 빈 항목 종료·nested 빈 항목 outdent(K2)를 구현·검증했다. 혼합 부모의 텍스트/노트 소실(E127)과 실제 중첩 JSON의 발행 거부(E128)를 수정했다. 위험한 일반 outdent/시작 Backspace는 진단·무변경 거부한다.

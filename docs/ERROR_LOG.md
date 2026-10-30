@@ -1,5 +1,12 @@
 # 에러 기록
 
+## E129 — 첫 비어 있지 않은 목록 항목 Backspace 해제 누락 (지원/거부 범위 검증 완료)
+
+- 2026-10-31 K3 실제 browser: 첫 항목 시작에서 Backspace 후 UL이 남아 문단 해제 수락 검사가 실패했다. 기존 native 위임만으로 이 경계의 제품 동작을 보장할 수 없었다.
+- 조치: root-level Tufte section의 첫 ul/ol 항목이며 문단에 허용된 phrasing 자식만 있을 때 HIGH handler가 문단으로 이동한다. 내용·노트 ID·direction/format/textFormat/textStyle과 나머지 목록을 보존하고 HISTORY_PUSH_TAG를 사용한다. 중첩 payload 전체를 강제 해제하지 않는다. 최종 실행은 후속 보고서 참조. M119.
+- 테스트 절차 오류: 최초 headless 회귀 중 native 첫 항목 해제·일반 문자 삭제4건은 window object not found로 실패했다. 브라우저 Selection API 필요 경로를 fake DOM으로 통과시키지 않고 실제 browser로 이동했다. 구현한 Tufte 해제 경로는 DOM 없이도 별도 검사한다.
+- 최종 check465개·package5개·목록1440/375px와 note browser3개 통과. 첫 nested payload는 진단·무변경 거부한다. 기존 nonempty 위임 회귀는 시작 경계의 새 소유권과 구분해 문자 내부 offset1을 검사하며 시작 offset0은 새 테스트에서 검사한다. [실행 결과](VERIFICATION_BACKSPACE_2026-10-31.ko.md). M119를 적용했고 다음 K4/K5에서 재점검한다. CI 생략.
+
 ## 2026-10-27 K1·K2 종료 검증
 
 E127/E128의 명시된 지원·거부 경계에서 수정 검증 완료. 최종 check458개·package5개·1440/375px 목록 UI 통과. 전체 browser34/35(보류 자산1실패), 공식6폭 pixel mask 밖 차이0이며 마지막 체크리스트 제외 조건 이후의 집중 재검증은 [보고서](VERIFICATION_LIST_KEYBOARD_2026-10-27.ko.md)에 구분했다. E127의 모든 일반 혼합 구조 편집을 구현한 것은 아니며 K3/K4는 미완료다. 두 오류 문서의 전체 기록/상태를 재점검했고 환경·실기기 IME·스크린리더·보류 자산 한계는 유지한다. CI 생략.

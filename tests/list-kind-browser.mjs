@@ -135,6 +135,11 @@ try{
  const splitList=editor.locator('section ul').last();
  const beforeSplit=await snapshot();
  await splitList.locator('li').first().click();
+ await page.keyboard.press('End');await page.keyboard.press('ArrowLeft');await page.keyboard.press('Backspace');
+ assert.equal(await splitList.locator('li').first().textContent(),'AlphaBea','Ordinary Backspace deletes one character');
+ await page.getByRole('button',{name:'실행 취소',exact:true}).click();
+ assert.deepEqual(await snapshot(),beforeSplit,'Undo restores ordinary character deletion');
+ await splitList.locator('li').first().click();
  await page.keyboard.press('End');
  await page.keyboard.press('ArrowLeft');
  await page.keyboard.press('ArrowLeft');
@@ -156,9 +161,30 @@ try{
  await page.waitForFunction(()=>[...document.querySelectorAll('.editor section ul')].some(ul=>
    [...ul.querySelectorAll(':scope > li')].some(li=>li.textContent==='AlphaBeta')));
  const mergedState=await snapshot();
+ await page.getByRole('button',{name:'실행 취소',exact:true}).click();
+ assert.deepEqual(await snapshot(),splitState,'One Undo restores the two items before Backspace merge');
+ await page.getByRole('button',{name:'다시 실행',exact:true}).click();
+ assert.deepEqual(await snapshot(),mergedState,'Redo restores Backspace merge');
  assert.match(JSON.stringify(mergedState),/AlphaBeta/);
  const mergedLists=mergedState.root.children.flatMap(n=>n.children).filter(n=>n.type==='list');
  assert.ok(mergedLists.some(list=>list.children.some(item=>item.children?.some(child=>child.text==='AlphaBeta'))));
+ // First nonempty item Backspace safely unwraps into a section paragraph.
+ await splitList.locator(':scope > li').first().click();
+ await page.keyboard.press('Home');await page.keyboard.press('Backspace');
+ const firstUnwrapped=await snapshot();
+ assert.equal(await editor.locator('section').last().locator(':scope > ul').count(),0);
+ assert.ok((await editor.locator('section').last().locator(':scope > p').allTextContents()).includes('AlphaBeta'));
+ await page.getByRole('button',{name:'실행 취소',exact:true}).click();
+ assert.deepEqual(await snapshot(),mergedState,'One Undo restores first-item unwrap');
+ await page.getByRole('button',{name:'다시 실행',exact:true}).click();
+ assert.deepEqual(await snapshot(),firstUnwrapped,'Redo restores the unwrapped paragraph');
+ await page.getByRole('button',{name:'저장',exact:true}).click();
+ await page.reload();await editor.waitFor();
+ await page.getByRole('button',{name:'불러오기',exact:true}).click();
+ assert.deepEqual(await snapshot(),firstUnwrapped,'Save/reopen preserves Backspace unwrap');
+ const backspacePublished=renderArticle({schemaVersion:1,id:'backspace',locale:'ko-KR',title:'Backspace',assets:[],lexicalState:firstUnwrapped});
+ assert.equal(backspacePublished.ok,true,JSON.stringify(backspacePublished.diagnostics));
+ assert.match(backspacePublished.html,/AlphaBeta/);
  // Nested-list keyboard regression: verify Tab/Shift+Tab history and content stability.
  await editor.focus();await page.keyboard.press('Control+End');
  await action('다음 섹션 추가').click();
@@ -178,6 +204,17 @@ try{
  assert.deepEqual(await snapshot(),beforeNestedTab,'Undo must restore flat list after Tab');
  await page.getByRole('button',{name:'다시 실행',exact:true}).click();
  assert.deepEqual(await snapshot(),afterNestedTab,'Redo must restore nested list');
+ await editor.locator('section ul ul li').last().click();
+ await page.keyboard.press('Home');await page.keyboard.press('Backspace');
+ const afterNestedBackspace=await snapshot();
+ assert.equal(await editor.locator('section ul ul li').count(),0,'Nested first-item Backspace outdents safely');
+ assert.match(JSON.stringify(afterNestedBackspace),/Parent item/);assert.match(JSON.stringify(afterNestedBackspace),/Nested item/);
+ await page.getByRole('button',{name:'실행 취소',exact:true}).click();
+ assert.deepEqual(await snapshot(),afterNestedTab,'One Undo restores nested Backspace');
+ await page.getByRole('button',{name:'다시 실행',exact:true}).click();
+ assert.deepEqual(await snapshot(),afterNestedBackspace,'Redo restores nested Backspace outdent');
+ await page.getByRole('button',{name:'실행 취소',exact:true}).click();
+ assert.deepEqual(await snapshot(),afterNestedTab);
  // On a nonempty nested item, Enter is delegated to Lexical. It must not
  // accidentally trigger the top-level empty-final-item exit handler.
  await editor.locator('section ul ul li').last().click();

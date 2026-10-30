@@ -1,0 +1,123 @@
+{
+  "date": "2026-10-31",
+  "baseCommit": "6053b682e0f90e807dd94e6f4aa7908d2d0691d2",
+  "task": "P2.2.b.2-K3",
+  "status": "complete-with-explicit-supported-and-rejected-boundaries",
+  "unit": {
+    "pass": 465,
+    "fail": 0,
+    "skip": 0,
+    "document": 57,
+    "render": 52,
+    "blog": 77,
+    "editorPorts": 2,
+    "lexical": 277
+  },
+  "build": "pass",
+  "typecheck": "pass",
+  "package": {
+    "pass": 5,
+    "finalCommand": "node scripts/pack-and-check.mjs"
+  },
+  "browser": {
+    "uniqueFiles": 4,
+    "runs": 5,
+    "pass": 5,
+    "fail": 0,
+    "skip": 0,
+    "widths": [
+      1440,
+      375
+    ],
+    "files": [
+      "list-kind-browser.mjs",
+      "note-browser.mjs",
+      "note-editing-browser.mjs",
+      "note-dom-browser.mjs"
+    ]
+  },
+  "notRun": [
+    "full 35-file browser suite",
+    "official full-page pixel parity",
+    "Python",
+    "CI"
+  ],
+  "knownDeferred": "Managed asset registration UI remains unimplemented.",
+  "sourceHashes": [
+    {
+      "path": "packages/lexical/src/listCommands.ts",
+      "sha256": "466816543d015da1eb673e8c29d25b3cf334ad60dc9fb2b94dbf7a6f433ea974"
+    },
+    {
+      "path": "packages/lexical/test/list-backspace.test.mjs",
+      "sha256": "aa9e01bdab7ec65e300f2daf06e775070fd0b4f1b4f62b5ad7c170702ee46f36"
+    },
+    {
+      "path": "packages/lexical/test/list-commands.test.mjs",
+      "sha256": "796e7731cfd386fce7c56dbb410d2314e337046381989ab6c979382d4921b47d"
+    },
+    {
+      "path": "tests/list-kind-browser.mjs",
+      "sha256": "86f8cd09549630825c808cd6de3d8ecd349f7c0e4937796b31e5af6a7b4f7ae0"
+    }
+  ],
+  "logs": [
+    {
+      "file": "check-final-boundary.log",
+      "sha256": "8c3bfd83d2770b8c8a2cc2f9c1fc1ed4e0141275dd6e2d06a729f52b5a0b2cb1",
+      "tail": [
+        "packages/lexical test: ℹ todo 0",
+        "packages/lexical test: ℹ duration_ms 1826.490074",
+        "packages/lexical test: Done"
+      ]
+    },
+    {
+      "file": "browser1440-final.log",
+      "sha256": "15c4c1c405ab871c7e0f9732e16ec7bb84ce4ad1c51833b1b4772b3aa97e13ed",
+      "tail": [
+        "P2.2.b list browser: ul/ol conversion, structural indent/outdent, safe unwrap, history, save/reopen, renderer, reject PASS."
+      ]
+    },
+    {
+      "file": "browser375-final.log",
+      "sha256": "15c4c1c405ab871c7e0f9732e16ec7bb84ce4ad1c51833b1b4772b3aa97e13ed",
+      "tail": [
+        "P2.2.b list browser: ul/ol conversion, structural indent/outdent, safe unwrap, history, save/reopen, renderer, reject PASS."
+      ]
+    },
+    {
+      "file": "package-final.log",
+      "sha256": "bcbf6f36cf7417608dec88f41e01246114496cbe92683dd5e35bd8e8338940b1",
+      "tail": [
+        "examples/editor build: dist/assets/index-C4c6fNxd.css    7.34 kB │ gzip:   2.10 kB",
+        "examples/editor build: dist/assets/index-DDR7fdi-.js   624.95 kB │ gzip: 188.45 kB",
+        "examples/editor build: ✓ built in 209ms"
+      ]
+    },
+    {
+      "file": "note-final.log",
+      "sha256": "ea308fc1f545bf643dc89b2a0190e29a067ed7cedca63ee7a3b66b6d2703ae54",
+      "tail": [
+        "P1.1 Chromium: insertion, keyboard entry/exit, bold/italic/code/link/image, nested rejection, JSON save/reload and HTML structure passed."
+      ]
+    },
+    {
+      "file": "note-editing-final.log",
+      "sha256": "7bbbe929d9ffcf9e137cbf3594577bc515d752629b7c8c2e044d26711bc4827b",
+      "tail": [
+        "    \"status\": \"passed\"",
+        "  }",
+        "]"
+      ]
+    },
+    {
+      "file": "note-dom-final.log",
+      "sha256": "b1e3d6c38aff1c5570195530692acf72a20f8e7eba9e20ab9a880b4221cc1c2b",
+      "tail": [
+        "P1.3 DOM: both note kinds, editing/publication separation, label-input-payload adjacency, JSON immutability and upstream mobile CSS toggles passed."
+      ]
+    }
+  ],
+  "extraEvidenceLog": "pack-consumption.log",
+  "logDirectory": "/workspace/scratch/484e46557938/lexical-tufte-backspace-20261031"
+}

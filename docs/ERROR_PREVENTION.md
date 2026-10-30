@@ -1,5 +1,13 @@
 # 재발 방지 대책 및 정기 점검
 
+## M119 — 위임 반환값과 실제 Backspace 결과를 분리
+
+2026-10-31 종료: check465·package5·목록 두 폭과 note browser3개 통과. 실제 첫 항목 해제 누락을 수정하고 nested payload의 문단 변환은 진단 거부했다. 기존 위임 테스트를 문자 내부와 시작 경계로 나눴다. [실행 결과](VERIFICATION_BACKSPACE_2026-10-31.ko.md). 시작에 검토한 관련 기록을 종료 시 다시 대조했고 이전 전체 pixel·자산·OS IME 한계를 유지한다. 다음 점검은 K4 및 K5 시작·완료다.
+
+- E129: registerRichText가 true를 반환하거나 headless 병합이 성공해도 실제 첫 항목 문단 해제가 된다고 가정하지 않는다. browser에서 문자 삭제·항목 병합·첫 항목 해제·중첩 outdent를 각각 검사한다.
+- 각 동작의 전체 JSON을 Undo/Redo 전후 비교하고 저장·재열기 및 순수 발행을 확인한다. ul/ol 노트 ID·payload 보존은 별도 단위로 검사한다. 실제 DOM 선택 API가 필요한 native 삭제를 headless 전역/window mock으로 우회하지 않는다.
+- 시작 시 E127/M117·E128/M118·E097/M088·M004를 검토했다. 종료 시 실행 보고서에 성공/미검증 범위를 연결하고 K3의 나머지 노트·범위·조합/키보드 행렬은 증거 전 완료 처리하지 않는다. CI 생략.
+
 ## 2026-10-27 목록 K1·K2 종료 점검
 
 E127/M117·E128/M118, E097/M088 재발과 M004/M113 절차를 코드·실제 RichText 단위·모바일/데스크톱 UI·발행 검사에 반영했다. 두 문서의 전체 기록/상태를 재점검했다. 최종 check458·package5·목록1440/375px 통과, 전체 browser34/35 및 공식6폭 pixel차이0. 마지막 checklist guard 이후 집중 재검증과 이전 전수 범위를 [보고서](VERIFICATION_LIST_KEYBOARD_2026-10-27.ko.md)에 분리했다. 일반 혼합 부모 outdent는 구현 완료로 바꾸지 않고 진단 거부, K3/K4/K5는 남긴다. 다음 점검: K3 일반 병합/해제 및 K4 깊이·focus 경계 시작·완료. CI 생략.
