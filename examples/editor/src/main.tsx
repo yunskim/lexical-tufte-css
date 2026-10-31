@@ -465,6 +465,7 @@ function EditorUI(){
           (resolved.expiresAt!==undefined&&(!Number.isFinite(Date.parse(resolved.expiresAt))||Date.parse(resolved.expiresAt)<=Date.now()))){
           failed++;failedHostKeys.current.add(image.key);continue;
         }
+        let applied=false;
         editor.update(()=>{
           const node=$getNodeByKey(image.key);
           if(!(node instanceof InlineImageNode))return;
@@ -473,9 +474,10 @@ function EditorUI(){
             current.hostAsset.assetId!==image.assetId||
             current.hostAsset.revisionId!==image.revisionId)return;
           node.setHostAsset(current.hostAsset,resolved.url,current.alt);
+          applied=true;
           refreshed++;
         },{tag:HISTORY_PUSH_TAG,discrete:true});
-        scheduleExpiryRefresh(resolved.expiresAt);
+        if(applied)scheduleExpiryRefresh(resolved.expiresAt);
       }
       if(generation!==refreshGeneration.current)return;
       if(failed){scheduleRefreshRetry();}else{refreshFailures.current=0;clearRetryRefresh();}
