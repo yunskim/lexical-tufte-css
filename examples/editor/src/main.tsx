@@ -332,6 +332,26 @@ function EditorUI(){
   const [json,setJson]=useState('');
   const [imageChooserOpen,setImageChooserOpen]=useState(false);
   const [noteImages,setNoteImages]=useState<NoteImageChoice[]>([]);
+  // Local document catalog. External AssetProvider remains read-only.
+  const [documentAssets,setDocumentAssets]=useState<Array<{id:string;src:string;mimeType:string;width?:number;height?:number}>>([]);
+  function registerDocumentImage(){
+    const id=window.prompt('자산 ID');if(id===null)return;
+    const src=window.prompt('이미지 URL');if(src===null)return;
+    const mimeType=window.prompt('MIME 유형','image/svg+xml');if(mimeType===null)return;
+    const widthText=window.prompt('너비 (선택)','');if(widthText===null)return;
+    const heightText=window.prompt('높이 (선택)','');if(heightText===null)return;
+    const validSize=(value:string)=>value===''||(/^[0-9]+$/.test(value)&&Number.isSafeInteger(Number(value))&&Number(value)>0);
+    if(!/^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$/.test(id)||
+       !src||src.startsWith('//')||/^[a-z]+:/i.test(src)&&!/^https?:\/\//i.test(src)||
+       !/^image\/[a-z0-9.+-]+$/i.test(mimeType)||!validSize(widthText)||!validSize(heightText)||
+       documentAssets.some(asset=>asset.id===id)){
+      setStatus('자산 등록 거부: 중복 ID 또는 잘못된 이미지 정보입니다.');return;
+    }
+    const asset={id,src,mimeType,...(widthText?{width:Number(widthText)}:{}),...(heightText?{height:Number(heightText)}:{})};
+    setDocumentAssets(previous=>[...previous,asset]);
+    setStatus('문서 이미지 자산을 등록했습니다.');
+  }
+
   const chooserNoteKey=useRef<string|null>(null);
   const chooserTrigger=useRef<HTMLButtonElement>(null);
   useEffect(()=>registerSectionCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
@@ -760,6 +780,11 @@ function EditorUI(){
     </main>
     <p role="status" aria-label="편집 작업 상태">{status}</p><p role="status" aria-label="자동 복구 저장 상태">{autoSaveState}</p>
     {structureIssues.length>0&&<aside role="alert" aria-label="문서 구조 복구"><p>문서 구조를 수정하세요. 내용은 자동 삭제하지 않으며 HTML 생성은 차단됩니다.</p><ul>{structureIssues.map((issue,i)=><li key={`${issue.key}-${i}`}><button onClick={()=>focusStructureIssue(editor,issue.key)}>{issue.message}</button> <code>{issue.path}</code></li>)}</ul><button onClick={()=>editor.dispatchCommand(UNDO_COMMAND,undefined)}>구조 변경 실행 취소</button><button onClick={recoverStructure} disabled={!checkpoint.current}>마지막 정상 구조로 복구</button></aside>}
+    <section role="group" aria-label="문서 이미지 자산">
+      <button type="button" onClick={registerDocumentImage}>문서 이미지 자산 등록</button>
+      <p>문서 자산 {documentAssets.length}개</p>
+      <ul>{documentAssets.map(asset=><li key={asset.id}>{asset.id} · {asset.mimeType} · {asset.width??'?'}×{asset.height??'?'}</li>)}</ul>
+    </section>
     <div className="actions"><button onClick={save}>저장</button><button onClick={restore}>불러오기</button><button onClick={restoreRecovery} disabled={!recoveryAvailable}>복구용 사본 열기</button><button onClick={exportRecovery} disabled={!recoveryAvailable}>복구본 JSON 내보내기</button><button onClick={deleteRecovery} disabled={!recoveryAvailable}>복구본 정리</button><button onClick={exportDocument}>JSON·HTML 확인</button><button onClick={()=>{editor.update($loadLayoutFixture,{tag:HISTORY_PUSH_TAG});setStatus('레이아웃 예제를 불러왔습니다. 실행 취소할 수 있습니다.');}}>레이아웃 예제 불러오기</button></div>
     <details><summary>JSON과 발행 HTML 검사</summary><label>JSON<textarea ref={textarea} aria-label="문서 JSON" value={json} readOnly/></label><label>HTML<textarea aria-label="발행 HTML" value={html} readOnly/></label></details>
     <p className="notice">프로토타입: 공개 발행·모바일 여백 배치·OS별 실제 IME와 다른 브라우저 검증은 후속 단계에서 진행합니다. 한글 웹폰트 자산 연결은 P4 대상입니다.</p>
