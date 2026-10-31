@@ -83,10 +83,10 @@ try{
   const document=JSON.parse(JSON.stringify(base));
   document.lexicalState.root.children[0].children.push(
    {type:'list',version:1,listType:'number',tag:'ol',start:3,children:[
-    {type:'listitem',version:1,value:3,children:[{type:'text',version:1,text:'Numbered item',format:0}]}
+    {type:'listitem',version:1,value:3,children:[{type:'text',version:1,text:'Numbered item',format:0,detail:0,mode:'normal',style:''}]}
    ]},
    {type:'quote',version:1,cite:'https://example.org/source',children:[
-    {type:'paragraph',version:1,children:[{type:'text',version:1,text:'Quoted text',format:0}]}
+    {type:'text',version:1,text:'Quoted text',format:0,detail:0,mode:'normal',style:''}
    ]}
   );
   return document;
