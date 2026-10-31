@@ -1,3 +1,9 @@
+## 2026-10-31 C2.c Tab·DOM 읽기 순서 자동화
+
+- 실제 Tab/Shift+Tab으로 인용 버튼17개 정/역순 도달·종료와 편집된 발행 HTML의 blockquote 본문→footer→cite 순서 검사. 기존 명령/이력/텍스트/DOM재열기 검사를 포함한 browser1440/375px 통과.
+- [자동화/수동 잔여 범위](VERIFICATION_QUOTATION_ACCESS_2026-10-31.ko.md), [증거](verification/quotation-tab-order-20261031.json). 제품 코드·schema·golden 변경 없음. unit/build/typecheck/package/full browser/pixel/Python/CI 미실행.
+- E133/M123·E134/M124를 시작/종료 재점검했고 새 오류 없음. 실제 스크린리더/OS IME는 P6.2/P6.6에 남아 C2.c 및 상위 인용 게이트 미완료. 다음 독립 코드 작업은 P2.2.d.1 capability 대조다.
+
 ## 2026-10-31 C2 생성 이력·키보드 실행/포커스 보강
 
 - 생성/추가6종의 한 Undo/Redo·인접 section 보존 회귀6개 추가. 실제1440/375px에서 Enter/Space 버튼 실행 후 editor activeElement 복귀 및 본문·문헌·section-footer 텍스트 입력 검사.

@@ -185,7 +185,7 @@ P1 gate: 완료. 노트 편집 회귀와 SSR 출력의 실제 브라우저 비�
     - [x] P2.2.b.3 정의목록 쌍/그룹의 추가·수정·삭제·복수dt 순서/노트 보존 및 canonical 재열기·editor native/pure renderer 의미 HTML 비교. malformed/section 밖/범위·조합·note 내부 진단·무변경. [지원/제한과 실행 결과](VERIFICATION_DEFINITION_LIST_2026-10-31.ko.md): check501·package5·정의목록1440/375px 및 publication/contextual 통과. 임의 HTML import/모든 속성·별도 alias GUI는 이 수락 범위에 포함하지 않는다.
   - [ ] P2.2.c F07–F09 구분선/section footer/quote·출처/epigraph 명령과 회귀.
     - [x] P2.2.c.1 이미 구현된 생성·출처 추가 명령을 기준으로 기존 노드의 속성/내용 수정, 출처·인용 삭제, 복수 epigraph 항목 관리의 지원/거부 경계를 정한다. [명령 계약·구현 체크리스트](QUOTATION_COMMANDS_P22C.ko.md)에 범위 설계 완료; C1.a URL/삭제 명령·예제 UI 구현, check551·quotation63·UI1440/375px·package5개 통과. C1.b epigraph 내부 항목 추가/이동 구현·회귀 검증 완료. 최종 check564·집중45·UI1440/375px. C2 전체 수락은 별도 미완료.
-    - [ ] P2.2.c.2 선택 위치·동일 블록 원자성·undo/redo·JSON→발행 HTML·재열기·스크린리더 읽기 순서를 회귀 검증한다.
+    - [ ] P2.2.c.2 선택 위치·동일 블록 원자성·undo/redo·JSON→발행 HTML·재열기·스크린리더 읽기 순서를 회귀 검증한다. [자동화 결과](VERIFICATION_QUOTATION_ACCESS_2026-10-31.ko.md): Tab/Shift+Tab17버튼·1440/375px·DOM 본문/출처/문헌 순서 통과. 실제 스크린리더 낭독 검증은 P6.2/P6.6에 남아 미완료.
   - [ ] P2.2.d F01–F09 직렬화·발행 지원 경계 통합 검증. F04 전체 폰트/시각 증거는 P4와 연결.
     - [ ] P2.2.d.1 `NODE_SCHEMA`에서 허용되는 타입/속성과 editor import/export 및 순수 renderer capability를 기능별 매트릭스로 대조한다. 구현하지 않은 속성은 침묵 변환 대신 진단·발행 차단.
     - [ ] P2.2.d.2 F01–F09 대표/거부 fixture에 대해 편집→JSON 저장→재열기→HTML 발행→semantic DOM 비교를 실행하고 명령별 history/IME/접근성 증거를 남긴다.

@@ -23,6 +23,30 @@ try{
    if(!await page.locator('details').evaluate(el=>el.open))await page.getByText('JSON과 발행 HTML 검사',{exact:true}).click();
    return JSON.parse(await page.getByRole('textbox',{name:'문서 JSON',exact:true}).inputValue());
   };
+  // Start once before the toolbar; reach every action using native Tab events.
+  const quotationLabels=['인용문 삽입','Epigraph 삽입','섹션 출처 삽입','구분선 삽입','인용문 출처 추가','섹션 문헌 추가','인용문 URL 수정','Epigraph 항목 추가','Epigraph 항목 위로','Epigraph 항목 아래로','인용문 URL 해제','문헌 삭제','인용 출처 삭제','인용문 삭제','Epigraph 전체 삭제','섹션 출처 삭제','구분선 삭제'];
+  await page.evaluate(()=>{
+   const toolbar=document.querySelector('[role="toolbar"][aria-label="노트 편집"]');
+   const start=document.createElement('button');start.id='quotation-tab-start';start.textContent='Tab start';toolbar.before(start);start.focus();
+  });
+  const forward=[];
+  for(let i=0;i<250;i++){
+   await page.keyboard.press('Tab');
+   const active=await page.evaluate(()=>{
+    const el=document.activeElement,toolbar=document.querySelector('[role="toolbar"][aria-label="노트 편집"]');
+    return {inside:toolbar.contains(el),label:el.getAttribute('aria-label')||el.textContent.trim()};
+   });
+   if(!active.inside)break;forward.push(active.label);if(i===249)throw Error('Toolbar Tab trap');
+  }
+  assert.deepEqual(forward.filter(label=>quotationLabels.includes(label)),quotationLabels,'Native Tab reaches quotation actions in DOM order');
+  const backward=[];
+  for(let i=0;i<250;i++){
+   await page.keyboard.press('Shift+Tab');
+   const active=await page.evaluate(()=>({id:document.activeElement.id,label:document.activeElement.getAttribute('aria-label')||document.activeElement.textContent.trim()}));
+   if(active.id==='quotation-tab-start')break;backward.push(active.label);if(i===249)throw Error('Reverse Tab trap');
+  }
+  assert.deepEqual(backward.filter(label=>quotationLabels.includes(label)),[...quotationLabels].reverse());
+  await page.locator('#quotation-tab-start').evaluate(el=>el.remove());
   const lastSection=()=>editor.locator('section').last();
   await editor.click();await page.keyboard.press('Control+Home');await action('본문을 섹션으로 묶기').click();
   await action('다음 섹션 추가').click();await page.keyboard.insertText('Quotation test');
@@ -31,6 +55,16 @@ try{
   await quote().click();await page.keyboard.press('End');await page.keyboard.insertText(' Body edit');
   assert.match(await quote().innerText(),/Body edit/);await keyboardAction('인용문 출처 추가');
   await quote().locator('cite').click();await page.keyboard.press('End');await page.keyboard.insertText(' Cite edit');assert.match(await quote().locator('cite').innerText(),/Cite edit/);const original=await snapshot();
+  const originalOutput=renderArticle({schemaVersion:1,id:'quotation-order',locale:'ko-KR',title:'Order',assets:[],lexicalState:original});
+  assert.equal(originalOutput.ok,true,JSON.stringify(originalOutput.diagnostics));
+  const readingOrder=await page.evaluate(html=>{
+   const dom=new DOMParser().parseFromString(html,'text/html'),q=[...dom.querySelectorAll('section > blockquote')].at(-1);
+   const footer=q.querySelector(':scope > footer'),cite=footer.querySelector(':scope > cite');
+   return {text:q.textContent,footerText:footer.textContent,citeText:cite.textContent,footerLast:q.lastElementChild===footer,citeLast:footer.lastElementChild===cite,hidden:!!q.querySelector('[aria-hidden="true"]')};
+  },originalOutput.html);
+  assert.match(readingOrder.text,/인용문 Body edit.*— .*출처 Cite edit/s);
+  assert.match(readingOrder.footerText,/— .*출처 Cite edit/s);assert.match(readingOrder.citeText,/출처 Cite edit/);
+  assert.equal(readingOrder.footerLast,true);assert.equal(readingOrder.citeLast,true);assert.equal(readingOrder.hidden,false);
   await quote().locator('cite').click();await keyboardAction('문헌 삭제','Space');
   const deleted=await snapshot();assert.equal(await quote().locator('cite').count(),0);
   assert.match(await quote().innerText(),/인용문/);

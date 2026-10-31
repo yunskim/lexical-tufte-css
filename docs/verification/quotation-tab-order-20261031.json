@@ -1,0 +1,28 @@
+{
+  "base": "4e71eee2aa48cc4eda215aa32746c4d2d63368b1",
+  "task": "C2.c Tab and DOM reading order",
+  "browserWidths": [
+    1440,
+    375
+  ],
+  "quotationButtons": 17,
+  "directions": [
+    "Tab",
+    "Shift+Tab"
+  ],
+  "result": "pass",
+  "manualPending": [
+    "screenreader",
+    "OS IME",
+    "other browsers/touch"
+  ],
+  "productChanged": false,
+  "ci": "not-run",
+  "hashes": {
+    "tests/quotation-editing-browser.mjs": "6920ce3dfd4e7071ea2b83d05886b454ef60ccf3145396ba835c2a93a9419aaf"
+  },
+  "log": {
+    "sha256": "c9b7f710d7a6bf6bd6c3fe41855d564ec5efdf334b4544ca8830846d4ad18540",
+    "output": "Quotation editing UI 1440px PASS\nQuotation editing UI 375px PASS\n"
+  }
+}

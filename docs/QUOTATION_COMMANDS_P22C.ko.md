@@ -72,3 +72,7 @@ frozen install과 workspace build 통과. `node --test packages/lexical/test/quo
 1440/375px UI에서 버튼 focus→Enter 또는 Space로 인용 생성·출처 추가·문헌 삭제·출처 삭제·quote 삭제·epigraph 생성/추가/양방향 이동·section-footer 생성/삭제·hr 생성/삭제·URL 해제를 실행하고 주 editor가 activeElement를 포함하는지 검사한다. 본문·문헌·section-footer에 실제 키보드 텍스트 입력도 검사한다. URL 설정의 prompt 경로와 DOM 재열기/발행 순서 비교는 기존 검사를 유지했다.
 
 직접 button.focus를 쓰므로 **Tab만으로 모든 버튼에 도달하는 경로 전체**를 검증한 것은 아니다. C2.c는 Tab 순서·읽기 순서 검사와 실제 OS IME/스크린리더(P6) 연결을 남겨 체크하지 않는다. C2.a/b는 명시된 자동화 범위에서 체크한다. 상위 P2.2.c.2/P2.2.c는 미완료다. 제품 코드/build/typecheck/package/full browser/pixel/Python/CI 변경·재실행은 없다. 시작/종료에 E133/M123·E134/M124의 history/선택 의미·독립 harness 탭 원칙을 적용했고 새 오류는 없었다.
+
+## Tab·DOM 읽기 순서 자동화 완료
+
+[2026-10-31 실행 범위](VERIFICATION_QUOTATION_ACCESS_2026-10-31.ko.md): 실제 Tab/Shift+Tab으로 인용 버튼17개 정/역순 도달, 편집 문서의 blockquote→footer→cite DOM 텍스트 순서,1440/375px 통과. C2.c의 자동화 부분을 확인했으며 실제 스크린리더 낭독은 P6.2/P6.6 수동 체크로 남긴다. C2.c와 상위 인용 수락 체크는 유지한다.
