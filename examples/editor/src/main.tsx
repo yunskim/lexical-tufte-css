@@ -353,6 +353,7 @@ function EditorUI(){
   const expiryRefreshDeadline=useRef<number|null>(null);
   const retryRefreshTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
   const refreshFailures=useRef(0);
+  const failedHostKeys=useRef<Set<string>>(new Set());
   const lastHostRefresh=useRef(0);
   function clearExpiryRefresh(){
     if(expiryRefreshTimer.current!==null)clearTimeout(expiryRefreshTimer.current);
@@ -383,7 +384,7 @@ function EditorUI(){
     clearRetryRefresh();
     retryRefreshTimer.current=setTimeout(()=>{
       retryRefreshTimer.current=null;
-      void refreshHostAssetURLs();
+      void refreshHostAssetURLs(true);
     },delay);
   }
   useEffect(()=>()=>{clearExpiryRefresh();clearRetryRefresh();},[]);
@@ -413,12 +414,13 @@ function EditorUI(){
   }
 
   const [refreshingHostAssets,setRefreshingHostAssets]=useState(false);
-  async function refreshHostAssetURLs(){
+  async function refreshHostAssetURLs(retryOnly=false){
     const provider=hostAssets.current;
     if(!provider||!hostNamespaceValid){
       setStatus('외부 이미지 갱신을 위한 호스트 설정이 없습니다.');return;
     }
     const generation=++refreshGeneration.current;
+    if(!retryOnly)failedHostKeys.current.clear();
     clearRetryRefresh();
     lastHostRefresh.current=Date.now();
     const images:Array<{key:string;assetId:string;revisionId?:string}>=[];
@@ -433,12 +435,14 @@ function EditorUI(){
       };
       scan($getRoot());
     });
-    if(images.length===0){setStatus('갱신할 외부 이미지가 없습니다.');return;}
+    const pending=retryOnly?images.filter(image=>failedHostKeys.current.has(image.key)):images;
+    if(pending.length===0){failedHostKeys.current.clear();refreshFailures.current=0;setStatus('갱신할 외부 이미지가 없습니다.');return;}
     setRefreshingHostAssets(true);
     let refreshed=0;
     let failed=0;
     try{
-      for(const image of images){
+      for(const image of pending){
+        failedHostKeys.current.delete(image.key);
         let resolved;
         try{
           resolved=await provider.resolve({assetId:image.assetId,
@@ -446,12 +450,13 @@ function EditorUI(){
         }catch{
           if(generation!==refreshGeneration.current)return;
           failed++;
+          failedHostKeys.current.add(image.key);
           continue;
         }
         if(generation!==refreshGeneration.current)return;
         if(!resolved||resolved.assetId!==image.assetId||
           (image.revisionId&&resolved.revisionId!==image.revisionId)||
-          !resolved.mediaType.startsWith('image/')||!isSafeURL(resolved.url,'image')){failed++;continue;}
+          !resolved.mediaType.startsWith('image/')||!isSafeURL(resolved.url,'image')){failed++;failedHostKeys.current.add(image.key);continue;}
         editor.update(()=>{
           const node=$getNodeByKey(image.key);
           if(!(node instanceof InlineImageNode))return;
@@ -465,7 +470,7 @@ function EditorUI(){
         scheduleExpiryRefresh(resolved.expiresAt);
       }
       if(failed){scheduleRefreshRetry();}else{refreshFailures.current=0;clearRetryRefresh();}
-      setStatus('외부 이미지 URL 갱신: '+refreshed+'/'+images.length+'개.'+(failed?' 실패 '+failed+'개, 재시도 예약.':''));
+      setStatus('외부 이미지 URL 갱신: '+refreshed+'/'+pending.length+'개.'+(failed?' 실패 '+failed+'개, 재시도 예약.':''));
     }catch{if(generation===refreshGeneration.current){scheduleRefreshRetry();setStatus('외부 이미지 URL 갱신 중 오류가 발생했습니다. 재시도합니다.');}}
     finally{if(generation===refreshGeneration.current)setRefreshingHostAssets(false);}
   }
