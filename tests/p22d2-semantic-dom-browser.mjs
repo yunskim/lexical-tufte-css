@@ -95,8 +95,21 @@ try{
  // Invalid schema must fail closed rather than silently dropping unsupported nodes.
  const invalid=JSON.parse(JSON.stringify(enriched));
  invalid.lexicalState.root.children[0].children.push({type:'future-unsupported-block',version:1,children:[]});
- const rejectedLoad=loadDocumentIntoEditor(makeEditor(),invalid);
+ const guardedEditor=makeEditor();
+ const guardedInitial=loadDocumentIntoEditor(guardedEditor,enriched);
+ assert.equal(guardedInitial.ok,true,JSON.stringify(guardedInitial.diagnostics));
+ const guardedBefore=exportEditorToDocument(guardedEditor,enriched);
+ assert.equal(guardedBefore.ok,true,JSON.stringify(guardedBefore.diagnostics));
+ const rejectedLoad=loadDocumentIntoEditor(guardedEditor,invalid);
  assert.equal(rejectedLoad.ok,false,'unknown canonical block must be rejected during load');
+ const guardedAfter=exportEditorToDocument(guardedEditor,enriched);
+ assert.equal(guardedAfter.ok,true,JSON.stringify(guardedAfter.diagnostics));
+ assert.deepEqual(guardedAfter.value.lexicalState,guardedBefore.value.lexicalState,'rejected load must not mutate existing editor state');
+ const guardedBeforeHTML=renderArticle(guardedBefore.value);
+ const guardedAfterHTML=renderArticle(guardedAfter.value);
+ assert.equal(guardedBeforeHTML.ok,true,JSON.stringify(guardedBeforeHTML.diagnostics));
+ assert.equal(guardedAfterHTML.ok,true,JSON.stringify(guardedAfterHTML.diagnostics));
+ assert.equal(guardedAfterHTML.html,guardedBeforeHTML.html,'rejected load must preserve existing publication');
  const rejectedPublication=renderArticle(invalid);
  assert.equal(rejectedPublication.ok,false,'unknown canonical block must be rejected during publication');
  const enrichedEditor=makeEditor();
