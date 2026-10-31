@@ -18,10 +18,21 @@ try{
    const button=action(name);await button.focus();await button.press(key);
    assert.equal(await editor.evaluate(el=>el.contains(document.activeElement)),true,`${name} returns keyboard focus to editor`);
   };
+  // The inspector takes DOM focus. Never use snapshot() between a focus assertion and typing.
   const snapshot=async()=>{
    await page.getByRole('button',{name:'JSON·HTML 확인',exact:true}).click();
    if(!await page.locator('details').evaluate(el=>el.open))await page.getByText('JSON과 발행 HTML 검사',{exact:true}).click();
    return JSON.parse(await page.getByRole('textbox',{name:'문서 JSON',exact:true}).inputValue());
+  };
+  const assertDocumentUnchanged=async(before,context)=>{
+   const after=await snapshot();
+   assert.deepEqual(after,before,`${context}: canonical JSON changed unexpectedly at ${width}px`);
+  };
+  const assertUndoRedo=async(before,after,context)=>{
+   await page.getByRole('button',{name:'실행 취소',exact:true}).click();
+   assert.deepEqual(await snapshot(),before,`${context}: undo failed at ${width}px`);
+   await page.getByRole('button',{name:'다시 실행',exact:true}).click();
+   assert.deepEqual(await snapshot(),after,`${context}: redo failed at ${width}px`);
   };
   // Start once before the toolbar; reach every action using native Tab events.
   const quotationLabels=['인용문 삽입','Epigraph 삽입','섹션 출처 삽입','구분선 삽입','인용문 출처 추가','섹션 문헌 추가','인용문 URL 수정','Epigraph 항목 추가','Epigraph 항목 위로','Epigraph 항목 아래로','인용문 URL 해제','문헌 삭제','인용 출처 삭제','인용문 삭제','Epigraph 전체 삭제','섹션 출처 삭제','구분선 삭제'];
@@ -126,19 +137,16 @@ try{
   await lastSection().locator('.epigraph > blockquote').first().click();
   const boundaryBefore=await snapshot();
   await keyboardAction('Epigraph 항목 위로');
-  assert.deepEqual(await snapshot(),boundaryBefore,'first item cannot move up');
+  await assertDocumentUnchanged(boundaryBefore,'first epigraph item moving up');
   await lastSection().locator('.epigraph > blockquote').last().click();
   await keyboardAction('Epigraph 항목 아래로');
-  assert.deepEqual(await snapshot(),boundaryBefore,'last item cannot move down');
+  await assertDocumentUnchanged(boundaryBefore,'last epigraph item moving down');
   // Delete one of two items, undo it, and verify that both order and content return.
   await lastSection().locator('.epigraph > blockquote').last().click();
   await keyboardAction('인용문 삭제');
   assert.equal(await lastSection().locator('.epigraph > blockquote').count(),1);
   const oneItem=await snapshot();
-  await page.getByRole('button',{name:'실행 취소',exact:true}).click();
-  assert.deepEqual(await snapshot(),boundaryBefore);
-  await page.getByRole('button',{name:'다시 실행',exact:true}).click();
-  assert.deepEqual(await snapshot(),oneItem);
+  await assertUndoRedo(boundaryBefore,oneItem,'epigraph item deletion');
   await page.getByRole('button',{name:'실행 취소',exact:true}).click();
   assert.deepEqual(await snapshot(),boundaryBefore);
   await lastSection().locator('.epigraph > blockquote').last().click();await keyboardAction('인용문 삭제');
