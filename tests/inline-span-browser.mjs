@@ -205,9 +205,15 @@ try{
   await page.getByRole('button',{name:'실행 취소',exact:true}).click();
   const undoneKind=await snapshot();
   assert.deepEqual(undoneKind,wrapped,'Kind change is one undo step');
+  const undoPublication=renderArticle({schemaVersion:1,id:'inline-span-case',locale:'ko-KR',title:'인라인 속성',assets:[],lexicalState:undoneKind});
+  assert.equal(undoPublication.ok,true,JSON.stringify(undoPublication.diagnostics));
+  assert.equal(undoPublication.html,published.html,'Undo must restore published HTML after inline kind change');
   await page.getByRole('button',{name:'다시 실행',exact:true}).click();
   const redoneKind=await snapshot();
   assert.deepEqual(redoneKind,changed,'Redo retains the changed inline kind');
+  const redoPublication=renderArticle({schemaVersion:1,id:'inline-span-case',locale:'ko-KR',title:'인라인 속성',assets:[],lexicalState:redoneKind});
+  assert.equal(redoPublication.ok,true,JSON.stringify(redoPublication.diagnostics));
+  assert.equal(redoPublication.html,changedPublication.html,'Redo must restore published HTML after inline kind change');
   await page.getByRole('button',{name:'실행 취소',exact:true}).click();
   const resetKind=await snapshot();
   assert.deepEqual(resetKind,wrapped,'Kind change cleanup restores the original wrapper');
