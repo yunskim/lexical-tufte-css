@@ -1,9 +1,11 @@
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
 import {chromium} from 'playwright';
 import {spawn} from 'node:child_process';
 import {setTimeout} from 'node:timers/promises';
 import {renderArticle} from '../packages/render/dist/index.js';
 
+const representative=JSON.parse(readFileSync(new URL('../fixtures/tufte/server-document.json',import.meta.url),'utf8'));
 const url='http://127.0.0.1:5178/';
 const server=spawn(process.execPath,['node_modules/vite/bin/vite.js','--host','127.0.0.1','--port','5178','--strictPort','--force','--config','../../tests/vite-publication.config.mjs'],{cwd:'examples/editor',stdio:'ignore'});
 let browser;
@@ -26,6 +28,17 @@ try{
   return JSON.parse(await page.getByRole('textbox',{name:'문서 JSON',exact:true}).inputValue());
  };
  const collect=node=>[node,...(node.children?.flatMap(collect)??[])];
+ // Exercise the prototype's real localStorage restore path with the F01-F09
+ // representative document before the existing composition scenario.
+ await page.goto(url);
+ await page.evaluate(state=>localStorage.setItem('lexical-tufte-p1',JSON.stringify(state)),representative.lexicalState);
+ await page.reload();
+ await page.getByRole('button',{name:'불러오기',exact:true}).click();
+ const representativeState=await snapshot();
+ assert.deepEqual(representativeState,representative.lexicalState,'prototype restore must retain representative canonical fixture');
+ await page.evaluate(()=>localStorage.removeItem('lexical-tufte-p1'));
+ await page.reload();
+ await editor.waitFor();
  await editor.click();await page.keyboard.press('Control+Home');
  await action('본문을 섹션으로 묶기').click();
  await action('다음 섹션 추가').click();
