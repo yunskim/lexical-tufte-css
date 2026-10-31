@@ -1036,3 +1036,44 @@ test('P2.2.d.2 unsupported list numbering remains canonical across reopen and fa
  assert.equal(published.html,null);
  assert.ok(published.diagnostics.some(d=>d.code==='UNSUPPORTED_RENDER_PROPERTY'&&d.path.endsWith('.start')),JSON.stringify(published.diagnostics));
 });
+
+test('P2.2.d.2 history undo/redo preserves canonical publication across a text edit',async()=>{
+ const {renderArticle}=await import('../../render/dist/index.js');
+ const source=editor();
+ source.update(()=>$getRoot().append($createSectionNode().append(
+  $createParagraphNode().append($createTextNode('Before'))
+ )),{discrete:true});
+ const initial={...fixture(),lexicalState:exportCanonicalEditorState(source.getEditorState())};
+ const destination=editor();
+ const loaded=loadDocumentIntoEditor(destination,initial);
+ assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
+ const history=createEmptyHistoryState();
+ const unregister=registerHistory(destination,history,300);
+ const flush=()=>new Promise(resolve=>setImmediate(resolve));
+ const snapshot=()=>{
+  const saved=exportEditorToDocument(destination,initial);
+  assert.equal(saved.ok,true,JSON.stringify(saved.diagnostics));
+  const published=renderArticle(saved.value);
+  assert.equal(published.ok,true,JSON.stringify(published.diagnostics));
+  return {state:saved.value.lexicalState,html:published.html};
+ };
+ try{
+  await flush();
+  const before=snapshot();
+  destination.update(()=>{
+   const textNode=$getRoot().getFirstChild().getFirstChild().getFirstChild();
+   textNode.setTextContent('After');
+  },{discrete:true,tag:HISTORY_PUSH_TAG});
+  await flush();
+  const changed=snapshot();
+  assert.notDeepEqual(changed.state,before.state);
+  assert.notEqual(changed.html,before.html);
+  assert.match(changed.html,/After/);
+  destination.dispatchCommand(UNDO_COMMAND,undefined);
+  await flush();
+  assert.deepEqual(snapshot(),before,'undo must restore canonical JSON and published HTML');
+  destination.dispatchCommand(REDO_COMMAND,undefined);
+  await flush();
+  assert.deepEqual(snapshot(),changed,'redo must restore canonical JSON and published HTML');
+ }finally{unregister();}
+});
