@@ -20,6 +20,7 @@ assert.equal(after.ok,true,JSON.stringify(after.diagnostics));
 const beforeHTML=renderArticle(saved.value),afterHTML=renderArticle(after.value);
 assert.equal(beforeHTML.ok,true,JSON.stringify(beforeHTML.diagnostics));
 assert.equal(afterHTML.ok,true,JSON.stringify(afterHTML.diagnostics));
+assert.deepEqual(after.value.lexicalState,saved.value.lexicalState,'base fixture canonical JSON must survive reopen');
 
 const browser=await chromium.launch({headless:true,...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{}),args:['--no-sandbox']});
 try{
@@ -206,6 +207,7 @@ try{
   }));
   return {ids,notes};
  });
+ assert.ok(accessibility.notes.length>0,'accessibility checks require rendered note toggles');
  assert.equal(new Set(accessibility.ids).size,accessibility.ids.length,'note toggle ids must be unique');
  for(const note of accessibility.notes){
   assert.equal(note.idMatches,1,'note id must be unique throughout the document');
