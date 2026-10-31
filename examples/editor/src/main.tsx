@@ -457,7 +457,10 @@ function EditorUI(){
         if(generation!==refreshGeneration.current)return;
         if(!resolved||resolved.assetId!==image.assetId||
           (image.revisionId&&resolved.revisionId!==image.revisionId)||
-          !resolved.mediaType.startsWith('image/')||!isSafeURL(resolved.url,'image')){failed++;failedHostKeys.current.add(image.key);continue;}
+          !resolved.mediaType.startsWith('image/')||!isSafeURL(resolved.url,'image')||
+          (resolved.expiresAt!==undefined&&(!Number.isFinite(Date.parse(resolved.expiresAt))||Date.parse(resolved.expiresAt)<=Date.now()))){
+          failed++;failedHostKeys.current.add(image.key);continue;
+        }
         editor.update(()=>{
           const node=$getNodeByKey(image.key);
           if(!(node instanceof InlineImageNode))return;
