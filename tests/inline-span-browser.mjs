@@ -76,6 +76,12 @@ try{
  assert.equal(await editor.locator('.newthought').count(),1,'Composition keeps the span intact');
  await cdp.send('Input.imeSetComposition',{text:'',selectionStart:0,selectionEnd:0});
  assert.deepEqual(await snapshot(),wrapped,'Cancelled composition and rejected unwrap preserve canonical JSON');
+
+ const afterComposition=await snapshot();
+ const compositionPublication=renderArticle({schemaVersion:1,id:'inline-span-case',locale:'ko-KR',title:'인라인 속성',assets:[],lexicalState:afterComposition});
+ assert.equal(compositionPublication.ok,true,JSON.stringify(compositionPublication.diagnostics));
+ assert.equal(compositionPublication.html,published.html,'Cancelled IME and rejected command must preserve published HTML');
+
  await cdp.detach();
  for(const kind of ['sans','numeral','danger']){
   await editor.locator('.newthought').click();await action(`인라인 ${kind}`).click();
