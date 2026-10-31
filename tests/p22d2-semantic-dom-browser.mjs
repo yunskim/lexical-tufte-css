@@ -162,6 +162,10 @@ try{
  const enrichedPublished=renderArticle(enriched);
  assert.equal(enrichedPublished.ok,true,JSON.stringify(enrichedPublished.diagnostics));
  const enrichedSemantics=await semantics(enrichedPublished.html);
+ // The input fixture checks renderer behavior; only saved/reopened results
+ // establish that Lexical actually preserved those semantics.
+ assert.ok(enrichedSemantics.lists.some(list=>list.tag==='ol'&&list.start==='3'&&list.items.some(item=>item.value==='3'&&item.text.includes('Numbered item'))),'fixture renderer must publish explicit list numbering');
+ assert.ok(enrichedSemantics.quotations.some(quote=>quote.cite==='https://example.org/source'&&quote.text.includes('Quoted text')),'fixture renderer must publish quote citation');
  const enrichedSavedHTML=renderArticle(enrichedSaved.value);
  const enrichedAfterHTML=renderArticle(enrichedAfter.value);
  assert.equal(enrichedSavedHTML.ok,true,JSON.stringify(enrichedSavedHTML.diagnostics));
@@ -187,8 +191,6 @@ try{
  assert.deepEqual(reopenedSemantics.quotations,savedSemantics.quotations,'quotation citation must survive Lexical save/reopen');
  assert.ok(reopenedSemantics.quotations.some(quote=>quote.cite==='https://example.org/source'&&quote.text.includes('Quoted text')),'reopened quotation must publish');
 
- assert.ok(enrichedSemantics.lists.some(list=>list.tag==='ol'&&list.start==='3'&&list.items.some(item=>item.value==='3'&&item.text.includes('Numbered item'))),'original enriched fixture must publish list semantics');
- assert.ok(enrichedSemantics.quotations.some(quote=>quote.cite==='https://example.org/source'&&quote.text.includes('Quoted text')),'quotation semantics must be present');
 
  // Verify keyboard-operable note toggles in the actual published DOM.
  await page.setContent(afterHTML.html);
