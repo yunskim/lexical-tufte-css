@@ -1,3 +1,4 @@
+import {validateDocument, type TufteDocument} from '@lexical-tufte/document';
 import {useEffect, useRef, useState, type MouseEvent} from 'react';
 import {createRoot} from 'react-dom/client';
 import {LexicalComposer} from '@lexical/react/LexicalComposer';
@@ -18,7 +19,7 @@ import {
   SELECTION_INSERT_CLIPBOARD_NODES_COMMAND, COPY_COMMAND, CUT_COMMAND, PASTE_COMMAND, KEY_BACKSPACE_COMMAND, KEY_DELETE_COMMAND, HISTORY_PUSH_TAG, UNDO_COMMAND, REDO_COMMAND,
   COMMAND_PRIORITY_HIGH, type LexicalNode, type EditorState, type RangeSelection,
 } from 'lexical';
-import {canonicalBlockType,exportCanonicalEditorState,parseCanonicalEditorState,registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,registerQuotationCommands,APPEND_TUFTE_EPIGRAPH_ITEM_COMMAND,MOVE_TUFTE_EPIGRAPH_ITEM_COMMAND,SET_TUFTE_QUOTE_CITE_COMMAND,REMOVE_TUFTE_QUOTATION_COMMAND,INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_SECTION_CITE_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,registerListKeyboardCommands,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,SET_TUFTE_LIST_KIND_COMMAND,CHANGE_TUFTE_LIST_INDENT_COMMAND,UNWRAP_TUFTE_LIST_COMMAND,registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND,WRAP_TUFTE_SPAN_COMMAND,UNWRAP_TUFTE_SPAN_COMMAND,registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_PAIR_COMMAND,MOVE_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_LIST_COMMAND,registerSectionCommands,WRAP_TUFTE_ROOT_COMMAND,INSERT_TUFTE_SECTION_COMMAND,SPLIT_TUFTE_SECTION_COMMAND,MERGE_TUFTE_SECTION_COMMAND,SET_TUFTE_BLOCK_COMMAND,inspectEditorStructure,focusStructureIssue,type StructureIssue,replaceEditorDocumentState,TUFTE_NODES,NoteNode, InlineImageNode, $createSidenoteNode, $createMarginnoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, registerNoteEdgeTypingGuard} from '@lexical-tufte/lexical';
+import {canonicalBlockType,exportCanonicalEditorState,parseCanonicalEditorState,loadDocumentIntoEditor,exportEditorToDocument,registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,registerQuotationCommands,APPEND_TUFTE_EPIGRAPH_ITEM_COMMAND,MOVE_TUFTE_EPIGRAPH_ITEM_COMMAND,SET_TUFTE_QUOTE_CITE_COMMAND,REMOVE_TUFTE_QUOTATION_COMMAND,INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_SECTION_CITE_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,registerListKeyboardCommands,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,SET_TUFTE_LIST_KIND_COMMAND,CHANGE_TUFTE_LIST_INDENT_COMMAND,UNWRAP_TUFTE_LIST_COMMAND,registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND,WRAP_TUFTE_SPAN_COMMAND,UNWRAP_TUFTE_SPAN_COMMAND,registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_PAIR_COMMAND,MOVE_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_LIST_COMMAND,registerSectionCommands,WRAP_TUFTE_ROOT_COMMAND,INSERT_TUFTE_SECTION_COMMAND,SPLIT_TUFTE_SECTION_COMMAND,MERGE_TUFTE_SECTION_COMMAND,SET_TUFTE_BLOCK_COMMAND,inspectEditorStructure,focusStructureIssue,type StructureIssue,replaceEditorDocumentState,TUFTE_NODES,NoteNode, InlineImageNode, $createSidenoteNode, $createMarginnoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, registerNoteEdgeTypingGuard} from '@lexical-tufte/lexical';
 import {NODE_SCHEMA} from '@lexical-tufte/document';
 import {NoteImagePanel,type NoteImageChoice,type ImagePresentation} from './NoteImagePanel.js';
 import './style.css';
@@ -713,15 +714,55 @@ function EditorUI(){
     editor.getEditorState().read(()=>setHtml($generateHtmlFromNodes(editor)));
     setJson(JSON.stringify(exportCanonicalEditorState(editor.getEditorState()),null,2));setStatus('JSON과 HTML을 생성했습니다.');
   }
+  const managedDocumentKey='lexical-tufte-p1-document';
+  function documentBase():TufteDocument{
+    return {schemaVersion:1,id:'editor-document',locale:'ko',title:'사이드노트 편집 문서',
+      lexicalState:exportCanonicalEditorState(editor.getEditorState()) as TufteDocument['lexicalState'],
+      assets:documentAssets};
+  }
   function save(){
-    try{const invalid=inspectEditorStructure(editor).length>0;localStorage.setItem(invalid?'lexical-tufte-recovery-v1':'lexical-tufte-p1',JSON.stringify(exportCanonicalEditorState(editor.getEditorState())));setStatus(invalid?'구조 오류가 있어 복구용 사본에만 저장했습니다. 마지막 저장 문서는 유지합니다.':'이 브라우저에 저장했습니다.');}
-    catch{setStatus('저장 실패: 저장 공간을 확인하세요.');}
+    try{
+      const invalid=inspectEditorStructure(editor).length>0;
+      if(invalid){
+        localStorage.setItem('lexical-tufte-recovery-v1',JSON.stringify(exportCanonicalEditorState(editor.getEditorState())));
+        setStatus('구조 오류가 있어 복구용 사본에만 저장했습니다. 마지막 저장 문서는 유지합니다.');return;
+      }
+      const existing=localStorage.getItem(managedDocumentKey);
+      if(documentAssets.length===0&&existing===null){
+        localStorage.setItem('lexical-tufte-p1',JSON.stringify(exportCanonicalEditorState(editor.getEditorState())));
+        setStatus('이 브라우저에 저장했습니다.');return;
+      }
+      if(existing!==null){
+        const checked=validateDocument(JSON.parse(existing));
+        if(!checked.ok){setStatus('기존 관리 문서 검증 실패: 저장본을 유지합니다.');return;}
+        if(!window.confirm('기존 관리 문서를 덮어쓰시겠습니까?')){
+          setStatus('기존 관리 문서 저장본을 유지합니다.');return;
+        }
+      }
+      const exported=exportEditorToDocument(editor,documentBase());
+      if(!exported.ok){setStatus('관리 문서 검증 실패: 저장하지 않았습니다.');return;}
+      localStorage.setItem(managedDocumentKey,JSON.stringify(exported.value));
+      setStatus('본문과 자산 목록을 한 문서로 저장했습니다.');
+    }catch{setStatus('저장 실패: 저장 공간과 문서 형식을 확인하세요.');}
   }
   function restore(){
     try{
-      const raw=localStorage.getItem('lexical-tufte-p1');if(!raw){setStatus('저장한 문서가 없습니다.');return;}
-      replaceEditorDocumentState(editor,parseCanonicalEditorState(editor,JSON.parse(raw)));setStatus('저장한 문서를 불러왔습니다.');
-    }catch{setStatus('문서를 불러오지 못했습니다.');}
+      const managed=localStorage.getItem(managedDocumentKey);
+      if(managed!==null){
+        const input:unknown=JSON.parse(managed);
+        const checked=validateDocument(input);
+        if(!checked.ok){setStatus('관리 문서 검증 실패: 현재 편집 내용을 유지합니다.');return;}
+        const loaded=loadDocumentIntoEditor(editor,checked.document);
+        if(!loaded.ok){setStatus('관리 문서 검증 실패: 현재 편집 내용을 유지합니다.');return;}
+        setDocumentAssets(structuredClone(loaded.value.assets));
+        setStatus('본문과 자산 목록을 함께 불러왔습니다.');return;
+      }
+      const raw=localStorage.getItem('lexical-tufte-p1');
+      if(!raw){setStatus('저장한 문서가 없습니다.');return;}
+      replaceEditorDocumentState(editor,parseCanonicalEditorState(editor,JSON.parse(raw)));
+      setDocumentAssets([]);
+      setStatus('저장한 문서를 불러왔습니다.');
+    }catch{setStatus('관리 문서 검증 실패: 현재 편집 내용을 유지합니다.');}
   }
   const preserve=(e:MouseEvent<HTMLButtonElement>)=>e.preventDefault();
   return <>
