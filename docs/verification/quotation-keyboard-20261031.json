@@ -1,0 +1,60 @@
+{
+  "base": "3803bc7d832a4ab7bb29c15ea610ebe8bdd28ab1",
+  "task": "C2 creation history and keyboard activation",
+  "unit": 588,
+  "lexical": 400,
+  "focused": 100,
+  "browserWidths": [
+    1440,
+    375
+  ],
+  "fail": 0,
+  "skip": 0,
+  "remaining": [
+    "Tab traversal to all buttons",
+    "reading order",
+    "OS IME/screenreader P6"
+  ],
+  "ci": "not-run",
+  "hashes": {
+    "packages/lexical/test/quotation-commands.test.mjs": "7de501abaf8bed3ddfe75551bdf9b819aeda9e689c3eb7d1e1e0b32e29835715",
+    "tests/quotation-editing-browser.mjs": "4c0435c9dc60706e48705e9d63445276111e4b11f6af1d2ce12272008f55ba44"
+  },
+  "logs": {
+    "quotation-history-unit.log": {
+      "sha256": "6a6057061e9c9bf25c1f42ac49a21b4804307caa7697324aa8d14c9ee7fd7264",
+      "tail": [
+        "✔ APPEND_TUFTE_SECTION_CITE: creation is one Undo/Redo with adjacent section intact (2.139154ms)",
+        "ℹ tests 37",
+        "ℹ suites 0",
+        "ℹ pass 37",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0",
+        "ℹ todo 0",
+        "ℹ duration_ms 609.1156"
+      ]
+    },
+    "quotation-history-all-unit.log": {
+      "sha256": "b3ad5a15ed0e1fc7b431dd05dfb86c5b4160c9bf9dd222e5b46316e42c399173",
+      "tail": [
+        "packages/lexical test: ℹ tests 400",
+        "packages/lexical test: ℹ suites 0",
+        "packages/lexical test: ℹ pass 400",
+        "packages/lexical test: ℹ fail 0",
+        "packages/lexical test: ℹ cancelled 0",
+        "packages/lexical test: ℹ skipped 0",
+        "packages/lexical test: ℹ todo 0",
+        "packages/lexical test: ℹ duration_ms 4385.986822",
+        "packages/lexical test: Done"
+      ]
+    },
+    "quotation-keyboard-browser-complete.log": {
+      "sha256": "c9b7f710d7a6bf6bd6c3fe41855d564ec5efdf334b4544ca8830846d4ad18540",
+      "tail": [
+        "Quotation editing UI 1440px PASS",
+        "Quotation editing UI 375px PASS"
+      ]
+    }
+  }
+}

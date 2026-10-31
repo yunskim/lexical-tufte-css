@@ -303,3 +303,25 @@ for(const [command,payload] of [
  assert.equal(diagnostics[0].code,'INVALID_QUOTATION_SELECTION');
  dispose();
 });
+
+for(const [command,payload,parentKind] of [
+ [INSERT_TUFTE_QUOTATION_COMMAND,'quote',null],
+ [INSERT_TUFTE_QUOTATION_COMMAND,'epigraph',null],
+ [INSERT_TUFTE_QUOTATION_COMMAND,'section-footer',null],
+ [INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,undefined,null],
+ [APPEND_TUFTE_ATTRIBUTION_COMMAND,undefined,'quote'],
+ [APPEND_TUFTE_SECTION_CITE_COMMAND,undefined,'section-footer']
+])test(`${command.type}:${payload??''} creation is one Undo/Redo with adjacent section intact`,async()=>{
+ const {editor,diagnostics,dispose}=setup(),flush=()=>new Promise(resolve=>setImmediate(resolve));
+ editor.update(()=>{
+  const text=$createTextNode('Source');$getRoot().append($createSectionNode().append($createParagraphNode().append(text)),$createSectionNode().append($createParagraphNode().append($createTextNode('Other'))));text.selectEnd();
+  if(parentKind)editor.dispatchCommand(INSERT_TUFTE_QUOTATION_COMMAND,parentKind);
+ },{discrete:true});await flush();
+ const history=createEmptyHistoryState(),stop=registerHistory(editor,history,300);history.current={editor,editorState:editor.getEditorState()};
+ const before=editor.getEditorState().toJSON();
+ editor.update(()=>editor.dispatchCommand(command,payload),{discrete:true});await flush();const after=editor.getEditorState().toJSON();
+ assert.notDeepEqual(after,before);assert.deepEqual(after.root.children[1],before.root.children[1]);assert.equal(history.undoStack.length,1);
+ editor.update(()=>editor.dispatchCommand(UNDO_COMMAND),{discrete:true});await flush();assert.deepEqual(editor.getEditorState().toJSON(),before);
+ editor.update(()=>editor.dispatchCommand(REDO_COMMAND),{discrete:true});await flush();assert.deepEqual(editor.getEditorState().toJSON(),after);
+ assert.equal(diagnostics.length,0);stop();dispose();
+});

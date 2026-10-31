@@ -1,3 +1,9 @@
+## 2026-10-31 C2 생성 이력·키보드 실행/포커스 보강
+
+- 생성/추가6종의 한 Undo/Redo·인접 section 보존 회귀6개 추가. 실제1440/375px에서 Enter/Space 버튼 실행 후 editor activeElement 복귀 및 본문·문헌·section-footer 텍스트 입력 검사.
+- 전체 unit588(Lexical400)·생성37+편집63=집중100개·UI두 폭 통과. 제품 코드 변경 없음. [수락 범위/잔여](QUOTATION_COMMANDS_P22C.ko.md), [실행 증거](verification/quotation-keyboard-20261031.json). build/typecheck/package/full browser/pixel/Python/CI는 재실행하지 않았다.
+- E133/M123·E134/M124를 시작/종료에 재점검했고 새 오류 없음. C2.a/b를 자동화 범위에서 체크, C2.c와 상위 P2.2.c는 유지. 다음은 실제 Tab 탐색·의미 읽기 순서와 P6 수동 검증 연결이다.
+
 ## 2026-10-31 C2 인용 기능 통합 검증 보강
 
 - 삭제6종의 range/composition/note 거부18개를 추가해 내용·선택·진단/이력 무변경을 검사했다. 실제 UI가 만든 epigraph2항목의 DOM canonical export→JSON→새 DOM editor 재열기와 native/pure HTML의 순서·본문·cite 비교를 보강했다.

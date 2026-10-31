@@ -31,8 +31,8 @@
 
 - [x] C1.a URL 설정/해제 및 attribution/cite/구분선/footer/quote/epigraph 삭제 명령과 public export, 예제 UI 연결.
 - [x] C1.b 같은 epigraph 내부 항목 추가/인접 이동/삭제, 첫·중간·끝·마지막 항목 및 잘못된 구조 거부.
-- [ ] C2.a 각 명령의 내용·선택·노트 ID 보존/거부 원자성 및 한 Undo/Redo.
-- [ ] C2.b canonical JSON 저장·재열기와 순수 renderer의 blockquote/URL/footer/cite/epigraph 자식 순서·개수 검사.
+- [x] C2.a 각 명령의 내용·선택·노트 ID 보존/거부 원자성 및 한 Undo/Redo.
+- [x] C2.b canonical JSON 저장·재열기와 순수 renderer의 blockquote/URL/footer/cite/epigraph 자식 순서·개수 검사.
 - [ ] C2.c 실제 1440/375px UI에서 키보드 접근·포커스 복귀·텍스트 수정과 다른 섹션 불변성 검사. 실제 OS IME·스크린리더 검증은 P6 증거와 연결한다.
 
 ## 이번 검증
@@ -64,3 +64,11 @@ frozen install과 workspace build 통과. `node --test packages/lexical/test/quo
 실제 UI에서 생성·추가·이동한 epigraph2항목을 DOM editor에서 canonical export→JSON 직렬화→새 DOM editor로 재열기한다. 문서 전체 동일성과 native HTML2경로/순수 renderer의 epigraph 직접 자식 blockquote 순서·본문·cite URL을 비교한다. 1440/375px 모두 통과했다. 보조 harness는 document.body를 교체하므로 독립 탭에서 실행한다(E134/M124).
 
 이 검증은 C2.a/b의 지원 경계를 보강한다. 각 생성 명령의 history 전수, 속성 조합 전체와 C2.c 키보드 전용 조작/포커스·실제 텍스트 수정 전체는 아직 미완료이므로 상위 P2.2.c.2/P2.2.c를 체크하지 않는다. 실제 OS IME/스크린리더도 P6에 남는다.
+
+## C2 이력·키보드 실행 검증 — 2026-10-31
+
+생성/추가6개 command/payload(quote/epigraph/section-footer/hr/attribution/section-cite)에 각각 한 Undo/Redo와 인접 section 불변성6개를 추가했다. 기존 생성31+6=37개, 편집/거부63개와 합계100개다. 전체 unit588개(Lexical400) 통과, 실패/skip0.
+
+1440/375px UI에서 버튼 focus→Enter 또는 Space로 인용 생성·출처 추가·문헌 삭제·출처 삭제·quote 삭제·epigraph 생성/추가/양방향 이동·section-footer 생성/삭제·hr 생성/삭제·URL 해제를 실행하고 주 editor가 activeElement를 포함하는지 검사한다. 본문·문헌·section-footer에 실제 키보드 텍스트 입력도 검사한다. URL 설정의 prompt 경로와 DOM 재열기/발행 순서 비교는 기존 검사를 유지했다.
+
+직접 button.focus를 쓰므로 **Tab만으로 모든 버튼에 도달하는 경로 전체**를 검증한 것은 아니다. C2.c는 Tab 순서·읽기 순서 검사와 실제 OS IME/스크린리더(P6) 연결을 남겨 체크하지 않는다. C2.a/b는 명시된 자동화 범위에서 체크한다. 상위 P2.2.c.2/P2.2.c는 미완료다. 제품 코드/build/typecheck/package/full browser/pixel/Python/CI 변경·재실행은 없다. 시작/종료에 E133/M123·E134/M124의 history/선택 의미·독립 harness 탭 원칙을 적용했고 새 오류는 없었다.
