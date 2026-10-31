@@ -195,3 +195,37 @@ test('F01 root nondefault direction or alignment is rejected with exact path',()
   assert.deepEqual(doc,before);
  }
 });
+
+test('F01-F09 nonzero paragraph indent fails closed instead of losing layout',()=>{
+ const doc=fixture();
+ const paragraph=doc.lexicalState.root.children[0].children[1];
+ paragraph.indent=2;
+ assert.equal(validateDocument(doc).ok,true);
+ const before=structuredClone(doc);
+ const result=renderArticle(doc);
+ assert.equal(result.ok,false);
+ assert.equal(result.html,null);
+ assert.ok(result.diagnostics.some(d=>d.code==='UNSUPPORTED_RENDER_PROPERTY'&&d.path==='$.lexicalState.root.children[0].children[1].indent'),JSON.stringify(result.diagnostics));
+ assert.deepEqual(doc,before);
+});
+
+test('F01-F09 arbitrary element textStyle is rejected at schema boundary',()=>{
+ const doc=fixture();
+ doc.lexicalState.root.children[0].children[1].textStyle='color:red';
+ const result=renderArticle(doc);
+ assert.equal(result.ok,false);
+ assert.equal(result.html,null);
+ assert.ok(result.diagnostics.some(d=>d.code==='UNSUPPORTED_STYLE'&&d.path==='$.lexicalState.root.children[0].children[1].textStyle'),JSON.stringify(result.diagnostics));
+});
+
+test('F01-F09 cached textFormat does not replace actual text formatting',()=>{
+ const doc=fixture();
+ const paragraph=doc.lexicalState.root.children[0].children[1];
+ paragraph.textFormat=1;
+ const before=structuredClone(doc);
+ const result=renderArticle(doc);
+ assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+ assert.match(result.html,/<p class="sans">Sans copy<\/p>/);
+ assert.doesNotMatch(result.html,/<strong>Sans copy<\/strong>/);
+ assert.deepEqual(doc,before);
+});
