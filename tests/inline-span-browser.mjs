@@ -199,6 +199,9 @@ try{
   assert.equal(inlineSpans.length,1,'Changing inline kind must not duplicate semantic spans');
   assert.equal(inlineSpans[0].kind,kind,'Toolbar must update the existing inline span kind');
   assert.equal(inlineSpans[0].children.map(node=>node.text).join(''),'selected','Changing inline kind must preserve selected text');
+  const changedPublication=renderArticle({schemaVersion:1,id:'inline-span-case',locale:'ko-KR',title:'인라인 속성',assets:[],lexicalState:changed});
+  assert.equal(changedPublication.ok,true,JSON.stringify(changedPublication.diagnostics));
+  assert.notEqual(changedPublication.html,published.html,'Changing inline kind must update published HTML');
   await page.getByRole('button',{name:'실행 취소',exact:true}).click();
   const undoneKind=await snapshot();
   assert.deepEqual(undoneKind,wrapped,'Kind change is one undo step');
