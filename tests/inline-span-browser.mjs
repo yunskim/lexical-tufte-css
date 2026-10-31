@@ -97,7 +97,10 @@ try{
    assert.ok(afterIds.some(id=>id!==undefined&&!beforeIds.has(id)),'toolbar must generate a fresh sidenote identifier');
   }
   const matchingNodes=state=>collect(state.root).filter(node=>node.type===nodeType||(nodeType==='quote'&&node.type==='tufte-quote'));
-  assert.ok(matchingNodes(changed).length>matchingNodes(baseline).length,buttonName+' must add a semantic node beyond those already present in the representative fixture');
+  if(nodeType==='tufte-sidenote')
+   assert.ok(matchingNodes(changed).length>matchingNodes(baseline).length,buttonName+' must add a new sidenote');
+  else
+   assert.ok(matchingNodes(changed).length>matchingNodes(baseline).length,buttonName+' must create a new structural block rather than only changing existing content');
   const beforeHTML=renderArticle({...representative,lexicalState:baseline});
   const changedHTML=renderArticle({...representative,lexicalState:changed});
   assert.equal(beforeHTML.ok,true,JSON.stringify(beforeHTML.diagnostics));
