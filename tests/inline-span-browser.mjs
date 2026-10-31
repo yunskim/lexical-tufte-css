@@ -78,6 +78,10 @@ try{
   await page.keyboard.press('End');
   const changedBefore=await snapshot();
   assert.deepEqual(changedBefore,baseline,'caret positioning must not modify representative fixture');
+  // snapshot() clicks an inspector control and may steal focus/selection.
+  // Restore the insertion caret immediately before dispatching the command.
+  await paragraph.click();
+  await page.keyboard.press('End');
   await action(buttonName).click();
   const changed=await snapshot();
   assert.notDeepEqual(changed,baseline,buttonName+' must modify representative JSON');
