@@ -99,6 +99,20 @@ try{
  const enrichedAfter=exportEditorToDocument(enrichedReopened,enrichedSaved.value);
  assert.equal(enrichedAfter.ok,true,JSON.stringify(enrichedAfter.diagnostics));
  assert.deepEqual(enrichedAfter.value.lexicalState,enrichedSaved.value.lexicalState,'list and quotation canonical state must survive reopen');
+
+ const sectionNodes=state=>state.root.children[0].children;
+ const getList=state=>sectionNodes(state).find(node=>node.type==='list'&&node.listType==='number');
+ const getQuote=state=>sectionNodes(state).find(node=>node.type==='quote');
+ for(const [stage,state] of [['saved',enrichedSaved.value.lexicalState],['reopened',enrichedAfter.value.lexicalState]]){
+  const list=getList(state),quote=getQuote(state);
+  assert.ok(list,stage+' must retain ordered list');
+  assert.equal(list.tag,'ol',stage+' list tag');
+  assert.equal(list.start,3,stage+' list start');
+  assert.equal(list.children[0]?.value,3,stage+' item value');
+  assert.ok(quote,stage+' must retain quotation');
+  assert.equal(quote.cite,'https://example.org/source',stage+' quotation cite');
+ }
+
  const enrichedPublished=renderArticle(enriched);
  assert.equal(enrichedPublished.ok,true,JSON.stringify(enrichedPublished.diagnostics));
  const enrichedSemantics=await semantics(enrichedPublished.html);
