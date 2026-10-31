@@ -121,3 +121,17 @@ test('F03 host reference is preserved as semantic reference, not fabricated href
  assert.doesNotMatch(result.html,/<a\\b[^>]*href="[^"]*"[^>]*>Linked title<\\/a>/,'unresolved reference must not become a guessed URL');
  assert.deepEqual(doc,before);
 });
+
+test('F06 unordered list start is diagnosed instead of silently discarded',()=>{
+ const doc=fixture();
+ doc.lexicalState.root.children[0].children.push(element('list',[
+  element('listitem',[text('Bullet')],{value:1})
+ ],{listType:'bullet',tag:'ul',start:5}));
+ assert.equal(validateDocument(doc).ok,true);
+ const before=structuredClone(doc);
+ const published=renderArticle(doc);
+ assert.equal(published.ok,false);
+ assert.equal(published.html,null);
+ assert.ok(published.diagnostics.some(d=>d.code==='UNSUPPORTED_RENDER_PROPERTY'&&d.path.endsWith('.start')),JSON.stringify(published.diagnostics));
+ assert.deepEqual(doc,before);
+});
