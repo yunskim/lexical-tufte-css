@@ -66,7 +66,8 @@ try{
  }finally{await representativeCDP.detach();}
  assert.deepEqual(await snapshot(),representativeState,'cancelled composition must preserve representative canonical JSON');
  const representativePublication=renderArticle({...representative,lexicalState:representativeState});
- const afterRepresentativeIME=renderArticle({...representative,lexicalState:await snapshot()});
+ const afterIMEState=await snapshot();
+ const afterRepresentativeIME=renderArticle({...representative,lexicalState:afterIMEState});
  assert.equal(afterRepresentativeIME.ok,representativePublication.ok,'IME cancellation must preserve representative publication status');
  assert.deepEqual(afterRepresentativeIME.diagnostics,representativePublication.diagnostics,'IME cancellation must preserve publication diagnostics');
  assert.equal(afterRepresentativeIME.html,representativePublication.html,'IME cancellation must preserve representative published HTML');
