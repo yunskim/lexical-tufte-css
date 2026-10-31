@@ -275,11 +275,13 @@ try{
  const noteChangedHTML=noteDoc(noteChanged);
  assert.notEqual(noteChangedHTML,noteBaselineHTML,'note insertion must change published HTML');
  await page.getByRole('button',{name:'실행 취소',exact:true}).click();
- assert.deepEqual(await snapshot(),noteBaseline,'note undo must restore canonical JSON');
- assert.equal(noteDoc(await snapshot()),noteBaselineHTML,'note undo must restore published HTML');
+ const noteUndone=await snapshot();
+ assert.deepEqual(noteUndone,noteBaseline,'note undo must restore canonical JSON');
+ assert.equal(noteDoc(noteUndone),noteBaselineHTML,'note undo must restore published HTML');
  await page.getByRole('button',{name:'다시 실행',exact:true}).click();
- assert.deepEqual(await snapshot(),noteChanged,'note redo must preserve generated note ID and JSON');
- assert.equal(noteDoc(await snapshot()),noteChangedHTML,'note redo must restore published HTML');
+ const noteRedone=await snapshot();
+ assert.deepEqual(noteRedone,noteChanged,'note redo must preserve generated note ID and JSON');
+ assert.equal(noteDoc(noteRedone),noteChangedHTML,'note redo must restore published HTML');
  assert.deepEqual(errors,[]);
  console.log(`P2.2.b.1 ${width}px: real selection, wrap/unwrap undo/redo, save/reopen and composition cancellation/guard PASS.`);
  await page.close();
