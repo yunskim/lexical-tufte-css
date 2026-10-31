@@ -138,7 +138,7 @@ try{
  assert.ok(reopenedSemantics.lists.some(list=>list.tag==='ol'&&list.start==='3'&&list.items.some(item=>item.text.includes('Numbered item'))),'reopened numbered list must publish');
  assert.ok(reopenedSemantics.quotations.some(quote=>quote.cite==='https://example.org/source'&&quote.text.includes('Quoted text')),'reopened quotation must publish');
 
- assert.ok(enrichedSemantics.lists.some(list=>list.tag==='ol'&&list.start==='3'&&list.items.some(item=>item.value==='3'&&item.text.includes('Numbered item'))),'numbered list semantics must be present');
+ assert.ok(enrichedSemantics.lists.some(list=>list.tag==='ol'&&list.start==='3'&&list.items.some(item=>item.value==='3'&&item.text.includes('Numbered item'))),'original enriched fixture must publish list semantics');
  assert.ok(enrichedSemantics.quotations.some(quote=>quote.cite==='https://example.org/source'&&quote.text.includes('Quoted text')),'quotation semantics must be present');
 
  // Verify keyboard-operable note toggles in the actual published DOM.
@@ -150,7 +150,7 @@ try{
   const labels=[...article.querySelectorAll('label')];
   const notes=inputs.map(input=>({
    id:input.id,
-   idMatches:article.querySelectorAll('[id]').length && [...article.querySelectorAll('[id]')].filter(node=>node.id===input.id).length,
+   idMatches:[...article.querySelectorAll('[id]')].filter(node=>node.id===input.id).length,
    associated:labels.filter(label=>label.control===input).length,
    payload:input.nextElementSibling?.matches('.sidenote,.marginnote')??false
   }));
