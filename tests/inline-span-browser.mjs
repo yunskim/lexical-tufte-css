@@ -26,7 +26,7 @@ try{
   // Export is a refresh action, not a panel toggle. Every snapshot must
   // regenerate JSON after the latest Lexical update, including Undo/Redo.
   await page.getByRole('button',{name:'JSON·HTML 확인',exact:true}).click();
-  const details=page.locator('details').filter({has:page.locator('summary').getByText('JSON과 발행 HTML 검사',{exact:true})});
+  const details=page.locator('details').filter({has:page.locator('summary', {hasText:'JSON과 발행 HTML 검사'})});
   if(!await details.evaluate(element=>element.open))
    await details.locator('summary').click();
   return JSON.parse(await page.getByRole('textbox',{name:'문서 JSON',exact:true}).inputValue());
