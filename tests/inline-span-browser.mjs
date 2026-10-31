@@ -64,9 +64,9 @@ try{
   assert.equal(await editor.locator('section').count(),sectionsBeforeCommand,'section insertion must be blocked during composition');
   await representativeCDP.send('Input.imeSetComposition',{text:'',selectionStart:0,selectionEnd:0});
  }finally{await representativeCDP.detach();}
- assert.deepEqual(await snapshot(),representativeState,'cancelled composition must preserve representative canonical JSON');
- const representativePublication=renderArticle({...representative,lexicalState:representativeState});
  const afterIMEState=await snapshot();
+ assert.deepEqual(afterIMEState,representativeState,'cancelled composition must preserve representative canonical JSON');
+ const representativePublication=renderArticle({...representative,lexicalState:representativeState});
  const afterRepresentativeIME=renderArticle({...representative,lexicalState:afterIMEState});
  assert.equal(afterRepresentativeIME.ok,representativePublication.ok,'IME cancellation must preserve representative publication status');
  assert.deepEqual(afterRepresentativeIME.diagnostics,representativePublication.diagnostics,'IME cancellation must preserve publication diagnostics');
