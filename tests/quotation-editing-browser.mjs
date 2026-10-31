@@ -105,6 +105,25 @@ try{
   assert.deepEqual(await semantic(roundtrip.b.html),await semantic(pure.html));
   assert.equal((await semantic(pure.html)).length,2);
   assert.match((await semantic(pure.html))[1].text,/Second/);
+  // Boundary actions must not mutate the canonical document.
+  await lastSection().locator('.epigraph > blockquote').first().click();
+  const boundaryBefore=await snapshot();
+  await keyboardAction('Epigraph 항목 위로');
+  assert.deepEqual(await snapshot(),boundaryBefore,'first item cannot move up');
+  await lastSection().locator('.epigraph > blockquote').last().click();
+  await keyboardAction('Epigraph 항목 아래로');
+  assert.deepEqual(await snapshot(),boundaryBefore,'last item cannot move down');
+  // Delete one of two items, undo it, and verify that both order and content return.
+  await lastSection().locator('.epigraph > blockquote').last().click();
+  await keyboardAction('인용문 삭제');
+  assert.equal(await lastSection().locator('.epigraph > blockquote').count(),1);
+  const oneItem=await snapshot();
+  await page.getByRole('button',{name:'실행 취소',exact:true}).click();
+  assert.deepEqual(await snapshot(),boundaryBefore);
+  await page.getByRole('button',{name:'다시 실행',exact:true}).click();
+  assert.deepEqual(await snapshot(),oneItem);
+  await page.getByRole('button',{name:'실행 취소',exact:true}).click();
+  assert.deepEqual(await snapshot(),boundaryBefore);
   await lastSection().locator('.epigraph > blockquote').last().click();await keyboardAction('인용문 삭제');
   await lastSection().locator('.epigraph blockquote').click();await keyboardAction('인용문 삭제');assert.equal(await lastSection().locator('.epigraph').count(),0);
   await lastSection().locator('p').click();await keyboardAction('섹션 출처 삽입');
