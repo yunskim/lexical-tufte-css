@@ -187,8 +187,7 @@ try{
  assert.equal(afterSections,beforeSections,'IME cancellation must preserve section structure');
  assert.equal(collect(afterCancel.root).filter(node=>node.type==='tufte-span'&&node.kind==='newthought').length,1,'IME cancellation must preserve the inline node');
 
- const afterComposition=await snapshot();
- const compositionPublication=renderArticle({schemaVersion:1,id:'inline-span-case',locale:'ko-KR',title:'인라인 속성',assets:[],lexicalState:afterComposition});
+ const compositionPublication=renderArticle({schemaVersion:1,id:'inline-span-case',locale:'ko-KR',title:'인라인 속성',assets:[],lexicalState:afterCancel});
  assert.equal(compositionPublication.ok,true,JSON.stringify(compositionPublication.diagnostics));
  assert.equal(compositionPublication.html,published.html,'Cancelled IME and rejected command must preserve published HTML');
 
