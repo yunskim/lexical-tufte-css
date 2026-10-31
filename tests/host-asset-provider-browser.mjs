@@ -124,6 +124,19 @@ try{
   await page.waitForFunction(count=>window.__hostCalls.resolve.length>count,beforeExpiry);
   await page.evaluate(()=>{window.__hostExpiryMs=3600_000;});
 
+  // A successful full refresh must replace, not retain, the old expiry deadline.
+  await page.evaluate(()=>{window.__hostExpiryMs=120_000;});
+  await button('외부 이미지 URL 다시 확인').click();
+  await page.getByRole('status',{name:'편집 작업 상태'}).getByText(/갱신: 1\/1개/).waitFor();
+  await page.clock.runFor(10_000);
+  await page.evaluate(()=>{window.__hostExpiryMs=3600_000;});
+  await button('외부 이미지 URL 다시 확인').click();
+  await page.getByRole('status',{name:'편집 작업 상태'}).getByText(/갱신: 1\/1개/).waitFor();
+  const afterReplacingExpiry=await page.evaluate(()=>window.__hostCalls.resolve.length);
+  await page.clock.runFor(50_001);
+  assert.equal(await page.evaluate(()=>window.__hostCalls.resolve.length),afterReplacingExpiry,
+    'Obsolete short-lived URL must not trigger a refresh after a new long-lived URL resolves');
+
   // Automatic retry uses a five-second initial backoff.
   await page.evaluate(()=>{window.__hostMode='invalid';});
   await button('외부 이미지 URL 다시 확인').click();
