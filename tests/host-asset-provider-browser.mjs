@@ -336,6 +336,25 @@ try{
   await page.clock.runFor(60_001);
   await page.evaluate(()=>window.dispatchEvent(new Event('pageshow')));
   await page.waitForFunction(count=>window.__hostCalls.resolve.length>count,beforeResume);
+  // Deleting an image during a pending resolve must not resurrect the removed node.
+  await page.evaluate(()=>{window.__hostMode='deferred';window.__hostPendingResolves=[];});
+  await button('외부 이미지 URL 다시 확인').click();
+  await page.waitForFunction(()=>window.__hostPendingResolves.length===1);
+  const beforeDelete=await page.locator('[data-note-id] img').count();
+  await page.locator('[data-note-id] img').first().click();
+  await page.keyboard.press('Backspace');
+  await page.waitForFunction(count=>document.querySelectorAll('[data-note-id] img').length<count,beforeDelete);
+  await page.evaluate(()=>{
+    const pending=window.__hostPendingResolves.shift();
+    pending.resolve({assetId:pending.locator.assetId,revisionId:pending.locator.revisionId,
+      mediaType:'image/svg+xml',url:'/obsolete.svg',
+      expiresAt:new Date(Date.now()+120_000).toISOString()});
+  });
+  await page.getByRole('status',{name:'편집 작업 상태'}).getByText(/외부 이미지 URL 갱신:/).waitFor();
+  assert.equal(await page.locator('[data-note-id] img').count(),beforeDelete-1,
+    'A delayed provider response must not restore a deleted image');
+  assert.equal(await page.locator('[data-note-id] img[src="/obsolete.svg"]').count(),0,
+    'Deleted image must not receive a stale URL');
   assert.deepEqual(errors,[]);
   console.log('Host asset search, revisions, resolve, persistence and reload regressions written.');
 }finally{
