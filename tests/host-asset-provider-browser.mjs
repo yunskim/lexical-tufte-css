@@ -39,7 +39,7 @@ try{
       },
       async resolve(locator){
         window.__hostCalls.resolve.push(locator);
-        if(window.__hostMode==='throw')throw Error('Temporary provider outage');
+        if(window.__hostMode==='throw'||(window.__hostMode==='partial'&&locator.assetId==='remote-image'))throw Error('Temporary provider outage');
         if(window.__hostMode==='invalid')return null;
         return {assetId:locator.assetId,revisionId:locator.revisionId||'rev-2',
           mediaType:'image/svg+xml',url:'/fixture.svg',
@@ -144,6 +144,23 @@ try{
   const beforeConcurrentExpiry=await page.evaluate(()=>window.__hostCalls.resolve.length);
   await page.clock.runFor(55_000);
   await page.waitForFunction(count=>window.__hostCalls.resolve.length>count,beforeConcurrentExpiry);
+
+  // A single provider failure is reported without corrupting the saved host locator.
+  await page.evaluate(()=>{window.__hostMode='partial';});
+  await button('외부 이미지 URL 다시 확인').click();
+  await page.getByRole('status',{name:'편집 작업 상태'}).getByText(/실패 1개, 재시도 예약/).waitFor();
+  const locatorAfterFailure=await page.evaluate(()=>{
+    const saved=JSON.parse(localStorage.getItem('lexical-tufte-p1-document'));
+    const images=[];
+    const visit=node=>{if(node.type==='tufte-inline-image')images.push(node);
+      node.children?.forEach(visit);};
+    visit(saved.lexicalState.root);
+    return images[0].hostAsset;
+  });
+  assert.deepEqual(locatorAfterFailure,{namespace:'test-host',assetId:'remote-image',revisionId:'rev-1'});
+  await page.evaluate(()=>{window.__hostMode='normal';});
+  await button('외부 이미지 URL 다시 확인').click();
+  await page.getByRole('status',{name:'편집 작업 상태'}).getByText(/갱신: 1\/1개/).waitFor();
 
   // Returning to a visible tab after the 60-second cooldown rechecks URLs.
   const beforeResume=await page.evaluate(()=>window.__hostCalls.resolve.length);
