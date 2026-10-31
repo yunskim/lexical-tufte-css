@@ -159,7 +159,10 @@ try{
  assert.ok(enrichedStructure.lists.some(list=>list.tag==='ol'&&list.items>0&&list.other===0),'ordered list must contain direct semantic li children');
  assert.ok(enrichedStructure.quotes.some(quote=>quote.tag==='blockquote'&&quote.text.includes('Quoted text')),'quotation must remain a semantic blockquote');
 
- assert.ok(reopenedSemantics.lists.some(list=>list.tag==='ol'&&list.start==='3'&&list.items.some(item=>item.text.includes('Numbered item'))),'reopened numbered list must publish');
+ assert.ok(reopenedSemantics.lists.some(list=>list.tag==='ol'&&list.start==='3'&&list.items.some(item=>item.value==='3'&&item.text.includes('Numbered item'))),'reopened numbered list must preserve explicit item value');
+ const savedSemantics=await semantics(enrichedSavedHTML.html);
+ assert.deepEqual(reopenedSemantics.lists,savedSemantics.lists,'ordered-list start and item values must survive Lexical save/reopen');
+ assert.deepEqual(reopenedSemantics.quotations,savedSemantics.quotations,'quotation citation must survive Lexical save/reopen');
  assert.ok(reopenedSemantics.quotations.some(quote=>quote.cite==='https://example.org/source'&&quote.text.includes('Quoted text')),'reopened quotation must publish');
 
  assert.ok(enrichedSemantics.lists.some(list=>list.tag==='ol'&&list.start==='3'&&list.items.some(item=>item.value==='3'&&item.text.includes('Numbered item'))),'original enriched fixture must publish list semantics');
