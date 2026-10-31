@@ -270,6 +270,39 @@ try{
       .some(image=>image.getAttribute('src')==='/obsolete.svg')),false,
     'Stale provider response must not overwrite the latest image URL');
 
+  // Repeated automatic resume signals must not start concurrent provider requests.
+  await page.clock.runFor(60_001);
+  await page.evaluate(()=>{
+    window.__hostMode='deferred';
+    window.__hostPendingResolves=[];
+    window.dispatchEvent(new Event('pageshow'));
+  });
+  await page.waitForFunction(()=>window.__hostPendingResolves.length===1);
+  const beforeDuplicateResume=await page.evaluate(()=>window.__hostCalls.resolve.length);
+  await page.evaluate(()=>{
+    window.dispatchEvent(new Event('pageshow'));
+    window.dispatchEvent(new Event('pageshow'));
+  });
+  assert.equal(await page.evaluate(()=>window.__hostCalls.resolve.length),beforeDuplicateResume,
+    'Automatic resume signals must coalesce while a refresh is in flight');
+
+  // A manual refresh is still allowed to supersede that pending automatic request.
+  await page.evaluate(()=>{window.__hostMode='normal';});
+  await button('외부 이미지 URL 다시 확인').click();
+  await page.getByRole('status',{name:'편집 작업 상태'}).getByText(/갱신: 2\\/2개/).waitFor();
+  const afterManualOverride=await page.evaluate(()=>window.__hostCalls.resolve.length);
+  assert.equal(afterManualOverride,beforeDuplicateResume+2,
+    'Manual refresh must resolve both images despite a pending automatic refresh');
+  await page.evaluate(()=>{
+    const pending=window.__hostPendingResolves.shift();
+    pending.resolve({assetId:pending.locator.assetId,revisionId:pending.locator.revisionId,
+      mediaType:'image/svg+xml',url:'/obsolete.svg',
+      expiresAt:new Date(Date.now()+120_000).toISOString()});
+  });
+  await page.waitForFunction(()=>window.__hostPendingResolves.length===0);
+  assert.equal(await page.evaluate(()=>window.__hostCalls.resolve.length),afterManualOverride,
+    'Superseded automatic request must not continue to the second image');
+
   // Returning to a visible tab after the 60-second cooldown rechecks URLs.
   const beforeResume=await page.evaluate(()=>window.__hostCalls.resolve.length);
   await page.clock.runFor(60_001);
