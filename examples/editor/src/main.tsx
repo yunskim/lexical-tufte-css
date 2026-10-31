@@ -421,7 +421,7 @@ function EditorUI(){
       setStatus('외부 이미지 갱신을 위한 호스트 설정이 없습니다.');return;
     }
     const generation=++refreshGeneration.current;
-    if(!retryOnly)failedHostKeys.current.clear();
+    if(!retryOnly){failedHostKeys.current.clear();clearExpiryRefresh();}
     clearRetryRefresh();
     lastHostRefresh.current=Date.now();
     const images:Array<{key:string;assetId:string;revisionId?:string}>=[];
