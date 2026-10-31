@@ -225,11 +225,18 @@ try{
   assert.equal(await toggle.getAttribute('type'),'checkbox','note toggle must be keyboard-operable checkbox');
   assert.equal(await toggle.isDisabled(),false,'note toggle must not be disabled');
   await toggle.focus();
-  assert.equal(await toggle.evaluate(el=>document.activeElement===el),true,'note toggle must accept keyboard focus');
+  await assert.doesNotReject(toggle.evaluate(el=>{
+   if(document.activeElement!==el)throw Error('note toggle did not receive focus');
+  }),'note toggle must accept keyboard focus');
   const beforeChecked=await toggle.isChecked();
-  await page.keyboard.press('Space');
+  // Space is activated on keyup for native checkboxes. Keep focus on the
+  // same element through both key phases and verify the complete cycle.
+  await page.keyboard.down('Space');
+  assert.equal(await toggle.evaluate(el=>document.activeElement===el),true,'note toggle must retain focus during keydown');
+  await page.keyboard.up('Space');
   assert.equal(await toggle.isChecked(),!beforeChecked,'Space must toggle note visibility control');
-  await page.keyboard.press('Space');
+  await page.keyboard.down('Space');
+  await page.keyboard.up('Space');
   assert.equal(await toggle.isChecked(),beforeChecked,'second Space must restore checkbox state');
  }
 
