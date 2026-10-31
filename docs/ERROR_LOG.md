@@ -961,3 +961,7 @@ E001–E049/M001–M042를 검토했다. E024의 경계 입력은 실제 Chromiu
 - 발견: 예제 편집기의 cutIds는 cut 또는 paste 때만 초기화되어 cut→copy→paste에서 오래된 cut ID를 새 클립보드 내용에 적용할 수 있었다.
 - 처리: COPY_COMMAND에 초기화 핸들러를 추가하고 Work 검증에 cut→copy→paste 시나리오를 등록했다.
 - 상태: 코드 수정, Work 실행 검증 대기. 외부 앱의 clipboard 변경과 취소된 cut/copy는 미해결. M064 참조.
+
+## 2026-10-31 C1.b 검증 절차 점검
+
+신규 epigraph 거부 회귀13개 중 group element 선택1개가 내부 RangeSelection.dirty flag 비교로 실패했다. anchor/focus/format/style은 동일했고 제품 변경은 없었다. E133/M123에서 정한 의미 선택 비교 .is를 적용해 집중45개와 실제 UI1440/375px 통과. 첫 전체 검사 실패와 수정 후 결과를 구분한다. 실제 구조·내용·진단 검사는 완화하지 않았다.

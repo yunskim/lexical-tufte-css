@@ -1,0 +1,75 @@
+{
+  "task": "P2.2.c-C1.b",
+  "date": "2026-10-31",
+  "base": "4a56a4d7003ea3df27635b572254c9e650b7cddb",
+  "check": {
+    "total": 564,
+    "lexical": 376,
+    "fail": 0,
+    "skip": 0
+  },
+  "focused": 45,
+  "browserWidths": [
+    1440,
+    375
+  ],
+  "package": 5,
+  "ci": "not-run",
+  "next": "P2.2.c.2 integrated acceptance",
+  "sourceHashes": {
+    "packages/lexical/src/quotationCommands.ts": "74a41f275ddf52d501a6726ee3f7a04982d236dceb2dd3e1471059875d8b2c4a",
+    "packages/lexical/test/quotation-editing.test.mjs": "c7c146776e592e8765d3c0564969d819df3cf525f2a2dc8397e4f8e7d0076c37",
+    "tests/quotation-editing-browser.mjs": "53f3a574515f4b1131e54a38a8448429df893906fb0f2656c0886076166cfd40"
+  },
+  "logs": {
+    "epigraph-check-final.log": {
+      "sha256": "e3ee39cdbadc0a28ab657245a48b459edddb041cbbe6f30896e33397b03acc8e",
+      "tail": [
+        "packages/lexical test: ℹ tests 376",
+        "packages/lexical test: ℹ suites 0",
+        "packages/lexical test: ℹ pass 376",
+        "packages/lexical test: ℹ fail 0",
+        "packages/lexical test: ℹ cancelled 0",
+        "packages/lexical test: ℹ skipped 0",
+        "packages/lexical test: ℹ todo 0",
+        "packages/lexical test: ℹ duration_ms 3295.814839",
+        "packages/lexical test: Done"
+      ]
+    },
+    "epigraph-unit.log": {
+      "sha256": "db486a0a5c91a8e847c7425b5e44e50fb37299b8a1438468425c3a54229c0983",
+      "tail": [
+        "✔ MOVE_TUFTE_EPIGRAPH_ITEM rejects boundary atomically (0.828646ms)",
+        "ℹ tests 45",
+        "ℹ suites 0",
+        "ℹ pass 45",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0",
+        "ℹ todo 0",
+        "ℹ duration_ms 643.876463"
+      ]
+    },
+    "epigraph-browser.log": {
+      "sha256": "c9b7f710d7a6bf6bd6c3fe41855d564ec5efdf334b4544ca8830846d4ad18540",
+      "tail": [
+        "Quotation editing UI 1440px PASS",
+        "Quotation editing UI 375px PASS"
+      ]
+    },
+    "epigraph-package.log": {
+      "sha256": "55cb2e002ad55309b06ddf13f59ccd7d3ce444018c75b2a845d0e17c846d3bb3",
+      "tail": [
+        "examples/editor build: ✓ built in 319ms",
+        "examples/editor build: [plugin builtin:vite-reporter] ",
+        "examples/editor build: (!) Some chunks are larger than 500 kB after minification. Consider:",
+        "examples/editor build: - Using dynamic import() to code-split the application",
+        "examples/editor build: - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting",
+        "examples/editor build: - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.",
+        "examples/editor build: Done",
+        "Checking packed JS imports and editor roundtrip (15s limit).",
+        "R13 five tarballs: full LICENSE/notices/OFL, packed JS imports, fresh declarations, strict editor roundtrip, renderer/blog and SQL exports PASS. No publishing."
+      ]
+    }
+  }
+}

@@ -41,6 +41,15 @@ try{
   await quote().locator('footer').click();await action('인용 출처 삭제').click();assert.equal(await quote().locator('footer').count(),0);
   await quote().click();await action('인용문 삭제').click();assert.equal(await quote().count(),0);
   await lastSection().locator('p').click();await action('Epigraph 삽입').click();
+  await lastSection().locator('.epigraph blockquote').click();await action('Epigraph 항목 추가').click();
+  assert.equal(await lastSection().locator('.epigraph > blockquote').count(),2);
+  await page.keyboard.insertText(' Second');const appended=await snapshot();
+  await lastSection().locator('.epigraph > blockquote').last().click();await action('Epigraph 항목 위로').click();
+  assert.match(await lastSection().locator('.epigraph > blockquote').first().innerText(),/Second/);const moved=await snapshot();
+  await page.getByRole('button',{name:'실행 취소',exact:true}).click();assert.deepEqual(await snapshot(),appended);
+  await page.getByRole('button',{name:'다시 실행',exact:true}).click();assert.deepEqual(await snapshot(),moved);
+  await lastSection().locator('.epigraph > blockquote').first().click();await action('Epigraph 항목 아래로').click();assert.deepEqual(await snapshot(),appended);
+  await lastSection().locator('.epigraph > blockquote').last().click();await action('인용문 삭제').click();
   await lastSection().locator('.epigraph blockquote').click();await action('인용문 삭제').click();assert.equal(await lastSection().locator('.epigraph').count(),0);
   await lastSection().locator('p').click();await action('섹션 출처 삽입').click();
   await lastSection().locator(':scope > footer').click();await action('섹션 문헌 추가').click();

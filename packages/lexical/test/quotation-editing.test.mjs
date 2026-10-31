@@ -6,7 +6,7 @@ import {$getRoot,$getSelection,$setCompositionKey,$createParagraphNode,$createTe
 import {$createQuoteNode} from '@lexical/rich-text';
 import {$createHorizontalRuleNode} from '@lexical/react/LexicalHorizontalRuleNode';
 import {renderArticle} from '../../render/dist/index.js';
-import {TUFTE_NODES,$createSectionNode,$createEpigraphNode,$createAttributionNode,$createCiteNode,$createSectionFooterNode,$createSidenoteNode,registerQuotationCommands,SET_TUFTE_QUOTE_CITE_COMMAND,REMOVE_TUFTE_QUOTATION_COMMAND,exportCanonicalEditorState,parseCanonicalEditorState} from '../dist/index.js';
+import {APPEND_TUFTE_EPIGRAPH_ITEM_COMMAND,MOVE_TUFTE_EPIGRAPH_ITEM_COMMAND,TUFTE_NODES,$createSectionNode,$createEpigraphNode,$createAttributionNode,$createCiteNode,$createSectionFooterNode,$createSidenoteNode,registerQuotationCommands,SET_TUFTE_QUOTE_CITE_COMMAND,REMOVE_TUFTE_QUOTATION_COMMAND,exportCanonicalEditorState,parseCanonicalEditorState} from '../dist/index.js';
 const flush=()=>new Promise(resolve=>setImmediate(resolve));
 const snapshot=e=>exportCanonicalEditorState(e.getEditorState());
 function setup(kind='quote',solo=false){
@@ -145,4 +145,36 @@ test('removing the only attribution leaves a schema-valid editable quote',()=>{
  editor.update(()=>{for(const child of target.getChildren().slice(0,-1))child.remove();target.getLastChild().selectStart();},{discrete:true});
  run(editor,REMOVE_TUFTE_QUOTATION_COMMAND,'attribution');
  assert.deepEqual(snapshot(editor).root.children[0].children[1].children.map(n=>n.type),['paragraph']);publish(snapshot(editor));stop();
+});
+
+test('epigraph append and moves preserve payload, caret and one undo/redo',async()=>{
+ const {editor,stop,target}=setup('epigraph');
+ const history=createEmptyHistoryState(),unregister=registerHistory(editor,history,300);history.current={editor,editorState:editor.getEditorState()};
+ for(const [command,payload] of [[APPEND_TUFTE_EPIGRAPH_ITEM_COMMAND,undefined],[MOVE_TUFTE_EPIGRAPH_ITEM_COMMAND,'up'],[MOVE_TUFTE_EPIGRAPH_ITEM_COMMAND,'down']]){
+  const before=snapshot(editor);let selection;editor.getEditorState().read(()=>{selection=$getSelection().clone();});
+  run(editor,command,payload);await flush();const after=snapshot(editor);assert.notDeepEqual(after,before);publish(after);
+  if(command===MOVE_TUFTE_EPIGRAPH_ITEM_COMMAND)editor.getEditorState().read(()=>assert.ok($getSelection().is(selection)));
+  assert.deepEqual(after.root.children[1],before.root.children[1]);
+  assert.match(JSON.stringify(after),/quote-note/);
+  run(editor,UNDO_COMMAND);await flush();assert.deepEqual(snapshot(editor),before);
+  run(editor,REDO_COMMAND);await flush();assert.deepEqual(snapshot(editor),after);
+  const restored=createHeadlessEditor({nodes:TUFTE_NODES,onError(e){throw e;}});restored.setEditorState(parseCanonicalEditorState(restored,after));await flush();assert.deepEqual(snapshot(restored),after);
+ }
+ unregister();stop();
+});
+for(const command of [APPEND_TUFTE_EPIGRAPH_ITEM_COMMAND,MOVE_TUFTE_EPIGRAPH_ITEM_COMMAND])for(const mode of ['outside','range','composition','note','malformed','boundary'])test(`${command.type} rejects ${mode} atomically`,()=>{
+ const {editor,diagnostics,stop,target,body}=setup(mode==='outside'?'quote':'epigraph');
+ editor.update(()=>{
+  if(mode==='range')body.select(0,2);
+  if(mode==='note')target.getFirstChild().getChildren()[1].selectStart();
+  if(mode==='malformed')target.append($createParagraphNode());
+ },{discrete:true});
+ const before=snapshot(editor);
+ // Append has no first/last restriction: boundary case instead uses the group element itself.
+ editor.update(()=>{
+  if(mode==='boundary'&&command===APPEND_TUFTE_EPIGRAPH_ITEM_COMMAND){const selection=$getSelection();selection.anchor.set(target.getKey(),0,'element');selection.focus.set(target.getKey(),0,'element');}
+  const selection=$getSelection().clone();if(mode==='composition')$setCompositionKey(selection.anchor.key);
+  try{editor.dispatchCommand(command,command===MOVE_TUFTE_EPIGRAPH_ITEM_COMMAND?'up':undefined);assert.ok($getSelection().is(selection));}finally{$setCompositionKey(null);}
+ },{discrete:true});
+ assert.deepEqual(snapshot(editor),before);assert.equal(diagnostics.length,1);stop();
 });

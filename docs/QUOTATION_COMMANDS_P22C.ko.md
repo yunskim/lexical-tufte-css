@@ -30,7 +30,7 @@
 ## 후속 체크리스트
 
 - [x] C1.a URL 설정/해제 및 attribution/cite/구분선/footer/quote/epigraph 삭제 명령과 public export, 예제 UI 연결.
-- [ ] C1.b 같은 epigraph 내부 항목 추가/인접 이동/삭제, 첫·중간·끝·마지막 항목 및 잘못된 구조 거부.
+- [x] C1.b 같은 epigraph 내부 항목 추가/인접 이동/삭제, 첫·중간·끝·마지막 항목 및 잘못된 구조 거부.
 - [ ] C2.a 각 명령의 내용·선택·노트 ID 보존/거부 원자성 및 한 Undo/Redo.
 - [ ] C2.b canonical JSON 저장·재열기와 순수 renderer의 blockquote/URL/footer/cite/epigraph 자식 순서·개수 검사.
 - [ ] C2.c 실제 1440/375px UI에서 키보드 접근·포커스 복귀·텍스트 수정과 다른 섹션 불변성 검사. 실제 OS IME·스크린리더 검증은 P6 증거와 연결한다.
@@ -50,3 +50,9 @@ frozen install과 workspace build 통과. `node --test packages/lexical/test/quo
 - C1.b 항목 추가/이동과 P2.2.c.2의 전체 노드/거부 행렬·실제 OS IME·스크린리더 수락은 남아 있다. 최종 실행 결과는 PROGRESS의 C1.a 항목을 따른다.
 
 최종 C1.a 검증: pnpm check551개(실패/skip0), quotation 관련63개(기존31+신규32), 실제 UI1440/375px, package5개 통과. 전체 브라우저/공식pixel/Python 및 CI는 재실행하지 않았다. C1.b와 C2 전체 체크는 유지한다.
+
+## C1.b epigraph 항목 관리 — 2026-10-31
+
+`APPEND_TUFTE_EPIGRAPH_ITEM_COMMAND`는 선택한 quote 바로 뒤에 새 quote를 추가한다. `MOVE_TUFTE_EPIGRAPH_ITEM_COMMAND`의 up/down은 같은 epigraph의 인접 quote와 순서를 바꾼다. epigraph element 자체·다른 블록·범위·composition·note 내부·malformed 구조와 첫/끝 경계는 진단·무변경이다. 이동 시 기존 노드를 재사용해 quote URL·본문·출처·노트 ID·서식과 caret을 보존한다. 예제 UI에 추가·위로·아래로 버튼을 연결했다.
+
+`quotation-editing.test.mjs`는 추가/양방향 이동의 한 Undo/Redo·canonical 재열기·발행 및 거부 행렬을 검사한다. `quotation-editing-browser.mjs`는1440/375px에서 실제 추가·이동 순서와 한 Undo/Redo·기존 삭제 경로를 검사한다. 전체 P2.2.c.2 수락, 실제 OS IME·스크린리더는 미완료다. 최종 수치는 PROGRESS의 C1.b 기록을 따른다.

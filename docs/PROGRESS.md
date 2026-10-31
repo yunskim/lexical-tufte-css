@@ -1,3 +1,9 @@
+## 2026-10-31 P2.2.c C1.b epigraph 항목 추가·이동
+
+- APPEND_TUFTE_EPIGRAPH_ITEM_COMMAND/MOVE_TUFTE_EPIGRAPH_ITEM_COMMAND와 예제 UI 추가·위/아래 버튼 구현. 같은 epigraph의 직접 자식 quote 단위로 추가/이동하며 기존 노드·본문/출처·노트 ID·caret을 보존한다. 범위/IME/note/잘못된 구조·이동 경계는 진단·무변경이다.
+- 최종 check564개(Lexical376, 실패/skip0), 집중45개, 실제 UI1440/375px, package5개 통과. 추가·양방향 이동·한 Undo/Redo·canonical 저장/재열기·순수 발행 검사. 최초 검사1실패는 E133/M123의 내부 dirty flag 비교 재발로 의미 선택 비교를 적용했다.
+- 시작/종료에 E133/M123·M122 및 관련 경계 기록을 점검했다. [명령 계약](QUOTATION_COMMANDS_P22C.ko.md), [증거](verification/epigraph-items-20261031.json). C1.b와 P2.2.c.1을 체크했고 다음은 C2 통합 수락 행렬이다. 전체 browser/공식pixel/Python·실제 OS IME/스크린리더·CI는 재실행하지 않았다.
+
 ## 2026-10-31 P2.2.c C1.a 인용문 URL·구조 삭제
 
 - SET_TUFTE_QUOTE_CITE_COMMAND와 REMOVE_TUFTE_QUOTATION_COMMAND를 public export하고 예제 toolbar에 URL 수정/해제 및 6종 삭제를 연결했다. URL은 기존 validator 정책을 재사용하고 서식·자식/노트 ID·caret을 보존한다. 마지막 epigraph/section/quote 삭제 경계와 구조 오류의 무변경 진단을 검사한다.

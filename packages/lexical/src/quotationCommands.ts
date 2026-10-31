@@ -15,6 +15,9 @@ export const INSERT_TUFTE_HORIZONTAL_RULE_COMMAND:LexicalCommand<void>=createCom
 export const APPEND_TUFTE_SECTION_CITE_COMMAND:LexicalCommand<void>=createCommand('APPEND_TUFTE_SECTION_CITE');
 export const APPEND_TUFTE_ATTRIBUTION_COMMAND:LexicalCommand<void>=createCommand('APPEND_TUFTE_ATTRIBUTION');
 
+export const APPEND_TUFTE_EPIGRAPH_ITEM_COMMAND:LexicalCommand<void>=createCommand('APPEND_TUFTE_EPIGRAPH_ITEM');
+export const MOVE_TUFTE_EPIGRAPH_ITEM_COMMAND:LexicalCommand<'up'|'down'>=createCommand('MOVE_TUFTE_EPIGRAPH_ITEM');
+
 export type TufteQuotationRemoval='quote'|'epigraph'|'section-footer'|'attribution'|'cite'|'horizontalrule';
 export const SET_TUFTE_QUOTE_CITE_COMMAND:LexicalCommand<string|null>=createCommand('SET_TUFTE_QUOTE_CITE');
 export const REMOVE_TUFTE_QUOTATION_COMMAND:LexicalCommand<TufteQuotationRemoval>=createCommand('REMOVE_TUFTE_QUOTATION');
@@ -76,7 +79,25 @@ export function registerQuotationCommands(editor:LexicalEditor,onDiagnostic?:(di
   }
  };
  const quote=()=> $createQuoteNode().append($createTextNode('인용문'));
+ const epigraphItem=()=>{
+  const selection=selected(),item=selection?ancestor(selection.anchor.getNode(),'quote'):null;
+  const group=item?.getParent();
+  return item instanceof QuoteNode&&group instanceof EpigraphNode&&validTarget(group)?{item,group,selection:selection!}:null;
+ };
  const registrations=[
+  editor.registerCommand(APPEND_TUFTE_EPIGRAPH_ITEM_COMMAND,()=>{
+   const current=epigraphItem();if(!current)return reject('유효한 epigraph 인용 항목을 선택하세요.');
+   $addUpdateTag(HISTORY_PUSH_TAG);const added=quote();current.item.insertAfter(added);added.selectStart();return true;
+  },COMMAND_PRIORITY_EDITOR),
+  editor.registerCommand(MOVE_TUFTE_EPIGRAPH_ITEM_COMMAND,direction=>{
+   const current=epigraphItem();
+   if(!current||(direction!=='up'&&direction!=='down'))return reject('이동할 epigraph 인용 항목을 선택하세요.');
+   const neighbor=direction==='up'?current.item.getPreviousSibling():current.item.getNextSibling();
+   if(!(neighbor instanceof QuoteNode))return reject('epigraph 항목의 이동 경계를 벗어났습니다.');
+   $addUpdateTag(HISTORY_PUSH_TAG);const saved=current.selection.clone();
+   if(direction==='up')neighbor.insertBefore(current.item);else neighbor.insertAfter(current.item);
+   $setSelection(saved);return true;
+  },COMMAND_PRIORITY_EDITOR),
   editor.registerCommand(SET_TUFTE_QUOTE_CITE_COMMAND,value=>{
    const selection=selected(),q=selection?ancestor(selection.anchor.getNode(),'quote'):null;
    if(!(q instanceof QuoteNode)||!validTarget(q))return reject('유효한 섹션 인용문 안의 한 위치를 선택하세요.');
