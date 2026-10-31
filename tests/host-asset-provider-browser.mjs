@@ -162,6 +162,31 @@ try{
   await button('외부 이미지 URL 다시 확인').click();
   await page.getByRole('status',{name:'편집 작업 상태'}).getByText(/갱신: 1\/1개/).waitFor();
 
+  // With two distinct host images, a retry must request only the failed locator.
+  await page.evaluate(()=>{
+    window.__hostMode='normal';
+    window.__hostCalls.resolve.length=0;
+  });
+  await editor.focus();
+  await page.keyboard.press('Control+End');
+  await button('노트 이미지 삽입').click();
+  await button('이미지 라이브러리에서 선택').click();
+  const secondDialog=page.getByRole('dialog',{name:'문서 이미지 선택'});
+  await secondDialog.getByRole('radio',{name:/Remote image/}).check();
+  await secondDialog.getByRole('combobox',{name:'버전'}).selectOption('rev-2');
+  await secondDialog.getByRole('button',{name:'선택한 외부 이미지 연결'}).click();
+  await secondDialog.waitFor({state:'hidden'});
+  await page.evaluate(()=>{window.__hostMode='partial';});
+  await button('외부 이미지 URL 다시 확인').click();
+  await page.getByRole('status',{name:'편집 작업 상태'}).getByText(/실패 1개, 재시도 예약/).waitFor();
+  const beforeSelectiveRetry=await page.evaluate(()=>window.__hostCalls.resolve.length);
+  await page.evaluate(()=>{window.__hostMode='normal';});
+  await page.clock.runFor(5000);
+  await page.waitForFunction(count=>window.__hostCalls.resolve.length>count,beforeSelectiveRetry);
+  const selectiveCalls=await page.evaluate(count=>window.__hostCalls.resolve.slice(count),beforeSelectiveRetry);
+  assert.deepEqual(selectiveCalls,[{assetId:'remote-image',revisionId:'rev-1'}],
+    'Automatic retry must skip the already-refreshed second revision');
+
   // Returning to a visible tab after the 60-second cooldown rechecks URLs.
   const beforeResume=await page.evaluate(()=>window.__hostCalls.resolve.length);
   await page.clock.runFor(60_001);
