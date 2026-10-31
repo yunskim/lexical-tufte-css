@@ -1114,3 +1114,47 @@ test('P2.2.d.2 rejected document load preserves real undo and redo stacks',async
   assert.equal(text(),'Original','undo must remain usable after rejected load');
  }finally{unregister();}
 });
+
+test('P2.2.d.2 rejected load retains history while successful replacement clears it',async()=>{
+ const source=editor();
+ source.update(()=>$getRoot().append($createSectionNode().append(
+  $createParagraphNode().append($createTextNode('Initial'))
+ )),{discrete:true});
+ const initial={...fixture(),lexicalState:exportCanonicalEditorState(source.getEditorState())};
+ const destination=editor();
+ assert.equal(loadDocumentIntoEditor(destination,initial).ok,true);
+ const history=createEmptyHistoryState();
+ const unregister=registerHistory(destination,history,300);
+ const flush=()=>new Promise(resolve=>setImmediate(resolve));
+ const current=()=>destination.getEditorState().read(()=>$getRoot().getTextContent());
+ try{
+  destination.update(()=>$getRoot().getFirstChild().getFirstChild().getFirstChild().setTextContent('Edited'),{discrete:true,tag:HISTORY_PUSH_TAG});
+  await flush();
+  destination.dispatchCommand(UNDO_COMMAND,undefined);
+  await flush();
+  assert.equal(current(),'Initial');
+  assert.ok(history.redoStack.length>0,'precondition: redo entry exists');
+  const oldUndo=history.undoStack.length,oldRedo=history.redoStack.length;
+  const malformed=structuredClone(initial);
+  malformed.lexicalState.root.children[0].children.push({type:'future-unsupported-block',version:1,children:[]});
+  assert.equal(loadDocumentIntoEditor(destination,malformed).ok,false);
+  assert.equal(history.undoStack.length,oldUndo,'rejected load must retain undo history');
+  assert.equal(history.redoStack.length,oldRedo,'rejected load must retain redo history');
+  assert.equal(current(),'Initial');
+  const replacementSource=editor();
+  replacementSource.update(()=>$getRoot().append($createSectionNode().append(
+   $createParagraphNode().append($createTextNode('Replacement'))
+  )),{discrete:true});
+  const replacement={...fixture(),lexicalState:exportCanonicalEditorState(replacementSource.getEditorState())};
+  const accepted=loadDocumentIntoEditor(destination,replacement);
+  assert.equal(accepted.ok,true,JSON.stringify(accepted.diagnostics));
+  await flush();
+  assert.equal(current(),'Replacement');
+  assert.equal(history.undoStack.length,0,'successful replacement must clear undo history');
+  assert.equal(history.redoStack.length,0,'successful replacement must clear redo history');
+  destination.dispatchCommand(REDO_COMMAND,undefined);await flush();
+  assert.equal(current(),'Replacement','old redo cannot cross document replacement');
+  destination.dispatchCommand(UNDO_COMMAND,undefined);await flush();
+  assert.equal(current(),'Replacement','old undo cannot cross document replacement');
+ }finally{unregister();}
+});
