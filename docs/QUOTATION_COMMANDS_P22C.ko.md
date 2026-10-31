@@ -1,10 +1,10 @@
 # P2.2.c 인용문·출처·epigraph 명령 계약
 
-2026-10-31, 기준 `339a7b3`. P2.2.c.1의 **지원/거부 범위 설계**다. C1.a 명령은 아래 후속 보고서 범위에서 구현했으며 C1.b는 미구현이다. 이 문서는 P2.2.c/P2.2.c.2 완료 증거가 아니다.
+2026-10-31, 기준 `339a7b3`. P2.2.c.1의 **지원/거부 범위 설계**다. C1.a/b 명령은 아래 후속 보고서 범위에서 구현했다. 이 문서는 P2.2.c/P2.2.c.2 완료 증거가 아니다.
 
 ## 현재 구현
 
-`packages/lexical/src/quotationCommands.ts`, `QuotationNodes.ts`, `SectionFooterNode.ts`, `blockSerialization.ts`와 `packages/document/src/schema.ts`, `packages/render/src/index.ts`를 대조했다. 예제 React UI에는 생성·출처 추가 버튼만 있다. 일반 텍스트 입력 가능 여부와 구조 편집 전용 명령 지원을 구분한다.
+`packages/lexical/src/quotationCommands.ts`, `QuotationNodes.ts`, `SectionFooterNode.ts`, `blockSerialization.ts`와 `packages/document/src/schema.ts`, `packages/render/src/index.ts`를 대조했다. 예제 React UI에는 생성·출처 추가·URL 수정/해제·삭제·epigraph 항목 추가/이동 버튼이 있다. 일반 텍스트 입력 가능 여부와 구조 편집 전용 명령 지원을 구분한다.
 
 | 대상 | 기존 명령/동작 | 후속 구현 범위 |
 | --- | --- | --- |
@@ -56,3 +56,11 @@ frozen install과 workspace build 통과. `node --test packages/lexical/test/quo
 `APPEND_TUFTE_EPIGRAPH_ITEM_COMMAND`는 선택한 quote 바로 뒤에 새 quote를 추가한다. `MOVE_TUFTE_EPIGRAPH_ITEM_COMMAND`의 up/down은 같은 epigraph의 인접 quote와 순서를 바꾼다. epigraph element 자체·다른 블록·범위·composition·note 내부·malformed 구조와 첫/끝 경계는 진단·무변경이다. 이동 시 기존 노드를 재사용해 quote URL·본문·출처·노트 ID·서식과 caret을 보존한다. 예제 UI에 추가·위로·아래로 버튼을 연결했다.
 
 `quotation-editing.test.mjs`는 추가/양방향 이동의 한 Undo/Redo·canonical 재열기·발행 및 거부 행렬을 검사한다. `quotation-editing-browser.mjs`는1440/375px에서 실제 추가·이동 순서와 한 Undo/Redo·기존 삭제 경로를 검사한다. 전체 P2.2.c.2 수락, 실제 OS IME·스크린리더는 미완료다. 최종 수치는 PROGRESS의 C1.b 기록을 따른다.
+
+## C2 통합 검증 보강 — 2026-10-31
+
+삭제6종 × range/composition/note 18개를 추가했다. horizontalrule은 텍스트 RangeSelection을 허용하지 않는 거부 경계이며 단일 NodeSelection의 성공 경로는 기존 테스트다. 내용·선택 의미·진단1회·빈 undoStack을 확인한다. 신규 전용45개+거부18개=63개, 기존 생성31개와 합쳐94개다.
+
+실제 UI에서 생성·추가·이동한 epigraph2항목을 DOM editor에서 canonical export→JSON 직렬화→새 DOM editor로 재열기한다. 문서 전체 동일성과 native HTML2경로/순수 renderer의 epigraph 직접 자식 blockquote 순서·본문·cite URL을 비교한다. 1440/375px 모두 통과했다. 보조 harness는 document.body를 교체하므로 독립 탭에서 실행한다(E134/M124).
+
+이 검증은 C2.a/b의 지원 경계를 보강한다. 각 생성 명령의 history 전수, 속성 조합 전체와 C2.c 키보드 전용 조작/포커스·실제 텍스트 수정 전체는 아직 미완료이므로 상위 P2.2.c.2/P2.2.c를 체크하지 않는다. 실제 OS IME/스크린리더도 P6에 남는다.

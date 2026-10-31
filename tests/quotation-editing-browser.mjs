@@ -49,6 +49,23 @@ try{
   await page.getByRole('button',{name:'실행 취소',exact:true}).click();assert.deepEqual(await snapshot(),appended);
   await page.getByRole('button',{name:'다시 실행',exact:true}).click();assert.deepEqual(await snapshot(),moved);
   await lastSection().locator('.epigraph > blockquote').first().click();await action('Epigraph 항목 아래로').click();assert.deepEqual(await snapshot(),appended);
+  // Reopen actual DOM-produced canonical JSON, then compare semantic order in both HTML exporters.
+  const input={schemaVersion:1,id:'quotation-roundtrip',locale:'ko-KR',title:'Quotation',assets:[],lexicalState:appended};
+  const harnessPath='/@fs'+new URL('../packages/lexical/test/publication-browser-harness.mjs',import.meta.url).pathname;
+  const roundtripPage=await browser.newPage();await roundtripPage.goto(url,{waitUntil:'domcontentloaded'});
+  const roundtrip=await roundtripPage.evaluate(async({input,harnessPath})=>{
+   const {mountPublicationHarness}=await import(harnessPath);
+   const first=mountPublicationHarness(input);await new Promise(requestAnimationFrame);const a=first.snapshot();first.dispose();
+   const second=mountPublicationHarness(JSON.parse(JSON.stringify(a.document)));await new Promise(requestAnimationFrame);const b=second.snapshot();second.dispose();return {a,b};
+  },{input,harnessPath});
+  await roundtripPage.close();
+  assert.deepEqual(roundtrip.b.document,roundtrip.a.document);
+  const pure=renderArticle(roundtrip.a.document);assert.equal(pure.ok,true,JSON.stringify(pure.diagnostics));
+  const semantic=html=>page.evaluate(html=>[...new DOMParser().parseFromString(html,'text/html').querySelectorAll('.epigraph > blockquote')].map(n=>({text:n.textContent,cite:n.getAttribute('cite')})),html);
+  assert.deepEqual(await semantic(roundtrip.a.html),await semantic(pure.html));
+  assert.deepEqual(await semantic(roundtrip.b.html),await semantic(pure.html));
+  assert.equal((await semantic(pure.html)).length,2);
+  assert.match((await semantic(pure.html))[1].text,/Second/);
   await lastSection().locator('.epigraph > blockquote').last().click();await action('인용문 삭제').click();
   await lastSection().locator('.epigraph blockquote').click();await action('인용문 삭제').click();assert.equal(await lastSection().locator('.epigraph').count(),0);
   await lastSection().locator('p').click();await action('섹션 출처 삽입').click();

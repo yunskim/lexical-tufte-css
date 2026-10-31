@@ -965,3 +965,7 @@ E001–E049/M001–M042를 검토했다. E024의 경계 입력은 실제 Chromiu
 ## 2026-10-31 C1.b 검증 절차 점검
 
 신규 epigraph 거부 회귀13개 중 group element 선택1개가 내부 RangeSelection.dirty flag 비교로 실패했다. anchor/focus/format/style은 동일했고 제품 변경은 없었다. E133/M123에서 정한 의미 선택 비교 .is를 적용해 집중45개와 실제 UI1440/375px 통과. 첫 전체 검사 실패와 수정 후 결과를 구분한다. 실제 구조·내용·진단 검사는 완화하지 않았다.
+
+## E134 — 발행 보조 harness가 주 편집기 DOM을 제거 (테스트 격리 수정)
+
+2026-10-31 C2: 새 DOM 재열기 비교 자체는 통과했으나 후속 epigraph locator가8초 timeout했다. mountPublicationHarness가 document.body.replaceChildren(host)를 호출해 기존 React UI를 제거한 것이 원인이다. 제품 데이터 삭제 오류가 아니다. 별도 탭에서 harness를 실행·종료하고 주 편집기에서 후속 삭제 검사를 유지했다.1440/375px 재실행 통과. M124.

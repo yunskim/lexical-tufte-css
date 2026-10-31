@@ -178,3 +178,23 @@ for(const command of [APPEND_TUFTE_EPIGRAPH_ITEM_COMMAND,MOVE_TUFTE_EPIGRAPH_ITE
  },{discrete:true});
  assert.deepEqual(snapshot(editor),before);assert.equal(diagnostics.length,1);stop();
 });
+
+for(const kind of ['quote','epigraph','section-footer','attribution','cite','horizontalrule'])for(const mode of ['range','composition','note'])test(`remove ${kind} rejects ${mode} with selection and payload intact`,()=>{
+ const {editor,diagnostics,stop}=setup(kind==='horizontalrule'?'quote':kind);
+ editor.update(()=>{
+  const section=$getRoot().getFirstChild();
+  if(mode==='note'){
+   const text=$createTextNode('Guard note');section.append($createParagraphNode().append($createSidenoteNode('guard-matrix').append(text)));text.selectEnd();
+  }else{
+   // Keep the valid target selection, except HR whose range target is unsupported.
+   const selection=$getSelection();
+   if(mode==='range')selection.focus.offset=selection.anchor.offset===0?1:0;
+  }
+ },{discrete:true});
+ const before=snapshot(editor),history=createEmptyHistoryState(),unregister=registerHistory(editor,history,300);
+ editor.update(()=>{
+  const selection=$getSelection().clone();if(mode==='composition')$setCompositionKey(selection.anchor.key);
+  try{editor.dispatchCommand(REMOVE_TUFTE_QUOTATION_COMMAND,kind);assert.ok($getSelection().is(selection));}finally{$setCompositionKey(null);}
+ },{discrete:true});
+ assert.deepEqual(snapshot(editor),before);assert.equal(diagnostics.length,1);assert.equal(history.undoStack.length,0);unregister();stop();
+});

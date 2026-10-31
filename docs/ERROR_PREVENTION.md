@@ -785,3 +785,7 @@ E059/M052 및 E067/M060의 선행 대책을 그림 주석 명령·회귀 테스�
 - debounce만 사용하는 자동 저장은 pagehide/visibilitychange/unmount 직전의 마지막 변경을 잃을 수 있다. pending EditorState를 별도 보유하고 종료 이벤트에서 동기 localStorage 쓰기를 시도한다.
 - 최신 상태를 성공적으로 쓴 뒤에만 pending 참조를 비운다. 저장 실패는 사용자에게 표시하고 정상 문서 슬롯을 덮어쓰지 않는다.
 - 종료 이벤트는 강제 종료·OS kill에서 보장되지 않는다. Work 브라우저 검증에 800ms 미만 종료, 숨김, 복귀, quota 실패, 여러 탭 시나리오를 포함한다.
+
+## M124 — document 전체를 교체하는 검증 harness 격리
+
+E134: 보조 harness의 mount/dispose가 body를 교체하는지 읽고 주 UI 수명과 분리한다. 별도 탭에서 canonical DOM 재열기를 수행하고 종료한다. 주 편집기를 재생성하거나 locator timeout을 늘려 원인을 숨기지 않는다. 실제 주 UI 후속 명령을 포함해 재검증한다. 종료에 E133/M123과 M122의 history/선택 범위를 재점검했고 다음 C2 키보드/포커스 검증에서 적용한다.

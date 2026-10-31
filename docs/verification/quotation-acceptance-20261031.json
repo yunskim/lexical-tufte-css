@@ -1,0 +1,58 @@
+{
+  "base": "2a227d0714ec48514dcc8485dc6365f6a9e6990e",
+  "task": "P2.2.c.2 partial integration",
+  "unit": 582,
+  "lexical": 394,
+  "focused": 63,
+  "quotationIncludingCreation": 94,
+  "fail": 0,
+  "skip": 0,
+  "browserWidths": [
+    1440,
+    375
+  ],
+  "productChanged": false,
+  "status": "partial; keyboard/focus and creation history matrix pending",
+  "ci": "not-run",
+  "hashes": {
+    "packages/lexical/test/quotation-editing.test.mjs": "a6d51c4dcce49af8a33219c86de78d71baaa360e9f8f99ab22eb8660bd73d5ed",
+    "tests/quotation-editing-browser.mjs": "820690ef334c7348f575f7d891ce96b742a4f25d752b9639b8051f665b66a872"
+  },
+  "logs": {
+    "quotation-acceptance-all-unit.log": {
+      "sha256": "9dcddfe840a7926c6ed348841b5f5807560d4105346962dab8c43ec898172647",
+      "tail": [
+        "packages/lexical test: ℹ tests 394",
+        "packages/lexical test: ℹ suites 0",
+        "packages/lexical test: ℹ pass 394",
+        "packages/lexical test: ℹ fail 0",
+        "packages/lexical test: ℹ cancelled 0",
+        "packages/lexical test: ℹ skipped 0",
+        "packages/lexical test: ℹ todo 0",
+        "packages/lexical test: ℹ duration_ms 3265.05469",
+        "packages/lexical test: Done"
+      ]
+    },
+    "quotation-acceptance-unit.log": {
+      "sha256": "d2dd94576397e78ba003771a2e504eb03513525847085bb949460a323f4c4c8e",
+      "tail": [
+        "✔ remove horizontalrule rejects note with selection and payload intact (0.825883ms)",
+        "ℹ tests 63",
+        "ℹ suites 0",
+        "ℹ pass 63",
+        "ℹ fail 0",
+        "ℹ cancelled 0",
+        "ℹ skipped 0",
+        "ℹ todo 0",
+        "ℹ duration_ms 481.189943"
+      ]
+    },
+    "quotation-acceptance-browser-final.log": {
+      "sha256": "c9b7f710d7a6bf6bd6c3fe41855d564ec5efdf334b4544ca8830846d4ad18540",
+      "tail": [
+        "Quotation editing UI 1440px PASS",
+        "Quotation editing UI 375px PASS"
+      ]
+    }
+  }
+}

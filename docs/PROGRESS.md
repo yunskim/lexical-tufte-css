@@ -1,3 +1,10 @@
+## 2026-10-31 C2 인용 기능 통합 검증 보강
+
+- 삭제6종의 range/composition/note 거부18개를 추가해 내용·선택·진단/이력 무변경을 검사했다. 실제 UI가 만든 epigraph2항목의 DOM canonical export→JSON→새 DOM editor 재열기와 native/pure HTML의 순서·본문·cite 비교를 보강했다.
+- 최종 pnpm test582개(Lexical394; 실패/skip0), 집중63개(기존 생성31개와 합계94개), UI1440/375px 통과. 제품 소스·schema·golden 변경 없음. build/typecheck/package/full browser/pixel/Python/CI는 이번에 재실행하지 않았다.
+- E134/M124 보조 harness의 body 교체를 독립 탭으로 격리했다. 최초 후속 locator timeout과 최종 성공을 구분했다. 시작/종료에 E133/M123·M122를 재대조했다.
+- [C2 범위와 남은 수락](QUOTATION_COMMANDS_P22C.ko.md), [로그/소스 해시](verification/quotation-acceptance-20261031.json). C2 및 상위 인용 기능 체크는 유지한다. 다음은 생성 명령 history 전수와 키보드/포커스·텍스트 수정 행렬이다.
+
 ## 2026-10-31 P2.2.c C1.b epigraph 항목 추가·이동
 
 - APPEND_TUFTE_EPIGRAPH_ITEM_COMMAND/MOVE_TUFTE_EPIGRAPH_ITEM_COMMAND와 예제 UI 추가·위/아래 버튼 구현. 같은 epigraph의 직접 자식 quote 단위로 추가/이동하며 기존 노드·본문/출처·노트 ID·caret을 보존한다. 범위/IME/note/잘못된 구조·이동 경계는 진단·무변경이다.
