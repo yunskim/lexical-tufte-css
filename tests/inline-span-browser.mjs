@@ -53,6 +53,10 @@ try{
  const representativeCDP=await page.context().newCDPSession(page);
  try{
   await representativeCDP.send('Input.imeSetComposition',{text:'한',selectionStart:1,selectionEnd:1});
+  // Structural toolbar commands must not mutate the representative document
+  // while its text selection is in an active IME composition.
+  await action('다음 섹션 추가').click();
+  assert.equal(await editor.locator('section').count(),representative.lexicalState.root.children.filter(node=>node.type==='section').length,'section insertion must be blocked during composition');
   await representativeCDP.send('Input.imeSetComposition',{text:'',selectionStart:0,selectionEnd:0});
  }finally{await representativeCDP.detach();}
  assert.deepEqual(await snapshot(),representativeState,'cancelled composition must preserve representative canonical JSON');
