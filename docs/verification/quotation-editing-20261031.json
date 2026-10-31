@@ -1,0 +1,84 @@
+{
+  "date": "2026-10-31",
+  "branch": "fix/main-browser-parity-20261023",
+  "baseCommit": "e3c5e35125dc3290e89fea9b9bb1a97e881e117c",
+  "task": "P2.2.c-C1.a",
+  "check": {
+    "unit": 551,
+    "lexical": 363,
+    "fail": 0,
+    "skip": 0,
+    "build": "pass",
+    "typecheck": "pass",
+    "static": "pass"
+  },
+  "quotationTests": {
+    "existing": 31,
+    "new": 32,
+    "total": 63
+  },
+  "browser": {
+    "file": "quotation-editing-browser.mjs",
+    "widths": [
+      1440,
+      375
+    ],
+    "result": "pass"
+  },
+  "package": 5,
+  "ci": "not-run",
+  "notRun": [
+    "full browser suite",
+    "official pixel parity",
+    "Python",
+    "OS IME",
+    "screenreader"
+  ],
+  "next": "C1.b epigraph item add/move",
+  "sourceHashes": {
+    "packages/lexical/src/quotationCommands.ts": "adea3c05473844d8248c90f03535a966a443b2ebb2fdd6f291b4675ed3eccf9c",
+    "packages/lexical/src/index.ts": "706a657170cc9555b17e18b0531cfd7a81ef32c7b471099a65b7eb0c877ac758",
+    "examples/editor/src/main.tsx": "701dc4c49eedd8c8534dc9fe184785250df550a9af8f75a08a7a2d17afe2962a",
+    "packages/lexical/test/quotation-editing.test.mjs": "7778b36b2f1f5bde79718574256df213569ba4004a16098e26dd49707f7a0adf",
+    "tests/quotation-editing-browser.mjs": "a814f1756c7d34f7a7736f31abeec42577840173a47c67bb1d5d074de151c419"
+  },
+  "logs": {
+    "quotation-check-final.log": {
+      "sha256": "c9f4f35bd8682c50888fe4a6f18d8c997442b5ffc1548a65e6b2195b409684a1",
+      "tail": [
+        "packages/lexical test: ✔ R05 stale recovery location does not mutate or throw (0.886736ms)",
+        "packages/lexical test: ℹ tests 363",
+        "packages/lexical test: ℹ suites 0",
+        "packages/lexical test: ℹ pass 363",
+        "packages/lexical test: ℹ fail 0",
+        "packages/lexical test: ℹ cancelled 0",
+        "packages/lexical test: ℹ skipped 0",
+        "packages/lexical test: ℹ todo 0",
+        "packages/lexical test: ℹ duration_ms 3217.521342",
+        "packages/lexical test: Done"
+      ]
+    },
+    "quotation-browser-final.log": {
+      "sha256": "c9b7f710d7a6bf6bd6c3fe41855d564ec5efdf334b4544ca8830846d4ad18540",
+      "tail": [
+        "Quotation editing UI 1440px PASS",
+        "Quotation editing UI 375px PASS"
+      ]
+    },
+    "quotation-package-final.log": {
+      "sha256": "4f224a44b4da99426938ceb5d74bdf6f2e2adf79669e8cdd73ac645751233104",
+      "tail": [
+        "examples/editor build: dist/assets/index-Da4qcUra.js   628.12 kB │ gzip: 189.22 kB",
+        "examples/editor build: ✓ built in 305ms",
+        "examples/editor build: [plugin builtin:vite-reporter] ",
+        "examples/editor build: (!) Some chunks are larger than 500 kB after minification. Consider:",
+        "examples/editor build: - Using dynamic import() to code-split the application",
+        "examples/editor build: - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting",
+        "examples/editor build: - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.",
+        "examples/editor build: Done",
+        "Checking packed JS imports and editor roundtrip (15s limit).",
+        "R13 five tarballs: full LICENSE/notices/OFL, packed JS imports, fresh declarations, strict editor roundtrip, renderer/blog and SQL exports PASS. No publishing."
+      ]
+    }
+  }
+}

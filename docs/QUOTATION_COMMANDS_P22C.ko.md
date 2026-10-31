@@ -1,6 +1,6 @@
 # P2.2.c 인용문·출처·epigraph 명령 계약
 
-2026-10-31, 기준 `339a7b3`. P2.2.c.1의 **지원/거부 범위 설계**다. 아래 후속 명령은 아직 구현하지 않았으며 P2.2.c/P2.2.c.2 완료 증거가 아니다.
+2026-10-31, 기준 `339a7b3`. P2.2.c.1의 **지원/거부 범위 설계**다. C1.a 명령은 아래 후속 보고서 범위에서 구현했으며 C1.b는 미구현이다. 이 문서는 P2.2.c/P2.2.c.2 완료 증거가 아니다.
 
 ## 현재 구현
 
@@ -20,7 +20,7 @@
 
 ## 구조 변경의 공통 계약
 
-- 최상위 root의 section 안에서 collapsed RangeSelection으로 대상을 정한다. note 내부·범위 선택·composition·대상 없음·잘못된 부모/자식 구조는 `INVALID_QUOTATION_SELECTION` 진단과 무변경으로 거부한다. 기존 생성 명령의 현재 지원 범위를 이 신규 계약만으로 축소하지 않는다.
+- 최상위 root의 section 안에서 collapsed RangeSelection으로 대상을 정한다. 구분선은 텍스트 caret이 없는 decorator이므로 단일 HorizontalRuleNode의 NodeSelection도 삭제에 허용한다. note 내부·범위 선택·composition·대상 없음·잘못된 부모/자식 구조는 `INVALID_QUOTATION_SELECTION` 진단과 무변경으로 거부한다. 기존 생성 명령의 현재 지원 범위를 이 신규 계약만으로 축소하지 않는다.
 - epigraph 항목은 직접 자식 quote 하나와 그 안의 본문·출처·노트 전체다. 추가는 선택 항목 뒤, 이동은 인접 항목과 순서를 교환한다. 처음/끝을 넘는 이동은 진단·무변경이다. 항목 삭제 후 빈 epigraph를 남기지 않고 마지막 항목이면 wrapper도 삭제한다.
 - attribution 삭제는 quote 본문을 보존한다. cite 삭제는 소속 footer/attribution의 나머지 텍스트를 보존한다. quote 삭제는 소속 epigraph가 비는 경우 wrapper까지 제거한다. footer/epigraph 전체 삭제는 명시적인 별도 동작이다. 문단으로 해제하거나 내용을 다른 섹션으로 옮기는 동작은 이번 범위에 넣지 않는다.
 - 삭제 후 선택은 다음 형제 시작, 없으면 이전 형제 끝으로 복귀한다. section의 마지막 블록을 지우면 빈 paragraph 하나를 두어 편집 위치를 보장한다. 다른 section의 내용·선택을 임의로 변경하지 않는다.
@@ -29,7 +29,7 @@
 
 ## 후속 체크리스트
 
-- [ ] C1.a URL 설정/해제 및 attribution/cite/구분선/footer/quote/epigraph 삭제 명령과 public export, 예제 UI 연결.
+- [x] C1.a URL 설정/해제 및 attribution/cite/구분선/footer/quote/epigraph 삭제 명령과 public export, 예제 UI 연결.
 - [ ] C1.b 같은 epigraph 내부 항목 추가/인접 이동/삭제, 첫·중간·끝·마지막 항목 및 잘못된 구조 거부.
 - [ ] C2.a 각 명령의 내용·선택·노트 ID 보존/거부 원자성 및 한 Undo/Redo.
 - [ ] C2.b canonical JSON 저장·재열기와 순수 renderer의 blockquote/URL/footer/cite/epigraph 자식 순서·개수 검사.
@@ -40,3 +40,13 @@
 frozen install과 workspace build 통과. `node --test packages/lexical/test/quotation-commands.test.mjs`: 기존 13개와 신규 18개, 총 31개 통과(실패/skip 0). 신규 검사는 기존 6개 명령/payload의 범위 선택·composition·note 내부 거부에 대한 전체 JSON 및 선택 보존, 진단 1회를 검사한다. append 명령의 range/composition fixture에는 실제 quote/footer 대상을 만든다. note fixture는 스키마가 허용하는 별도 paragraph 안에 둔다.
 
 이 결과는 기존 생성 명령의 guard 증거다. 신규 수정·삭제 명령, 실제 OS IME, 브라우저 접근성, 전체 회귀는 이번에 검증하지 않았다. CI 생략. E132/M122의 경계 공유·canonical 타입 원칙과 M117–M121의 실제 저장/발행·검증 범위를 시작/종료에 점검했다. 다음은 C1.a 구현이다.
+
+## C1.a 구현 — 2026-10-31
+
+- `SET_TUFTE_QUOTE_CITE_COMMAND`: string URL 설정, null/빈 문자열 해제. 문서의 isSafeURL(link) 정책을 그대로 사용한다. wrapper의 방향·정렬·indent·textFormat/textStyle과 자식·노트 identity·caret을 보존한다. 같은 값은 내용·이력을 바꾸지 않는다.
+- `REMOVE_TUFTE_QUOTATION_COMMAND`: quote/epigraph/section-footer/attribution/cite/horizontalrule의 명시적 대상 삭제. 전체 선택 블록의 부모/자식 구조와 root-level section 소속을 확인한다. quote 삭제로 마지막 epigraph가 비면 wrapper도 제거한다. section의 마지막 블록 삭제는 paragraph를 남기고, quote의 마지막 attribution 삭제도 빈 paragraph로 편집 위치를 유지한다.
+- cite 삭제의 history 보존은 E133/M123을 따른다. 이동 명령과 달리 삭제 후 attribution/footer wrapper key는 갱신될 수 있다. 남은 자식·노트 ID·metadata는 유지한다.
+- 예제 toolbar에 URL 수정/해제와 6종 삭제 버튼을 연결했다. `pnpm test:quotation-editing`으로 집중 UI 검사를 실행하며 test:browser에도 포함했다.
+- C1.b 항목 추가/이동과 P2.2.c.2의 전체 노드/거부 행렬·실제 OS IME·스크린리더 수락은 남아 있다. 최종 실행 결과는 PROGRESS의 C1.a 항목을 따른다.
+
+최종 C1.a 검증: pnpm check551개(실패/skip0), quotation 관련63개(기존31+신규32), 실제 UI1440/375px, package5개 통과. 전체 브라우저/공식pixel/Python 및 CI는 재실행하지 않았다. C1.b와 C2 전체 체크는 유지한다.

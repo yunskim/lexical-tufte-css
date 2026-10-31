@@ -1,8 +1,9 @@
+import {TufteQuoteNode,$createTufteQuoteNode} from './TufteBlockNodes.js';
 import {canonicalBlockType} from './blockSerialization.js';
 import {HorizontalRuleNode,$createHorizontalRuleNode} from '@lexical/react/LexicalHorizontalRuleNode';
-import {$addUpdateTag,$createTextNode,$getSelection,$isRangeSelection,createCommand,COMMAND_PRIORITY_EDITOR,HISTORY_PUSH_TAG,type LexicalCommand,type LexicalEditor,type LexicalNode} from 'lexical';
+import {$addUpdateTag,$copyNode,$createParagraphNode,$isElementNode,$isNodeSelection,$setSelection,$createTextNode,$getSelection,$isRangeSelection,createCommand,COMMAND_PRIORITY_EDITOR,HISTORY_PUSH_TAG,type LexicalCommand,type LexicalEditor,type LexicalNode} from 'lexical';
 import {QuoteNode,$createQuoteNode} from '@lexical/rich-text';
-import {NODE_SCHEMA,type Diagnostic} from '@lexical-tufte/document';
+import {NODE_SCHEMA,isSafeURL,type Diagnostic} from '@lexical-tufte/document';
 import {SectionNode} from './LayoutNodes.js';
 import {EpigraphNode,AttributionNode,CiteNode,$createEpigraphNode,$createAttributionNode,$createCiteNode} from './QuotationNodes.js';
 import {SectionFooterNode,$createSectionFooterNode} from './SectionFooterNode.js';
@@ -13,6 +14,10 @@ export const INSERT_TUFTE_QUOTATION_COMMAND:LexicalCommand<TufteQuotationKind>=c
 export const INSERT_TUFTE_HORIZONTAL_RULE_COMMAND:LexicalCommand<void>=createCommand('INSERT_TUFTE_HORIZONTAL_RULE');
 export const APPEND_TUFTE_SECTION_CITE_COMMAND:LexicalCommand<void>=createCommand('APPEND_TUFTE_SECTION_CITE');
 export const APPEND_TUFTE_ATTRIBUTION_COMMAND:LexicalCommand<void>=createCommand('APPEND_TUFTE_ATTRIBUTION');
+
+export type TufteQuotationRemoval='quote'|'epigraph'|'section-footer'|'attribution'|'cite'|'horizontalrule';
+export const SET_TUFTE_QUOTE_CITE_COMMAND:LexicalCommand<string|null>=createCommand('SET_TUFTE_QUOTE_CITE');
+export const REMOVE_TUFTE_QUOTATION_COMMAND:LexicalCommand<TufteQuotationRemoval>=createCommand('REMOVE_TUFTE_QUOTATION');
 
 export function registerQuotationCommands(editor:LexicalEditor,onDiagnostic?:(diagnostic:Diagnostic)=>void):()=>void{
  if(!editor.hasNodes([QuoteNode,SectionNode,EpigraphNode,AttributionNode,CiteNode,SectionFooterNode,HorizontalRuleNode]))
@@ -27,8 +32,84 @@ export function registerQuotationCommands(editor:LexicalEditor,onDiagnostic?:(di
   if(!$isRangeSelection(s)||!s.isCollapsed()||editor.isComposing()||$getContainingNote(s.anchor.getNode()))return null;
   return s;
  };
+ // Validate the complete selected block and its ancestry before destructive edits.
+ const validTree=(node:LexicalNode):boolean=>{
+  const type=canonicalBlockType(node.getType()),schema=NODE_SCHEMA[type];
+  if(!schema)return false;
+  if(!$isElementNode(node))return !schema.children;
+  const children=node.getChildren();
+  return !!schema.children&& (children.length>0||['paragraph','tufte-attribution','tufte-cite','tufte-section-footer'].includes(type))
+   &&children.every(child=>schema.children!.includes(canonicalBlockType(child.getType()))&&validTree(child));
+ };
+ const validTarget=(node:LexicalNode):boolean=>{
+  let block=node;
+  while(block.getParent()&&!(block.getParent() instanceof SectionNode))block=block.getParent()!;
+  const section=block.getParent();
+  return section instanceof SectionNode&&section.getParent()?.getType()==='root'
+   &&NODE_SCHEMA['tufte-section']!.children!.includes(canonicalBlockType(block.getType()))&&validTree(block);
+ };
+ const remove=(node:LexicalNode)=>{
+  let target=node;
+  const parent=target.getParent();
+  if(parent instanceof EpigraphNode&&parent.getChildrenSize()===1)target=parent;
+  const container=target.getParentOrThrow(),next=target.getNextSibling(),previous=target.getPreviousSibling();
+  $addUpdateTag(HISTORY_PUSH_TAG);
+  if(next)next.selectStart();
+  else if(previous)previous.selectEnd();
+  else if(container instanceof SectionNode){const paragraph=$createParagraphNode();target.insertAfter(paragraph);paragraph.selectStart();}
+  else container.selectStart();
+  target.remove(true);
+  if(container instanceof QuoteNode&&container.getChildrenSize()===0){
+   const paragraph=$createParagraphNode();container.append(paragraph);paragraph.selectStart();
+  }
+  // A sole dirty, unchanged text sibling makes Lexical History merge an inline
+  // removal even with HISTORY_PUSH_TAG. Renew its semantic parent so the
+  // structural edit is recognized, preserving children and all metadata.
+  if(node instanceof CiteNode&&$isElementNode(container)){
+   const replacement=$copyNode(container),selection=$getSelection()?.clone();
+   replacement.append(...container.getChildren());container.replace(replacement);
+   if($isRangeSelection(selection)){
+    if(selection.anchor.key===container.getKey())selection.anchor.key=replacement.getKey();
+    if(selection.focus.key===container.getKey())selection.focus.key=replacement.getKey();
+    $setSelection(selection);
+   }
+  }
+ };
  const quote=()=> $createQuoteNode().append($createTextNode('인용문'));
  const registrations=[
+  editor.registerCommand(SET_TUFTE_QUOTE_CITE_COMMAND,value=>{
+   const selection=selected(),q=selection?ancestor(selection.anchor.getNode(),'quote'):null;
+   if(!(q instanceof QuoteNode)||!validTarget(q))return reject('유효한 섹션 인용문 안의 한 위치를 선택하세요.');
+   if(value!==null&&(typeof value!=='string'||(value!==''&&!isSafeURL(value,'link'))))return reject('허용된 인용문 URL을 입력하세요.');
+   const cite=value===null||value===''?undefined:value;
+   if((q instanceof TufteQuoteNode?q.getCite():undefined)===cite)return true;
+   $addUpdateTag(HISTORY_PUSH_TAG);
+   if(q instanceof TufteQuoteNode)q.setCite(cite);
+   else{
+    // Keep child keys and selection; only the metadata-bearing wrapper changes.
+    const replacement=$createTufteQuoteNode(cite);
+    replacement.setFormat(q.getFormatType()).setIndent(q.getIndent()).setDirection(q.getDirection());
+    replacement.setTextFormat(q.getTextFormat()).setTextStyle(q.getTextStyle());
+    const saved=selection!.clone();
+    replacement.append(...q.getChildren());q.replace(replacement);
+    if(saved.anchor.key===q.getKey())saved.anchor.key=replacement.getKey();
+    if(saved.focus.key===q.getKey())saved.focus.key=replacement.getKey();
+    $setSelection(saved);
+   }
+   return true;
+  },COMMAND_PRIORITY_EDITOR),
+  editor.registerCommand(REMOVE_TUFTE_QUOTATION_COMMAND,kind=>{
+   const types:Record<TufteQuotationRemoval,string>={quote:'quote',epigraph:'tufte-epigraph','section-footer':'tufte-section-footer',attribution:'tufte-attribution',cite:'tufte-cite',horizontalrule:'horizontalrule'};
+   if(!Object.hasOwn(types,kind))return reject('지원하지 않는 인용 삭제 대상입니다.');
+   const selection=$getSelection();let target:LexicalNode|null=null;
+   if(kind==='horizontalrule'&&$isNodeSelection(selection)&&!editor.isComposing()){
+    const nodes=selection.getNodes();if(nodes.length===1&&nodes[0] instanceof HorizontalRuleNode)target=nodes[0];
+   }else{
+    const range=selected();if(range)target=ancestor(range.anchor.getNode(),types[kind]);
+   }
+   if(!target||$getContainingNote(target)||!validTarget(target))return reject('삭제할 인용 구조 안의 한 위치를 선택하세요.');
+   remove(target);return true;
+  },COMMAND_PRIORITY_EDITOR),
   editor.registerCommand(INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,()=>{
    const s=selected();if(!s)return reject('구분선을 삽입할 섹션의 한 위치를 선택하세요.');
    const section=ancestor(s.anchor.getNode(),'tufte-section');

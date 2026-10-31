@@ -1,3 +1,10 @@
+## 2026-10-31 P2.2.c C1.a 인용문 URL·구조 삭제
+
+- SET_TUFTE_QUOTE_CITE_COMMAND와 REMOVE_TUFTE_QUOTATION_COMMAND를 public export하고 예제 toolbar에 URL 수정/해제 및 6종 삭제를 연결했다. URL은 기존 validator 정책을 재사용하고 서식·자식/노트 ID·caret을 보존한다. 마지막 epigraph/section/quote 삭제 경계와 구조 오류의 무변경 진단을 검사한다.
+- E133/M123: cite 삭제가 History의 단일 unchanged text 최적화로 merge되는 실패를 재현했다. 부모 semantic wrapper를 공개 $copyNode로 교체해 자식/metadata를 보존하고 headless와 실제 UI의 한 Undo/Redo를 검증했다. 단순 dirty flag 표식 우회는 실제 UI에서 실패해 제거했다.
+- 최종 pnpm check551개(실패/skip0; Lexical363), quotation63개(기존31+신규32), 실제 UI1440/375px 및 package5개 통과. canonical 저장/재열기·순수 renderer와 URL/출처/노트 보존을 검사했다. 전체 브라우저/공식pixel/Python과 CI는 재실행하지 않았다.
+- [계약/남은 작업](QUOTATION_COMMANDS_P22C.ko.md), [실행·소스 해시](verification/quotation-editing-20261031.json). C1.a를 체크하고 C1.b 같은 epigraph 내부 항목 추가·이동과 C2 전체 수락은 유지한다. 시작/종료에 M122 및 M117–M121을 점검했고 다음은 C1.b다.
+
 ## 2026-10-31 P2.2.c.1 인용문 편집 계약 및 기존 명령 guard
 
 - `fix/main-browser-parity-20261023`의 `339a7b3`에서 재개했다. K4 이후 K5와 정의목록 수락까지 저장소에 반영돼 있어 중복 작업하지 않았다.

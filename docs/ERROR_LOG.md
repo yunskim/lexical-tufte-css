@@ -1,5 +1,14 @@
 # 에러 기록
 
+## E133 — cite 삭제의 단일 Undo 누락 (명시한 경계 검증 완료)
+
+- P2.2.c C1.a 신규 headless 27개 중 cite 삭제의 Undo와 선택 비교 2개가 실패했다. 선택 비교는 내부 dirty flag까지 동일하다고 기대한 테스트 오류로, 실제 anchor/focus/format/style 동일성을 RangeSelection.is로 검사하도록 고쳤다.
+- 제품 원인: Lexical 0.52 History는 dirty text가 하나이고 직렬화가 같으면 HISTORY_PUSH_TAG가 있어도 history merge한다. cite 삭제가 남은 author 텍스트의 next 링크만 변경하는 경우 삭제 자체가 Undo 항목으로 남지 않았다.
+- 최초 removed leaf markDirty 우회는 headless에서 통과했지만 실제 1440px UI의 한 Undo가 cite 삭제 이전 대신 attribution 추가 이전까지 돌아가 실패했다. 이 우회는 제거했다.
+- 수정: cite 삭제 후 부모 attribution/section-footer를 공개 $copyNode로 교체하고 남은 자식·모든 metadata·caret을 보존한다. 남은 텍스트의 부모 변경으로 실제 구조 편집을 이력에서 구분한다. cite-only/빈 attribution, 남은 본문/노트·서식, canonical 재열기와 실제 UI Undo/Redo를 검사한다. M123.
+- 마지막 attribution 삭제로 빈 quote가 되는 경계는 빈 paragraph를 넣어 유효한 편집 위치를 유지한다. headless 최초 수정 후59개와 UI1440/375px 통과; 추가 빈 구조 회귀 포함 최종 check551·quotation63·실제UI1440/375px·package5개 통과. 전체 브라우저/실제 OS IME는 이번 범위 밖이다.
+
+
 ## E132 — 정의목록 추가 명령의 구조·위치 검증 누락 (지원/거부 경계 검증 완료)
 
 - 2026-10-31 P2.2.b.3: malformed dd/dt 순서와 root 직속 dl에서 APPEND가 내용을 변경했다. 새 경계17개 중2개 실패로 재현했고 범위/조합/note 거부15개는 통과했다.

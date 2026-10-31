@@ -1,5 +1,14 @@
 # 재발 방지 대책 및 정기 점검
 
+## M123 — 인라인 구조 삭제의 실제 History 경계
+
+- E133: HISTORY_PUSH_TAG만으로 한 Undo가 보장된다고 가정하지 않는다. Lexical History의 single unchanged text heuristic과 실제 UI selection/reconciliation에서 구조 삭제가 merge되는지 확인한다.
+- cite 삭제의 부모는 공개 $copyNode로 metadata를 보존해 교체하고 남은 자식·note identity와 caret을 유지한다. 라이브러리 private history stack을 제품 코드에서 수정하지 않는다. removed leaf markDirty로 headless만 통과시키는 우회는 사용하지 않는다.
+- cite-only/author+cite/section-footer, 빈 quote 방지, 인접 section 불변성, 한 Undo/Redo와 canonical 저장/재열기·순수 발행,1440/375px 실제 UI를 함께 검사한다.
+- 유효 변경의 caret 비교는 anchor/focus/format/style 의미를 비교한다. 내부 dirty/cache 상태가 동일해야 한다는 가정은 하지 않는다. 거부 명령은 전체 문서·선택·빈 history를 별도 검사한다.
+- 시작 시 M122와 M117–M121을 검토했다. 첫 browser 호출에서 선행 build의 완료 출력을 회수하지 않은 절차 문제를 확인해, 최종 검증은 check 성공 후 browser→package를 &&로 연결했다. 이전 실행을 최종 증거로 재사용하지 않는다. 다음 점검은 C1.b epigraph 항목 관리다.
+
+
 ## M122 — 정의목록 그룹의 모든 명령에 동일한 경계 적용
 
 2026-10-31 종료: E132의 공유 그룹 경계와 현재 block canonical type 검사를 적용해 check501·정의목록 두 폭·publication/contextual·package5개를 통과했다. [수락/제한](VERIFICATION_DEFINITION_LIST_2026-10-31.ko.md). 두 오류 문서의 기록/상태를 재대조했고 과거 main/환경/실기기 범위를 현재 결과로 덮지 않았다. 다음 점검은 P2.2.c.1 시작/완료다. CI 생략.
