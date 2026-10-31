@@ -1077,3 +1077,40 @@ test('P2.2.d.2 history undo/redo preserves canonical publication across a text e
   assert.deepEqual(snapshot(),changed,'redo must restore canonical JSON and published HTML');
  }finally{unregister();}
 });
+
+test('P2.2.d.2 rejected document load preserves real undo and redo stacks',async()=>{
+ const source=editor();
+ source.update(()=>$getRoot().append($createSectionNode().append(
+  $createParagraphNode().append($createTextNode('Original'))
+ )),{discrete:true});
+ const initial={...fixture(),lexicalState:exportCanonicalEditorState(source.getEditorState())};
+ const destination=editor();
+ assert.equal(loadDocumentIntoEditor(destination,initial).ok,true);
+ const history=createEmptyHistoryState();
+ const unregister=registerHistory(destination,history,300);
+ const flush=()=>new Promise(resolve=>setImmediate(resolve));
+ const text=()=>destination.getEditorState().read(()=>$getRoot().getTextContent());
+ const edit=value=>destination.update(()=>$getRoot().getFirstChild().getFirstChild().getFirstChild().setTextContent(value),{discrete:true,tag:HISTORY_PUSH_TAG});
+ try{
+  await flush();
+  edit('Changed');await flush();
+  assert.equal(text(),'Changed');
+  destination.dispatchCommand(UNDO_COMMAND,undefined);await flush();
+  assert.equal(text(),'Original');
+  const beforeState=exportCanonicalEditorState(destination.getEditorState());
+  const beforeUndo=[...history.undoStack];
+  const beforeRedo=[...history.redoStack];
+  assert.ok(beforeRedo.length>0,'test requires a real redo entry');
+  const invalid=structuredClone(initial);
+  invalid.lexicalState.root.children[0].children.push({type:'future-unsupported-block',version:1,children:[]});
+  const rejected=loadDocumentIntoEditor(destination,invalid);
+  assert.equal(rejected.ok,false,'unsupported block must fail loading');
+  assert.deepEqual(exportCanonicalEditorState(destination.getEditorState()),beforeState,'failed load must preserve editor state');
+  assert.deepEqual(history.undoStack,beforeUndo,'failed load must preserve undo stack');
+  assert.deepEqual(history.redoStack,beforeRedo,'failed load must preserve redo stack');
+  destination.dispatchCommand(REDO_COMMAND,undefined);await flush();
+  assert.equal(text(),'Changed','redo must remain usable after rejected load');
+  destination.dispatchCommand(UNDO_COMMAND,undefined);await flush();
+  assert.equal(text(),'Original','undo must remain usable after rejected load');
+ }finally{unregister();}
+});
