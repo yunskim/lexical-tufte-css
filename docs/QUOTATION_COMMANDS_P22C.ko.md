@@ -76,3 +76,32 @@ frozen install과 workspace build 통과. `node --test packages/lexical/test/quo
 ## Tab·DOM 읽기 순서 자동화 완료
 
 [2026-10-31 실행 범위](VERIFICATION_QUOTATION_ACCESS_2026-10-31.ko.md): 실제 Tab/Shift+Tab으로 인용 버튼17개 정/역순 도달, 편집 문서의 blockquote→footer→cite DOM 텍스트 순서,1440/375px 통과. C2.c의 자동화 부분을 확인했으며 실제 스크린리더 낭독은 P6.2/P6.6 수동 체크로 남긴다. C2.c와 상위 인용 수락 체크는 유지한다.
+
+## Work 일괄 검증 절차 — 추가 테스트 미실행
+
+이 절은 이후 작성된 회귀 테스트의 **실행 안내**다. 아래 명령의 성공 여부를 아직 확인하지 않았으며, 위에 적힌 과거 통과 기록과 구별한다.
+
+프로젝트 루트에서 의존성을 설치한 환경(Node.js 22 이상, pnpm 11.25.0, Playwright Chromium 설치)에서 다음 순서로 실행한다.
+
+```sh
+pnpm build
+node --test packages/lexical/test/quotation-editing.test.mjs
+node --test packages/lexical/test/quotation-commands.test.mjs
+node tests/quotation-editing-browser.mjs
+pnpm test
+pnpm test:browser
+```
+
+`pnpm test:quotation-editing`은 `pnpm build` 후 브라우저 테스트를 실행하는 단축 명령이다. `pnpm test:browser`에는 동일한 quotation 브라우저 테스트가 이미 포함되어 있으므로 집중 실행 뒤 전체 실행하면 **의도적으로 중복 실행**된다. 실패 재현 단계에서는 집중 실행을 먼저 사용하고, 전체 회귀 확인 단계에서 전체 스크립트를 사용한다. CI는 사용자가 별도로 요청하기 전까지 실행하지 않는다.
+
+### 확인 항목
+
+- 단위: 첫·중간·마지막 항목 추가/삭제/이동, 잘못된 이동 방향과 malformed sibling 거부, 문서·선택 불변성, 한 Undo/Redo 단위, canonical JSON 재열기와 발행.
+- 브라우저(1440px/375px): Enter/Space 버튼 활성화, Tab/Shift+Tab 순서, 편집기로 포커스 복귀, 이동 직후 텍스트 입력, 이동 경계의 무변경, 삭제 후 Undo/Redo, 발행 HTML 읽기 순서.
+- 브라우저 테스트의 `snapshot()`은 JSON 검사 버튼을 클릭해 **DOM 포커스를 옮긴다**. 포커스 복원 여부는 `snapshot()` 호출 전에 키보드 입력과 DOM 검증으로 확인한다.
+- 브라우저 테스트는 하나의 페이지에서 여러 편집 동작을 이어 수행한다. 실패 시 assertion의 작업명·화면 너비를 확인하고 해당 단계의 직전 상태를 재현한다. 현재 테스트를 독립 fixture로 완전히 분리했다고 주장하지 않는다.
+- 브라우저 자동화 성공은 실제 OS IME 조합 입력과 스크린리더 낭독의 통과 증거가 아니다. 해당 수동 검증은 P6에서 별도로 처리한다.
+
+### 실패 시 기록
+
+실패 명령, 화면 너비, assertion 메시지, 최초 실패 단계, 기대 JSON과 실제 JSON 차이, 편집기 DOM 포커스 상태, 재현에 사용한 커밋 SHA를 함께 남긴다. 첫 실패를 수정한 뒤 집중 테스트를 다시 실행하고, 마지막에 전체 회귀를 확인한다. 실패 결과를 실행하지 않은 테스트의 성공으로 기록하지 않는다.
