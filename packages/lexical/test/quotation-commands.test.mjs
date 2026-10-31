@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createHeadlessEditor} from '@lexical/headless';
-import {$getRoot,$createParagraphNode,$createTextNode,UNDO_COMMAND,REDO_COMMAND} from 'lexical';
+import {$getRoot,$getSelection,$setCompositionKey,$createParagraphNode,$createTextNode,UNDO_COMMAND,REDO_COMMAND} from 'lexical';
 import {registerHistory,createEmptyHistoryState} from '@lexical/history';
 import {TUFTE_NODES,$createSectionNode,registerQuotationCommands,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,APPEND_TUFTE_SECTION_CITE_COMMAND,INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,$createSidenoteNode} from '../dist/index.js';
 
@@ -264,5 +264,42 @@ test('F07 section cite survives JSON save and reload without changing adjacent c
  await new Promise(resolve=>setImmediate(resolve));
  assert.deepEqual(restored.getEditorState().toJSON(),saved);
  assert.equal(diagnostics.length,0);
+ dispose();
+});
+
+// These are guards of the existing creation commands, not acceptance of editing/removal.
+for(const [command,payload] of [
+ [INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,undefined],
+ [INSERT_TUFTE_QUOTATION_COMMAND,'quote'],
+ [INSERT_TUFTE_QUOTATION_COMMAND,'epigraph'],
+ [INSERT_TUFTE_QUOTATION_COMMAND,'section-footer'],
+ [APPEND_TUFTE_ATTRIBUTION_COMMAND,undefined],
+ [APPEND_TUFTE_SECTION_CITE_COMMAND,undefined]
+])for(const mode of ['range','composition','note'])test(`${command.type}:${payload??''} refuses ${mode} without content or selection changes`,()=>{
+ const {editor,diagnostics,dispose}=setup();
+ editor.update(()=>{
+  const text=$createTextNode('Quotation body'),noteText=$createTextNode('Protected note');
+  // Give each append command a valid target, so a missing target cannot mask the guard.
+  $getRoot().append($createSectionNode().append($createParagraphNode().append(text)));
+  text.selectEnd();
+  if(command===APPEND_TUFTE_ATTRIBUTION_COMMAND)editor.dispatchCommand(INSERT_TUFTE_QUOTATION_COMMAND,'quote');
+  if(command===APPEND_TUFTE_SECTION_CITE_COMMAND)editor.dispatchCommand(INSERT_TUFTE_QUOTATION_COMMAND,'section-footer');
+  const target=$getRoot().getFirstChild().getLastChild();
+  const anchor=target.getFirstChild();
+  if(mode==='note')$getRoot().getFirstChild().append($createParagraphNode().append($createSidenoteNode('quotation-guard').append(noteText)));
+  if(mode==='note')noteText.selectEnd();else anchor.select(0,mode==='range'?2:0);
+ },{discrete:true});
+ const before=editor.getEditorState().toJSON();
+ editor.update(()=>{
+  const selection=$getSelection().clone();
+  if(mode==='composition')$setCompositionKey(selection.anchor.key);
+  try{
+   assert.equal(editor.dispatchCommand(command,payload),true);
+   assert.deepEqual($getSelection(),selection);
+  }finally{$setCompositionKey(null);}
+ },{discrete:true});
+ assert.deepEqual(editor.getEditorState().toJSON(),before);
+ assert.equal(diagnostics.length,1);
+ assert.equal(diagnostics[0].code,'INVALID_QUOTATION_SELECTION');
  dispose();
 });

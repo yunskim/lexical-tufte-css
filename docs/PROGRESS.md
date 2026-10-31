@@ -1,3 +1,10 @@
+## 2026-10-31 P2.2.c.1 인용문 편집 계약 및 기존 명령 guard
+
+- `fix/main-browser-parity-20261023`의 `339a7b3`에서 재개했다. K4 이후 K5와 정의목록 수락까지 저장소에 반영돼 있어 중복 작업하지 않았다.
+- [지원/거부 계약](QUOTATION_COMMANDS_P22C.ko.md): URL·출처/인용 삭제, 같은 epigraph 항목 관리의 대상·마지막 항목·선택 복귀·노트/이력 보존 및 C1/C2 후속 체크리스트를 정의했다. 신규 기능 구현/수락 완료는 아니다.
+- 기존 생성/추가 6개 command/payload에 range/composition/note 무변경·선택 보존 회귀 18개 추가. frozen install·workspace build·quotation 31/31 통과, 실패/skip0. 제품 코드·schema·golden 변경 없음. 브라우저/전체 회귀 및 CI 미실행.
+- 시작/종료에 E132/M122와 M117–M121을 검토했다. 새 제품 오류는 확인하지 않았다. 다음은 C1.a URL/삭제 명령 구현이며 상위 P2.2.c 체크는 유지한다.
+
 ## 2026-10-31 정의목록 P2.2.b.3 및 명령 단계 P2.2.b 수락
 
 - 정의목록 append의 그룹/section 검증 누락과 insert의 현재 block 미검증(E132)을 수정했다. 복수dt 공유dd/노트의 canonical 재열기와 native/pure HTML 의미 순서·내용 비교, 실제 UI 이동/그룹·전체 삭제 history를 보강했다.
