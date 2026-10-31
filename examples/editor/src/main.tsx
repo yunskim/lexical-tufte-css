@@ -338,8 +338,11 @@ function EditorUI(){
   const [documentAssets,setDocumentAssets]=useState<Array<{id:string;src:string;mimeType:string;width?:number;height?:number}>>([]);
   // The embedding host may provide this capability; the standalone example
   // intentionally does not create a network client or bind to Magnolia Works.
-  const hostAssets=useRef<AssetProvider|null>(
-    (window as Window & {lexicalTufteAssetProvider?:AssetProvider}).lexicalTufteAssetProvider??null);
+  const hostConfig=useRef(
+    window as Window & {lexicalTufteAssetProvider?:AssetProvider;lexicalTufteAssetNamespace?:string});
+  const hostAssets=useRef<AssetProvider|null>(hostConfig.current.lexicalTufteAssetProvider??null);
+  const hostNamespace=hostConfig.current.lexicalTufteAssetNamespace;
+  const hostNamespaceValid=typeof hostNamespace==='string'&&hostNamespace.trim().length>0;
   const [hostResults,setHostResults]=useState<AssetSummary[]>([]);
   const [hostRevisions,setHostRevisions]=useState<AssetRevision[]>([]);
   const [hostAssetId,setHostAssetId]=useState<string|null>(null);
@@ -351,6 +354,7 @@ function EditorUI(){
     const target=assetTargetKey;
     const id=hostAssetId;
     if(!provider||!target||!id||hostResolving)return;
+    if(!hostNamespaceValid){setHostError('호스트 자산 namespace가 설정되지 않았습니다.');return;}
     const generation=++hostResolveGeneration.current;
     setHostResolving(true);setHostError('');
     try{
@@ -369,7 +373,7 @@ function EditorUI(){
       editor.update(()=>{
         const node=$getNodeByKey(target);
         if(node instanceof InlineImageNode&&containingNote(node))
-          node.setHostAsset({namespace:'host',assetId:id,...(hostRevisionId?{revisionId:resolved.revisionId}:{})},resolved.url,assetAlt);
+          node.setHostAsset({namespace:hostNamespace!,assetId:id,...(hostRevisionId?{revisionId:resolved.revisionId}:{})},resolved.url,assetAlt);
       },{tag:HISTORY_PUSH_TAG,discrete:true});
       setStatus('외부 이미지 자산을 연결했습니다.');
       closeAssetChooser();
@@ -1031,7 +1035,7 @@ function EditorUI(){
             </select>
           </label>}
         </section>}
-        {hostAssets.current&&<button type="button" disabled={!hostAssetId||!assetTargetKey||hostResolving}
+        {hostAssets.current&&<button type="button" disabled={!hostAssetId||!assetTargetKey||hostResolving||!hostNamespaceValid}
           onClick={()=>void connectHostAsset()}>{hostResolving?'외부 이미지 확인 중…':'선택한 외부 이미지 연결'}</button>}
         <button type="button" onClick={closeAssetChooser}>취소</button>
         <button type="button" disabled={!assetChoice||!assetTargetKey} onClick={connectChosenAsset}>선택한 이미지 연결</button>
