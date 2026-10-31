@@ -57,3 +57,38 @@ test('title anchor conflicts with document heading, article or generated note ID
  assert.equal(published.ok,false);
  assert.ok(published.diagnostics.some(d=>d.code==='DUPLICATE_TITLE_ID'));
 });
+
+test('F06 ordered list start and item value are not silently discarded',()=>{
+ const doc=fixture();
+ const section=doc.lexicalState.root.children[0];
+ section.children.push(element('list',[
+  element('listitem',[text('First')],{value:4}),
+  element('listitem',[text('Second')],{value:9})
+ ],{listType:'number',tag:'ol',start:4}));
+ const before=structuredClone(doc);
+ const published=renderArticle(doc);
+ assert.equal(published.ok,true,JSON.stringify(published.diagnostics));
+ assert.match(published.html,/<ol[^>]*start="4"/);
+ assert.match(published.html,/<li[^>]*value="9"/);
+ assert.deepEqual(doc,before,'publication must preserve canonical list metadata');
+});
+
+test('F03 link metadata survives publication or fails closed with a diagnostic',()=>{
+ const doc=fixture();
+ const section=doc.lexicalState.root.children[0];
+ section.children.push(element('paragraph',[
+  element('link',[text('Reference')],{url:'https://example.org/reference',target:'_blank',rel:'noopener noreferrer',title:'Reference title'})
+ ]));
+ const before=structuredClone(doc);
+ const published=renderArticle(doc);
+ if(published.ok){
+  assert.match(published.html,/<a\b[^>]*href="https:\/\/example\.org\/reference"/);
+  assert.match(published.html,/<a\b[^>]*target="_blank"/);
+  assert.match(published.html,/<a\b[^>]*title="Reference title"/);
+  assert.match(published.html,/<a\b[^>]*rel="noopener noreferrer"/);
+ }else{
+  assert.equal(published.html,null);
+  assert.ok(published.diagnostics.some(d=>d.code==='UNSUPPORTED_RENDER_PROPERTY'),JSON.stringify(published.diagnostics));
+ }
+ assert.deepEqual(doc,before,'publication must not mutate link attributes');
+});
