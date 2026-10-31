@@ -307,6 +307,30 @@ try{
   assert.equal(await page.evaluate(()=>window.__hostCalls.resolve.length),afterManualOverride,
     'Superseded automatic request must not continue to the second image');
 
+  // Changing the target image while resolve is pending must discard the stale result.
+  await page.evaluate(()=>{window.__hostMode='deferred';window.__hostPendingResolves=[];});
+  await button('외부 이미지 URL 다시 확인').click();
+  await page.waitForFunction(()=>window.__hostPendingResolves.length===1);
+  await page.evaluate(()=>{window.__hostMode='normal';});
+  await button('이미지 라이브러리에서 선택').click();
+  const changedDialog=page.getByRole('dialog',{name:'문서 이미지 선택'});
+  await changedDialog.getByRole('group',{name:'교체할 노트 이미지 선택'}).getByRole('radio').first().check();
+  await changedDialog.getByRole('radio',{name:/Remote image/}).check();
+  await changedDialog.getByRole('combobox',{name:'버전'}).selectOption('rev-2');
+  await changedDialog.getByRole('button',{name:'선택한 외부 이미지 연결'}).click();
+  await changedDialog.waitFor({state:'hidden'});
+  await page.evaluate(()=>{
+    const pending=window.__hostPendingResolves.shift();
+    pending.resolve({assetId:pending.locator.assetId,revisionId:pending.locator.revisionId,
+      mediaType:'image/svg+xml',url:'/obsolete.svg',
+      expiresAt:new Date(Date.now()+120_000).toISOString()});
+  });
+  await page.waitForFunction(()=>window.__hostPendingResolves.length===0);
+  assert.equal(await page.evaluate(()=>
+    [...document.querySelectorAll('[data-note-id] img')]
+      .some(image=>image.getAttribute('src')==='/obsolete.svg')),false,
+    'A pending response must not overwrite an image whose revision was replaced');
+
   // Returning to a visible tab after the 60-second cooldown rechecks URLs.
   const beforeResume=await page.evaluate(()=>window.__hostCalls.resolve.length);
   await page.clock.runFor(60_001);
