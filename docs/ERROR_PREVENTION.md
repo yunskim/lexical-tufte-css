@@ -793,3 +793,11 @@ E134: 보조 harness의 mount/dispose가 body를 교체하는지 읽고 주 UI �
 ## M125 — wrapper 없는 노드의 속성 지원 분리
 
 E135: 자식만 반환하는 renderer 경로는 schema 공통 필드를 자동으로 지원한다고 간주하지 않는다. nondefault direction/format/indent를 출력·명시 진단 중 하나로 처리하고 경로 포함 html:null·입력 불변성 회귀를 둔다. 저장 capability와 발행 capability를 나눠 저장 원본을 지우지 않는다. root 새4개 거부/기본값1개/editor 저장1개를 실행했다. 시작/종료에 E128/M118·E133/M123·E134/M124와 schema/profile 구분을 점검했다. 다음 목록 start/value의 조건부 출력 대조에서 적용한다.
+
+## M127 — 누적 테스트의 실제 실행·데이터/이력/포커스 경계
+
+E137/E138: 테스트 파일 작성만으로 통과 처리하지 않는다. 전체 단위와 모든 browser 파일을 각각 실행하고 실패 뒤에도 나머지 파일 결과를 회수한다. 첫 실패/최종 재실행·timeout을 구분한다. DOM selection은 의도한 TextNode와 section 소속을 확인한다. inspector로 이동한 focus를 복구하고 무효 명령의 focus 유지와 성공 명령의 복귀를 구분한다.
+
+fixture는 실제 Lexical factory와 canonical exporter로 구성하고 strict importer의 손실 진단을 우회하지 않는다. load 후 History 등록 테스트는 공개 current entry를 초기화하거나 History를 먼저 등록한다. 구조 삽입은 명시적 history 경계와 commit 후 focus로 검증한다. 파생 listitem.value는 실제 start/nested-container 순번과 대조하고 ul의 임의 번호 속성과 구분한다.
+
+E004/E005/M004의 공식 shell 설치→smoke, E124/M113의 동일 venv pytest/HTTP, E133/M123의 실제 Undo/Redo, E134/M124의 독립 DOM harness와 E135/M125의 fail-closed 출력 정책을 시작/종료에 점검한다. 실제 OS IME/스크린리더·자산 등록 미구현은 자동화 통과로 해결하지 않는다.

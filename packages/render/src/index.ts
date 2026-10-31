@@ -55,8 +55,8 @@ export function renderArticle(input:unknown,options:{idPrefix?:string}={}):Rende
    case 'heading':return [element(n.tag,{...attrs(n),...(n.id?{id:n.id}:{})},inner())];
    case 'horizontalrule':return [element('hr',{},[],true)];
    case 'list':return [element(n.tag,{...attrs(n),...(n.tag==='ol'&&n.start!==1?{start:String(n.start)}:{})},
-    n.children.map(item=>item.type==='listitem'
-     ?element('li',{...attrs(item),...(n.tag==='ol'&&item.value!==1?{value:String(item.value)}:{})},item.children.flatMap(render))
+    n.children.map((item,index)=>item.type==='listitem'
+     ?element('li',{...attrs(item),...(n.tag==='ol'&&(item.value!==1||n.start!==1||index>0)?{value:String(item.value)}:{})},item.children.flatMap(render))
      :render(item)).flat())];
    case 'listitem':return [element('li',attrs(n),inner())];
    case 'tufte-definition-list':return [element('dl',attrs(n),inner())];

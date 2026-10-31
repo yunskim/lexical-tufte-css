@@ -1,3 +1,9 @@
+## 2026-10-31 미뤄둔 자동 테스트 전수 실행
+
+- 원격79d7553의 누적 테스트와 ol value1 reset 수정을 별도 검증 브랜치에 결합했다. [전체 보고서](VERIFICATION_FULL_DEFERRED_2026-10-31.ko.md), [파일별 결과/로그 해시](verification/full-deferred-20261031.json).
+- frozen/static/build/typecheck·unit629·package5·Python16/실제HTTP·revision모델12그룹 통과. browser38개 모두 실행, 최종37통과/자산UI미구현1실패. 공식6폭 pixel mask 밖 차이0. all-nodes locator timeout은 독립 성공과 분리 기록했다.
+- E137/E138/M127의 fixture/의존성/이력·note 삽입 commit·ul 파생값 정책을 수정했다. 실제 OS IME/스크린리더/타 브라우저는 미검증, CI 미실행. 상위 기능 게이트를 전수 통과로 닫지 않는다.
+
 ## 2026-10-31 P2.2.d.1 capability 대조 시작·root 손실 차단
 
 - [F01–F09 첫18타입 매트릭스](CAPABILITY_F01_F09_P22D.ko.md) 작성. schema/editor/renderer와 공통 필드를 분리했다. 모든 타입/필드 조합 실행 완료는 아니다.

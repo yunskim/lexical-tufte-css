@@ -118,7 +118,7 @@ test('F03 host reference is preserved as semantic reference, not fabricated href
  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
  assert.match(result.html,/Linked title/);
  assert.match(result.html,/data-host-/,'host reference metadata must survive publication');
- assert.doesNotMatch(result.html,/<a\\b[^>]*href="[^"]*"[^>]*>Linked title<\\/a>/,'unresolved reference must not become a guessed URL');
+ assert.doesNotMatch(result.html,/<a\b[^>]*href="[^"]*"[^>]*>Linked title<\/a>/,'unresolved reference must not become a guessed URL');
  assert.deepEqual(doc,before);
 });
 

@@ -1,8 +1,12 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {chromium} from 'playwright';
-import {createHeadlessEditor} from '@lexical/headless';
-import {TUFTE_NODES,loadDocumentIntoEditor,exportEditorToDocument} from '../packages/lexical/dist/index.js';
+import {createRequire} from 'node:module';
+const lexicalRequire=createRequire(new URL('../packages/lexical/package.json',import.meta.url));
+const {createHeadlessEditor}=await import(lexicalRequire.resolve('@lexical/headless'));
+const {$getRoot,$createTextNode}=await import(lexicalRequire.resolve('lexical'));
+const {$createListNode,$createListItemNode}=await import(lexicalRequire.resolve('@lexical/list'));
+import {TUFTE_NODES,loadDocumentIntoEditor,exportEditorToDocument,$createTufteQuoteNode} from '../packages/lexical/dist/index.js';
 import {renderArticle} from '../packages/render/dist/index.js';
 
 const fixture=JSON.parse(readFileSync(new URL('../fixtures/tufte/server-document.json',import.meta.url),'utf8'));
@@ -81,16 +85,12 @@ try{
  assert.equal(beforeSemantics.lists.length,0,'base fixture intentionally has no lists');
  assert.equal(beforeSemantics.quotations.length,0,'base fixture intentionally has no quotations');
  const makeEnrichedFixture=base=>{
-  const document=JSON.parse(JSON.stringify(base));
-  document.lexicalState.root.children[0].children.push(
-   {type:'list',version:1,listType:'number',tag:'ol',start:3,children:[
-    {type:'listitem',version:1,value:3,children:[{type:'text',version:1,text:'Numbered item',format:0,detail:0,mode:'normal',style:''}]}
-   ]},
-   {type:'quote',version:1,cite:'https://example.org/source',children:[
-    {type:'text',version:1,text:'Quoted text',format:0,detail:0,mode:'normal',style:''}
-   ]}
-  );
-  return document;
+  const source=makeEditor();const loaded=loadDocumentIntoEditor(source,base);assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
+  source.update(()=>{$getRoot().getFirstChild().append(
+   $createListNode('number',3).append($createListItemNode().append($createTextNode('Numbered item'))),
+   $createTufteQuoteNode('https://example.org/source').append($createTextNode('Quoted text'))
+  );},{discrete:true});
+  const exported=exportEditorToDocument(source,base);assert.equal(exported.ok,true,JSON.stringify(exported.diagnostics));return exported.value;
  };
  const enriched=makeEnrichedFixture(saved.value);
  // Check the constructed fixture before loading it: these are the wire-level

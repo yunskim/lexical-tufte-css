@@ -594,7 +594,7 @@ function EditorUI(){
       if(containingNote(s.anchor.getNode())){setStatus('노트 안에 노트를 넣을 수 없습니다.');return;}
       const note=(kind==='sidenote'?$createSidenoteNode(crypto.randomUUID()):$createMarginnoteNode(crypto.randomUUID())).append($createTextNode('새 노트'));
       s.insertNodes([note]);note.selectStart();setStatus('새 노트를 삽입했습니다. Escape로 본문에 돌아갑니다.');
-    });editor.focus();
+    },{tag:HISTORY_PUSH_TAG,discrete:true});editor.focus();
   }
   function noteOperation(operation:'split'|'merge'|'previous'|'next'){
     editor.update(()=>{

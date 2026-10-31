@@ -18,10 +18,12 @@ export function validateRenderProfile(doc:TufteDocument):Diagnostic[]{
   // HTML does not represent unordered list numbering or per-item values.
   if(n.type==='list'){
    if(n.tag==='ul'&&n.start!==1)add('start','Unordered list start cannot be represented in HTML publication');
+   let derivedValue=n.start;
    for(const [i,item] of n.children.entries()){
-    if(item.type==='listitem'&&n.tag==='ul'&&item.value!==1&&diagnostics.length<100){
+    if(item.type==='listitem'&&n.tag==='ul'&&item.value!==derivedValue&&diagnostics.length<100){
      diagnostics.push({code:'UNSUPPORTED_RENDER_PROPERTY',path:`${path}.children[${i}].value`,message:'Unordered list item value cannot be represented in HTML publication'});
     }
+    if(item.type==='listitem'&&item.children[0]?.type!=='list')derivedValue++;
    }
   }
   if(n.type==='tufte-code'&&n.language!==undefined&&n.language!==null)add('language','Code language metadata is not yet published');

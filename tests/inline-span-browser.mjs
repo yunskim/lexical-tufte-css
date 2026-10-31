@@ -81,14 +81,19 @@ try{
   assert.deepEqual(baseline,representative.lexicalState,buttonName+' fixture reload must start from canonical representative JSON');
   const paragraph=editor.locator('section[data-tufte-editor="section"] > p').filter({hasText:/./}).first();
   assert.equal(await editor.locator('section[data-tufte-editor="section"] > p').filter({hasText:/./}).count(),2,'representative fixture must expose its two direct section paragraphs');
-  await paragraph.click();
-  await page.keyboard.press('End');
+  const placeCaret=async()=>{
+   await paragraph.evaluate(el=>{
+    el.closest('.editor').focus();const walker=document.createTreeWalker(el,NodeFilter.SHOW_TEXT),text=walker.nextNode();
+    if(!text)throw Error('Expected editable paragraph text');
+    const selection=window.getSelection(),range=document.createRange();range.setStart(text,text.textContent.length);range.collapse(true);selection.removeAllRanges();selection.addRange(range);document.dispatchEvent(new Event('selectionchange'));
+   });await page.evaluate(()=>new Promise(requestAnimationFrame));
+  };
+  await placeCaret();
   const changedBefore=await snapshot();
   assert.deepEqual(changedBefore,baseline,'caret positioning must not modify representative fixture');
   // snapshot() clicks an inspector control and may steal focus/selection.
   // Restore the insertion caret immediately before dispatching the command.
-  await paragraph.click();
-  await page.keyboard.press('End');
+  await placeCaret();
   assert.equal(await page.evaluate(()=>{
    const selection=window.getSelection();
    const anchor=selection?.anchorNode;

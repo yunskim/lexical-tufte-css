@@ -14,9 +14,10 @@ try{
   const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto(url,{waitUntil:'domcontentloaded'});
   const editor=page.locator('.editor');await editor.waitFor();
   const action=name=>page.getByRole('toolbar',{name:'노트 편집',exact:true}).getByRole('button',{name,exact:true});
-  const keyboardAction=async (name,key='Enter')=>{
+  const keyboardAction=async (name,key='Enter',expectEditorFocus=true)=>{
    const button=action(name);await button.focus();await button.press(key);
-   assert.equal(await editor.evaluate(el=>el.contains(document.activeElement)),true,`${name} returns keyboard focus to editor`);
+   if(expectEditorFocus)assert.equal(await editor.evaluate(el=>el.contains(document.activeElement)),true,`${name} returns keyboard focus to editor`);
+   else assert.equal(await button.evaluate(el=>el===document.activeElement),true,'Rejected action keeps keyboard focus on its button');
   };
   // The inspector takes DOM focus. Never use snapshot() between a focus assertion and typing.
   const snapshot=async()=>{
@@ -136,10 +137,10 @@ try{
   // Boundary actions must not mutate the canonical document.
   await lastSection().locator('.epigraph > blockquote').first().click();
   const boundaryBefore=await snapshot();
-  await keyboardAction('Epigraph 항목 위로');
+  await keyboardAction('Epigraph 항목 위로','Enter',false);
   await assertDocumentUnchanged(boundaryBefore,'first epigraph item moving up');
   await lastSection().locator('.epigraph > blockquote').last().click();
-  await keyboardAction('Epigraph 항목 아래로');
+  await keyboardAction('Epigraph 항목 아래로','Enter',false);
   await assertDocumentUnchanged(boundaryBefore,'last epigraph item moving down');
   // Delete one of two items, undo it, and verify that both order and content return.
   await lastSection().locator('.epigraph > blockquote').last().click();

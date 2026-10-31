@@ -161,7 +161,7 @@ test('P2.2 ordered list numbering is retained; unordered list has no numeric att
    {type:'listitem',version:1,value:12,children:[t('twelve')]}
   ]},
   {type:'list',version:1,tag:'ul',listType:'bullet',start:1,children:[
-   {type:'listitem',version:1,value:5,children:[t('bullet')]}
+   {type:'listitem',version:1,value:1,children:[t('bullet')]}
   ]}
  );
  const result=renderArticle(d);
@@ -453,4 +453,12 @@ for(const [field,value] of [['direction','rtl'],['direction','ltr'],['format','c
 });
 test('default root direction/alignment remain publishable',()=>{
  const d=fixture();d.lexicalState.root.direction=null;d.lexicalState.root.format='';const r=renderArticle(d);assert.equal(r.ok,true,JSON.stringify(r.diagnostics));
+});
+
+for(const [start,values] of [[7,[1,2]],[1,[4,1]],[7,[7,1]]])test(`ordered list start ${start} preserves explicit item reset ${values}`,()=>{
+ const d=fixture(),text=value=>({type:'text',version:1,text:String(value),format:0,style:'',detail:0,mode:'normal'});
+ d.lexicalState.root.children[0].children=[{type:'list',version:1,listType:'number',tag:'ol',start,children:values.map(value=>({type:'listitem',version:1,value,children:[text(value)]}))}];
+ assert.equal(validateDocument(d).ok,true);const result=renderArticle(d);assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+ const items=[...result.html.matchAll(/<li(?: value="(\d+)")?>(\d+)<\/li>/g)];assert.equal(items.length,values.length);
+ let ordinal=start;assert.deepEqual(items.map(item=>{if(item[1]!==undefined)ordinal=Number(item[1]);return ordinal++;}),values);
 });

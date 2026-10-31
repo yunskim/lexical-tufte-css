@@ -973,3 +973,15 @@ E001–E049/M001–M042를 검토했다. E024의 경계 입력은 실제 Chromiu
 ## E135 — root presentation 속성의 침묵 발행 손실
 
 P2.2.d.1 대조에서 schema-valid root.direction(ltr/rtl), root.format(center/right)이 render의 root→inner 경로에서 사라졌다. 새4개 회귀 모두 최초 실패로 재현했다. profile에서 nondefault root 방향/정렬을 정확한 속성 경로의 UNSUPPORTED_RENDER_PROPERTY와 html:null로 거부한다. 기본값은 유지하고 editor 저장 경계에서는 원래 속성을 보존한다. 새6개 포함 check594 통과. M125.
+
+## E137 — 누적 미실행 테스트의 구문·fixture·의존성·History 준비 오류
+
+2026-10-31 전체 검증 기준 원격79d7553 + 목록 reset 수정. official-attributes 정규식의 이중 escaping으로 파일 파싱이 실패했다. semantic DOM 검사는 루트 package에 없는 @lexical/headless를 직접 import했다. bridge의 hand-built list/quote fixture는 실제 Lexical 기본 필드와 불일치해 LEXICAL_IMPORT_LOSSY로 거부됐으며, load 후 History 등록 테스트는 초기 current entry가 없어 첫 Undo를 검사하지 못했다. 정규식 수정, lexical package 경유 의존성 해석, 실제 factory/export fixture와 공개 HistoryState 초기값으로 보완했다. 기대 내용/HTML/거부 원자성 검사는 유지했다.
+
+inline UI의 paragraph 클릭/End가 주석 anchor 또는 inspector focus를 선택하는 경계를 실제 paragraph Text DOM range로 고정했다. epigraph 이동 거부는 변경/포커스 이동을 하지 않는 명령이므로 성공 명령의 editor focus 복귀 기대와 분리해 거부 버튼 focus 유지·문서 불변성을 검사한다. 재실행 결과는 전체 보고서 참조. M127.
+
+## E138 — 노트 삽입 Undo 경계 누락과 정상 bullet 파생값 발행 거부
+
+새 inline UI 전체 실행에서 note insert 후 Undo/Redo의 문서/노트 ID가 복원되지 않았다. insertNote의 update에 HISTORY_PUSH_TAG/discrete가 없어 인접 이력과 합쳐지는 경계를 확인했다. 태그와 동기 commit 후 focus를 적용해 두 폭 회귀 통과.
+
+누적 renderer profile은 ul의 value!=1을 모두 거부했지만 Lexical은 정상 ul에서도1,2,…의 파생값을 저장한다. 실제 목록 깊이/컨테이너 규칙에 따른 순번만 허용하고 임의 value와 비기본 ul.start는 계속 진단 거부한다. 순수 ol의 명시 value1 reset도 이번 미반영 수정을 포함했다. M127. 최초 실패와 수정 후 결과는 전체 보고서에 분리한다.

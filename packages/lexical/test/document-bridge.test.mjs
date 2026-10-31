@@ -484,6 +484,7 @@ test('R03 malformed migrated import leaves editor state and history untouched',(
 test('R03 actual HistoryPlugin state is cleared after document replacement',()=>{
  const destination=editor();
  const history=createEmptyHistoryState();
+ history.current={editor:destination,editorState:destination.getEditorState()};
  const unregister=registerHistory(destination,history,300);
  const source=editor();
  source.update(()=>$getRoot().append($createSectionNode().append(
@@ -936,7 +937,8 @@ test('F17/F18/F19 serialized contract rejects invalid fields before Lexical impo
 for(const [name,load] of [['strict',loadDocumentIntoEditor],['migrated',loadMigratedDocumentIntoEditor]]){
  test(`R03.d ${name} replacement isolates real undo/redo and preserves rejected-load history`,async()=>{
   const destination=editor(),history=createEmptyHistoryState();
-  const unregister=registerHistory(destination,history,300);
+  history.current={editor:destination,editorState:destination.getEditorState()};
+ const unregister=registerHistory(destination,history,300);
   const flush=()=>new Promise(resolve=>setImmediate(resolve));
   const text=()=>destination.getEditorState().read(()=>$getRoot().getTextContent());
   const edit=value=>destination.update(()=>{$getRoot().getFirstDescendant().setTextContent(value);},{discrete:true,tag:HISTORY_PUSH_TAG});
@@ -1016,11 +1018,14 @@ test('P2.2.d.2 unsupported list numbering remains canonical across reopen and fa
  const original=fixture();
  original.lexicalState.root.children[0].children.push({
   type:'list',version:1,listType:'bullet',tag:'ul',start:7,children:[
-   {type:'listitem',version:1,value:1,children:[{type:'text',version:1,text:'Bullet',format:0}]}
+   {type:'listitem',version:1,value:7,children:[{type:'text',version:1,text:'Bullet',format:0}]}
   ]
  });
  assert.equal(validateDocument(original).ok,true);
  const source=editor();
+ // Use real Lexical defaults and derived list values, rather than a lossy hand-built JSON node.
+ const listSource=editor();listSource.update(()=>{$getRoot().append($createSectionNode().append($createListNode('bullet',7).append($createListItemNode().append($createTextNode('Bullet')))));},{discrete:true});
+ original.lexicalState.root.children[0].children[original.lexicalState.root.children[0].children.length-1]=exportCanonicalEditorState(listSource.getEditorState()).root.children[0].children[0];
  const loaded=loadDocumentIntoEditor(source,original);
  assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
  const first=exportEditorToDocument(source,original);
@@ -1048,6 +1053,7 @@ test('P2.2.d.2 history undo/redo preserves canonical publication across a text e
  const loaded=loadDocumentIntoEditor(destination,initial);
  assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
  const history=createEmptyHistoryState();
+ history.current={editor:destination,editorState:destination.getEditorState()};
  const unregister=registerHistory(destination,history,300);
  const flush=()=>new Promise(resolve=>setImmediate(resolve));
  const snapshot=()=>{
@@ -1087,6 +1093,7 @@ test('P2.2.d.2 rejected document load preserves real undo and redo stacks',async
  const destination=editor();
  assert.equal(loadDocumentIntoEditor(destination,initial).ok,true);
  const history=createEmptyHistoryState();
+ history.current={editor:destination,editorState:destination.getEditorState()};
  const unregister=registerHistory(destination,history,300);
  const flush=()=>new Promise(resolve=>setImmediate(resolve));
  const text=()=>destination.getEditorState().read(()=>$getRoot().getTextContent());
@@ -1124,6 +1131,7 @@ test('P2.2.d.2 rejected load retains history while successful replacement clears
  const destination=editor();
  assert.equal(loadDocumentIntoEditor(destination,initial).ok,true);
  const history=createEmptyHistoryState();
+ history.current={editor:destination,editorState:destination.getEditorState()};
  const unregister=registerHistory(destination,history,300);
  const flush=()=>new Promise(resolve=>setImmediate(resolve));
  const current=()=>destination.getEditorState().read(()=>$getRoot().getTextContent());
@@ -1166,6 +1174,7 @@ test('P2.2.d.2 F01-F09 fixture text edit undo/redo preserves JSON and publicatio
  const loaded=loadDocumentIntoEditor(destination,original);
  assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
  const history=createEmptyHistoryState();
+ history.current={editor:destination,editorState:destination.getEditorState()};
  const unregister=registerHistory(destination,history,300);
  const flush=()=>new Promise(resolve=>setImmediate(resolve));
  const snapshot=()=>{
@@ -1210,7 +1219,8 @@ test('P2.2.d.2 representative fixture structural list and quote edits survive un
   const original=fixture(),destination=editor();
   const loaded=loadDocumentIntoEditor(destination,original);
   assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
-  const history=createEmptyHistoryState(),unregister=registerHistory(destination,history,300);
+  const history=createEmptyHistoryState();history.current={editor:destination,editorState:destination.getEditorState()};
+  const unregister=registerHistory(destination,history,300);
   const flush=()=>new Promise(resolve=>setImmediate(resolve));
   const snapshot=()=>{
    const saved=exportEditorToDocument(destination,original);
@@ -1247,7 +1257,8 @@ test('P2.2.d.2 representative fixture note insertion survives undo/redo and publ
  const original=fixture(),destination=editor();
  const loaded=loadDocumentIntoEditor(destination,original);
  assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
- const history=createEmptyHistoryState(),unregister=registerHistory(destination,history,300);
+ const history=createEmptyHistoryState();history.current={editor:destination,editorState:destination.getEditorState()};
+  const unregister=registerHistory(destination,history,300);
  const flush=()=>new Promise(resolve=>setImmediate(resolve));
  const snapshot=()=>{
   const saved=exportEditorToDocument(destination,original);
@@ -1276,4 +1287,12 @@ test('P2.2.d.2 representative fixture note insertion survives undo/redo and publ
   destination.dispatchCommand(REDO_COMMAND,undefined);await flush();
   assert.deepEqual(snapshot(),changed,'note redo must restore canonical JSON and HTML');
  }finally{unregister();}
+});
+
+for(const kind of ['bullet','number'])test(`list ${kind} start and derived item values survive canonical storage`,()=>{
+ const source=editor();source.update(()=>{$getRoot().append($createSectionNode().append($createListNode(kind,7).append($createListItemNode().append($createTextNode('A')),$createListItemNode().append($createTextNode('B')))));},{discrete:true});
+ const doc={...fixture(),lexicalState:exportCanonicalEditorState(source.getEditorState())};const list=doc.lexicalState.root.children[0].children[0];
+ assert.equal(list.start,7);assert.deepEqual(list.children.map(item=>item.value),[7,8]);
+ const target=editor(),loaded=loadDocumentIntoEditor(target,doc);assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
+ const saved=exportEditorToDocument(target,doc);assert.equal(saved.ok,true,JSON.stringify(saved.diagnostics));assert.deepEqual(saved.value.lexicalState,doc.lexicalState);
 });
