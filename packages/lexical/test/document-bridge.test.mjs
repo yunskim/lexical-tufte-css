@@ -1241,3 +1241,39 @@ test('P2.2.d.2 representative fixture structural list and quote edits survive un
   }finally{unregister();}
  }
 });
+
+test('P2.2.d.2 representative fixture note insertion survives undo/redo and publication',async()=>{
+ const {renderArticle}=await import('../../render/dist/index.js');
+ const original=fixture(),destination=editor();
+ const loaded=loadDocumentIntoEditor(destination,original);
+ assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
+ const history=createEmptyHistoryState(),unregister=registerHistory(destination,history,300);
+ const flush=()=>new Promise(resolve=>setImmediate(resolve));
+ const snapshot=()=>{
+  const saved=exportEditorToDocument(destination,original);
+  assert.equal(saved.ok,true,JSON.stringify(saved.diagnostics));
+  const published=renderArticle(saved.value);
+  assert.equal(published.ok,true,JSON.stringify(published.diagnostics));
+  return {json:saved.value.lexicalState,html:published.html};
+ };
+ try{
+  await flush();
+  const before=snapshot();
+  destination.update(()=>{
+   const section=$getRoot().getFirstChild();
+   const paragraph=$createParagraphNode();
+   paragraph.append($createTextNode('History note anchor '));
+   paragraph.append($createSidenoteNode('history-note-p22d2').append($createTextNode('History note body')));
+   section.append(paragraph);
+  },{discrete:true,tag:HISTORY_PUSH_TAG});
+  await flush();
+  const changed=snapshot();
+  assert.notDeepEqual(changed.json,before.json,'note insertion must change canonical JSON');
+  assert.notEqual(changed.html,before.html,'note insertion must change published HTML');
+  assert.match(changed.html,/History note body/,'note body must be published');
+  destination.dispatchCommand(UNDO_COMMAND,undefined);await flush();
+  assert.deepEqual(snapshot(),before,'note undo must restore canonical JSON and HTML');
+  destination.dispatchCommand(REDO_COMMAND,undefined);await flush();
+  assert.deepEqual(snapshot(),changed,'note redo must restore canonical JSON and HTML');
+ }finally{unregister();}
+});
