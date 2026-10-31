@@ -46,6 +46,7 @@ try{
       }
     };
   });
+  await page.clock.install();
   await page.goto(url);
   const editor=page.getByRole('textbox',{name:'본문과 사이드노트 편집'});
   const button=name=>page.getByRole('button',{name,exact:true});
@@ -93,6 +94,22 @@ try{
   await page.evaluate(()=>{window.__hostMode='normal';});
   await button('외부 이미지 URL 다시 확인').click();
   await page.getByRole('status',{name:'편집 작업 상태'}).getByText(/갱신: 1\/1개/).waitFor();
+  // Automatic retry uses a five-second initial backoff.
+  await page.evaluate(()=>{window.__hostMode='invalid';});
+  await button('외부 이미지 URL 다시 확인').click();
+  await page.getByRole('status',{name:'편집 작업 상태'}).getByText(/재시도 예약/).waitFor();
+  const beforeRetry=await page.evaluate(()=>window.__hostCalls.resolve.length);
+  await page.clock.runFor(4999);
+  assert.equal(await page.evaluate(()=>window.__hostCalls.resolve.length),beforeRetry);
+  await page.evaluate(()=>{window.__hostMode='normal';});
+  await page.clock.runFor(1);
+  await page.waitForFunction(count=>window.__hostCalls.resolve.length>count,beforeRetry);
+
+  // Returning to a visible tab after the 60-second cooldown rechecks URLs.
+  const beforeResume=await page.evaluate(()=>window.__hostCalls.resolve.length);
+  await page.clock.runFor(60_001);
+  await page.evaluate(()=>window.dispatchEvent(new Event('pageshow')));
+  await page.waitForFunction(count=>window.__hostCalls.resolve.length>count,beforeResume);
   assert.deepEqual(errors,[]);
   console.log('Host asset search, revisions, resolve, persistence and reload regressions written.');
 }finally{
