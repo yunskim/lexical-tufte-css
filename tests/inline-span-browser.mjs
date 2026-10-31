@@ -79,6 +79,7 @@ try{
   const baseline=await snapshot();
   assert.deepEqual(baseline,representative.lexicalState,buttonName+' fixture reload must start from canonical representative JSON');
   const paragraph=editor.locator('section[data-tufte-editor="section"] > p').filter({hasText:/./}).first();
+  assert.equal(await paragraph.count(),1,'representative fixture must expose a direct editable section paragraph');
   await paragraph.click();
   await page.keyboard.press('End');
   const changedBefore=await snapshot();
