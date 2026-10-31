@@ -349,6 +349,53 @@ function EditorUI(){
   const [hostRevisionId,setHostRevisionId]=useState<string|null>(null);
   const [hostResolving,setHostResolving]=useState(false);
   const hostResolveGeneration=useRef(0);
+  const refreshGeneration=useRef(0);
+  const [refreshingHostAssets,setRefreshingHostAssets]=useState(false);
+  async function refreshHostAssetURLs(){
+    const provider=hostAssets.current;
+    if(!provider||!hostNamespaceValid){
+      setStatus('외부 이미지 갱신을 위한 호스트 설정이 없습니다.');return;
+    }
+    const generation=++refreshGeneration.current;
+    const images:Array<{key:string;assetId:string;revisionId?:string}>=[];
+    editor.getEditorState().read(()=>{
+      const scan=(node:LexicalNode):void=>{
+        if(node instanceof InlineImageNode){
+          const locator=node.getImageProperties().hostAsset;
+          if(locator?.namespace===hostNamespace)
+            images.push({key:node.getKey(),assetId:locator.assetId,revisionId:locator.revisionId});
+        }
+        if($isElementNode(node))node.getChildren().forEach(scan);
+      };
+      scan($getRoot());
+    });
+    if(images.length===0){setStatus('갱신할 외부 이미지가 없습니다.');return;}
+    setRefreshingHostAssets(true);
+    let refreshed=0;
+    try{
+      for(const image of images){
+        const resolved=await provider.resolve({assetId:image.assetId,
+          ...(image.revisionId?{revisionId:image.revisionId}:{})});
+        if(generation!==refreshGeneration.current)return;
+        if(!resolved||resolved.assetId!==image.assetId||
+          (image.revisionId&&resolved.revisionId!==image.revisionId)||
+          !resolved.mediaType.startsWith('image/')||!isSafeURL(resolved.url,'image'))continue;
+        editor.update(()=>{
+          const node=$getNodeByKey(image.key);
+          if(!(node instanceof InlineImageNode))return;
+          const current=node.getImageProperties();
+          if(current.hostAsset?.namespace!==hostNamespace||
+            current.hostAsset.assetId!==image.assetId||
+            current.hostAsset.revisionId!==image.revisionId)return;
+          node.setHostAsset(current.hostAsset,resolved.url,current.alt);
+          refreshed++;
+        },{tag:HISTORY_PUSH_TAG,discrete:true});
+      }
+      setStatus('외부 이미지 URL 갱신: '+refreshed+'/'+images.length+'개.');
+    }catch{if(generation===refreshGeneration.current)setStatus('외부 이미지 URL 갱신 중 오류가 발생했습니다.');}
+    finally{if(generation===refreshGeneration.current)setRefreshingHostAssets(false);}
+  }
+
   async function connectHostAsset(){
     const provider=hostAssets.current;
     const target=assetTargetKey;
@@ -1041,6 +1088,8 @@ function EditorUI(){
         <button type="button" disabled={!assetChoice||!assetTargetKey} onClick={connectChosenAsset}>선택한 이미지 연결</button>
       </div>
     </div>}
+    {hostAssets.current&&<button type="button" disabled={refreshingHostAssets}
+      onClick={()=>void refreshHostAssetURLs()}>{refreshingHostAssets?'외부 이미지 갱신 중…':'외부 이미지 URL 다시 확인'}</button>}
     <section role="group" aria-label="문서 이미지 자산">
       <button type="button" onClick={registerDocumentImage}>문서 이미지 자산 등록</button>
       <button ref={assetChooserTrigger} type="button" onClick={openAssetChooser}>이미지 라이브러리에서 선택</button>
