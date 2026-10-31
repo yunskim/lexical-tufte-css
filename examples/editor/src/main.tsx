@@ -439,8 +439,15 @@ function EditorUI(){
     let failed=0;
     try{
       for(const image of images){
-        const resolved=await provider.resolve({assetId:image.assetId,
-          ...(image.revisionId?{revisionId:image.revisionId}:{})});
+        let resolved;
+        try{
+          resolved=await provider.resolve({assetId:image.assetId,
+            ...(image.revisionId?{revisionId:image.revisionId}:{})});
+        }catch{
+          if(generation!==refreshGeneration.current)return;
+          failed++;
+          continue;
+        }
         if(generation!==refreshGeneration.current)return;
         if(!resolved||resolved.assetId!==image.assetId||
           (image.revisionId&&resolved.revisionId!==image.revisionId)||
