@@ -338,13 +338,50 @@ function EditorUI(){
   const [assetChooserOpen,setAssetChooserOpen]=useState(false);
   const [assetQuery,setAssetQuery]=useState('');
   const [assetChoice,setAssetChoice]=useState<string|null>(null);
+  const [assetTargetKey,setAssetTargetKey]=useState<string|null>(null);
+  const [assetTargets,setAssetTargets]=useState<Array<{key:string;noteId:string;alt:string;src:string}>>([]);
+  function openAssetChooser(){
+    const targets:Array<{key:string;noteId:string;alt:string;src:string}>=[];
+    editor.getEditorState().read(()=>{
+      const scan=(node:LexicalNode,noteId:string|null):void=>{
+        const currentNote=node instanceof NoteNode?node.getNoteId():noteId;
+        if(node instanceof InlineImageNode&&currentNote!==null){
+          const properties=node.getImageProperties();
+          targets.push({key:node.getKey(),noteId:currentNote,alt:properties.alt,src:properties.src});
+        }
+        if($isElementNode(node))node.getChildren().forEach(child=>scan(child,currentNote));
+      };
+      scan($getRoot(),null);
+    });
+    setAssetTargets(targets);
+    setAssetTargetKey(targets.length===1?targets[0].key:null);
+    setAssetQuery('');setAssetChoice(null);setAssetChooserOpen(true);
+  }
+  function connectChosenAsset(){
+    const asset=documentAssets.find(item=>item.id===assetChoice);
+    if(!asset||!assetTargetKey){setStatus('이미지와 연결 대상을 모두 선택하세요.');return;}
+    let valid=false;
+    editor.getEditorState().read(()=>{
+      const node=$getNodeByKey(assetTargetKey!);
+      valid=node instanceof InlineImageNode&&containingNote(node)!==null;
+    });
+    if(!valid){setStatus('연결 대상 이미지가 변경되었습니다. 다시 선택하세요.');return;}
+    const key=assetTargetKey;
+    editor.update(()=>{
+      const node=$getNodeByKey(key);
+      if(node instanceof InlineImageNode&&containingNote(node))node.setDocumentAsset(asset);
+    },{tag:HISTORY_PUSH_TAG,discrete:true});
+    setStatus('선택한 노트 이미지에 문서 자산을 연결했습니다.');
+    closeAssetChooser();
+  }
+
   const assetChooserTrigger=useRef<HTMLButtonElement>(null);
   const assetChooserDialog=useRef<HTMLDivElement>(null);
   const assetSearchRef=useRef<HTMLInputElement>(null);
   const matchingAssets=documentAssets.filter(asset=>
     (asset.id+' '+asset.mimeType+' '+asset.src).toLocaleLowerCase().includes(assetQuery.toLocaleLowerCase()));
   function closeAssetChooser(){
-    setAssetChooserOpen(false);setAssetChoice(null);
+    setAssetChooserOpen(false);setAssetChoice(null);setAssetTargetKey(null);
     queueMicrotask(()=>assetChooserTrigger.current?.focus());
   }
   useEffect(()=>{
@@ -892,6 +929,13 @@ function EditorUI(){
       <div ref={assetChooserDialog} role="dialog" aria-modal="true" aria-label="문서 이미지 선택" className="asset-chooser">
         <h2>문서 이미지 선택</h2>
         <label>이미지 검색 <input ref={assetSearchRef} type="search" value={assetQuery} onChange={event=>{setAssetQuery(event.target.value);setAssetChoice(null);}}/></label>
+        <fieldset><legend>교체할 노트 이미지 선택</legend>
+          {assetTargets.length===0&&<p>연결할 노트 이미지가 없습니다.</p>}
+          {assetTargets.map(target=><label key={target.key} style={{display:'block'}}>
+            <input type="radio" name="document-asset-target" checked={assetTargetKey===target.key} onChange={()=>setAssetTargetKey(target.key)}/>
+            {target.noteId} · {target.alt||'(장식 이미지)'} · {target.src}
+          </label>)}
+        </fieldset>
         <p aria-live="polite">검색 결과 {matchingAssets.length}개</p>
         <ul>{matchingAssets.map(asset=><li key={asset.id}>
           <label><input type="radio" name="document-asset-choice" checked={assetChoice===asset.id} onChange={()=>setAssetChoice(asset.id)}/>
@@ -899,16 +943,12 @@ function EditorUI(){
           {asset.id} · {asset.mimeType} · {asset.width??'?'}×{asset.height??'?'}</label>
         </li>)}</ul>
         <button type="button" onClick={closeAssetChooser}>취소</button>
-        <button type="button" disabled={!assetChoice} onClick={()=>{
-          const chosen=documentAssets.find(asset=>asset.id===assetChoice);
-          if(!chosen)return;
-          connectDocumentAsset(chosen);closeAssetChooser();
-        }}>선택한 이미지 연결</button>
+        <button type="button" disabled={!assetChoice||!assetTargetKey} onClick={connectChosenAsset}>선택한 이미지 연결</button>
       </div>
     </div>}
     <section role="group" aria-label="문서 이미지 자산">
       <button type="button" onClick={registerDocumentImage}>문서 이미지 자산 등록</button>
-      <button ref={assetChooserTrigger} type="button" onClick={()=>{setAssetQuery('');setAssetChoice(null);setAssetChooserOpen(true);}}>이미지 라이브러리에서 선택</button>
+      <button ref={assetChooserTrigger} type="button" onClick={openAssetChooser}>이미지 라이브러리에서 선택</button>
       <p>문서 자산 {documentAssets.length}개</p>
       <ul>{documentAssets.map(asset=><li key={asset.id}>{asset.id} · {asset.mimeType} · {asset.width??'?'}×{asset.height??'?'} <button type="button" onClick={()=>connectDocumentAsset(asset)}>선택한 노트 이미지에 {asset.id} 연결</button></li>)}</ul>
     </section>
