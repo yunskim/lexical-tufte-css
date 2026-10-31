@@ -376,7 +376,7 @@ function EditorUI(){
     expiryRefreshDeadline.current=deadline;
     expiryRefreshTimer.current=setTimeout(()=>{
       expiryRefreshTimer.current=null;expiryRefreshDeadline.current=null;
-      void refreshHostAssetURLs();
+      void refreshHostAssetURLs(false,true);
     },Math.min(delay,2_147_483_647));
   }
   function scheduleRefreshRetry(){
@@ -385,7 +385,7 @@ function EditorUI(){
     clearRetryRefresh();
     retryRefreshTimer.current=setTimeout(()=>{
       retryRefreshTimer.current=null;
-      void refreshHostAssetURLs(true);
+      void refreshHostAssetURLs(true,true);
     },delay);
   }
   useEffect(()=>()=>{clearExpiryRefresh();clearRetryRefresh();},[]);
@@ -403,6 +403,7 @@ function EditorUI(){
     };
   },[editor]);
   const refreshGeneration=useRef(0);
+  const activeHostRefresh=useRef(false);
   const restoreRefreshGeneration=useRef(0);
   function scheduleHostRefresh(){
     if(!hostAssets.current||!hostNamespaceValid)return;
@@ -415,12 +416,14 @@ function EditorUI(){
   }
 
   const [refreshingHostAssets,setRefreshingHostAssets]=useState(false);
-  async function refreshHostAssetURLs(retryOnly=false){
+  async function refreshHostAssetURLs(retryOnly=false,automatic=false){
+    if(automatic&&activeHostRefresh.current)return;
     const provider=hostAssets.current;
     if(!provider||!hostNamespaceValid){
       setStatus('외부 이미지 갱신을 위한 호스트 설정이 없습니다.');return;
     }
     const generation=++refreshGeneration.current;
+    activeHostRefresh.current=true;
     if(!retryOnly){failedHostKeys.current.clear();clearExpiryRefresh();}
     clearRetryRefresh();
     lastHostRefresh.current=Date.now();
@@ -437,7 +440,7 @@ function EditorUI(){
       scan($getRoot());
     });
     const pending=retryOnly?images.filter(image=>failedHostKeys.current.has(image.key)):images;
-    if(pending.length===0){failedHostKeys.current.clear();refreshFailures.current=0;setRefreshingHostAssets(false);setStatus('갱신할 외부 이미지가 없습니다.');return;}
+    if(pending.length===0){activeHostRefresh.current=false;failedHostKeys.current.clear();refreshFailures.current=0;setRefreshingHostAssets(false);setStatus('갱신할 외부 이미지가 없습니다.');return;}
     setRefreshingHostAssets(true);
     let refreshed=0;
     let failed=0;
@@ -477,7 +480,7 @@ function EditorUI(){
       if(failed){scheduleRefreshRetry();}else{refreshFailures.current=0;clearRetryRefresh();}
       setStatus('외부 이미지 URL 갱신: '+refreshed+'/'+pending.length+'개.'+(failed?' 실패 '+failed+'개, 재시도 예약.':''));
     }catch{if(generation===refreshGeneration.current){scheduleRefreshRetry();setStatus('외부 이미지 URL 갱신 중 오류가 발생했습니다. 재시도합니다.');}}
-    finally{if(generation===refreshGeneration.current)setRefreshingHostAssets(false);}
+    finally{if(generation===refreshGeneration.current){activeHostRefresh.current=false;setRefreshingHostAssets(false);}}
   }
 
   async function connectHostAsset(){
