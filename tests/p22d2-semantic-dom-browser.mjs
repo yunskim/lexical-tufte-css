@@ -88,9 +88,31 @@ try{
    {type:'paragraph',version:1,children:[{type:'text',version:1,text:'Quoted text',format:0}]}
   ]}
  );
+ const enrichedEditor=makeEditor();
+ const enrichedLoaded=loadDocumentIntoEditor(enrichedEditor,enriched);
+ assert.equal(enrichedLoaded.ok,true,JSON.stringify(enrichedLoaded.diagnostics));
+ const enrichedSaved=exportEditorToDocument(enrichedEditor,enriched);
+ assert.equal(enrichedSaved.ok,true,JSON.stringify(enrichedSaved.diagnostics));
+ const enrichedReopened=makeEditor();
+ const enrichedReloaded=loadDocumentIntoEditor(enrichedReopened,JSON.parse(JSON.stringify(enrichedSaved.value)));
+ assert.equal(enrichedReloaded.ok,true,JSON.stringify(enrichedReloaded.diagnostics));
+ const enrichedAfter=exportEditorToDocument(enrichedReopened,enrichedSaved.value);
+ assert.equal(enrichedAfter.ok,true,JSON.stringify(enrichedAfter.diagnostics));
+ assert.deepEqual(enrichedAfter.value.lexicalState,enrichedSaved.value.lexicalState,'list and quotation canonical state must survive reopen');
  const enrichedPublished=renderArticle(enriched);
  assert.equal(enrichedPublished.ok,true,JSON.stringify(enrichedPublished.diagnostics));
  const enrichedSemantics=await semantics(enrichedPublished.html);
+ const enrichedSavedHTML=renderArticle(enrichedSaved.value);
+ const enrichedAfterHTML=renderArticle(enrichedAfter.value);
+ assert.equal(enrichedSavedHTML.ok,true,JSON.stringify(enrichedSavedHTML.diagnostics));
+ assert.equal(enrichedAfterHTML.ok,true,JSON.stringify(enrichedAfterHTML.diagnostics));
+ const savedDOM=await inspect(enrichedSavedHTML.html);
+ const reopenedDOM=await inspect(enrichedAfterHTML.html);
+ assert.deepEqual(reopenedDOM,savedDOM,'list and quotation semantic DOM must survive actual Lexical reopen');
+ const reopenedSemantics=await semantics(enrichedAfterHTML.html);
+ assert.ok(reopenedSemantics.lists.some(list=>list.tag==='ol'&&list.start==='3'&&list.items.some(item=>item.text.includes('Numbered item'))),'reopened numbered list must publish');
+ assert.ok(reopenedSemantics.quotations.some(quote=>quote.cite==='https://example.org/source'&&quote.text.includes('Quoted text')),'reopened quotation must publish');
+
  assert.ok(enrichedSemantics.lists.some(list=>list.tag==='ol'&&list.start==='3'&&list.items.some(item=>item.value==='3'&&item.text.includes('Numbered item'))),'numbered list semantics must be present');
  assert.ok(enrichedSemantics.quotations.some(quote=>quote.cite==='https://example.org/source'&&quote.text.includes('Quoted text')),'quotation semantics must be present');
 
