@@ -130,6 +130,26 @@ try{
  assert.ok(enrichedSemantics.lists.some(list=>list.tag==='ol'&&list.start==='3'&&list.items.some(item=>item.value==='3'&&item.text.includes('Numbered item'))),'numbered list semantics must be present');
  assert.ok(enrichedSemantics.quotations.some(quote=>quote.cite==='https://example.org/source'&&quote.text.includes('Quoted text')),'quotation semantics must be present');
 
+ // Verify keyboard-operable note toggles in the actual published DOM.
+ await page.setContent(afterHTML.html);
+ const toggles=page.locator('article input.margin-toggle');
+ assert.equal(await toggles.count(),afterSemantics.notes.length,'all canonical notes must render keyboard toggles');
+ for(let index=0;index<afterSemantics.notes.length;index++){
+  const toggle=toggles.nth(index);
+  const id=await toggle.getAttribute('id');
+  assert.ok(id,'note toggle needs an id');
+  assert.equal(await page.locator('article label').evaluateAll((labels,target)=>labels.filter(label=>label.htmlFor===target).length,id),1,'note toggle needs exactly one associated label');
+  assert.equal(await toggle.getAttribute('type'),'checkbox','note toggle must be keyboard-operable checkbox');
+  assert.equal(await toggle.isDisabled(),false,'note toggle must not be disabled');
+  await toggle.focus();
+  assert.equal(await toggle.evaluate(el=>document.activeElement===el),true,'note toggle must accept keyboard focus');
+  const beforeChecked=await toggle.isChecked();
+  await page.keyboard.press('Space');
+  assert.equal(await toggle.isChecked(),!beforeChecked,'Space must toggle note visibility control');
+  await page.keyboard.press('Space');
+  assert.equal(await toggle.isChecked(),beforeChecked,'second Space must restore checkbox state');
+ }
+
  for(const note of afterSemantics.notes){
   assert.equal(note.type,'checkbox','note toggle must remain a checkbox');
   assert.equal(note.labels.length,1,'note toggle must retain one matching label');
