@@ -49,6 +49,15 @@ export class InlineImageNode extends DecoratorNode<null> {
     writable.__height=asset.height;
     return this;
   }
+  /** Keep the host locator separate from the resolved display URL. */
+  setHostAsset(locator:HostAssetLocator,src:string,alt:string):this {
+    const current=this.getLatest();
+    assertImageProperties(src,alt,undefined,current.__width,current.__height,locator);
+    const writable=this.getWritable();
+    writable.__src=src;writable.__alt=alt;
+    writable.__assetId=undefined;writable.__hostAsset={...locator};
+    return this;
+  }
   isInline(): true { return true; }
   decorate(): null { return null; }
   private createImageElement(): HTMLImageElement {
