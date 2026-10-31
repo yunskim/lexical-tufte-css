@@ -100,14 +100,13 @@ try{
   const changed=await snapshot();
   assert.notDeepEqual(changed,baseline,buttonName+' must modify representative JSON');
   assert.equal(await editor.locator('section[data-tufte-editor="section"]').count(),collect(changed.root).filter(node=>node.type==='tufte-section').length,'representative DOM section count must match canonical section nodes');
+  const matchingNodes=state=>collect(state.root).filter(node=>node.type===nodeType||(nodeType==='quote'&&node.type==='tufte-quote'));
   if(nodeType==='tufte-sidenote'){
-   const beforeIds=new Set(collect(baseline.root).filter(node=>node.type==='tufte-sidenote').map(node=>node.noteId));
-   const afterIds=collect(changed.root).filter(node=>node.type==='tufte-sidenote').map(node=>node.noteId);
+   const beforeIds=new Set(matchingNodes(baseline).map(node=>node.noteId));
+   const afterIds=matchingNodes(changed).map(node=>node.noteId);
+   assert.equal(afterIds.length,matchingNodes(baseline).length+1,buttonName+' must add exactly one sidenote');
    assert.ok(afterIds.some(id=>typeof id==='string'&&id.length>0&&!beforeIds.has(id)),'toolbar must generate a fresh nonempty sidenote identifier');
   }
-  const matchingNodes=state=>collect(state.root).filter(node=>node.type===nodeType||(nodeType==='quote'&&node.type==='tufte-quote'));
-  if(nodeType==='tufte-sidenote')
-   assert.ok(matchingNodes(changed).length>matchingNodes(baseline).length,buttonName+' must add a new sidenote');
   else{
    assert.ok(matchingNodes(changed).length>0,buttonName+' must leave the requested semantic block in the document');
    assert.notDeepEqual(matchingNodes(changed),matchingNodes(baseline),buttonName+' must create or transform the requested structural block');
