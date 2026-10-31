@@ -350,6 +350,17 @@ function EditorUI(){
   const [hostResolving,setHostResolving]=useState(false);
   const hostResolveGeneration=useRef(0);
   const refreshGeneration=useRef(0);
+  const restoreRefreshGeneration=useRef(0);
+  function scheduleHostRefresh(){
+    if(!hostAssets.current||!hostNamespaceValid)return;
+    const generation=++restoreRefreshGeneration.current;
+    // Lexical may commit the restored state after the caller returns.
+    requestAnimationFrame(()=>{
+      if(generation!==restoreRefreshGeneration.current)return;
+      void refreshHostAssetURLs();
+    });
+  }
+
   const [refreshingHostAssets,setRefreshingHostAssets]=useState(false);
   async function refreshHostAssetURLs(){
     const provider=hostAssets.current;
@@ -726,6 +737,7 @@ function EditorUI(){
       replaceEditorDocumentState(editor,state);
       setDocumentAssets(structuredClone(checked.document.assets));
       setStatus('복구본의 본문과 자산 목록을 함께 불러왔습니다. 구조를 확인한 후 정상 저장하세요.');
+      scheduleHostRefresh();
     }catch{setStatus('복구용 사본을 열지 못했습니다.');}
   }
   const textarea=useRef<HTMLTextAreaElement>(null);
@@ -948,13 +960,15 @@ function EditorUI(){
         const loaded=loadDocumentIntoEditor(editor,checked.document);
         if(!loaded.ok){setStatus('관리 문서 검증 실패: 현재 편집 내용을 유지합니다.');return;}
         setDocumentAssets(structuredClone(loaded.value.assets));
-        setStatus('본문과 자산 목록을 함께 불러왔습니다.');return;
+        setStatus('본문과 자산 목록을 함께 불러왔습니다.');
+        scheduleHostRefresh();return;
       }
       const raw=localStorage.getItem('lexical-tufte-p1');
       if(!raw){setStatus('저장한 문서가 없습니다.');return;}
       replaceEditorDocumentState(editor,parseCanonicalEditorState(editor,JSON.parse(raw)));
       setDocumentAssets([]);
       setStatus('저장한 문서를 불러왔습니다.');
+      scheduleHostRefresh();
     }catch{setStatus('관리 문서 검증 실패: 현재 편집 내용을 유지합니다.');}
   }
   const preserve=(e:MouseEvent<HTMLButtonElement>)=>e.preventDefault();
