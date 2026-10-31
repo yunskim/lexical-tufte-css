@@ -198,3 +198,42 @@ for(const kind of ['quote','epigraph','section-footer','attribution','cite','hor
  },{discrete:true});
  assert.deepEqual(snapshot(editor),before);assert.equal(diagnostics.length,1);assert.equal(history.undoStack.length,0);unregister();stop();
 });
+
+test('epigraph reordering preserves attribution, cite and note as one subtree',async()=>{
+ const {editor,stop,target}=setup('epigraph');
+ editor.update(()=>{
+  const second=$createQuoteNode().append($createTextNode('Second body'));
+  second.append($createAttributionNode().append($createTextNode('Second author '),$createCiteNode().append($createTextNode('Second book'))));
+  target.append(second);
+  target.getFirstChild().getFirstChild().selectEnd();
+ },{discrete:true});
+ const before=snapshot(editor),first=before.root.children[0].children[1].children[0],second=before.root.children[0].children[1].children[1];
+ const history=createEmptyHistoryState(),unregister=registerHistory(editor,history,300);
+ history.current={editor,editorState:editor.getEditorState()};
+ let caret;editor.getEditorState().read(()=>{caret=$getSelection().clone();});
+ run(editor,MOVE_TUFTE_EPIGRAPH_ITEM_COMMAND,'down');await flush();
+ const after=snapshot(editor);
+ assert.deepEqual(after.root.children[0].children[1].children,[second,first]);
+ editor.getEditorState().read(()=>assert.ok($getSelection().is(caret)));
+ assert.match(publish(after),/Second author/);
+ assert.match(publish(after),/quote-note/);
+ run(editor,UNDO_COMMAND);await flush();assert.deepEqual(snapshot(editor),before);
+ run(editor,REDO_COMMAND);await flush();assert.deepEqual(snapshot(editor),after);
+ const reopened=createHeadlessEditor({nodes:TUFTE_NODES,onError(e){throw e;}});
+ reopened.setEditorState(parseCanonicalEditorState(reopened,after));await flush();
+ assert.deepEqual(snapshot(reopened),after);
+ unregister();stop();
+});
+test('epigraph rejects malformed sibling without changing a valid selected quote',()=>{
+ const {editor,diagnostics,stop,target}=setup('epigraph');
+ editor.update(()=>{
+  target.append($createParagraphNode().append($createTextNode('Invalid sibling')));
+  target.getFirstChild().getFirstChild().selectEnd();
+ },{discrete:true});
+ const before=snapshot(editor);
+ run(editor,APPEND_TUFTE_EPIGRAPH_ITEM_COMMAND);
+ run(editor,MOVE_TUFTE_EPIGRAPH_ITEM_COMMAND,'down');
+ assert.deepEqual(snapshot(editor),before);
+ assert.equal(diagnostics.length,2);
+ stop();
+});
