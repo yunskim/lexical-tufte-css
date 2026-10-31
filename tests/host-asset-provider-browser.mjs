@@ -46,6 +46,10 @@ try{
         }
         if(window.__hostMode==='throw'||(window.__hostMode==='partial'&&locator.assetId==='remote-image'&&locator.revisionId==='rev-1'))throw Error('Temporary provider outage');
         if(window.__hostMode==='invalid')return null;
+        if(window.__hostMode==='malformed-media')return {assetId:locator.assetId,
+          revisionId:locator.revisionId||'rev-2',url:'/fixture.svg'};
+        if(window.__hostMode==='malformed-url')return {assetId:locator.assetId,
+          revisionId:locator.revisionId||'rev-2',mediaType:'image/svg+xml'};
         if(window.__hostMode==='expired'||window.__hostMode==='bad-expiry')
           return {assetId:locator.assetId,revisionId:locator.revisionId||'rev-2',
             mediaType:'image/svg+xml',url:'/fixture.svg',
@@ -108,7 +112,7 @@ try{
   await button('외부 이미지 URL 다시 확인').click();
   await page.getByRole('status',{name:'편집 작업 상태'}).getByText(/갱신: 1\/1개/).waitFor();
   // Reject a resolved URL whose expiry is already past or cannot be parsed.
-  for(const mode of ['expired','bad-expiry']){
+  for(const mode of ['expired','bad-expiry','malformed-media','malformed-url']){
     await page.evaluate(value=>{window.__hostMode=value;},mode);
     await button('외부 이미지 URL 다시 확인').click();
     await page.getByRole('status',{name:'편집 작업 상태'}).getByText(/실패 1개, 재시도 예약/).waitFor();
