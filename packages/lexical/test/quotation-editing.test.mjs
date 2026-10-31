@@ -295,3 +295,52 @@ test('repeated epigraph moves preserve three-item order and selection',()=>{
  assert.deepEqual(snapshot(editor).root.children[0].children[1].children,initial);
  stop();
 });
+
+test('invalid epigraph movement direction is atomic and diagnosed',()=>{
+ const {editor,diagnostics,stop,target}=setup('epigraph');
+ editor.update(()=>{target.append($createQuoteNode().append($createTextNode('Second quote')));target.getFirstChild().selectStart();},{discrete:true});
+ const before=snapshot(editor);
+ for(const direction of ['left','',null,undefined,42]){
+  let selection;
+  editor.getEditorState().read(()=>{selection=$getSelection().clone();});
+  run(editor,MOVE_TUFTE_EPIGRAPH_ITEM_COMMAND,direction);
+  assert.deepEqual(snapshot(editor),before);
+  editor.getEditorState().read(()=>assert.ok($getSelection().is(selection)));
+ }
+ assert.equal(diagnostics.length,5);
+ stop();
+});
+test('epigraph append after middle quote retains following sibling and history',async()=>{
+ const {editor,stop,target}=setup('epigraph');
+ editor.update(()=>{
+  target.append($createQuoteNode().append($createTextNode('Last quote')));
+  target.getFirstChild().getFirstChild().selectEnd();
+ },{discrete:true});
+ const before=snapshot(editor),items=before.root.children[0].children[1].children;
+ const history=createEmptyHistoryState(),unregister=registerHistory(editor,history,300);
+ history.current={editor,editorState:editor.getEditorState()};
+ run(editor,APPEND_TUFTE_EPIGRAPH_ITEM_COMMAND);await flush();
+ const after=snapshot(editor),updated=after.root.children[0].children[1].children;
+ assert.equal(updated.length,3);
+ assert.deepEqual(updated[0],items[0]);assert.deepEqual(updated[2],items[1]);
+ assert.equal(updated[1].type,'quote');
+ assert.match(JSON.stringify(updated[1]),/인용문/);
+ publish(after);
+ run(editor,UNDO_COMMAND);await flush();assert.deepEqual(snapshot(editor),before);
+ run(editor,REDO_COMMAND);await flush();assert.deepEqual(snapshot(editor),after);
+ unregister();stop();
+});
+test('epigraph commands reject a selected quote detached from root section',()=>{
+ const {editor,diagnostics,stop,target}=setup('epigraph');
+ editor.update(()=>{
+  target.remove();
+  $getRoot().append(target);
+  target.getFirstChild().selectStart();
+ },{discrete:true});
+ const before=snapshot(editor);
+ run(editor,APPEND_TUFTE_EPIGRAPH_ITEM_COMMAND);
+ run(editor,MOVE_TUFTE_EPIGRAPH_ITEM_COMMAND,'down');
+ assert.deepEqual(snapshot(editor),before);
+ assert.equal(diagnostics.length,2);
+ stop();
+});
