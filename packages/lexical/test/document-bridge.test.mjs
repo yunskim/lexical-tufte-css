@@ -968,3 +968,23 @@ test('root presentation remains in canonical editor storage even when publicatio
  const exported=exportEditorToDocument(e,doc);assert.equal(exported.ok,true,JSON.stringify(exported.diagnostics));
  assert.equal(exported.value.lexicalState.root.direction,'rtl');assert.equal(exported.value.lexicalState.root.format,'right');assert.deepEqual(doc,before);
 });
+
+test('P2.2.d.2 F01-F09 canonical reopen and publication remain identical',async()=>{
+ const {renderArticle}=await import('../../render/dist/index.js');
+ const original=fixture();
+ const source=editor();
+ const imported=loadDocumentIntoEditor(source,original);
+ assert.equal(imported.ok,true,JSON.stringify(imported.diagnostics));
+ const saved=exportEditorToDocument(source,original);
+ assert.equal(saved.ok,true,JSON.stringify(saved.diagnostics));
+ const reopened=editor();
+ const loaded=loadDocumentIntoEditor(reopened,JSON.parse(JSON.stringify(saved.value)));
+ assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
+ const exported=exportEditorToDocument(reopened,saved.value);
+ assert.equal(exported.ok,true,JSON.stringify(exported.diagnostics));
+ assert.deepEqual(exported.value.lexicalState,saved.value.lexicalState);
+ const before=renderArticle(saved.value),after=renderArticle(exported.value);
+ assert.equal(before.ok,true,JSON.stringify(before.diagnostics));
+ assert.equal(after.ok,true,JSON.stringify(after.diagnostics));
+ assert.equal(after.html,before.html,'reopening must not alter published semantic HTML');
+});
