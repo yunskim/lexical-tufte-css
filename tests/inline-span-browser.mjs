@@ -36,6 +36,31 @@ try{
  await page.getByRole('button',{name:'불러오기',exact:true}).click();
  const representativeState=await snapshot();
  assert.deepEqual(representativeState,representative.lexicalState,'prototype restore must retain representative canonical fixture');
+ // Run composition cancellation on the loaded representative itself, not only
+ // on the separately constructed inline-span example below.
+ const representativeText=editor.locator('section p').filter({hasText:/./}).first();
+ await representativeText.evaluate(paragraph=>{
+  const walker=document.createTreeWalker(paragraph,NodeFilter.SHOW_TEXT);
+  const node=walker.nextNode();
+  if(!node)throw Error('Representative fixture needs editable paragraph text');
+  const selection=window.getSelection(),range=document.createRange();
+  range.setStart(node,Math.min(1,node.textContent.length));
+  range.collapse(true);
+  selection.removeAllRanges();selection.addRange(range);
+  document.dispatchEvent(new Event('selectionchange'));
+ });
+ await editor.focus();
+ const representativeCDP=await page.context().newCDPSession(page);
+ try{
+  await representativeCDP.send('Input.imeSetComposition',{text:'한',selectionStart:1,selectionEnd:1});
+  await representativeCDP.send('Input.imeSetComposition',{text:'',selectionStart:0,selectionEnd:0});
+ }finally{await representativeCDP.detach();}
+ assert.deepEqual(await snapshot(),representativeState,'cancelled composition must preserve representative canonical JSON');
+ const representativePublication=renderArticle({...representative,lexicalState:representativeState});
+ const afterRepresentativeIME=renderArticle({...representative,lexicalState:await snapshot()});
+ assert.equal(afterRepresentativeIME.ok,representativePublication.ok,'IME cancellation must preserve representative publication status');
+ assert.deepEqual(afterRepresentativeIME.diagnostics,representativePublication.diagnostics,'IME cancellation must preserve publication diagnostics');
+ assert.equal(afterRepresentativeIME.html,representativePublication.html,'IME cancellation must preserve representative published HTML');
  await page.evaluate(()=>localStorage.removeItem('lexical-tufte-p1'));
  await page.reload();
  await editor.waitFor();
