@@ -29,7 +29,8 @@
     "upstream:assets:sync": "node scripts/sync-upstream-visual-assets.mjs",
     "test:upstream-full-page": "pnpm build && node tests/upstream-full-page-baseline-browser.mjs && node tests/upstream-full-document-roundtrip-browser.mjs && node tests/upstream-full-document-editor-browser.mjs && node tests/upstream-full-document-visual-browser.mjs && node tests/full-page-pixel-parity-browser.mjs",
     "test:upstream-sections": "pnpm build && node tests/upstream-geometry-browser.mjs && node tests/upstream-newthought-sidenote-browser.mjs && node tests/upstream-same-content-opening-browser.mjs && node tests/upstream-same-content-getting-started-browser.mjs && node tests/upstream-same-content-fundamentals-browser.mjs && node tests/upstream-same-content-epigraphs-browser.mjs && node tests/upstream-same-content-sidenotes-browser.mjs && node tests/upstream-same-content-figures-browser.mjs && node tests/upstream-same-content-final-sections-browser.mjs",
-    "test:note-assets": "pnpm build && node tests/managed-note-assets-browser.mjs && node tests/note-export-parity-browser.mjs && node tests/note-image-chooser-browser.mjs && node tests/note-image-dimensions-browser.mjs"
+    "test:note-assets": "pnpm build && node tests/managed-note-assets-browser.mjs && node tests/note-export-parity-browser.mjs && node tests/note-image-chooser-browser.mjs && node tests/note-image-dimensions-browser.mjs",
+    "test:p22d2-dom": "pnpm build && node tests/p22d2-semantic-dom-browser.mjs"
   },
   "devDependencies": {
     "playwright": "1.51.1"
