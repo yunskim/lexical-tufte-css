@@ -118,6 +118,18 @@ try{
   await page.clock.runFor(1);
   await page.waitForFunction(count=>window.__hostCalls.resolve.length>count,beforeRetry);
 
+  // A manual successful refresh must cancel the outstanding retry timer.
+  await page.evaluate(()=>{window.__hostMode='invalid';});
+  await button('외부 이미지 URL 다시 확인').click();
+  await page.getByRole('status',{name:'편집 작업 상태'}).getByText(/재시도 예약/).waitFor();
+  await page.evaluate(()=>{window.__hostMode='normal';});
+  await button('외부 이미지 URL 다시 확인').click();
+  await page.getByRole('status',{name:'편집 작업 상태'}).getByText(/갱신: 1\/1개/).waitFor();
+  const afterManualRecovery=await page.evaluate(()=>window.__hostCalls.resolve.length);
+  await page.clock.runFor(5000);
+  assert.equal(await page.evaluate(()=>window.__hostCalls.resolve.length),afterManualRecovery,
+    'Successful manual refresh cancels the stale retry');
+
   // Returning to a visible tab after the 60-second cooldown rechecks URLs.
   const beforeResume=await page.evaluate(()=>window.__hostCalls.resolve.length);
   await page.clock.runFor(60_001);
