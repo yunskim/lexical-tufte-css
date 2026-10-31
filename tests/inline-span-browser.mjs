@@ -66,6 +66,34 @@ try{
  assert.equal(afterRepresentativeIME.ok,representativePublication.ok,'IME cancellation must preserve representative publication status');
  assert.deepEqual(afterRepresentativeIME.diagnostics,representativePublication.diagnostics,'IME cancellation must preserve publication diagnostics');
  assert.equal(afterRepresentativeIME.html,representativePublication.html,'IME cancellation must preserve representative published HTML');
+ // Run real structural toolbar commands against the restored representative fixture.
+ // Reload the fixture for each case to avoid sharing History or selection state.
+ for(const [buttonName,nodeType] of [['번호 목록 삽입','list'],['인용문 삽입','quote'],['노트 삽입','tufte-sidenote']]){
+  await page.evaluate(state=>localStorage.setItem('lexical-tufte-p1',JSON.stringify(state)),representative.lexicalState);
+  await page.reload();
+  await page.getByRole('button',{name:'불러오기',exact:true}).click();
+  const baseline=await snapshot();
+  const paragraph=editor.locator('section p').filter({hasText:/./}).first();
+  await paragraph.click();
+  await page.keyboard.press('End');
+  const changedBefore=await snapshot();
+  assert.deepEqual(changedBefore,baseline,'caret positioning must not modify representative fixture');
+  await action(buttonName).click();
+  const changed=await snapshot();
+  assert.notDeepEqual(changed,baseline,buttonName+' must modify representative JSON');
+  assert.ok(collect(changed.root).some(node=>node.type===nodeType||nodeType==='quote'&&node.type==='tufte-quote'),buttonName+' must insert its semantic node');
+  const beforeHTML=renderArticle({...representative,lexicalState:baseline});
+  const changedHTML=renderArticle({...representative,lexicalState:changed});
+  assert.equal(beforeHTML.ok,true,JSON.stringify(beforeHTML.diagnostics));
+  assert.equal(changedHTML.ok,true,JSON.stringify(changedHTML.diagnostics));
+  assert.notEqual(changedHTML.html,beforeHTML.html,buttonName+' must modify representative publication');
+  await page.getByRole('button',{name:'실행 취소',exact:true}).click();
+  assert.deepEqual(await snapshot(),baseline,buttonName+' undo must restore representative JSON');
+  assert.equal(renderArticle({...representative,lexicalState:await snapshot()}).html,beforeHTML.html,buttonName+' undo must restore representative publication');
+  await page.getByRole('button',{name:'다시 실행',exact:true}).click();
+  assert.deepEqual(await snapshot(),changed,buttonName+' redo must restore representative JSON');
+  assert.equal(renderArticle({...representative,lexicalState:await snapshot()}).html,changedHTML.html,buttonName+' redo must restore representative publication');
+ }
  await page.evaluate(()=>localStorage.removeItem('lexical-tufte-p1'));
  await page.reload();
  await editor.waitFor();
