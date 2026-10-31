@@ -215,6 +215,7 @@ try{
    return result.html;
   };
   const baselineHTML=publish(baseline);
+  await focusInsertionPoint(); // Inspector snapshot may move focus away from Lexical.
   await action(buttonName).click();
   const changed=await snapshot();
   const changedHTML=publish(changed);
@@ -240,6 +241,7 @@ try{
   return result.html;
  };
  const noteBaselineHTML=noteDoc(noteBaseline);
+ await focusInsertionPoint(); // Restore collapsed selection after inspector snapshot.
  await action('노트 삽입').click();
  const noteChanged=await snapshot();
  assert.notDeepEqual(noteChanged,noteBaseline,'note toolbar insertion must modify canonical JSON');
