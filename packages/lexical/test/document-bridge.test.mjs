@@ -1203,3 +1203,41 @@ test('P2.2.d.2 F01-F09 fixture text edit undo/redo preserves JSON and publicatio
   assert.deepEqual(snapshot(),changed,'fixture redo must restore canonical JSON and published HTML');
  }finally{unregister();}
 });
+
+test('P2.2.d.2 representative fixture structural list and quote edits survive undo/redo',async()=>{
+ const {renderArticle}=await import('../../render/dist/index.js');
+ for(const kind of ['list','quote']){
+  const original=fixture(),destination=editor();
+  const loaded=loadDocumentIntoEditor(destination,original);
+  assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
+  const history=createEmptyHistoryState(),unregister=registerHistory(destination,history,300);
+  const flush=()=>new Promise(resolve=>setImmediate(resolve));
+  const snapshot=()=>{
+   const saved=exportEditorToDocument(destination,original);
+   assert.equal(saved.ok,true,JSON.stringify(saved.diagnostics));
+   const publication=renderArticle(saved.value);
+   assert.equal(publication.ok,true,JSON.stringify(publication.diagnostics));
+   return {json:saved.value.lexicalState,html:publication.html};
+  };
+  try{
+   await flush();
+   const before=snapshot();
+   destination.update(()=>{
+    const section=$getRoot().getFirstChild();
+    if(kind==='list'){
+     const list=$createListNode('number');
+     list.append($createListItemNode().append($createTextNode('History list item')));
+     section.append(list);
+    }else section.append($createQuoteNode().append($createTextNode('History quotation')));
+   },{discrete:true,tag:HISTORY_PUSH_TAG});
+   await flush();
+   const changed=snapshot();
+   assert.notDeepEqual(changed.json,before.json,kind+' must change canonical JSON');
+   assert.notEqual(changed.html,before.html,kind+' must change publication');
+   destination.dispatchCommand(UNDO_COMMAND,undefined);await flush();
+   assert.deepEqual(snapshot(),before,kind+' undo must restore canonical JSON and HTML');
+   destination.dispatchCommand(REDO_COMMAND,undefined);await flush();
+   assert.deepEqual(snapshot(),changed,kind+' redo must restore canonical JSON and HTML');
+  }finally{unregister();}
+ }
+});
