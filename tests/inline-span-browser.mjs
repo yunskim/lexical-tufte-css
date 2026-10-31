@@ -197,11 +197,14 @@ try{
   const changed=await snapshot();
   assert.equal(collect(changed.root).find(n=>n.type==='tufte-span').kind,kind);
   await page.getByRole('button',{name:'실행 취소',exact:true}).click();
-  assert.deepEqual(await snapshot(),wrapped,'Kind change is one undo step');
+  const undoneKind=await snapshot();
+  assert.deepEqual(undoneKind,wrapped,'Kind change is one undo step');
   await page.getByRole('button',{name:'다시 실행',exact:true}).click();
-  assert.deepEqual(await snapshot(),changed,'Redo retains note identity and changed kind');
+  const redoneKind=await snapshot();
+  assert.deepEqual(redoneKind,changed,'Redo retains the changed inline kind');
   await page.getByRole('button',{name:'실행 취소',exact:true}).click();
-  assert.deepEqual(await snapshot(),wrapped);
+  const resetKind=await snapshot();
+  assert.deepEqual(resetKind,wrapped,'Kind change cleanup restores the original wrapper');
  }
  await editor.locator('.newthought').click();
  if(width===375){await action('인라인 속성 해제').focus();await page.keyboard.press('Space');}
