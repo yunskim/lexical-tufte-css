@@ -1158,3 +1158,48 @@ test('P2.2.d.2 rejected load retains history while successful replacement clears
   assert.equal(current(),'Replacement','old undo cannot cross document replacement');
  }finally{unregister();}
 });
+
+test('P2.2.d.2 F01-F09 fixture text edit undo/redo preserves JSON and publication',async()=>{
+ const {renderArticle}=await import('../../render/dist/index.js');
+ const original=fixture();
+ const destination=editor();
+ const loaded=loadDocumentIntoEditor(destination,original);
+ assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
+ const history=createEmptyHistoryState();
+ const unregister=registerHistory(destination,history,300);
+ const flush=()=>new Promise(resolve=>setImmediate(resolve));
+ const snapshot=()=>{
+  const saved=exportEditorToDocument(destination,original);
+  assert.equal(saved.ok,true,JSON.stringify(saved.diagnostics));
+  const rendered=renderArticle(saved.value);
+  assert.equal(rendered.ok,true,JSON.stringify(rendered.diagnostics));
+  return {json:saved.value.lexicalState,html:rendered.html};
+ };
+ try{
+  await flush();
+  const before=snapshot();
+  let edited=false;
+  destination.update(()=>{
+   const visit=node=>{
+    if(edited)return;
+    if(node.getType()==='text'){
+     node.setTextContent(node.getTextContent()+' P22D2');
+     edited=true;
+     return;
+    }
+    if(typeof node.getChildren==='function')
+     for(const child of node.getChildren())visit(child);
+   };
+   visit($getRoot());
+  },{discrete:true,tag:HISTORY_PUSH_TAG});
+  assert.equal(edited,true,'representative fixture must contain editable text');
+  await flush();
+  const changed=snapshot();
+  assert.notDeepEqual(changed.json,before.json);
+  assert.notEqual(changed.html,before.html);
+  destination.dispatchCommand(UNDO_COMMAND,undefined);await flush();
+  assert.deepEqual(snapshot(),before,'fixture undo must restore canonical JSON and published HTML');
+  destination.dispatchCommand(REDO_COMMAND,undefined);await flush();
+  assert.deepEqual(snapshot(),changed,'fixture redo must restore canonical JSON and published HTML');
+ }finally{unregister();}
+});
