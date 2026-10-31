@@ -55,6 +55,15 @@ try{
   name:'선택한 노트 이미지에 fixture-image 연결'
  }).click();
 
+ // The library chooser must explicitly target an existing note image.
+ await catalog.getByRole('button',{name:'이미지 라이브러리에서 선택'}).click();
+ const chooser=page.getByRole('dialog',{name:'문서 이미지 선택'});
+ await chooser.waitFor();
+ assert.equal(await chooser.getByRole('radio',{name:/seed-note/}).count(),1);
+ await chooser.getByRole('radio',{name:/fixture-image/}).check();
+ assert.equal(await chooser.getByRole('button',{name:'선택한 이미지 연결'}).isEnabled(),true);
+ await chooser.getByRole('button',{name:'선택한 이미지 연결'}).click();
+ assert.equal(await chooser.count(),0,'Chooser closes after connecting an image');
  const image=page.locator('[data-note-id="seed-note"] img');
  await page.waitForFunction(()=>{
   const image=document.querySelector('[data-note-id="seed-note"] img');
