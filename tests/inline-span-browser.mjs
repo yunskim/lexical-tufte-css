@@ -160,14 +160,24 @@ try{
  for(const [buttonName,nodeType] of [['번호 목록 삽입','list'],['인용문 삽입','quote']]){
   await editor.locator('section').last().click();
   const baseline=await snapshot();
+  const publish=state=>{
+   const result=renderArticle({schemaVersion:1,id:'inline-span-case',locale:'ko-KR',title:'인라인 속성',assets:[],lexicalState:state});
+   assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+   return result.html;
+  };
+  const baselineHTML=publish(baseline);
   await action(buttonName).click();
   const changed=await snapshot();
+  const changedHTML=publish(changed);
+  assert.notEqual(changedHTML,baselineHTML,buttonName+' must change published HTML');
   assert.notDeepEqual(changed,baseline,buttonName+' must change canonical editor JSON');
   assert.ok(collect(changed.root).some(node=>node.type===nodeType||nodeType==='quote'&&node.type==='tufte-quote'),buttonName+' must create a semantic node');
   await page.getByRole('button',{name:'실행 취소',exact:true}).click();
   assert.deepEqual(await snapshot(),baseline,buttonName+' undo must restore JSON');
+  assert.equal(publish(await snapshot()),baselineHTML,buttonName+' undo must restore published HTML');
   await page.getByRole('button',{name:'다시 실행',exact:true}).click();
   assert.deepEqual(await snapshot(),changed,buttonName+' redo must restore JSON');
+  assert.equal(publish(await snapshot()),changedHTML,buttonName+' redo must restore published HTML');
   await page.getByRole('button',{name:'실행 취소',exact:true}).click();
  }
  assert.deepEqual(errors,[]);
