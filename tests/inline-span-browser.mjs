@@ -243,7 +243,9 @@ try{
   const changedHTML=publish(changed);
   assert.notEqual(changedHTML,baselineHTML,buttonName+' must change published HTML');
   assert.notDeepEqual(changed,baseline,buttonName+' must change canonical editor JSON');
-  assert.ok(collect(changed.root).some(node=>node.type===nodeType||(nodeType==='quote'&&node.type==='tufte-quote')),buttonName+' must create a semantic node');
+  const structuralNodes=state=>collect(state.root).filter(node=>node.type===nodeType||(nodeType==='quote'&&node.type==='tufte-quote'));
+  assert.ok(structuralNodes(changed).length>0,buttonName+' must leave the requested semantic node in the document');
+  assert.notDeepEqual(structuralNodes(changed),structuralNodes(baseline),buttonName+' must create or transform the requested semantic node');
   await page.getByRole('button',{name:'실행 취소',exact:true}).click();
   const undone=await snapshot();
   assert.deepEqual(undone,baseline,buttonName+' undo must restore JSON');
