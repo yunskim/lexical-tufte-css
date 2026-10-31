@@ -1,7 +1,7 @@
 import {createEditor,$getRoot,$getNodeByKey,$createRangeSelection,$setSelection,$createTextNode,$createParagraphNode} from 'lexical';
 import {$createListNode,$createListItemNode} from '@lexical/list';
 import {registerRichText} from '@lexical/rich-text';
-import {TUFTE_NODES,$createSectionNode,$createMarginnoteNode,registerListCommands,registerListKeyboardCommands,exportCanonicalEditorState} from '../src/index.js';
+import {TUFTE_NODES,$createSectionNode,$createMarginnoteNode,registerListCommands,registerListKeyboardCommands,exportCanonicalEditorState,parseCanonicalEditorState} from '../src/index.js';
 let active;
 export function mountTabFixture({mode='valid',kind='bullet',depth=0}={}){
  active?.dispose();
@@ -39,4 +39,10 @@ export function mountTabFixture({mode='valid',kind='bullet',depth=0}={}){
 export function readTabFixture(){
  const {editor,itemKey}=active;
  return {state:exportCanonicalEditorState(editor.getEditorState()),depth:editor.getEditorState().read(()=>$getNodeByKey(itemKey)?.getIndent()??null)};
+}
+export function reopenTabFixture(){
+ const {editor}=active;
+ const saved=JSON.parse(JSON.stringify(exportCanonicalEditorState(editor.getEditorState())));
+ editor.setEditorState(parseCanonicalEditorState(editor,saved));
+ return exportCanonicalEditorState(editor.getEditorState());
 }

@@ -1,3 +1,9 @@
+## 2026-10-31 K5 및 ul/ol 지원·거부 범위 수락 완료
+
+- 빈 첫/중간 Enter와 3항목 중간 Backspace 병합, 혼합 ul/ol 저장/재열기·발행, 깊이19 노트 목록의 DOM 재조정 이후 JSON/발행 보존을 보강했다. 제품 소스·schema·golden 변경 없음.
+- build/typecheck/static 및 최종 unit483·package5·Python16/HTTP 통과. 전수 browser36개 최종35통과/보류 자산1실패, 파일timeout·skip0. 공식 전체9섹션6폭 mask 밖 pixel차이0. load 대기로 실패했던 editor 회귀는 E131/M121의 명시적 readiness로 수정 후 통과했다. CI 생략.
+- [수락 행렬/보고서](VERIFICATION_LIST_ACCEPTANCE_2026-10-31.ko.md), [최초·재실행/파일별 결과](verification/list-acceptance-20261031.json). K5와 P2.2.b.2를 명시한 지원·거부 경계에서 체크했다. F06/상위 P2.2.b 전체는 아직 미완료이며 다음은 P2.2.b.3 정의목록이다. 보류 자산과 실제 OS IME/P6는 유지한다.
+
 ## 2026-10-31 K4 Tab 깊이·포커스 검증 완료
 
 - 깊이19↔20 및 거부 경계의 실제 기본 focus 이동을 ul/ol·1440/375px에서 검증했다. list-only 컨테이너 자체가 변형 없이 Tab을 소비하던 E130을 keyboard 위임/toolbar 진단으로 수정했다.

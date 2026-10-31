@@ -36,4 +36,4 @@ Lexical은 nested listitem의 indent를 구조에서 계산해 JSON에 저장한
 - `tests/list-kind-browser.mjs`: 1440/375px 실제 키 입력, 기본 Enter 분할과 최종 빈 항목 종료·nested 빈 항목 outdent 각각 한 Undo/Redo, 저장·재열기, 실제 중첩 JSON 발행. 동적 last UL 대신 section 직접 자식 목록으로 경계를 검사한다.
 - `packages/render/test/render.test.mjs`: 구조 깊이 일치 허용/불일치 거부와 입력 불변성.
 
-K1·K2의 실행 판정과 전체 회귀 결과는 별도 실행 보고서에 기록한다. K3는 2026-10-31 위 지원/거부 경계의 history·노트·저장/발행을 검증했다([보고서](VERIFICATION_BACKSPACE_2026-10-31.ko.md)). K4의 깊이19/20 및 실제 기본 focus/외부 버튼·메뉴 탐색도 검증했다([보고서](VERIFICATION_TAB_FOCUS_2026-10-31.ko.md)). K5 통합 행렬은 미완료다. 실제 OS IME·다른 브라우저·스크린리더 실기기는 P6이며 자산 확장은 보류한다. CI 없음.
+K1·K2의 실행 판정과 전체 회귀 결과는 별도 실행 보고서에 기록한다. K3는 2026-10-31 위 지원/거부 경계의 history·노트·저장/발행을 검증했다([보고서](VERIFICATION_BACKSPACE_2026-10-31.ko.md)). K4의 깊이19/20 및 실제 기본 focus/외부 버튼·메뉴 탐색도 검증했다([보고서](VERIFICATION_TAB_FOCUS_2026-10-31.ko.md)). K5와 ul/ol의 위 지원·거부 범위도 통합 수락했다([행렬·전체 결과](VERIFICATION_LIST_ACCEPTANCE_2026-10-31.ko.md)). 정의목록/전체 F06은 별도 미완료다. 실제 OS IME·다른 브라우저·스크린리더 실기기는 P6이며 자산 확장은 보류한다. CI 없음.

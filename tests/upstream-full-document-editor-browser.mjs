@@ -48,7 +48,8 @@ try{
  await page.route('**/*',route=>
   route.request().url().startsWith(url)?route.continue():route.abort()
  );
- await page.goto(url);
+ // App readiness is asserted below; unrelated load completion is not a gate.
+ await page.goto(url,{waitUntil:'domcontentloaded'});
  await page.locator('.editor').waitFor();
  const reconstructed=await page.evaluate(reconstructPinnedArticle,{
   html:upstream,modernFrame,modernCode
@@ -104,7 +105,7 @@ try{
  const diskState=await page.evaluate(()=>
   JSON.parse(localStorage.getItem('lexical-tufte-p1')??'null'));
  assert.deepEqual(diskState,edited,'Actual Save must persist all sections');
- await page.reload();
+ await page.reload({waitUntil:'domcontentloaded'});
  await page.locator('.editor').waitFor();
  await page.getByRole('button',{name:'불러오기',exact:true}).click();
  await page.getByRole('status',{name:'편집 작업 상태'}).filter({

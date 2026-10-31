@@ -1,5 +1,11 @@
 # 에러 기록
 
+## E131 — 공식 문서 편집 회귀의 navigation load 대기 초과 (수락 경로 완화 검증, 리소스 원인 미확정)
+
+- 2026-10-31 K5 전수 실행: upstream-full-document-editor-browser.mjs의 최초 page.goto가 load 대기10초 초과로 실패했다. editor DOM 검사 전의 실패이며 구체적으로 어떤 리소스가 지연됐는지는 미확정이다. 로컬 HTTP 준비 응답과 외부 URL 차단만으로 load 완료를 보장할 수 없다.
+- 조치: 최초 탐색/재로드를 domcontentloaded로 하고 기존 editor.waitFor 및 실제 9섹션 복원·편집·이력·저장 검사를 그대로 수락 게이트로 유지한다. assertion이나 원본/golden, 시간 제한은 완화하지 않는다. 재실행 결과는 K5 보고서에 기록한다. M121.
+- 종료: 해당 파일 독립 재실행과 편집/저장/발행 검사는 통과했다. K5 최종 unit483·package5·Python16/HTTP 및 browser35/36(기존 보류 자산1실패), 공식6폭 pixel차이0. [수락 결과](VERIFICATION_LIST_ACCEPTANCE_2026-10-31.ko.md). 최초 실패와 재실행을 분리하고 구체적 지연 리소스는 미확정으로 남긴다. CI 생략.
+
 ## E130 — 중첩 목록 컨테이너의 변경 없는 Tab 소비 (지원/거부 경계 검증 완료)
 
 - 2026-10-31 K4: list-only wrapper 자체의 element 선택에서 setIndent는 아무 작업도 하지 않는데 keyboard handler가 preventDefault와 true를 반환했다. 명시적 wrapper 선택을 만든 ul/ol 단위2개에서 재현했다.

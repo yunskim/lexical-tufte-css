@@ -1,5 +1,12 @@
 # 재발 방지 대책 및 정기 점검
 
+## M121 — 탐색 이벤트와 애플리케이션 준비를 분리
+
+2026-10-31 K5 종료: E131의 명시적 editor readiness 수정 후 독립 재실행 통과. M117–M120 및 과거 오류/현재 범위를 대조하고 deep JSON의 DOM 재조정 후 비교까지 보강했다. 최종 unit483·package5·Python16/HTTP, browser35/36 및 공식6폭 pixel차이0. 보류 자산1실패와 load 지연 리소스 미확정/OS IME 한계는 유지한다. [수락 행렬](VERIFICATION_LIST_ACCEPTANCE_2026-10-31.ko.md). 다음 점검은 P2.2.b.3 시작/완료다. CI 생략.
+
+- E131: 편집기 동작 회귀는 domcontentloaded 이후 실제 editor DOM과 복원 상태를 명시적으로 대기한다. 전체 load 이벤트가 편집 준비의 유일한 증거가 되지 않게 한다. 이미지/font 픽셀 검증은 해당 visual 테스트의 decode/font-ready 게이트를 유지한다.
+- 최초 실패 로그와 재실행을 따로 남기고 file timeout/locator timeout/navigation timeout을 구분한다. 원인 미확정 환경 지연을 제품 데이터 손실로 단정하거나 전체 통과로 숨기지 않는다. 시작/종료에 M117–M120과 기존 보류 자산 범위를 점검하며 다음 P2.2.b.3에서 재검토한다. CI 생략.
+
 ## M120 — 거부 반환값과 실제 포커스 이동을 함께 검사
 
 2026-10-31 종료: check475·집중10·포커스/목록1440/375px·contextual UI·package5개 통과. E130의 재현 선택 및 실제 focus/문서 보존을 검증했다. [실행 보고서](VERIFICATION_TAB_FOCUS_2026-10-31.ko.md). 관련 기존 M117–M119/M088/M004를 다시 대조하고 전체 전수·OS IME·자산 한계는 유지했다. 다음 점검은 K5 시작·완료다.

@@ -1,0 +1,734 @@
+{
+  "date": "2026-10-31",
+  "baseCommit": "f4ccf6560c0e474fd3973788523f8e096a981dd3",
+  "branch": "fix/main-browser-parity-20261023",
+  "task": "P2.2.b.2-K5",
+  "status": "complete-for-documented-list-support-and-rejection-boundaries",
+  "productionCodeChanged": false,
+  "build": "pass",
+  "typecheck": "pass",
+  "checkPhase": {
+    "unitPass": 475,
+    "status": "pass"
+  },
+  "finalUnit": {
+    "total": 483,
+    "document": 57,
+    "render": 52,
+    "blog": 77,
+    "editorPorts": 2,
+    "lexical": 295,
+    "fail": 0,
+    "skip": 0,
+    "cancelled": 0
+  },
+  "package": {
+    "pass": 5
+  },
+  "browser": {
+    "total": 36,
+    "pass": 35,
+    "fail": 1,
+    "skip": 0,
+    "fileTimeout": 0,
+    "initialRows": [
+      {
+        "file": "list-tab-focus-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "all-nodes-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "contextual-ui-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "definition-pairs-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "font-proof-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "full-page-pixel-parity-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "inline-span-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "inline-span-html-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "layout-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "list-kind-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "managed-note-assets-browser.mjs",
+        "exitCode": 1
+      },
+      {
+        "file": "note-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "note-dom-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "note-editing-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "note-export-parity-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "note-image-chooser-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "note-image-dimensions-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "publication-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "recovery-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "section-commands-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "server-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "text-format-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-dom-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-full-document-editor-browser.mjs",
+        "exitCode": 1
+      },
+      {
+        "file": "upstream-full-document-roundtrip-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-full-document-visual-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-full-page-baseline-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-geometry-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-newthought-sidenote-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-same-content-epigraphs-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-same-content-figures-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-same-content-final-sections-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-same-content-fundamentals-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-same-content-getting-started-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-same-content-opening-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-same-content-sidenotes-browser.mjs",
+        "exitCode": 0
+      }
+    ],
+    "finalRows": [
+      {
+        "file": "list-tab-focus-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "all-nodes-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "contextual-ui-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "definition-pairs-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "font-proof-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "full-page-pixel-parity-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "inline-span-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "inline-span-html-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "layout-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "list-kind-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "managed-note-assets-browser.mjs",
+        "exitCode": 1
+      },
+      {
+        "file": "note-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "note-dom-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "note-editing-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "note-export-parity-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "note-image-chooser-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "note-image-dimensions-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "publication-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "recovery-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "section-commands-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "server-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "text-format-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-dom-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-full-document-editor-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-full-document-roundtrip-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-full-document-visual-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-full-page-baseline-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-geometry-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-newthought-sidenote-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-same-content-epigraphs-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-same-content-figures-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-same-content-final-sections-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-same-content-fundamentals-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-same-content-getting-started-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-same-content-opening-browser.mjs",
+        "exitCode": 0
+      },
+      {
+        "file": "upstream-same-content-sidenotes-browser.mjs",
+        "exitCode": 0
+      }
+    ],
+    "reruns": [
+      {
+        "file": "upstream-full-document-editor-browser.mjs",
+        "exitCode": 0,
+        "log": "upstream-editor-final.log"
+      },
+      {
+        "file": "list-tab-focus-browser.mjs",
+        "exitCode": 0,
+        "log": "tab-final.log"
+      }
+    ]
+  },
+  "officialPixels": [
+    {
+      "width": 375,
+      "mask": {
+        "x": 30,
+        "y": 12188.046875,
+        "width": 283.5,
+        "height": 202.1875
+      },
+      "dimensions": {
+        "upstream": [
+          375,
+          15247
+        ],
+        "published": [
+          375,
+          15247
+        ]
+      },
+      "dimensionsMatch": true,
+      "totalPixels": 5717625,
+      "maskedPixels": 56883,
+      "maskedMismatchPixels": 0,
+      "unmaskedMismatchPixels": 0,
+      "maxChannelDelta": 0,
+      "mismatchBounds": null,
+      "firstDifferences": []
+    },
+    {
+      "width": 759,
+      "mask": {
+        "x": 60.71875,
+        "y": 7897.890625,
+        "width": 573.78125,
+        "height": 383.609375
+      },
+      "dimensions": {
+        "upstream": [
+          759,
+          10948
+        ],
+        "published": [
+          759,
+          10948
+        ]
+      },
+      "dimensionsMatch": true,
+      "totalPixels": 8309532,
+      "maskedPixels": 219459,
+      "maskedMismatchPixels": 0,
+      "unmaskedMismatchPixels": 0,
+      "maxChannelDelta": 0,
+      "mismatchBounds": null,
+      "firstDifferences": []
+    },
+    {
+      "width": 760,
+      "mask": {
+        "x": 60.796875,
+        "y": 7898.8125,
+        "width": 574.546875,
+        "height": 384.09375
+      },
+      "dimensions": {
+        "upstream": [
+          760,
+          10950
+        ],
+        "published": [
+          760,
+          10950
+        ]
+      },
+      "dimensionsMatch": true,
+      "totalPixels": 8322000,
+      "maskedPixels": 219842,
+      "maskedMismatchPixels": 0,
+      "unmaskedMismatchPixels": 0,
+      "maxChannelDelta": 0,
+      "mismatchBounds": null,
+      "firstDifferences": []
+    },
+    {
+      "width": 761,
+      "mask": {
+        "x": 95.125,
+        "y": 10855.0625,
+        "width": 366.21875,
+        "height": 399.546875
+      },
+      "dimensions": {
+        "upstream": [
+          761,
+          14211
+        ],
+        "published": [
+          761,
+          14211
+        ]
+      },
+      "dimensionsMatch": true,
+      "totalPixels": 10814571,
+      "maskedPixels": 145270,
+      "maskedMismatchPixels": 0,
+      "unmaskedMismatchPixels": 0,
+      "maxChannelDelta": 0,
+      "mismatchBounds": null,
+      "firstDifferences": []
+    },
+    {
+      "width": 1024,
+      "mask": {
+        "x": 128,
+        "y": 9166.453125,
+        "width": 492.796875,
+        "height": 529
+      },
+      "dimensions": {
+        "upstream": [
+          1024,
+          12587
+        ],
+        "published": [
+          1024,
+          12587
+        ]
+      },
+      "dimensionsMatch": true,
+      "totalPixels": 12889088,
+      "maskedPixels": 259776,
+      "maskedMismatchPixels": 0,
+      "unmaskedMismatchPixels": 0,
+      "maxChannelDelta": 0,
+      "mismatchBounds": null,
+      "firstDifferences": []
+    },
+    {
+      "width": 1440,
+      "mask": {
+        "x": 180,
+        "y": 7842.96875,
+        "width": 693,
+        "height": 733.75
+      },
+      "dimensions": {
+        "upstream": [
+          1440,
+          11630
+        ],
+        "published": [
+          1440,
+          11630
+        ]
+      },
+      "dimensionsMatch": true,
+      "totalPixels": 16747200,
+      "maskedPixels": 507969,
+      "maskedMismatchPixels": 0,
+      "unmaskedMismatchPixels": 0,
+      "maxChannelDelta": 0,
+      "mismatchBounds": null,
+      "firstDifferences": []
+    }
+  ],
+  "python": {
+    "pass": 16,
+    "fail": 0,
+    "skip": 0,
+    "warnings": 1
+  },
+  "http": "pass",
+  "ci": "not-run-by-request",
+  "unresolved": [
+    "Deferred managed asset registration UI absent; its original test remains failing.",
+    "Exact resource behind initial navigation load delay not identified; editor readiness gate rerun passed.",
+    "Physical OS IME, screen readers and other browsers remain P6."
+  ],
+  "next": "P2.2.b.3",
+  "sourceHashes": [
+    {
+      "path": "packages/lexical/test/list-acceptance.test.mjs",
+      "sha256": "d0e2cf5b16d467e437c0b613988f599e1864abdc9d07ae271b947457ff21295e"
+    },
+    {
+      "path": "packages/lexical/test/tab-browser-harness.mjs",
+      "sha256": "c6b94ac1812104d5ceaa60f6c1d421810f81259fc98d6e11b36579280c385f31"
+    },
+    {
+      "path": "tests/list-tab-focus-browser.mjs",
+      "sha256": "b7080b0f91687ee8d909c1d897c9cbc1da2c8bfedfa39ae9a9650bde0c4cde59"
+    },
+    {
+      "path": "tests/upstream-full-document-editor-browser.mjs",
+      "sha256": "913fc4eb8d153a8ff580df0b78dfa42bc7c9c594f2d3623a739f702e03385d0c"
+    }
+  ],
+  "logs": [
+    {
+      "file": "all-nodes-browser.mjs.log",
+      "sha256": "85e730a38c4d22f1cbab86bc533121f9855751ca2b80b65560fc7527cd7b2c46"
+    },
+    {
+      "file": "audit-final.log",
+      "sha256": "0ec3aae31fa4611e4052641b9fd528554483ec3e295897a3de96b264f1e8c9da"
+    },
+    {
+      "file": "browser-install.log",
+      "sha256": "57074ada3ed3b5f0cd77ede0e82f2e391f683424f6645ad68796a81a58280a74"
+    },
+    {
+      "file": "check.log",
+      "sha256": "a74006f42d4180e82048821183fbf3206b09fc1c3c3e4e62dda9168dfa32f46c"
+    },
+    {
+      "file": "contextual-ui-browser.mjs.log",
+      "sha256": "acb046ad3909544ac14d647e186cee4964328326bdfe4578c0ae36a8a42b5cb7"
+    },
+    {
+      "file": "definition-pairs-browser.mjs.log",
+      "sha256": "dcbe607645e2be7795a46c293ae808b2ddbfdb655d426b860595e4adb5b21a22"
+    },
+    {
+      "file": "font-proof-browser.mjs.log",
+      "sha256": "9bdc915b36876721e126abe4c1cf9f3cb3ef2e48b85df874721fb8cac1a73885"
+    },
+    {
+      "file": "full-page-pixel-parity-browser.mjs.log",
+      "sha256": "97833aaf9e806e649fb45c3daa294444ed0906b8094d7e78d13aa0f801bee1b8"
+    },
+    {
+      "file": "http.log",
+      "sha256": "34ec031e9067e8b718f3ebfd97d72270893a0bace86b16fa302ecea8a64612a7"
+    },
+    {
+      "file": "inline-span-browser.mjs.log",
+      "sha256": "3e82a821e4d30db4e0394c41b6edcd3c45c6cd342945f4fdbd53aa7828e9465d"
+    },
+    {
+      "file": "inline-span-html-browser.mjs.log",
+      "sha256": "c2b97c4b792c48a808a76d86413f7626e0b6307166fb405ddf426a6d6ea2de78"
+    },
+    {
+      "file": "install.log",
+      "sha256": "0cbe66b879c00ebac2f8d3e75c4bbac2d2794fc4a3973f05af0bbc060ee505c7"
+    },
+    {
+      "file": "layout-browser.mjs.log",
+      "sha256": "bfe3fe2116b3ebaeb57ae2cd05ddc159cc4da26b77ca662d408075e64237fedc"
+    },
+    {
+      "file": "lint-final.log",
+      "sha256": "a87b4b6b3c58ebec78496a3263c5f809a8776135dfdbab2d82f47d6449068955"
+    },
+    {
+      "file": "list-kind-browser.mjs.log",
+      "sha256": "15c4c1c405ab871c7e0f9732e16ec7bb84ce4ad1c51833b1b4772b3aa97e13ed"
+    },
+    {
+      "file": "list-tab-focus-browser.mjs.log",
+      "sha256": "b3d073dd38f17793b93873704f5190cd6593ac0495ca957d8b2b9cd118e5863f"
+    },
+    {
+      "file": "managed-note-assets-browser.mjs.log",
+      "sha256": "73551277edf51c54d2ba7d0287db4fb7f3b63b5b0cfa40667ac353ed3b93842a"
+    },
+    {
+      "file": "note-browser.mjs.log",
+      "sha256": "ea308fc1f545bf643dc89b2a0190e29a067ed7cedca63ee7a3b66b6d2703ae54"
+    },
+    {
+      "file": "note-dom-browser.mjs.log",
+      "sha256": "b1e3d6c38aff1c5570195530692acf72a20f8e7eba9e20ab9a880b4221cc1c2b"
+    },
+    {
+      "file": "note-editing-browser.mjs.log",
+      "sha256": "7bbbe929d9ffcf9e137cbf3594577bc515d752629b7c8c2e044d26711bc4827b"
+    },
+    {
+      "file": "note-export-parity-browser.mjs.log",
+      "sha256": "1e68ffc10d91409d14879233c64e03965f5cc958499d782040fe5971a7317b1d"
+    },
+    {
+      "file": "note-image-chooser-browser.mjs.log",
+      "sha256": "fe35d72fb5bd3e67a55e0157d2dfffe940138db46795dbccc2e1bfaa424994f3"
+    },
+    {
+      "file": "note-image-dimensions-browser.mjs.log",
+      "sha256": "b4453e50271770e99ddc48d4f442e27c67b34ae6e1d6671f05b6d403d58d0b1f"
+    },
+    {
+      "file": "package.log",
+      "sha256": "0db51b0fca40e7709cbac5198c03d3431bf2fbb4fdd2acb4086f4faf428e8a73"
+    },
+    {
+      "file": "publication-browser.mjs.log",
+      "sha256": "5b37f55c5dedbaad42113d8a8fbfb6a1b14bcd152d93367d4b6af0844630f053"
+    },
+    {
+      "file": "python-install.log",
+      "sha256": "daa5461992fa87be9bbb3311af38dfda9f66f4dd3b9d284870f7ebdd5a02a2a0"
+    },
+    {
+      "file": "python.log",
+      "sha256": "55f6811b21a94b7da31b3a0a1146680bf64af86b9df4e10910809718328e3745"
+    },
+    {
+      "file": "recovery-browser.mjs.log",
+      "sha256": "8a7b9067c2149c25021b422d5865fe9d5c4d8855594394dde950d7fffceffd09"
+    },
+    {
+      "file": "section-commands-browser.mjs.log",
+      "sha256": "7390a1b6f861903338bc65574c727590a51222decaa33d6b14a8c73faf06e799"
+    },
+    {
+      "file": "server-browser.mjs.log",
+      "sha256": "32ed579cb7488fa866ea1b85063ac7ff2d7ff89e549268779758ae2383ae7772"
+    },
+    {
+      "file": "tab-final.log",
+      "sha256": "b3d073dd38f17793b93873704f5190cd6593ac0495ca957d8b2b9cd118e5863f"
+    },
+    {
+      "file": "test-complete.log",
+      "sha256": "493b5a40055f60249edef8dc2c17f074503047cacd748f6647ba5bd8cfbdcd43"
+    },
+    {
+      "file": "test-final.log",
+      "sha256": "e496ecbf069ae8e6ba4d63b35619f3e65029c0b0fc8f607efb1409ef1719a894"
+    },
+    {
+      "file": "text-format-browser.mjs.log",
+      "sha256": "2e8122698430c69772c62b70ed180fb8b1eae734836bfa964d3770cc4268af5a"
+    },
+    {
+      "file": "upstream-dom-browser.mjs.log",
+      "sha256": "f42c9b689143c776d0f325d1aa426f2c3f1f87b96d05c1a97635683733a3d071"
+    },
+    {
+      "file": "upstream-editor-final.log",
+      "sha256": "a577eb05499e38c136fc832ebe0c601f1c748137ec3a7b8006e2d371168b2683"
+    },
+    {
+      "file": "upstream-full-document-editor-browser.mjs.log",
+      "sha256": "e5d66826a730b20b862b7683f4f0b7c910a1295396afd558e63a1325d6c4e5b9"
+    },
+    {
+      "file": "upstream-full-document-roundtrip-browser.mjs.log",
+      "sha256": "e8dd0d52fbf7e0388446b5f42b108c06888ca7c15985f2e6d787430c3a16bb4c"
+    },
+    {
+      "file": "upstream-full-document-visual-browser.mjs.log",
+      "sha256": "6b0365da6d5fd56efc7bc4259a43ce70e297559b4ace2c1f15cbd0ef796c9304"
+    },
+    {
+      "file": "upstream-full-page-baseline-browser.mjs.log",
+      "sha256": "bd4eda65eff6993aec1df52b39cf0b266a240bc9c96fd3969eba28696a24e94d"
+    },
+    {
+      "file": "upstream-geometry-browser.mjs.log",
+      "sha256": "afbcf842b1c100f8f74968abe835bf159598a467ee5d3aff1a0ed1a03d74b726"
+    },
+    {
+      "file": "upstream-newthought-sidenote-browser.mjs.log",
+      "sha256": "02ac853f7789de63ff8329b25369c625c7aab0d81335f475243ab024838d9100"
+    },
+    {
+      "file": "upstream-same-content-epigraphs-browser.mjs.log",
+      "sha256": "9392144922f7b983c71de03768e5ed78cb7f9249960673f59c56cc67d42e74da"
+    },
+    {
+      "file": "upstream-same-content-figures-browser.mjs.log",
+      "sha256": "10e159b95d98382bda19e9bad6977208ee72f9c2590d2fc21cbd8e8c9733f65b"
+    },
+    {
+      "file": "upstream-same-content-final-sections-browser.mjs.log",
+      "sha256": "dde6932b05ce965e7483cae4c34729eaf5ab9926104015d898bcc4ec51b8ffd6"
+    },
+    {
+      "file": "upstream-same-content-fundamentals-browser.mjs.log",
+      "sha256": "8534ed7de271c6101f52419a71ba851f8b486d0b6da1683d9994a2f925a8c686"
+    },
+    {
+      "file": "upstream-same-content-getting-started-browser.mjs.log",
+      "sha256": "443c9a02c83e85b53ab54313eb7a995c4902f0630488aae22b1e5e8f1b7b24f9"
+    },
+    {
+      "file": "upstream-same-content-opening-browser.mjs.log",
+      "sha256": "ea45882015ab1712ab8e0b34c329649f818355e8ba644cb65c7a6e8d7de81779"
+    },
+    {
+      "file": "upstream-same-content-sidenotes-browser.mjs.log",
+      "sha256": "dce51c3af4be98f1b660261a57ee354078c76b7cc07941dd50fa9b0c4a3df318"
+    }
+  ],
+  "logDirectory": "/workspace/scratch/484e46557938/lexical-tufte-k5-20261031"
+}

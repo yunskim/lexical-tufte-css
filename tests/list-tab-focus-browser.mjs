@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {spawn} from 'node:child_process';
 import {setTimeout} from 'node:timers/promises';
 import {chromium} from 'playwright';
+import {renderArticle} from '../packages/render/dist/index.js';
 const url='http://127.0.0.1:5184/';
 const server=spawn(process.execPath,['node_modules/vite/bin/vite.js','--host','127.0.0.1','--port','5184','--strictPort','--force','--config','../../tests/vite-publication.config.mjs'],{cwd:'examples/editor',stdio:'ignore'});
 let browser;
@@ -39,6 +40,14 @@ try{
    await page.locator('#tab-before').focus();await page.keyboard.press('Tab');
    assert.equal(await page.evaluate(()=>document.activeElement.id),'tab-editor');
    assert.deepEqual(await read(),restored,'A toolbar/button Tab must not indent');
+   const reopened=await page.evaluate(async path=>(await import(path)).reopenTabFixture(),path);
+   assert.deepEqual(reopened,restored.state,'Deep nested list JSON must survive save/reopen');
+   assert.deepEqual((await read()).state,reopened,'DOM reconciliation after reopen must preserve canonical JSON');
+   const doc=state=>({schemaVersion:1,id:'deep-list',locale:'ko-KR',title:'목록 통합',assets:[],lexicalState:state});
+   const published=renderArticle(doc(restored.state)),republished=renderArticle(doc(reopened));
+   assert.equal(published.ok,true,JSON.stringify(published.diagnostics));
+   assert.deepEqual(republished,published,'Reopened deep list must publish identical HTML');
+   assert.match(published.html,/Annotation/);assert.match(published.html,/tab-note/);
   }
   assert.deepEqual(errors,[]);await page.close();
   console.log(`K4 ${width}px: ul/ol depth19/20, reject focus, payload and external button navigation PASS`);
