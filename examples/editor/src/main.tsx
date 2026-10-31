@@ -1,5 +1,5 @@
 import type {AssetProvider,AssetSummary,AssetRevision} from '@lexical-tufte/editor-ports';
-import {validateDocument, type TufteDocument} from '@lexical-tufte/document';
+import {validateDocument,isSafeURL, type TufteDocument} from '@lexical-tufte/document';
 import {useEffect, useRef, useState, type MouseEvent} from 'react';
 import {createRoot} from 'react-dom/client';
 import {LexicalComposer} from '@lexical/react/LexicalComposer';
@@ -344,6 +344,38 @@ function EditorUI(){
   const [hostRevisions,setHostRevisions]=useState<AssetRevision[]>([]);
   const [hostAssetId,setHostAssetId]=useState<string|null>(null);
   const [hostRevisionId,setHostRevisionId]=useState<string|null>(null);
+  const [hostResolving,setHostResolving]=useState(false);
+  const hostResolveGeneration=useRef(0);
+  async function connectHostAsset(){
+    const provider=hostAssets.current;
+    const target=assetTargetKey;
+    const id=hostAssetId;
+    if(!provider||!target||!id||hostResolving)return;
+    const generation=++hostResolveGeneration.current;
+    setHostResolving(true);setHostError('');
+    try{
+      const resolved=await provider.resolve({assetId:id,...(hostRevisionId?{revisionId:hostRevisionId}:{})});
+      if(generation!==hostResolveGeneration.current)return;
+      if(!resolved||resolved.assetId!==id||!resolved.mediaType.startsWith('image/')||
+        !isSafeURL(resolved.url,'image')||(hostRevisionId&&resolved.revisionId!==hostRevisionId)){
+        setHostError('외부 자산 URL 또는 버전이 유효하지 않습니다.');return;
+      }
+      let valid=false;
+      editor.getEditorState().read(()=>{
+        const node=$getNodeByKey(target);
+        valid=node instanceof InlineImageNode&&containingNote(node)!==null;
+      });
+      if(!valid){setHostError('연결 대상 이미지가 변경되었습니다.');return;}
+      editor.update(()=>{
+        const node=$getNodeByKey(target);
+        if(node instanceof InlineImageNode&&containingNote(node))
+          node.setHostAsset({namespace:'host',assetId:id,...(hostRevisionId?{revisionId:resolved.revisionId}:{})},resolved.url,assetAlt);
+      },{tag:HISTORY_PUSH_TAG,discrete:true});
+      setStatus('외부 이미지 자산을 연결했습니다.');
+      closeAssetChooser();
+    }catch{if(generation===hostResolveGeneration.current)setHostError('외부 자산 URL 해석에 실패했습니다.');}
+    finally{if(generation===hostResolveGeneration.current)setHostResolving(false);}
+  }
   const [hostLoading,setHostLoading]=useState(false);
   const [hostError,setHostError]=useState('');
   useEffect(()=>{
@@ -418,6 +450,7 @@ function EditorUI(){
   const matchingAssets=documentAssets.filter(asset=>
     (asset.id+' '+asset.mimeType+' '+asset.src).toLocaleLowerCase().includes(assetQuery.toLocaleLowerCase()));
   function closeAssetChooser(){
+    hostResolveGeneration.current++;
     setAssetChooserOpen(false);setAssetChoice(null);setAssetTargetKey(null);setAssetAlt('');
     queueMicrotask(()=>assetChooserTrigger.current?.focus());
   }
@@ -998,6 +1031,8 @@ function EditorUI(){
             </select>
           </label>}
         </section>}
+        {hostAssets.current&&<button type="button" disabled={!hostAssetId||!assetTargetKey||hostResolving}
+          onClick={()=>void connectHostAsset()}>{hostResolving?'외부 이미지 확인 중…':'선택한 외부 이미지 연결'}</button>}
         <button type="button" onClick={closeAssetChooser}>취소</button>
         <button type="button" disabled={!assetChoice||!assetTargetKey} onClick={connectChosenAsset}>선택한 이미지 연결</button>
       </div>
