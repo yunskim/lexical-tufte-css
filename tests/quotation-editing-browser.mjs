@@ -116,12 +116,12 @@ try{
   assert.deepEqual(await snapshot(),focusMoved);
   await lastSection().locator('.epigraph > blockquote').first().click();
   await keyboardAction('Epigraph 항목 아래로','Enter');
-  assert.deepEqual(await snapshot(),appended);
-  // The quote selected for a move must remain the active edit target.
+  // Type before opening the JSON inspector: snapshot() moves DOM focus to its button.
   await page.keyboard.insertText(' Focus retained');
   assert.match(await lastSection().locator('.epigraph > blockquote').last().innerText(),/Focus retained/);
   const focusEdited=await snapshot();
   assert.match(JSON.stringify(focusEdited),/Focus retained/);
+  assert.equal(focusEdited.root.children[0].type,appended.root.children[0].type);
   // Boundary actions must not mutate the canonical document.
   await lastSection().locator('.epigraph > blockquote').first().click();
   const boundaryBefore=await snapshot();
