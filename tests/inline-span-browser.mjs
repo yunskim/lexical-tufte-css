@@ -85,7 +85,7 @@ try{
   await action(buttonName).click();
   const changed=await snapshot();
   assert.notDeepEqual(changed,baseline,buttonName+' must modify representative JSON');
-  assert.ok(collect(changed.root).some(node=>node.type===nodeType||nodeType==='quote'&&node.type==='tufte-quote'),buttonName+' must insert its semantic node');
+  assert.ok(collect(changed.root).some(node=>node.type===nodeType||(nodeType==='quote'&&node.type==='tufte-quote')),buttonName+' must insert its semantic node');
   const beforeHTML=renderArticle({...representative,lexicalState:baseline});
   const changedHTML=renderArticle({...representative,lexicalState:changed});
   assert.equal(beforeHTML.ok,true,JSON.stringify(beforeHTML.diagnostics));
@@ -214,7 +214,7 @@ try{
   const changedHTML=publish(changed);
   assert.notEqual(changedHTML,baselineHTML,buttonName+' must change published HTML');
   assert.notDeepEqual(changed,baseline,buttonName+' must change canonical editor JSON');
-  assert.ok(collect(changed.root).some(node=>node.type===nodeType||nodeType==='quote'&&node.type==='tufte-quote'),buttonName+' must create a semantic node');
+  assert.ok(collect(changed.root).some(node=>node.type===nodeType||(nodeType==='quote'&&node.type==='tufte-quote')),buttonName+' must create a semantic node');
   await page.getByRole('button',{name:'실행 취소',exact:true}).click();
   assert.deepEqual(await snapshot(),baseline,buttonName+' undo must restore JSON');
   assert.equal(publish(await snapshot()),baselineHTML,buttonName+' undo must restore published HTML');
