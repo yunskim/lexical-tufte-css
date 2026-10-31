@@ -47,7 +47,7 @@ try{
       }
     };
   });
-  await page.clock.install();
+  await page.clock.install({time:new Date('2026-10-31T12:00:00.000Z')});
   await page.goto(url);
   const editor=page.getByRole('textbox',{name:'본문과 사이드노트 편집'});
   const button=name=>page.getByRole('button',{name,exact:true});
