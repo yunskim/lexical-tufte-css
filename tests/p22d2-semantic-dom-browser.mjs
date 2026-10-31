@@ -146,18 +146,17 @@ try{
  assert.equal(enrichedAfter.ok,true,JSON.stringify(enrichedAfter.diagnostics));
  assert.deepEqual(enrichedAfter.value.lexicalState,enrichedSaved.value.lexicalState,'list and quotation canonical state must survive reopen');
 
- const sectionNodes=state=>state.root.children[0].children;
- const getList=state=>sectionNodes(state).find(node=>node.type==='list'&&node.listType==='number');
- const getQuote=state=>sectionNodes(state).find(node=>node.type==='quote');
- for(const [stage,state] of [['saved',enrichedSaved.value.lexicalState],['reopened',enrichedAfter.value.lexicalState]]){
-  const list=getList(state),quote=getQuote(state);
-  assert.ok(list,stage+' must retain ordered list');
-  assert.equal(list.tag,'ol',stage+' list tag');
-  assert.equal(list.start,3,stage+' list start');
-  assert.equal(list.children[0]?.value,3,stage+' item value');
-  assert.ok(quote,stage+' must retain quotation');
-  assert.equal(quote.cite,'https://example.org/source',stage+' quotation cite');
- }
+ // Assert the first actual Lexical export against the input contract. The
+ // reopened export is compared to this complete canonical state above.
+ const savedNodes=enrichedSaved.value.lexicalState.root.children[0].children;
+ const savedList=savedNodes.find(node=>node.type==='list'&&node.listType==='number');
+ const savedQuote=savedNodes.find(node=>node.type==='quote');
+ assert.ok(savedList,'Lexical export must retain the ordered list');
+ assert.equal(savedList.tag,'ol');
+ assert.equal(savedList.start,3);
+ assert.equal(savedList.children[0]?.value,3);
+ assert.ok(savedQuote,'Lexical export must retain the quotation');
+ assert.equal(savedQuote.cite,'https://example.org/source');
 
  const enrichedPublished=renderArticle(enriched);
  assert.equal(enrichedPublished.ok,true,JSON.stringify(enrichedPublished.diagnostics));
