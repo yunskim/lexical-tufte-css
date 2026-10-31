@@ -130,6 +130,21 @@ try{
   assert.equal(await page.evaluate(()=>window.__hostCalls.resolve.length),afterManualRecovery,
     'Successful manual refresh cancels the stale retry');
 
+  // An expiry refresh must survive an independently scheduled failed-request retry.
+  await page.evaluate(()=>{window.__hostExpiryMs=120_000;});
+  await button('외부 이미지 URL 다시 확인').click();
+  await page.getByRole('status',{name:'편집 작업 상태'}).getByText(/갱신: 1\/1개/).waitFor();
+  await page.evaluate(()=>{window.__hostMode='invalid';});
+  await button('외부 이미지 URL 다시 확인').click();
+  await page.getByRole('status',{name:'편집 작업 상태'}).getByText(/재시도 예약/).waitFor();
+  const beforeConcurrentRetry=await page.evaluate(()=>window.__hostCalls.resolve.length);
+  await page.clock.runFor(5000);
+  await page.waitForFunction(count=>window.__hostCalls.resolve.length>count,beforeConcurrentRetry);
+  await page.evaluate(()=>{window.__hostMode='normal';window.__hostExpiryMs=3600_000;});
+  const beforeConcurrentExpiry=await page.evaluate(()=>window.__hostCalls.resolve.length);
+  await page.clock.runFor(55_000);
+  await page.waitForFunction(count=>window.__hostCalls.resolve.length>count,beforeConcurrentExpiry);
+
   // Returning to a visible tab after the 60-second cooldown rechecks URLs.
   const beforeResume=await page.evaluate(()=>window.__hostCalls.resolve.length);
   await page.clock.runFor(60_001);
