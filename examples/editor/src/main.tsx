@@ -367,6 +367,33 @@ function EditorUI(){
   }
   const expiryRefreshDeadline=useRef<number|null>(null);
   useEffect(()=>()=>{if(expiryRefreshTimer.current!==null)clearTimeout(expiryRefreshTimer.current);},[]);
+  const refreshFailures=useRef(0);
+  const lastHostRefresh=useRef(0);
+  function scheduleRefreshRetry(){
+    refreshFailures.current=Math.min(refreshFailures.current+1,6);
+    const delay=Math.min(300_000,5000*2**(refreshFailures.current-1));
+    const deadline=Date.now()+delay;
+    if(expiryRefreshDeadline.current!==null&&expiryRefreshDeadline.current<=deadline)return;
+    if(expiryRefreshTimer.current!==null)clearTimeout(expiryRefreshTimer.current);
+    expiryRefreshDeadline.current=deadline;
+    expiryRefreshTimer.current=setTimeout(()=>{
+      expiryRefreshTimer.current=null;expiryRefreshDeadline.current=null;
+      void refreshHostAssetURLs();
+    },delay);
+  }
+  useEffect(()=>{
+    if(!hostAssets.current||!hostNamespaceValid)return;
+    const onResume=()=>{
+      if(document.visibilityState==='visible'&&Date.now()-lastHostRefresh.current>60_000)
+        void refreshHostAssetURLs();
+    };
+    document.addEventListener('visibilitychange',onResume);
+    window.addEventListener('pageshow',onResume);
+    return()=>{
+      document.removeEventListener('visibilitychange',onResume);
+      window.removeEventListener('pageshow',onResume);
+    };
+  },[editor]);
   const refreshGeneration=useRef(0);
   const restoreRefreshGeneration=useRef(0);
   function scheduleHostRefresh(){
@@ -386,6 +413,7 @@ function EditorUI(){
       setStatus('외부 이미지 갱신을 위한 호스트 설정이 없습니다.');return;
     }
     const generation=++refreshGeneration.current;
+    lastHostRefresh.current=Date.now();
     const images:Array<{key:string;assetId:string;revisionId?:string}>=[];
     editor.getEditorState().read(()=>{
       const scan=(node:LexicalNode):void=>{
@@ -401,6 +429,7 @@ function EditorUI(){
     if(images.length===0){setStatus('갱신할 외부 이미지가 없습니다.');return;}
     setRefreshingHostAssets(true);
     let refreshed=0;
+    let failed=0;
     try{
       for(const image of images){
         const resolved=await provider.resolve({assetId:image.assetId,
@@ -408,7 +437,7 @@ function EditorUI(){
         if(generation!==refreshGeneration.current)return;
         if(!resolved||resolved.assetId!==image.assetId||
           (image.revisionId&&resolved.revisionId!==image.revisionId)||
-          !resolved.mediaType.startsWith('image/')||!isSafeURL(resolved.url,'image'))continue;
+          !resolved.mediaType.startsWith('image/')||!isSafeURL(resolved.url,'image')){failed++;continue;}
         editor.update(()=>{
           const node=$getNodeByKey(image.key);
           if(!(node instanceof InlineImageNode))return;
@@ -421,8 +450,9 @@ function EditorUI(){
         },{tag:HISTORY_PUSH_TAG,discrete:true});
         scheduleExpiryRefresh(resolved.expiresAt);
       }
-      setStatus('외부 이미지 URL 갱신: '+refreshed+'/'+images.length+'개.');
-    }catch{if(generation===refreshGeneration.current)setStatus('외부 이미지 URL 갱신 중 오류가 발생했습니다.');}
+      if(failed){scheduleRefreshRetry();}else{refreshFailures.current=0;}
+      setStatus('외부 이미지 URL 갱신: '+refreshed+'/'+images.length+'개.'+(failed?' 실패 '+failed+'개, 재시도 예약.':''));
+    }catch{if(generation===refreshGeneration.current){scheduleRefreshRetry();setStatus('외부 이미지 URL 갱신 중 오류가 발생했습니다. 재시도합니다.');}}
     finally{if(generation===refreshGeneration.current)setRefreshingHostAssets(false);}
   }
 
