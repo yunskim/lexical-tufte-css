@@ -103,7 +103,7 @@ try{
   if(nodeType==='tufte-sidenote'){
    const beforeIds=new Set(collect(baseline.root).filter(node=>node.type==='tufte-sidenote').map(node=>node.noteId));
    const afterIds=collect(changed.root).filter(node=>node.type==='tufte-sidenote').map(node=>node.noteId);
-   assert.ok(afterIds.some(id=>id!==undefined&&!beforeIds.has(id)),'toolbar must generate a fresh sidenote identifier');
+   assert.ok(afterIds.some(id=>typeof id==='string'&&id.length>0&&!beforeIds.has(id)),'toolbar must generate a fresh nonempty sidenote identifier');
   }
   const matchingNodes=state=>collect(state.root).filter(node=>node.type===nodeType||(nodeType==='quote'&&node.type==='tufte-quote'));
   if(nodeType==='tufte-sidenote')
