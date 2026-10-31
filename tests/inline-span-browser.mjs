@@ -88,6 +88,11 @@ try{
   // Restore the insertion caret immediately before dispatching the command.
   await paragraph.click();
   await page.keyboard.press('End');
+  assert.equal(await page.evaluate(()=>{
+   const selection=window.getSelection();
+   const anchor=selection?.anchorNode;
+   return Boolean(selection?.rangeCount===1&&selection.isCollapsed&&anchor&&document.querySelector('.editor')?.contains(anchor));
+  }),true,buttonName+' requires a collapsed caret inside the editor before toolbar dispatch');
   await action(buttonName).click();
   const changed=await snapshot();
   assert.notDeepEqual(changed,baseline,buttonName+' must modify representative JSON');
