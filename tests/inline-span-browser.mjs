@@ -190,6 +190,8 @@ try{
   assert.deepEqual(await snapshot(),changed,buttonName+' redo must restore JSON');
   assert.equal(publish(await snapshot()),changedHTML,buttonName+' redo must restore published HTML');
   await page.getByRole('button',{name:'실행 취소',exact:true}).click();
+  assert.deepEqual(await snapshot(),baseline,buttonName+' cleanup undo must restore baseline before next command');
+  assert.equal(publish(await snapshot()),baselineHTML,buttonName+' cleanup undo must restore baseline publication');
  }
  // Note insertion uses the real editor toolbar and generates a fresh ID.
  await focusInsertionPoint();
