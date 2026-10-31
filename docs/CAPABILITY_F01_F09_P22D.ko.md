@@ -41,6 +41,35 @@
 
 root presentation을 설정한 schema-valid 문서를 renderer가 성공으로 반환하고 속성을 버렸다. 새4개 회귀의 최초 실패로 재현했다. root.direction/root.format이 nondefault일 때 UNSUPPORTED_RENDER_PROPERTY와 정확한 `$.lexicalState.root.*` 위치, html:null을 반환하게 했다. 기본값 성공1개와 editor canonical 저장 보존1개를 추가했다. 저장 schema를 축소하거나 값을 지우지 않았다.
 
+## NODE_SCHEMA 기반 F01–F09 필드 전수 목록 (정적 대조, 실행 전)
+
+`packages/document/src/schema.ts`의 F01–F09 관련 타입 19개를 기준으로 **고유 필드 전부**를 아래와 같이 펼쳤다. 기존 노드별 표는 요약이고 이 표는 필드 누락 검토용이다. 타입/필드가 추가되면 동기화해야 한다.
+
+| 타입 | 스키마 고유 필드 | 별도 검증해야 할 경계 |
+| --- | --- | --- |
+| root | 없음 | direction/format 비기본 거부 |
+| tufte-section | 없음 | section 순서와 공통 속성 |
+| paragraph | tufteClass | sans 값·미지원 값 거부 |
+| heading | tag, id | h2/h3·id 검증 |
+| text | text, format, detail, mode, style | 서식 bit·직렬화 캐시·style 제한 |
+| linebreak | 없음 | br 및 부모 허용 |
+| tufte-span | kind | sans/newthought/numeral/danger |
+| list | listType, tag, start | ol/ul 조합, start 기본/비기본 |
+| listitem | value, checked | ol.value, ul.value, checked 거부 |
+| tufte-definition-list | 없음 | dt/dd 짝과 순서 |
+| tufte-term | 없음 | phrasing 자식 |
+| tufte-definition | 없음 | paragraph/list 자식 |
+| horizontalrule | 없음 | 공통 element 속성 비허용 |
+| quote | cite | URL·attribution·노트 자식 |
+| tufte-epigraph | 없음 | quote 자식만 허용 |
+| tufte-attribution | 없음 | footer/cite 자식 |
+| tufte-cite | 없음 | 문헌 이름과 inline 자식 |
+| tufte-section-footer | 없음 | footer/cite 자식 |
+| link | url, target, rel, title | F03 링크·안전 URL·속성 보존 |
+| host-link | reference | 호스트 참조 해석 실패/발행 차단 |
+
+`link`와 `host-link`는 앞선 첫18타입 요약에서 빠져 있던 **F03 인라인 링크 타입**이다. 둘 다 공통 element 필드가 적용되는지, renderer에서 실제 출력되는지, 호스트 참조 미해결 때 진단하는지는 구현·fixture별로 확인해야 한다. 이 목록은 NODE_SCHEMA를 읽은 결과이며 **각 필드의 편집·발행 동작이 검증되었다는 뜻은 아니다.**
+
 ## 남은 체크리스트
 
 - [ ] ul의 start, li.value 및 모든 공통 속성의 의미/정규화/거부 정책을 대조하고 비기본 fixture 추가.
