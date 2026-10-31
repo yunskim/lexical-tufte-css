@@ -436,7 +436,7 @@ function EditorUI(){
       scan($getRoot());
     });
     const pending=retryOnly?images.filter(image=>failedHostKeys.current.has(image.key)):images;
-    if(pending.length===0){failedHostKeys.current.clear();refreshFailures.current=0;setStatus('갱신할 외부 이미지가 없습니다.');return;}
+    if(pending.length===0){failedHostKeys.current.clear();refreshFailures.current=0;setRefreshingHostAssets(false);setStatus('갱신할 외부 이미지가 없습니다.');return;}
     setRefreshingHostAssets(true);
     let refreshed=0;
     let failed=0;
@@ -469,6 +469,7 @@ function EditorUI(){
         },{tag:HISTORY_PUSH_TAG,discrete:true});
         scheduleExpiryRefresh(resolved.expiresAt);
       }
+      if(generation!==refreshGeneration.current)return;
       if(failed){scheduleRefreshRetry();}else{refreshFailures.current=0;clearRetryRefresh();}
       setStatus('외부 이미지 URL 갱신: '+refreshed+'/'+pending.length+'개.'+(failed?' 실패 '+failed+'개, 재시도 예약.':''));
     }catch{if(generation===refreshGeneration.current){scheduleRefreshRetry();setStatus('외부 이미지 URL 갱신 중 오류가 발생했습니다. 재시도합니다.');}}
