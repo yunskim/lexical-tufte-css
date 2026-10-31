@@ -15,7 +15,16 @@ export function validateRenderProfile(doc:TufteDocument):Diagnostic[]{
    if(n.indent&&!(n.type==='listitem'&&n.indent===listDepth-1))add('indent','Indent output is deferred or inconsistent with list nesting');
    for(const [i,child]of n.children.entries())visit(child,`${path}.children[${i}]`,listDepth+(n.type==='list'?1:0));
   }
-  // A bullet list has no HTML numbering semantics; li.value would be silently lost.\n  if(n.type==='list')for(const [i,item] of n.children.entries())if(item.type==='listitem'&&n.tag==='ul'&&item.value!==1&&diagnostics.length<100)diagnostics.push({code:'UNSUPPORTED_RENDER_PROPERTY',path:`${path}.children[${i}].value`,message:'Unordered list item value cannot be represented in HTML publication'});\n  if(n.type==='tufte-code'&&n.language!==undefined&&n.language!==null)add('language','Code language metadata is not yet published');
+  // HTML does not represent unordered list numbering or per-item values.
+  if(n.type==='list'){
+   if(n.tag==='ul'&&n.start!==1)add('start','Unordered list start cannot be represented in HTML publication');
+   for(const [i,item] of n.children.entries()){
+    if(item.type==='listitem'&&n.tag==='ul'&&item.value!==1&&diagnostics.length<100){
+     diagnostics.push({code:'UNSUPPORTED_RENDER_PROPERTY',path:`${path}.children[${i}].value`,message:'Unordered list item value cannot be represented in HTML publication'});
+    }
+   }
+  }
+  if(n.type==='tufte-code'&&n.language!==undefined&&n.language!==null)add('language','Code language metadata is not yet published');
   if(n.type==='code-highlight')add('highlightType','Code syntax highlighting is not yet published');
   if(n.type==='tufte-table-layout'&&n.layout!=='scroll'&&(n.format||n.direction))add('','Unwrapped layout attributes must be defaults');
   if(n.type==='tufte-inline-image')for(const key of ['assetId','width','height'] as const)if(n[key]!==undefined)add(key,'Managed/sized image output is deferred');
