@@ -335,6 +335,33 @@ function EditorUI(){
   const [noteImages,setNoteImages]=useState<NoteImageChoice[]>([]);
   // Local document catalog. External AssetProvider remains read-only.
   const [documentAssets,setDocumentAssets]=useState<Array<{id:string;src:string;mimeType:string;width?:number;height?:number}>>([]);
+  const [assetChooserOpen,setAssetChooserOpen]=useState(false);
+  const [assetQuery,setAssetQuery]=useState('');
+  const [assetChoice,setAssetChoice]=useState<string|null>(null);
+  const assetChooserTrigger=useRef<HTMLButtonElement>(null);
+  const assetChooserDialog=useRef<HTMLDivElement>(null);
+  const assetSearchRef=useRef<HTMLInputElement>(null);
+  const matchingAssets=documentAssets.filter(asset=>
+    (asset.id+' '+asset.mimeType+' '+asset.src).toLocaleLowerCase().includes(assetQuery.toLocaleLowerCase()));
+  function closeAssetChooser(){
+    setAssetChooserOpen(false);setAssetChoice(null);
+    queueMicrotask(()=>assetChooserTrigger.current?.focus());
+  }
+  useEffect(()=>{
+    if(!assetChooserOpen)return;
+    assetSearchRef.current?.focus();
+    const onKey=(event:KeyboardEvent)=>{
+      if(event.key==='Escape'){event.preventDefault();closeAssetChooser();return;}
+      if(event.key!=='Tab')return;
+      const nodes=Array.from(assetChooserDialog.current?.querySelectorAll<HTMLElement>('button:not([disabled]),input:not([disabled])')??[]);
+      if(!nodes.length)return;
+      const first=nodes[0],last=nodes[nodes.length-1];
+      if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+      else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+    };
+    document.addEventListener('keydown',onKey);
+    return()=>document.removeEventListener('keydown',onKey);
+  },[assetChooserOpen]);
   const documentAssetsRef=useRef(documentAssets);
   documentAssetsRef.current=documentAssets;
 
@@ -861,8 +888,27 @@ function EditorUI(){
     </main>
     <p role="status" aria-label="편집 작업 상태">{status}</p><p role="status" aria-label="자동 복구 저장 상태">{autoSaveState}</p>
     {structureIssues.length>0&&<aside role="alert" aria-label="문서 구조 복구"><p>문서 구조를 수정하세요. 내용은 자동 삭제하지 않으며 HTML 생성은 차단됩니다.</p><ul>{structureIssues.map((issue,i)=><li key={`${issue.key}-${i}`}><button onClick={()=>focusStructureIssue(editor,issue.key)}>{issue.message}</button> <code>{issue.path}</code></li>)}</ul><button onClick={()=>editor.dispatchCommand(UNDO_COMMAND,undefined)}>구조 변경 실행 취소</button><button onClick={recoverStructure} disabled={!checkpoint.current}>마지막 정상 구조로 복구</button></aside>}
+    {assetChooserOpen&&<div role="presentation" className="asset-chooser-backdrop">
+      <div ref={assetChooserDialog} role="dialog" aria-modal="true" aria-label="문서 이미지 선택" className="asset-chooser">
+        <h2>문서 이미지 선택</h2>
+        <label>이미지 검색 <input ref={assetSearchRef} type="search" value={assetQuery} onChange={event=>{setAssetQuery(event.target.value);setAssetChoice(null);}}/></label>
+        <p aria-live="polite">검색 결과 {matchingAssets.length}개</p>
+        <ul>{matchingAssets.map(asset=><li key={asset.id}>
+          <label><input type="radio" name="document-asset-choice" checked={assetChoice===asset.id} onChange={()=>setAssetChoice(asset.id)}/>
+          <img src={asset.src} alt="" width="72" height="54" loading="lazy"/>
+          {asset.id} · {asset.mimeType} · {asset.width??'?'}×{asset.height??'?'}</label>
+        </li>)}</ul>
+        <button type="button" onClick={closeAssetChooser}>취소</button>
+        <button type="button" disabled={!assetChoice} onClick={()=>{
+          const chosen=documentAssets.find(asset=>asset.id===assetChoice);
+          if(!chosen)return;
+          connectDocumentAsset(chosen);closeAssetChooser();
+        }}>선택한 이미지 연결</button>
+      </div>
+    </div>}
     <section role="group" aria-label="문서 이미지 자산">
       <button type="button" onClick={registerDocumentImage}>문서 이미지 자산 등록</button>
+      <button ref={assetChooserTrigger} type="button" onClick={()=>{setAssetQuery('');setAssetChoice(null);setAssetChooserOpen(true);}}>이미지 라이브러리에서 선택</button>
       <p>문서 자산 {documentAssets.length}개</p>
       <ul>{documentAssets.map(asset=><li key={asset.id}>{asset.id} · {asset.mimeType} · {asset.width??'?'}×{asset.height??'?'} <button type="button" onClick={()=>connectDocumentAsset(asset)}>선택한 노트 이미지에 {asset.id} 연결</button></li>)}</ul>
     </section>
