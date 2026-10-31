@@ -92,6 +92,28 @@ try{
   return document;
  };
  const enriched=makeEnrichedFixture(saved.value);
+ // Check the constructed fixture before loading it: these are the wire-level
+ // fields required by the list/quote regression, not renderer defaults.
+ const enrichedList=enriched.lexicalState.root.children[0].children.find(node=>node.type==='list');
+ const enrichedQuote=enriched.lexicalState.root.children[0].children.find(node=>node.type==='quote');
+ assert.equal(enrichedList?.version,1);
+ assert.equal(enrichedList?.listType,'number');
+ assert.equal(enrichedList?.tag,'ol');
+ assert.equal(enrichedList?.start,3);
+ assert.equal(enrichedList?.children?.[0]?.type,'listitem');
+ assert.equal(enrichedList?.children?.[0]?.version,1);
+ assert.equal(enrichedList?.children?.[0]?.value,3);
+ assert.equal(enrichedQuote?.version,1);
+ assert.equal(enrichedQuote?.cite,'https://example.org/source');
+ assert.equal(enrichedQuote?.children?.[0]?.type,'text','quote children must be inline nodes, not paragraphs');
+ for(const textNode of [enrichedList.children[0].children[0],enrichedQuote.children[0]]){
+  assert.equal(textNode.version,1);
+  assert.equal(textNode.format,0);
+  assert.equal(textNode.detail,0);
+  assert.equal(textNode.mode,'normal');
+  assert.equal(textNode.style,'');
+ }
+
  // Invalid schema must fail closed rather than silently dropping unsupported nodes.
  const invalid=JSON.parse(JSON.stringify(enriched));
  invalid.lexicalState.root.children[0].children.push({type:'future-unsupported-block',version:1,children:[]});
