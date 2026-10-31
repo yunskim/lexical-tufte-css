@@ -156,6 +156,20 @@ try{
  assert.deepEqual(await snapshot(),wrapped,'Undo must restore original wrapper');
  await page.getByRole('button',{name:'다시 실행',exact:true}).click();
  assert.deepEqual(await snapshot(),unwrapped,'Redo must remove wrapper again');
+ // Exercise real toolbar commands and History rather than direct node edits.
+ for(const [buttonName,nodeType] of [['번호 목록 삽입','list'],['인용문 삽입','quote']]){
+  await editor.locator('section').last().click();
+  const baseline=await snapshot();
+  await action(buttonName).click();
+  const changed=await snapshot();
+  assert.notDeepEqual(changed,baseline,buttonName+' must change canonical editor JSON');
+  assert.ok(collect(changed.root).some(node=>node.type===nodeType||nodeType==='quote'&&node.type==='tufte-quote'),buttonName+' must create a semantic node');
+  await page.getByRole('button',{name:'실행 취소',exact:true}).click();
+  assert.deepEqual(await snapshot(),baseline,buttonName+' undo must restore JSON');
+  await page.getByRole('button',{name:'다시 실행',exact:true}).click();
+  assert.deepEqual(await snapshot(),changed,buttonName+' redo must restore JSON');
+  await page.getByRole('button',{name:'실행 취소',exact:true}).click();
+ }
  assert.deepEqual(errors,[]);
  console.log(`P2.2.b.1 ${width}px: real selection, wrap/unwrap undo/redo, save/reopen and composition cancellation/guard PASS.`);
  await page.close();
