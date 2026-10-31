@@ -335,6 +335,9 @@ function EditorUI(){
   const [noteImages,setNoteImages]=useState<NoteImageChoice[]>([]);
   // Local document catalog. External AssetProvider remains read-only.
   const [documentAssets,setDocumentAssets]=useState<Array<{id:string;src:string;mimeType:string;width?:number;height?:number}>>([]);
+  const documentAssetsRef=useRef(documentAssets);
+  documentAssetsRef.current=documentAssets;
+
   function connectDocumentAsset(asset:{id:string;src:string;width?:number;height?:number}){
     let imageKey:string|null=null;
     editor.getEditorState().read(()=>{
@@ -441,7 +444,7 @@ function EditorUI(){
       if(pending!==undefined){clearTimeout(pending);pending=undefined;}
       if(latest===null)return;
       try{
-        localStorage.setItem(sessionKey,JSON.stringify({savedAt:new Date().toISOString(),state:exportCanonicalEditorState(latest)}));
+        localStorage.setItem(sessionKey,JSON.stringify({savedAt:new Date().toISOString(),state:exportCanonicalEditorState(latest),assets:documentAssetsRef.current}));
         latest=null;refresh();setAutoSaveState('이 탭의 편집 상태를 복구용으로 저장했습니다.');
       }catch{
         // Quota pressure must not silently delete older recovery copies.
@@ -516,9 +519,9 @@ function EditorUI(){
           try{
             const raw=localStorage.getItem(key);
             if(raw===null)return null;
-            const value=JSON.parse(raw) as {savedAt?:unknown;state?:unknown};
+            const value=JSON.parse(raw) as {savedAt?:unknown;state?:unknown;assets?:unknown};
             if(typeof value.savedAt!=='string'||!value.state)return null;
-            return {key,savedAt:value.savedAt,state:value.state};
+            return {key,savedAt:value.savedAt,state:value.state,assets:value.assets};
           }catch{return null;}
         }).filter((item):item is NonNullable<typeof item>=>item!==null)
         .sort((a,b)=>b.savedAt.localeCompare(a.savedAt));
@@ -529,10 +532,15 @@ function EditorUI(){
       if(choice===null){setStatus('복구본 선택을 취소했습니다.');return;}
       const selected=/^(0|[1-9][0-9]*)$/.test(choice)?entries[Number(choice)]:undefined;
       if(!selected){setStatus('복구본 선택을 취소했습니다.');return;}
-      const state=parseCanonicalEditorState(editor,selected.state);
+      const candidate={schemaVersion:1,id:'editor-document',locale:'ko',
+        title:'사이드노트 편집 문서',lexicalState:selected.state,assets:selected.assets??[]};
+      const checked=validateDocument(candidate);
+      if(!checked.ok){setStatus('복구본의 본문 또는 자산 목록 검증 실패: 현재 문서를 유지합니다.');return;}
+      const state=parseCanonicalEditorState(editor,checked.document.lexicalState);
       if(!window.confirm('현재 편집 상태를 선택한 복구본으로 바꾸시겠습니까?'))return;
       replaceEditorDocumentState(editor,state);
-      setStatus('선택한 복구본을 열었습니다. 구조를 확인한 후 정상 저장하세요.');
+      setDocumentAssets(structuredClone(checked.document.assets));
+      setStatus('복구본의 본문과 자산 목록을 함께 불러왔습니다. 구조를 확인한 후 정상 저장하세요.');
     }catch{setStatus('복구용 사본을 열지 못했습니다.');}
   }
   const textarea=useRef<HTMLTextAreaElement>(null);
