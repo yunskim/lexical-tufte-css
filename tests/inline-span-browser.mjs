@@ -91,8 +91,10 @@ try{
   assert.equal(await page.evaluate(()=>{
    const selection=window.getSelection();
    const anchor=selection?.anchorNode;
-   return Boolean(selection?.rangeCount===1&&selection.isCollapsed&&anchor&&document.querySelector('.editor')?.contains(anchor));
-  }),true,buttonName+' requires a collapsed caret inside the editor before toolbar dispatch');
+   const editor=document.querySelector('.editor');
+   const section=anchor?.parentElement?.closest('section[data-tufte-editor="section"]');
+   return Boolean(selection?.rangeCount===1&&selection.isCollapsed&&anchor&&editor?.contains(anchor)&&section&&editor.contains(section));
+  }),true,buttonName+' requires a collapsed caret in an editable Tufte section before toolbar dispatch');
   await action(buttonName).click();
   const changed=await snapshot();
   assert.notDeepEqual(changed,baseline,buttonName+' must modify representative JSON');
