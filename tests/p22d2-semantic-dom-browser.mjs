@@ -174,22 +174,15 @@ try{
   const labels=[...article.querySelectorAll('label')];
   const notes=inputs.map(input=>({
    id:input.id,
-   idMatches:[...article.querySelectorAll('[id]')].filter(node=>node.id===input.id).length,
+   idMatches:[...document.querySelectorAll('[id]')].filter(node=>node.id===input.id).length,
    associated:labels.filter(label=>label.control===input).length,
    payload:input.nextElementSibling?.matches('.sidenote,.marginnote')??false
   }));
-  const lists=[...article.querySelectorAll('ol,ul')].map(list=>({
-   directItems:[...list.children].filter(node=>node.localName==='li').length,
-   nonItemChildren:[...list.children].filter(node=>node.localName!=='li').length
-  }));
-  const quotes=[...article.querySelectorAll('blockquote')].map(quote=>({
-   text:quote.textContent.trim(),nested:!!quote.querySelector('blockquote')
-  }));
-  return {ids,notes,lists,quotes};
+  return {ids,notes};
  });
  assert.equal(new Set(accessibility.ids).size,accessibility.ids.length,'note toggle ids must be unique');
  for(const note of accessibility.notes){
-  assert.equal(note.idMatches,1,'note id must be unique throughout the article');
+  assert.equal(note.idMatches,1,'note id must be unique throughout the document');
   assert.equal(note.associated,1,'HTMLLabelElement.control must resolve to the note input');
   assert.equal(note.payload,true,'note toggle must immediately precede semantic note payload');
  }
