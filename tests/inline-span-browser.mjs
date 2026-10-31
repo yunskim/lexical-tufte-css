@@ -73,6 +73,7 @@ try{
   await page.reload();
   await page.getByRole('button',{name:'불러오기',exact:true}).click();
   const baseline=await snapshot();
+  assert.deepEqual(baseline,representative.lexicalState,buttonName+' fixture reload must start from canonical representative JSON');
   const paragraph=editor.locator('section p').filter({hasText:/./}).first();
   await paragraph.click();
   await page.keyboard.press('End');
@@ -85,6 +86,11 @@ try{
   await action(buttonName).click();
   const changed=await snapshot();
   assert.notDeepEqual(changed,baseline,buttonName+' must modify representative JSON');
+  if(nodeType==='tufte-sidenote'){
+   const beforeIds=new Set(collect(baseline.root).filter(node=>node.type==='tufte-sidenote').map(node=>node.noteId??node.id));
+   const afterIds=collect(changed.root).filter(node=>node.type==='tufte-sidenote').map(node=>node.noteId??node.id);
+   assert.ok(afterIds.some(id=>id!==undefined&&!beforeIds.has(id)),'toolbar must generate a fresh sidenote identifier');
+  }
   assert.ok(collect(changed.root).some(node=>node.type===nodeType||(nodeType==='quote'&&node.type==='tufte-quote')),buttonName+' must insert its semantic node');
   const beforeHTML=renderArticle({...representative,lexicalState:baseline});
   const changedHTML=renderArticle({...representative,lexicalState:changed});
