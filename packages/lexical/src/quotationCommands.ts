@@ -82,7 +82,9 @@ export function registerQuotationCommands(editor:LexicalEditor,onDiagnostic?:(di
  const epigraphItem=()=>{
   const selection=selected(),item=selection?ancestor(selection.anchor.getNode(),'quote'):null;
   const group=item?.getParent();
-  return item instanceof QuoteNode&&group instanceof EpigraphNode&&validTarget(group)?{item,group,selection:selection!}:null;
+  return item instanceof QuoteNode&&group instanceof EpigraphNode&&validTarget(group)
+   &&group.getChildren().every(child=>child instanceof QuoteNode&&validTree(child))
+   ?{item,group,selection:selection!}:null;
  };
  const registrations=[
   editor.registerCommand(APPEND_TUFTE_EPIGRAPH_ITEM_COMMAND,()=>{
