@@ -23,6 +23,7 @@ try{
   await page.addInitScript(()=>{
     window.__hostCalls={search:[],revisions:[],resolve:[]};
     window.__hostMode='normal';
+    window.__hostExpiryMs=3600_000;
     window.lexicalTufteAssetNamespace='test-host';
     window.lexicalTufteAssetProvider={
       async search(query,signal){
@@ -42,7 +43,7 @@ try{
         if(window.__hostMode==='invalid')return null;
         return {assetId:locator.assetId,revisionId:locator.revisionId||'rev-2',
           mediaType:'image/svg+xml',url:'/fixture.svg',
-          expiresAt:new Date(Date.now()+3600_000).toISOString()};
+          expiresAt:new Date(Date.now()+window.__hostExpiryMs).toISOString()};
       }
     };
   });
@@ -94,6 +95,18 @@ try{
   await page.evaluate(()=>{window.__hostMode='normal';});
   await button('외부 이미지 URL 다시 확인').click();
   await page.getByRole('status',{name:'편집 작업 상태'}).getByText(/갱신: 1\/1개/).waitFor();
+  // An expiring signed URL should refresh 60 seconds before expiration.
+  await page.evaluate(()=>{window.__hostExpiryMs=120_000;});
+  await button('외부 이미지 URL 다시 확인').click();
+  await page.getByRole('status',{name:'편집 작업 상태'}).getByText(/갱신: 1\/1개/).waitFor();
+  const beforeExpiry=await page.evaluate(()=>window.__hostCalls.resolve.length);
+  await page.clock.runFor(59_999);
+  assert.equal(await page.evaluate(()=>window.__hostCalls.resolve.length),beforeExpiry,
+    'No premature refresh before expiry margin');
+  await page.clock.runFor(1);
+  await page.waitForFunction(count=>window.__hostCalls.resolve.length>count,beforeExpiry);
+  await page.evaluate(()=>{window.__hostExpiryMs=3600_000;});
+
   // Automatic retry uses a five-second initial backoff.
   await page.evaluate(()=>{window.__hostMode='invalid';});
   await button('외부 이미지 URL 다시 확인').click();
