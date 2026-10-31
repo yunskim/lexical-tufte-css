@@ -339,6 +339,7 @@ function EditorUI(){
   const [assetQuery,setAssetQuery]=useState('');
   const [assetChoice,setAssetChoice]=useState<string|null>(null);
   const [assetTargetKey,setAssetTargetKey]=useState<string|null>(null);
+  const [assetAlt,setAssetAlt]=useState('');
   const [assetTargets,setAssetTargets]=useState<Array<{key:string;noteId:string;alt:string;src:string}>>([]);
   function openAssetChooser(){
     const targets:Array<{key:string;noteId:string;alt:string;src:string}>=[];
@@ -355,6 +356,7 @@ function EditorUI(){
     });
     setAssetTargets(targets);
     setAssetTargetKey(targets.length===1?targets[0].key:null);
+    setAssetAlt(targets.length===1?targets[0].alt:'');
     setAssetQuery('');setAssetChoice(null);setAssetChooserOpen(true);
   }
   function connectChosenAsset(){
@@ -367,9 +369,10 @@ function EditorUI(){
     });
     if(!valid){setStatus('연결 대상 이미지가 변경되었습니다. 다시 선택하세요.');return;}
     const key=assetTargetKey;
+    const alt=assetAlt;
     editor.update(()=>{
       const node=$getNodeByKey(key);
-      if(node instanceof InlineImageNode&&containingNote(node))node.setDocumentAsset(asset);
+      if(node instanceof InlineImageNode&&containingNote(node))node.setDocumentAsset(asset).setImagePresentation(alt,asset.width,asset.height);
     },{tag:HISTORY_PUSH_TAG,discrete:true});
     setStatus('선택한 노트 이미지에 문서 자산을 연결했습니다.');
     closeAssetChooser();
@@ -381,7 +384,7 @@ function EditorUI(){
   const matchingAssets=documentAssets.filter(asset=>
     (asset.id+' '+asset.mimeType+' '+asset.src).toLocaleLowerCase().includes(assetQuery.toLocaleLowerCase()));
   function closeAssetChooser(){
-    setAssetChooserOpen(false);setAssetChoice(null);setAssetTargetKey(null);
+    setAssetChooserOpen(false);setAssetChoice(null);setAssetTargetKey(null);setAssetAlt('');
     queueMicrotask(()=>assetChooserTrigger.current?.focus());
   }
   useEffect(()=>{
@@ -932,10 +935,13 @@ function EditorUI(){
         <fieldset><legend>교체할 노트 이미지 선택</legend>
           {assetTargets.length===0&&<p>연결할 노트 이미지가 없습니다.</p>}
           {assetTargets.map(target=><label key={target.key} style={{display:'block'}}>
-            <input type="radio" name="document-asset-target" checked={assetTargetKey===target.key} onChange={()=>setAssetTargetKey(target.key)}/>
+            <input type="radio" name="document-asset-target" checked={assetTargetKey===target.key} onChange={()=>{setAssetTargetKey(target.key);setAssetAlt(target.alt);}}/>
             {target.noteId} · {target.alt||'(장식 이미지)'} · {target.src}
           </label>)}
         </fieldset>
+        <label>대체텍스트 (장식용 이미지는 비워 두세요)
+          <input type="text" value={assetAlt} onChange={event=>setAssetAlt(event.target.value)} maxLength={2000}/>
+        </label>
         <p aria-live="polite">검색 결과 {matchingAssets.length}개</p>
         <ul>{matchingAssets.map(asset=><li key={asset.id}>
           <label><input type="radio" name="document-asset-choice" checked={assetChoice===asset.id} onChange={()=>setAssetChoice(asset.id)}/>
