@@ -349,6 +349,24 @@ function EditorUI(){
   const [hostRevisionId,setHostRevisionId]=useState<string|null>(null);
   const [hostResolving,setHostResolving]=useState(false);
   const hostResolveGeneration=useRef(0);
+  const expiryRefreshTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
+  function scheduleExpiryRefresh(expiresAt?:string){
+    if(!expiresAt)return;
+    const expiry=Date.parse(expiresAt);
+    if(!Number.isFinite(expiry))return;
+    const delay=Math.max(1000,expiry-Date.now()-60_000);
+    // Preserve an earlier deadline if several images have expiring URLs.
+    const deadline=Date.now()+delay;
+    if(expiryRefreshDeadline.current!==null&&expiryRefreshDeadline.current<=deadline)return;
+    if(expiryRefreshTimer.current!==null)clearTimeout(expiryRefreshTimer.current);
+    expiryRefreshDeadline.current=deadline;
+    expiryRefreshTimer.current=setTimeout(()=>{
+      expiryRefreshTimer.current=null;expiryRefreshDeadline.current=null;
+      void refreshHostAssetURLs();
+    },Math.min(delay,2_147_483_647));
+  }
+  const expiryRefreshDeadline=useRef<number|null>(null);
+  useEffect(()=>()=>{if(expiryRefreshTimer.current!==null)clearTimeout(expiryRefreshTimer.current);},[]);
   const refreshGeneration=useRef(0);
   const restoreRefreshGeneration=useRef(0);
   function scheduleHostRefresh(){
@@ -401,6 +419,7 @@ function EditorUI(){
           node.setHostAsset(current.hostAsset,resolved.url,current.alt);
           refreshed++;
         },{tag:HISTORY_PUSH_TAG,discrete:true});
+        scheduleExpiryRefresh(resolved.expiresAt);
       }
       setStatus('외부 이미지 URL 갱신: '+refreshed+'/'+images.length+'개.');
     }catch{if(generation===refreshGeneration.current)setStatus('외부 이미지 URL 갱신 중 오류가 발생했습니다.');}
@@ -433,6 +452,7 @@ function EditorUI(){
         if(node instanceof InlineImageNode&&containingNote(node))
           node.setHostAsset({namespace:hostNamespace!,assetId:id,...(hostRevisionId?{revisionId:resolved.revisionId}:{})},resolved.url,assetAlt);
       },{tag:HISTORY_PUSH_TAG,discrete:true});
+      scheduleExpiryRefresh(resolved.expiresAt);
       setStatus('외부 이미지 자산을 연결했습니다.');
       closeAssetChooser();
     }catch{if(generation===hostResolveGeneration.current)setHostError('외부 자산 URL 해석에 실패했습니다.');}
