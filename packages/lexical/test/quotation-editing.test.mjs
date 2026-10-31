@@ -237,3 +237,61 @@ test('epigraph rejects malformed sibling without changing a valid selected quote
  assert.equal(diagnostics.length,2);
  stop();
 });
+
+test('deleting middle epigraph item keeps remaining order and supports undo/redo',async()=>{
+ const {editor,stop,target}=setup('epigraph');
+ editor.update(()=>{
+  target.append($createQuoteNode().append($createTextNode('Middle quote')),$createQuoteNode().append($createTextNode('Last quote')));
+  target.getChildAtIndex(1).selectStart();
+ },{discrete:true});
+ const before=snapshot(editor),items=before.root.children[0].children[1].children;
+ assert.equal(items.length,3);
+ const history=createEmptyHistoryState(),unregister=registerHistory(editor,history,300);
+ history.current={editor,editorState:editor.getEditorState()};
+ run(editor,REMOVE_TUFTE_QUOTATION_COMMAND,'quote');await flush();
+ const after=snapshot(editor);
+ assert.deepEqual(after.root.children[0].children[1].children,[items[0],items[2]]);
+ assert.deepEqual(after.root.children[0].children[0],before.root.children[0].children[0]);
+ assert.deepEqual(after.root.children[0].children.at(-1),before.root.children[0].children.at(-1));
+ publish(after);
+ run(editor,UNDO_COMMAND);await flush();assert.deepEqual(snapshot(editor),before);
+ run(editor,REDO_COMMAND);await flush();assert.deepEqual(snapshot(editor),after);
+ const reopened=createHeadlessEditor({nodes:TUFTE_NODES,onError(e){throw e;}});
+ reopened.setEditorState(parseCanonicalEditorState(reopened,after));await flush();
+ assert.deepEqual(snapshot(reopened),after);
+ unregister();stop();
+});
+test('first and last epigraph movement boundaries reject atomically',()=>{
+ const {editor,diagnostics,stop,target}=setup('epigraph');
+ editor.update(()=>{
+  target.append($createQuoteNode().append($createTextNode('Last quote')));
+  target.getFirstChild().selectStart();
+ },{discrete:true});
+ const before=snapshot(editor);
+ run(editor,MOVE_TUFTE_EPIGRAPH_ITEM_COMMAND,'up');
+ assert.deepEqual(snapshot(editor),before);
+ editor.update(()=>target.getLastChild().selectStart(),{discrete:true});
+ run(editor,MOVE_TUFTE_EPIGRAPH_ITEM_COMMAND,'down');
+ assert.deepEqual(snapshot(editor),before);
+ assert.equal(diagnostics.length,2);
+ stop();
+});
+test('repeated epigraph moves preserve three-item order and selection',()=>{
+ const {editor,stop,target}=setup('epigraph');
+ editor.update(()=>{
+  target.append($createQuoteNode().append($createTextNode('Middle quote')),$createQuoteNode().append($createTextNode('Last quote')));
+  target.getFirstChild().getFirstChild().selectEnd();
+ },{discrete:true});
+ const initial=snapshot(editor).root.children[0].children[1].children;
+ let caret;editor.getEditorState().read(()=>{caret=$getSelection().clone();});
+ run(editor,MOVE_TUFTE_EPIGRAPH_ITEM_COMMAND,'down');
+ run(editor,MOVE_TUFTE_EPIGRAPH_ITEM_COMMAND,'down');
+ const after=snapshot(editor);
+ assert.deepEqual(after.root.children[0].children[1].children,[initial[1],initial[2],initial[0]]);
+ editor.getEditorState().read(()=>assert.ok($getSelection().is(caret)));
+ publish(after);
+ run(editor,MOVE_TUFTE_EPIGRAPH_ITEM_COMMAND,'up');
+ run(editor,MOVE_TUFTE_EPIGRAPH_ITEM_COMMAND,'up');
+ assert.deepEqual(snapshot(editor).root.children[0].children[1].children,initial);
+ stop();
+});
