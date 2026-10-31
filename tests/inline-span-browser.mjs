@@ -222,8 +222,10 @@ try{
   await page.keyboard.press('End');
   assert.equal(await page.evaluate(()=>{
    const selection=window.getSelection();
-   return Boolean(selection&&selection.rangeCount===1&&selection.isCollapsed&&document.activeElement?.closest('.editor'));
-  }),true,'structural toolbar commands require a collapsed editor selection');
+   const anchor=selection?.anchorNode;
+   const editor=document.querySelector('.editor');
+   return Boolean(selection?.rangeCount===1&&selection.isCollapsed&&anchor&&editor?.contains(anchor)&&anchor.parentElement?.closest('section[data-tufte-editor="section"]'));
+  }),true,'structural toolbar commands require a collapsed caret inside an editable Tufte section');
  };
  // Exercise real toolbar commands and History rather than direct node edits.
  for(const [buttonName,nodeType] of [['번호 목록 삽입','list'],['인용문 삽입','quote']]){
