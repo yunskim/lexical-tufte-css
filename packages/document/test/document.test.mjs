@@ -110,3 +110,27 @@ test('R03 canonical serialization is deterministic, reversible and rejects unkno
  assert.equal(canonicalizeDocument({...original,schemaVersion:2}).ok,false);
  assert.equal(canonicalizeDocument(original).value,a.value);
 });
+
+test('P2.2.d.1 F01-F09 capability matrix tracks every canonical node field',()=>{
+ const source=readFileSync(new URL('../../../docs/CAPABILITY_F01_F09_P22D.ko.md',import.meta.url),'utf8');
+ const section=source.split('## NODE_SCHEMA 기반 F01–F09 필드 전수 목록 (정적 대조, 실행 전)')[1]?.split('## 남은 체크리스트')[0];
+ assert.ok(section,'F01-F09 schema matrix section is missing');
+ const expected=['root','tufte-section','paragraph','heading','text','linebreak','tufte-span','list','listitem',
+  'tufte-definition-list','tufte-term','tufte-definition','horizontalrule','quote','tufte-epigraph',
+  'tufte-attribution','tufte-cite','tufte-section-footer','link','host-link'];
+ const rows=[...section.matchAll(/^\| ([a-z][a-z-]*) \| ([^|]+) \|/gm)];
+ const actual=new Map(rows.map(([,type,fields])=>[type,fields.trim()]));
+ assert.deepEqual([...actual.keys()].sort(),[...expected].sort(),'F01-F09 capability rows changed');
+ for(const type of expected){
+  const fields=NODE_SCHEMA[type]?.fields;
+  assert.ok(fields,'NODE_SCHEMA no longer contains '+type);
+  const documented=actual.get(type);
+  assert.ok(documented,'Missing capability row: '+type);
+  if(fields.length===0){
+   assert.equal(documented,'없음',type+' must document empty fields');
+  }else{
+   const listed=documented.split(',').map(s=>s.trim().replaceAll('`',''));
+   assert.deepEqual(listed,[...fields],type+' fields drifted from NODE_SCHEMA');
+  }
+ }
+});
