@@ -37,6 +37,18 @@ export class InlineImageNode extends DecoratorNode<null> {
     writable.__alt=alt;writable.__width=width;writable.__height=height;
     return this;
   }
+  /** Atomically bind a local catalog asset while retaining the image's alt text. */
+  setDocumentAsset(asset:{id:string;src:string;width?:number;height?:number}):this {
+    const current=this.getLatest();
+    assertImageProperties(asset.src,current.__alt,asset.id,asset.width,asset.height);
+    const writable=this.getWritable();
+    writable.__src=asset.src;
+    writable.__assetId=asset.id;
+    writable.__hostAsset=undefined;
+    writable.__width=asset.width;
+    writable.__height=asset.height;
+    return this;
+  }
   isInline(): true { return true; }
   decorate(): null { return null; }
   private createImageElement(): HTMLImageElement {
@@ -49,7 +61,7 @@ export class InlineImageNode extends DecoratorNode<null> {
   createDOM(): HTMLElement {
     const img=this.createImageElement();img.contentEditable='false';return img;
   }
-  updateDOM(previous: InlineImageNode): boolean { return previous.__src!==this.__src || previous.__alt!==this.__alt || previous.__width!==this.__width || previous.__height!==this.__height; }
+  updateDOM(previous: InlineImageNode): boolean { return previous.__src!==this.__src || previous.__alt!==this.__alt || previous.__width!==this.__width || previous.__height!==this.__height || previous.__assetId!==this.__assetId || JSON.stringify(previous.__hostAsset)!==JSON.stringify(this.__hostAsset); }
   exportDOM(): DOMExportOutput { return {element:this.createImageElement()}; }
   exportJSON(): SerializedInlineImage {
     const node=this.getLatest();
