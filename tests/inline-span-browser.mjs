@@ -156,9 +156,20 @@ try{
  assert.deepEqual(await snapshot(),wrapped,'Undo must restore original wrapper');
  await page.getByRole('button',{name:'다시 실행',exact:true}).click();
  assert.deepEqual(await snapshot(),unwrapped,'Redo must remove wrapper again');
+ // Give each structural command a collapsed caret inside editable body text.
+ // Clicking a section container can leave Lexical without a range selection.
+ const focusInsertionPoint=async()=>{
+  const paragraph=editor.locator('section p').last();
+  await paragraph.click();
+  await page.keyboard.press('End');
+  assert.equal(await page.evaluate(()=>{
+   const selection=window.getSelection();
+   return Boolean(selection&&selection.rangeCount===1&&selection.isCollapsed&&document.activeElement?.closest('.editor'));
+  }),true,'structural toolbar commands require a collapsed editor selection');
+ };
  // Exercise real toolbar commands and History rather than direct node edits.
  for(const [buttonName,nodeType] of [['번호 목록 삽입','list'],['인용문 삽입','quote']]){
-  await editor.locator('section').last().click();
+  await focusInsertionPoint();
   const baseline=await snapshot();
   const publish=state=>{
    const result=renderArticle({schemaVersion:1,id:'inline-span-case',locale:'ko-KR',title:'인라인 속성',assets:[],lexicalState:state});
@@ -181,7 +192,7 @@ try{
   await page.getByRole('button',{name:'실행 취소',exact:true}).click();
  }
  // Note insertion uses the real editor toolbar and generates a fresh ID.
- await editor.locator('section').last().click();
+ await focusInsertionPoint();
  const noteBaseline=await snapshot();
  const noteDoc=state=>{
   const result=renderArticle({schemaVersion:1,id:'inline-span-case',locale:'ko-KR',title:'인라인 속성',assets:[],lexicalState:state});
