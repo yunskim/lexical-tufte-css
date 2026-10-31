@@ -90,6 +90,7 @@ try{
   await action(buttonName).click();
   const changed=await snapshot();
   assert.notDeepEqual(changed,baseline,buttonName+' must modify representative JSON');
+  assert.equal(await editor.locator('section').count(),collect(changed.root).filter(node=>node.type==='tufte-section').length,'representative DOM section count must match canonical section nodes');
   if(nodeType==='tufte-sidenote'){
    const beforeIds=new Set(collect(baseline.root).filter(node=>node.type==='tufte-sidenote').map(node=>node.noteId));
    const afterIds=collect(changed.root).filter(node=>node.type==='tufte-sidenote').map(node=>node.noteId);
