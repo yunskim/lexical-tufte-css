@@ -48,7 +48,7 @@ try{
               ?new Date(Date.now()-1000).toISOString():'not-a-date'};
         return {assetId:locator.assetId,revisionId:locator.revisionId||'rev-2',
           mediaType:'image/svg+xml',url:'/fixture.svg',
-          expiresAt:new Date(Date.now()+window.__hostExpiryMs).toISOString()};
+          expiresAt:new Date(Date.now()+(window.__hostExpiryByRevision?.[locator.revisionId]??window.__hostExpiryMs)).toISOString()};
       }
     };
   });
@@ -221,6 +221,27 @@ try{
   const selectiveCalls=await page.evaluate(count=>window.__hostCalls.resolve.slice(count),beforeSelectiveRetry);
   assert.deepEqual(selectiveCalls,[{assetId:'remote-image',revisionId:'rev-1'}],
     'Automatic retry must skip the already-refreshed second revision');
+
+  // Distinct revisions may expire at different times. Schedule the earliest one.
+  await page.evaluate(()=>{
+    window.__hostMode='normal';
+    window.__hostExpiryByRevision={'rev-1':120_000,'rev-2':240_000};
+  });
+  await button('외부 이미지 URL 다시 확인').click();
+  await page.getByRole('status',{name:'편집 작업 상태'}).getByText(/갱신: 2\/2개/).waitFor();
+  const beforeEarliestExpiry=await page.evaluate(()=>window.__hostCalls.resolve.length);
+  await page.clock.runFor(59_999);
+  assert.equal(await page.evaluate(()=>window.__hostCalls.resolve.length),beforeEarliestExpiry,
+    'Neither revision should refresh before the earliest expiry margin');
+  await page.evaluate(()=>{window.__hostExpiryByRevision={'rev-1':3600_000,'rev-2':3600_000};});
+  await page.clock.runFor(1);
+  await page.waitForFunction(count=>window.__hostCalls.resolve.length>=count+2,beforeEarliestExpiry);
+  const earliestCalls=await page.evaluate(count=>window.__hostCalls.resolve.slice(count),beforeEarliestExpiry);
+  assert.deepEqual(earliestCalls,[
+    {assetId:'remote-image',revisionId:'rev-1'},
+    {assetId:'remote-image',revisionId:'rev-2'}
+  ],'Earliest expiry triggers a full refresh of both linked revisions');
+  await page.evaluate(()=>{delete window.__hostExpiryByRevision;});
 
   // Returning to a visible tab after the 60-second cooldown rechecks URLs.
   const beforeResume=await page.evaluate(()=>window.__hostCalls.resolve.length);
