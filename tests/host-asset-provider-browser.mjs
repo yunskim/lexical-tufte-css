@@ -351,7 +351,8 @@ try{
       mediaType:'image/svg+xml',url:'/obsolete.svg',
       expiresAt:new Date(Date.now()+120_000).toISOString()});
   });
-  await page.waitForFunction(()=>window.__hostPendingResolves.length===0);
+  await page.getByRole('status',{name:'편집 작업 상태'})
+    .getByText(/외부 이미지 URL 갱신:/).waitFor();
   assert.equal(await page.locator('[data-note-id] img').count(),beforeDelete-1,
     'A delayed provider response must not restore a deleted image');
   assert.equal(await page.locator('[data-note-id] img[src="/obsolete.svg"]').count(),0,
