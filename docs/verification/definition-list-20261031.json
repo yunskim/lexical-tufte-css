@@ -1,0 +1,130 @@
+{
+  "date": "2026-10-31",
+  "baseCommit": "034adedf24e59f0a44c6484aa5894a0da3b69702",
+  "branch": "fix/main-browser-parity-20261023",
+  "task": "P2.2.b.3",
+  "status": "complete-for-documented-pair-and-group-commands",
+  "check": {
+    "build": "pass",
+    "typecheck": "pass",
+    "unit": {
+      "total": 501,
+      "document": 57,
+      "render": 52,
+      "blog": 77,
+      "editorPorts": 2,
+      "lexical": 313,
+      "fail": 0,
+      "skip": 0
+    }
+  },
+  "definitionUnit": {
+    "existing": 10,
+    "added": 18,
+    "total": 28,
+    "includedInTotal": true
+  },
+  "initialReproduction": {
+    "pass": 15,
+    "fail": 2,
+    "total": 17
+  },
+  "browser": {
+    "uniqueFiles": 3,
+    "processRuns": 4,
+    "definitionWidths": [
+      1440,
+      375
+    ],
+    "files": [
+      "definition-pairs-browser.mjs",
+      "publication-browser.mjs",
+      "contextual-ui-browser.mjs"
+    ],
+    "status": "pass"
+  },
+  "package": {
+    "pass": 5
+  },
+  "sourceHashes": [
+    {
+      "path": "packages/lexical/src/definitionCommands.ts",
+      "sha256": "a4ae292ec66b43a396d295e5eee85132dd9c3e95adf42ff5beaf89302dc4cba0"
+    },
+    {
+      "path": "packages/lexical/test/definition-boundaries.test.mjs",
+      "sha256": "eb80d6877a584ac4ec267f9be1860d21fbbca845f6850cc5a2102095aefe0a57"
+    },
+    {
+      "path": "tests/definition-pairs-browser.mjs",
+      "sha256": "cb74d91ba80752e2afe060ed92c39d34d2eb496a1bf9fb787ff1e917ebeb191f"
+    }
+  ],
+  "logs": [
+    {
+      "file": "before.log",
+      "sha256": "ad7fb6f3ddd287030b2f9c9d4e886617a9e5ff78817ba8627c8d0de6b583d37c",
+      "tail": [
+        "    diff: 'simple'",
+        "  }"
+      ]
+    },
+    {
+      "file": "check-final.log",
+      "sha256": "55712225ba76432e9097d754f7daf77ff05c185e6f986f0f2c1b97f5ffb3e530",
+      "tail": [
+        "packages/lexical test: ℹ duration_ms 3311.614121",
+        "packages/lexical test: Done"
+      ]
+    },
+    {
+      "file": "browser1440-final.log",
+      "sha256": "dcbe607645e2be7795a46c293ae808b2ddbfdb655d426b860595e4adb5b21a22",
+      "tail": [
+        "P2.2.b definition browser: pair move/delete, final-pair rejection, JSON save/reopen, canonical HTML, undo/redo PASS."
+      ]
+    },
+    {
+      "file": "browser375-final.log",
+      "sha256": "dcbe607645e2be7795a46c293ae808b2ddbfdb655d426b860595e4adb5b21a22",
+      "tail": [
+        "P2.2.b definition browser: pair move/delete, final-pair rejection, JSON save/reopen, canonical HTML, undo/redo PASS."
+      ]
+    },
+    {
+      "file": "package-final.log",
+      "sha256": "0db51b0fca40e7709cbac5198c03d3431bf2fbb4fdd2acb4086f4faf428e8a73",
+      "tail": [
+        "Checking packed JS imports and editor roundtrip (15s limit).",
+        "R13 five tarballs: full LICENSE/notices/OFL, packed JS imports, fresh declarations, strict editor roundtrip, renderer/blog and SQL exports PASS. No publishing."
+      ]
+    },
+    {
+      "file": "publication-final.log",
+      "sha256": "5b37f55c5dedbaad42113d8a8fbfb6a1b14bcd152d93367d4b6af0844630f053",
+      "tail": [
+        "Publication regression: real definition/cite editing, strict document export, code/ImageQuilt, 5 embed ratios and both Tufte wrappers at 5 widths under enforced CSP (no inline styles/scripts)."
+      ]
+    },
+    {
+      "file": "contextual-final.log",
+      "sha256": "acb046ad3909544ac14d647e186cee4964328326bdfe4578c0ae36a8a42b5cb7",
+      "tail": [
+        "Contextual UI: formatting, selection snapshot restoration, Escape and Tab focus targets, schema-filtered inserts, undo and 375px bounds PASS."
+      ]
+    }
+  ],
+  "ci": "not-run",
+  "notRun": [
+    "full 36-file browser suite",
+    "official full-page pixel parity",
+    "Python"
+  ],
+  "limits": [
+    "UI adds dt/dd pairs and edits/removes/reorders complete groups; multiple-term groups also supported by Node/API and canonical input, no dedicated alias-add button.",
+    "HTML comparison covers semantic dl/dt/dd text/order; arbitrary HTML import and all nondefault attribute capabilities remain separate work.",
+    "OS IME/screenreader and other browsers remain P6; asset registration remains deferred."
+  ],
+  "next": "P2.2.c.1",
+  "logDirectory": "/workspace/scratch/484e46557938/lexical-tufte-definition-20261031"
+}

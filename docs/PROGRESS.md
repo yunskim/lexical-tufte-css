@@ -1,3 +1,9 @@
+## 2026-10-31 정의목록 P2.2.b.3 및 명령 단계 P2.2.b 수락
+
+- 정의목록 append의 그룹/section 검증 누락과 insert의 현재 block 미검증(E132)을 수정했다. 복수dt 공유dd/노트의 canonical 재열기와 native/pure HTML 의미 순서·내용 비교, 실제 UI 이동/그룹·전체 삭제 history를 보강했다.
+- 최종 check501·package5·정의목록1440/375px·publication/contextual 통과. 전체36파일/공식pixel/Python은 이번에 전수 재실행하지 않았고 보류 자산·실기기 한계는 유지한다. CI 생략.
+- [수락·제한](VERIFICATION_DEFINITION_LIST_2026-10-31.ko.md), [소스·로그 해시](verification/definition-list-20261031.json). P2.2.b.3 및 P2.2.b를 명시한 명령 지원·거부 범위에서 체크했다. F06 전체·P2.2는 미완료이며 다음은 P2.2.c.1 인용문·출처·epigraph 수정/삭제 범위다.
+
 ## 2026-10-31 K5 및 ul/ol 지원·거부 범위 수락 완료
 
 - 빈 첫/중간 Enter와 3항목 중간 Backspace 병합, 혼합 ul/ol 저장/재열기·발행, 깊이19 노트 목록의 DOM 재조정 이후 JSON/발행 보존을 보강했다. 제품 소스·schema·golden 변경 없음.

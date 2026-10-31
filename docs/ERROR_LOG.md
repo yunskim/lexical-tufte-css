@@ -1,5 +1,13 @@
 # 에러 기록
 
+## E132 — 정의목록 추가 명령의 구조·위치 검증 누락 (지원/거부 경계 검증 완료)
+
+- 2026-10-31 P2.2.b.3: malformed dd/dt 순서와 root 직속 dl에서 APPEND가 내용을 변경했다. 새 경계17개 중2개 실패로 재현했고 범위/조합/note 거부15개는 통과했다.
+- 원인: append만 nearest dl의 클래스만 확인해 selectedGroup의 그룹 순서·선택 주체·최상위 section 검증을 사용하지 않았다.
+- 조치: append도 이동/삭제와 같은 selectedGroup 경계를 사용한다. 잘못된 구조를 임의 수선하거나 변경하지 않고 INVALID_DEFINITION_SELECTION 진단으로 거부한다. 실행 결과는 정의목록 수락 보고서에 기록한다. M122.
+- 추가 정적 검토: insert의 허용 자식 검사가 현재 block이 아닌 고정된 definition-list 타입을 검사하고 있었다. 현재 block의 canonical type을 검사하도록 수정하고 section의 직접 TextNode를 선택했을 때 무변경 진단하는 회귀를 추가했다. 처음2개 실패와 이 후속 정적 발견은 구분한다.
+- 종료: check501·정의목록 두 폭·publication/contextual·package5개 통과. [범위/실행 보고서](VERIFICATION_DEFINITION_LIST_2026-10-31.ko.md). 관련 과거 기록/상태와 환경·실기기·자산 한계는 유지한다. 다음 P2.2.c.1에서 재점검한다. CI 생략.
+
 ## E131 — 공식 문서 편집 회귀의 navigation load 대기 초과 (수락 경로 완화 검증, 리소스 원인 미확정)
 
 - 2026-10-31 K5 전수 실행: upstream-full-document-editor-browser.mjs의 최초 page.goto가 load 대기10초 초과로 실패했다. editor DOM 검사 전의 실패이며 구체적으로 어떤 리소스가 지연됐는지는 미확정이다. 로컬 HTTP 준비 응답과 외부 URL 차단만으로 load 완료를 보장할 수 없다.

@@ -13,7 +13,7 @@ try{
   if(i===99)throw Error('Editor server not ready');await setTimeout(100);
  }
  browser=await chromium.launch({headless:true,args:['--no-sandbox']});
- const page=await browser.newPage();page.setDefaultTimeout(6000);
+ const page=await browser.newPage({viewport:{width:Number(process.env.DEFINITION_VIEWPORT_WIDTH||1440),height:1000}});page.setDefaultTimeout(6000);
  const errors=[];page.on('pageerror',error=>errors.push(error.message));
  await page.goto(url);
  const editor=page.locator('.editor');await editor.waitFor();
@@ -50,6 +50,8 @@ try{
  assert.deepEqual(await editor.locator('section dl dd').allInnerTexts(),['설명 2','설명 1']);
  const moved=await snapshot();
  assert.notDeepEqual(moved,original);
+ await page.getByRole('button',{name:'실행 취소',exact:true}).click();assert.deepEqual(await snapshot(),original,'One Undo restores definition order');
+ await page.getByRole('button',{name:'다시 실행',exact:true}).click();assert.deepEqual(await snapshot(),moved,'Redo restores definition order');
  const published=renderArticle({schemaVersion:1,id:'definition-pairs-case',locale:'ko-KR',title:'정의목록 편집',assets:[],lexicalState:moved});
  assert.equal(published.ok,true,JSON.stringify(published.diagnostics));
  assert.match(published.html,/<dl>/);
@@ -70,6 +72,35 @@ try{
  assert.deepEqual(await snapshot(),moved,'Undo restores the deleted pair');
  await page.getByRole('button',{name:'다시 실행',exact:true}).click();
  assert.deepEqual(await snapshot(),remaining,'Redo repeats removal');
+ await editor.locator('section dl dt').first().click();await action('정의목록 전체 삭제').click();
+ const removed=await snapshot();assert.equal(findList(removed),undefined);
+ await page.getByRole('button',{name:'실행 취소',exact:true}).click();assert.deepEqual(await snapshot(),remaining,'Undo restores whole definition list');
+ await page.getByRole('button',{name:'다시 실행',exact:true}).click();assert.deepEqual(await snapshot(),removed,'Redo deletes whole list');
+ // Canonical multi-term + note fixture through the actual DOM editor exporter.
+ const sample=structuredClone(remaining),dl=findList(sample);
+ const text=s=>({type:'text',version:1,text:s,format:0,detail:0,mode:'normal',style:''});
+ const term=s=>({...structuredClone(dl.children[0]),children:[text(s)]});
+ const description=s=>({...structuredClone(dl.children[1]),children:[{...structuredClone(dl.children[1].children[0]),children:[text(s)]}]});
+ const findNote=node=>['tufte-sidenote','tufte-marginnote'].includes(node.type)?node:node.children?.map(findNote).find(Boolean);
+ const note=structuredClone(findNote(sample.root));assert.ok(note);note.noteId='definition-roundtrip-note';note.children=[text('Definition annotation')];
+ const firstDescription=description('Description A');firstDescription.children[0].children.push(note);
+ dl.children=[term('Term A'),term('Alias A'),firstDescription,term('Term B'),description('Description B')];
+ const input={schemaVersion:1,id:'definition-roundtrip',locale:'ko-KR',title:'정의목록',assets:[],lexicalState:sample};
+ const path='/@fs'+new URL('../packages/lexical/test/publication-browser-harness.mjs',import.meta.url).pathname;
+ const result=await page.evaluate(async({path,input})=>{
+  const {mountPublicationHarness}=await import(path);
+  const first=mountPublicationHarness(input);await new Promise(requestAnimationFrame);const a=first.snapshot();first.dispose();
+  const second=mountPublicationHarness(JSON.parse(JSON.stringify(a.document)));await new Promise(requestAnimationFrame);const b=second.snapshot();second.dispose();return {a,b};
+ },{path,input});
+ assert.deepEqual(result.b.document,result.a.document,'Definition canonical JSON survives DOM reopen');
+ const semantic=html=>page.evaluate(html=>{
+  const dom=new DOMParser().parseFromString(html,'text/html');
+  return [...dom.querySelectorAll('dl > dt,dl > dd')].map(node=>{node.querySelectorAll('label,input').forEach(n=>n.remove());return [node.tagName,node.textContent.replace(/\s+/g,' ').trim()];});
+ },html);
+ const pure=renderArticle(result.a.document);assert.equal(pure.ok,true,JSON.stringify(pure.diagnostics));
+ const expected=[['DT','Term A'],['DT','Alias A'],['DD','Description ADefinition annotation'],['DT','Term B'],['DD','Description B']];
+ assert.deepEqual(await semantic(result.a.html),expected);assert.deepEqual(await semantic(result.b.html),expected);assert.deepEqual(await semantic(pure.html),expected);
+ assert.match(JSON.stringify(result.b.document),/definition-roundtrip-note/);
  assert.deepEqual(errors,[]);
  console.log('P2.2.b definition browser: pair move/delete, final-pair rejection, JSON save/reopen, canonical HTML, undo/redo PASS.');
 }finally{await browser?.close();server.kill();}

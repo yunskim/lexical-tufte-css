@@ -173,7 +173,7 @@ P1 gate: 완료. 노트 편집 회귀와 SSR 출력의 실제 브라우저 비�
 - [x] P2.1 envelope·metadata·asset·노드 schema 및 validator 구현. 증거: packages/document, DOCUMENT_SCHEMA_V1.ko.md, document-contract.test.mjs, PROGRESS.md.
 - [ ] P2.2 F01–F09 노드/속성/commands와 JSON serialization 구현.
   - [x] P2.2.a section 묶기/추가/블록 경계 분할/병합 및 paragraph·h2·h3 명령, 내용 보존·거부 원자성·실제 UI 왕복. [명령 계약](SECTION_COMMANDS_P22A.ko.md), check214개·browser10개·package4개 통과.
-  - [ ] P2.2.b F03/F05 인라인 속성 및 F06 목록/정의목록 명령과 회귀. [추적 이슈 #9](https://github.com/yunskim/lexical-tufte-css/issues/9).
+  - [x] P2.2.b F03/F05 인라인 속성 및 F06 목록/정의목록 명령과 회귀의 명시한 지원·거부 범위 수락. [추적 이슈 #9](https://github.com/yunskim/lexical-tufte-css/issues/9), [정의목록 최종 수락/범위](VERIFICATION_DEFINITION_LIST_2026-10-31.ko.md). 전체 F06/P2.2.d/P4/P6 게이트를 완료했다는 뜻은 아니다.
     - [x] P2.2.b.0 editor prototype의 직접 import가 package.json과 pnpm-lock에 명시되는지 확인하고 workspace frozen install/package 경계를 검증한다. 2026-10-18 frozen/check297개/package4개 통과, [실행 보고서](VERIFICATION_2026-10-18.ko.md). E087 실행 검증 완료.
     - [x] P2.2.b.1 선택 텍스트 span 생성·기존 kind 변경·해제의 지원/거부 경계 및 atomic undo/redo, JSON/인라인 HTML 왕복 검증. 한 TextNode 부분 선택·링크·rich text·인접 note identity를 보존하고 cross-node/부모·노트 내부·IME는 명시적 거부. [지원 계약](INLINE_SPAN_P22B1.ko.md), [실행 증거](VERIFICATION_INLINE_SPAN_2026-10-23.ko.md): check425개, browser35개 중34통과/보류 자산1실패, 모바일/데스크톱·키보드·CDP IME 검증. 전체 문서 HTML importer는 P2.4, 실제 OS IME/스크린리더는 P6.
     - [x] P2.2.b.2 ul/ol 항목 생성·추가·형태 변경·중첩·들여쓰기·내어쓰기/해제 및 Enter/Backspace/Tab의 명시된 지원·거부 범위 구현·검증. 빈/최초·중간·최종·혼합/중첩·노트/범위 보존 검사 완료. [K5 수락 행렬·제한](VERIFICATION_LIST_ACCEPTANCE_2026-10-31.ko.md): 최종 unit483·package5·Python16/HTTP 통과, browser35/36(보류 자산1실패), 공식6폭 pixel차이0. 임의 mixed-parent 변환·실제 OS IME/스크린리더 전체 지원을 뜻하지 않는다.
@@ -182,7 +182,7 @@ P1 gate: 완료. 노트 편집 회귀와 SSR 출력의 실제 브라우저 비�
       - [x] P2.2.b.2-K3 Backspace: root-level section의 첫 phrasing 항목을 내용·서식·노트 보존 paragraph로 해제. 일반 문자 삭제/병합·안전한 nested outdent는 RichText 위임, 위험한 혼합 부모와 첫 nested payload는 진단·무변경 거부. 2026-10-31 check465·package5·목록1440/375px의 각 Undo/Redo·저장/발행 및 note browser3개 통과. [지원 범위·실행 결과](VERIFICATION_BACKSPACE_2026-10-31.ko.md). 실제 OS IME/다른 브라우저는 P6, K4/K5는 별도 미완료.
       - [x] P2.2.b.2-K4 Tab/Shift+Tab: ul/ol 깊이19↔20, 깊이20/최상위/첫 항목/혼합 부모/컨테이너·범위·note/paragraph 거부 시 실제 앞뒤 focus 및 무변경을1440/375px에서 검증. no-op 컨테이너는 keyboard 위임/toolbar 진단. 최종 check475·집중10개·패키지5개·목록 두 폭·contextual UI 통과. [실행 결과](VERIFICATION_TAB_FOCUS_2026-10-31.ko.md). 실제 OS IME/스크린리더는 P6, K5는 미완료.
       - [x] P2.2.b.2-K5 수락: [조합별 수락 행렬·전체 실행 결과](VERIFICATION_LIST_ACCEPTANCE_2026-10-31.ko.md), [소스/로그·최초/재실행 및 pixel 수치](verification/list-acceptance-20261031.json). 지원/거부 범위의 최초·중간·최종·빈·혼합/nested·노트/IME·history·JSON 저장/재열기/발행·실제 focus를 통합 검증. unit483·package5·Python16/HTTP 통과, browser35/36(보류 자산1실패), 실제 OS IME/스크린리더는 P6.
-    - [ ] P2.2.b.3 dl/dt/dd의 추가·수정·삭제·항목 순서 보존을 검증하고 기존 문서·editor·renderer 3경로의 JSON/HTML 왕복을 연결한다.
+    - [x] P2.2.b.3 정의목록 쌍/그룹의 추가·수정·삭제·복수dt 순서/노트 보존 및 canonical 재열기·editor native/pure renderer 의미 HTML 비교. malformed/section 밖/범위·조합·note 내부 진단·무변경. [지원/제한과 실행 결과](VERIFICATION_DEFINITION_LIST_2026-10-31.ko.md): check501·package5·정의목록1440/375px 및 publication/contextual 통과. 임의 HTML import/모든 속성·별도 alias GUI는 이 수락 범위에 포함하지 않는다.
   - [ ] P2.2.c F07–F09 구분선/section footer/quote·출처/epigraph 명령과 회귀.
     - [ ] P2.2.c.1 이미 구현된 생성·출처 추가 명령을 기준으로 기존 노드의 속성/내용 수정, 출처·인용 삭제, 복수 epigraph 항목 관리의 지원/거부 경계를 정한다.
     - [ ] P2.2.c.2 선택 위치·동일 블록 원자성·undo/redo·JSON→발행 HTML·재열기·스크린리더 읽기 순서를 회귀 검증한다.

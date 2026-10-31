@@ -1,5 +1,14 @@
 # 재발 방지 대책 및 정기 점검
 
+## M122 — 정의목록 그룹의 모든 명령에 동일한 경계 적용
+
+2026-10-31 종료: E132의 공유 그룹 경계와 현재 block canonical type 검사를 적용해 check501·정의목록 두 폭·publication/contextual·package5개를 통과했다. [수락/제한](VERIFICATION_DEFINITION_LIST_2026-10-31.ko.md). 두 오류 문서의 기록/상태를 재대조했고 과거 main/환경/실기기 범위를 현재 결과로 덮지 않았다. 다음 점검은 P2.2.c.1 시작/완료다. CI 생략.
+
+- E132: append/move/remove의 top-level section·one-or-more dt→one dd·선택 주체 조건을 공유한다. malformed/outside-section·범위/조합/note의 무변경 진단을 별도 검사한다.
+- 삽입 허용 검사는 목표 노드의 상수가 아니라 현재 section block의 canonical type을 대조한다. metadata runtime alias와 wire type을 혼동하지 않고 잘못된 직접 text/미지원 블록에서 진단·무변경을 검사한다.
+- 여러 용어가 한 설명을 공유하는 그룹은 한 단위로 이동/삭제하고 note ID를 유지한다. canonical 저장/DOM 재열기 및 native HTML과 순수 renderer의 dl/dt/dd 순서·내용을 비교한다. 범용 HTML import와 단순 HTML 발행을 혼동하지 않는다.
+- 시작 시 E090/M084·M117–M121의 그룹 이동/실제 DOM/준비 게이트를 점검했다. 종료 결과와 다음 P2.2.c 점검은 정의목록 보고서에 연결한다. CI 생략.
+
 ## M121 — 탐색 이벤트와 애플리케이션 준비를 분리
 
 2026-10-31 K5 종료: E131의 명시적 editor readiness 수정 후 독립 재실행 통과. M117–M120 및 과거 오류/현재 범위를 대조하고 deep JSON의 DOM 재조정 후 비교까지 보강했다. 최종 unit483·package5·Python16/HTTP, browser35/36 및 공식6폭 pixel차이0. 보류 자산1실패와 load 지연 리소스 미확정/OS IME 한계는 유지한다. [수락 행렬](VERIFICATION_LIST_ACCEPTANCE_2026-10-31.ko.md). 다음 점검은 P2.2.b.3 시작/완료다. CI 생략.
