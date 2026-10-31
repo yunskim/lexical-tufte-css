@@ -23,8 +23,8 @@
 | text | text/format/detail/mode/style | TextNode; 기본 typing state | text escape 및8종 bit 의미 태그. mode/style은 schema 제한, detail은 편집 상태 |
 | linebreak | 없음 | LineBreakNode | br |
 | tufte-span | kind | TufteSpanNode | sans/newthought/numeral/danger class, 공통 attrs |
-| list | listType/tag/start | ListNode; kind/tag schema 일치 | ul/ol, ol.start. bullet의 start 비기본값 정책은 다음 검토 |
-| listitem | value/checked | ListItemNode | li.value는 ol에서만 출력. checked는 schema 거부; bullet.value 비기본값 정책은 다음 검토 |
+| list | listType/tag/start | ListNode; kind/tag schema 일치 | ul/ol, ol.start. ul.start 비기본값은 발행 차단(신규 회귀 실행 대기) |
+| listitem | value/checked | ListItemNode | li.value는 ol에서만 출력. checked는 schema 거부; ul.value 비기본값 발행 차단(신규 회귀 실행 대기) |
 | tufte-definition-list | 없음 | DefinitionListNode | dl 및 공통 attrs |
 | tufte-term | 없음 | DefinitionTermNode | dt 및 공통 attrs |
 | tufte-definition | 없음 | DefinitionDescriptionNode | dd 및 공통 attrs |
@@ -72,8 +72,8 @@ root presentation을 설정한 schema-valid 문서를 renderer가 성공으로 �
 
 ## 남은 체크리스트
 
-- [ ] ul의 start, li.value 및 모든 공통 속성의 의미/정규화/거부 정책을 대조하고 비기본 fixture 추가.
-- [ ] link/host-link와 F10–F19 미디어·표·code/embed 전체 필드 매트릭스로 확장.
+- [x] ul.start, ul의 li.value 비기본값 발행 차단 구현 및 회귀 작성. ol.start/ol의 li.value 보존, 링크 URL/target/rel/title, direction/format/indent/textStyle/textFormat 회귀 작성. **신규 회귀는 미실행이며 통과로 간주하지 않는다.**\n- [ ] F01–F09의 나머지 타입별 공통 속성·정규화/거부 fixture 확장 및 실행 증거 확보.
+- [x] F03 link/host-link의 NODE_SCHEMA 필드 목록과 발행 정책을 본 문서에 추가. host-link는 해석 전에는 href가 아닌 참조 메타데이터 span으로 출력하며, 실제 링크 해석은 호스트 책임.\n- [ ] F10–F19 미디어·표·code/embed 전체 필드 매트릭스 확장(후속 P2.3과 연계).
 - [ ] NODE_SCHEMA에서 타입/필드가 늘면 매트릭스 누락을 검출하는 기계 검증 추가.
 - [ ] P2.2.d.2 실제 editor/저장/재열기/발행 DOM 통합 매트릭스로 연결.
 
