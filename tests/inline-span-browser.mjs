@@ -76,6 +76,14 @@ try{
  assert.equal(await editor.locator('.newthought').count(),1,'Composition keeps the span intact');
  await cdp.send('Input.imeSetComposition',{text:'',selectionStart:0,selectionEnd:0});
  assert.deepEqual(await snapshot(),wrapped,'Cancelled composition and rejected unwrap preserve canonical JSON');
+ // The representative edited document has multiple sections and a semantic
+ // inline node; cancellation must preserve their placement, not just text.
+ const afterCancel=await snapshot();
+ const beforeSections=collect(wrapped.root).filter(node=>node.type==='section').length;
+ const afterSections=collect(afterCancel.root).filter(node=>node.type==='section').length;
+ assert.ok(beforeSections>=2,'IME regression requires a multi-section editor document');
+ assert.equal(afterSections,beforeSections,'IME cancellation must preserve section structure');
+ assert.equal(collect(afterCancel.root).filter(node=>node.type==='tufte-span'&&node.kind==='newthought').length,1,'IME cancellation must preserve the inline node');
 
  const afterComposition=await snapshot();
  const compositionPublication=renderArticle({schemaVersion:1,id:'inline-span-case',locale:'ko-KR',title:'인라인 속성',assets:[],lexicalState:afterComposition});
