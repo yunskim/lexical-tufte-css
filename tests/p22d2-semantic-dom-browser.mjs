@@ -38,6 +38,37 @@ try{
  const a=await inspect(beforeHTML.html),b=await inspect(afterHTML.html);
  assert.deepEqual(b,a,'canonical reopen must preserve semantic DOM tree, attributes and text');
  assert.ok(a.children.length>0,'published article must have semantic children');
+
+ const semantics=html=>page.evaluate(source=>{
+  const doc=new DOMParser().parseFromString(source,'text/html');
+  const article=doc.querySelector('article');
+  if(!article)throw Error('missing article');
+  const lists=[...article.querySelectorAll('ol,ul')].map(list=>({
+   tag:list.localName,start:list.getAttribute('start'),
+   items:[...list.children].filter(child=>child.localName==='li').map(item=>({
+    value:item.getAttribute('value'),text:item.textContent.trim()
+   }))
+  }));
+  const quotations=[...article.querySelectorAll('blockquote')].map(node=>({
+   cite:node.getAttribute('cite'),text:node.textContent.trim(),
+   inEpigraph:!!node.closest('.epigraph')
+  }));
+  const notes=[...article.querySelectorAll('input.margin-toggle')].map(input=>({
+   id:input.id,type:input.getAttribute('type'),
+   labels:[...article.querySelectorAll('label')].filter(label=>label.htmlFor===input.id).map(label=>label.className),
+   nextClass:input.nextElementSibling?.className??null
+  }));
+  return {lists,quotations,notes};
+ },html);
+ const beforeSemantics=await semantics(beforeHTML.html);
+ const afterSemantics=await semantics(afterHTML.html);
+ assert.deepEqual(afterSemantics,beforeSemantics,'list numbering, quotations and note associations must survive reopen');
+ for(const note of afterSemantics.notes){
+  assert.equal(note.type,'checkbox','note toggle must remain a checkbox');
+  assert.equal(note.labels.length,1,'note toggle must retain one matching label');
+  assert.match(note.nextClass??'',/sidenote|marginnote/,'note payload must follow toggle');
+ }
+
 }finally{
  await browser.close();
 }
