@@ -332,6 +332,7 @@ function EditorUI(){
   const [status,setStatus]=useState('본문을 선택하고 노트를 삽입하세요.');
   const [html,setHtml]=useState('');
   const [json,setJson]=useState('');
+  const [managedJson,setManagedJson]=useState('');
   const [imageChooserOpen,setImageChooserOpen]=useState(false);
   const [noteImages,setNoteImages]=useState<NoteImageChoice[]>([]);
   // Local document catalog. External AssetProvider remains read-only.
@@ -508,6 +509,8 @@ function EditorUI(){
     }catch{if(generation===hostResolveGeneration.current)setHostError('외부 자산 URL 해석에 실패했습니다.');}
     finally{if(generation===hostResolveGeneration.current)setHostResolving(false);}
   }
+  const [assetChooserOpen,setAssetChooserOpen]=useState(false);
+  const [assetQuery,setAssetQuery]=useState('');
   const [hostLoading,setHostLoading]=useState(false);
   const [hostError,setHostError]=useState('');
   useEffect(()=>{
@@ -533,8 +536,6 @@ function EditorUI(){
       .catch(()=>{if(current)setHostError('외부 자산 버전을 조회하지 못했습니다.');});
     return()=>{current=false;controller.abort();};
   },[assetChooserOpen,hostAssetId]);
-  const [assetChooserOpen,setAssetChooserOpen]=useState(false);
-  const [assetQuery,setAssetQuery]=useState('');
   const [assetChoice,setAssetChoice]=useState<string|null>(null);
   const [assetTargetKey,setAssetTargetKey]=useState<string|null>(null);
   const [assetAlt,setAssetAlt]=useState('');
@@ -583,6 +584,7 @@ function EditorUI(){
     (asset.id+' '+asset.mimeType+' '+asset.src).toLocaleLowerCase().includes(assetQuery.toLocaleLowerCase()));
   function closeAssetChooser(){
     hostResolveGeneration.current++;
+    setHostResolving(false);
     setAssetChooserOpen(false);setAssetChoice(null);setAssetTargetKey(null);setAssetAlt('');
     queueMicrotask(()=>assetChooserTrigger.current?.focus());
   }
@@ -985,6 +987,8 @@ function EditorUI(){
     return true;
   }
   function exportDocument(){
+    const managed=exportEditorToDocument(editor,documentBase());
+    setManagedJson(managed.ok?JSON.stringify(managed.value,null,2):'');
     if(inspectEditorStructure(editor).length){setHtml('');setJson(JSON.stringify(exportCanonicalEditorState(editor.getEditorState()),null,2));setStatus('구조를 수정해야 HTML을 생성할 수 있습니다. JSON은 복구용으로 보존합니다.');return;}
     editor.getEditorState().read(()=>setHtml($generateHtmlFromNodes(editor)));
     setJson(JSON.stringify(exportCanonicalEditorState(editor.getEditorState()),null,2));setStatus('JSON과 HTML을 생성했습니다.');
@@ -1003,7 +1007,14 @@ function EditorUI(){
         setStatus('구조 오류가 있어 복구용 사본에만 저장했습니다. 마지막 저장 문서는 유지합니다.');return;
       }
       const existing=localStorage.getItem(managedDocumentKey);
-      if(documentAssets.length===0&&existing===null){
+      let hasHostAsset=false;
+      editor.getEditorState().read(()=>{
+        const scan=(node:LexicalNode):void=>{
+          if(node instanceof InlineImageNode&&node.getImageProperties().hostAsset)hasHostAsset=true;
+          if($isElementNode(node))node.getChildren().forEach(scan);
+        };scan($getRoot());
+      });
+      if(documentAssets.length===0&&existing===null&&!hasHostAsset){
         localStorage.setItem('lexical-tufte-p1',JSON.stringify(exportCanonicalEditorState(editor.getEditorState())));
         setStatus('이 브라우저에 저장했습니다.');return;
       }
@@ -1181,7 +1192,7 @@ function EditorUI(){
       <ul>{documentAssets.map(asset=><li key={asset.id}>{asset.id} · {asset.mimeType} · {asset.width??'?'}×{asset.height??'?'} <button type="button" onClick={()=>connectDocumentAsset(asset)}>선택한 노트 이미지에 {asset.id} 연결</button></li>)}</ul>
     </section>
     <div className="actions"><button onClick={save}>저장</button><button onClick={restore}>불러오기</button><button onClick={restoreRecovery} disabled={!recoveryAvailable}>복구용 사본 열기</button><button onClick={exportRecovery} disabled={!recoveryAvailable}>복구본 JSON 내보내기</button><button onClick={deleteRecovery} disabled={!recoveryAvailable}>복구본 정리</button><button onClick={exportDocument}>JSON·HTML 확인</button><button onClick={()=>{editor.update($loadLayoutFixture,{tag:HISTORY_PUSH_TAG});setStatus('레이아웃 예제를 불러왔습니다. 실행 취소할 수 있습니다.');}}>레이아웃 예제 불러오기</button></div>
-    <details><summary>JSON과 발행 HTML 검사</summary><label>JSON<textarea ref={textarea} aria-label="문서 JSON" value={json} readOnly/></label><label>HTML<textarea aria-label="발행 HTML" value={html} readOnly/></label></details>
+    <details><summary>JSON과 발행 HTML 검사</summary><label>JSON<textarea ref={textarea} aria-label="문서 JSON" value={json} readOnly/></label><label>관리 문서 JSON<textarea aria-label="관리 문서 JSON" value={managedJson} readOnly/></label><label>HTML<textarea aria-label="발행 HTML" value={html} readOnly/></label></details>
     <p className="notice">프로토타입: 공개 발행·모바일 여백 배치·OS별 실제 IME와 다른 브라우저 검증은 후속 단계에서 진행합니다. 한글 웹폰트 자산 연결은 P4 대상입니다.</p>
   </>;
 }

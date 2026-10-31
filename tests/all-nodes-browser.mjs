@@ -33,7 +33,7 @@ try {
  const edited=await exported();assert.match(JSON.stringify(edited),/용어 수정/);
  await page.getByRole('button',{name:'실행 취소',exact:true}).click();assert.deepEqual(await exported(),golden.lexicalState);
  await page.evaluate(()=>localStorage.setItem('lexical-tufte-p1','{invalid JSON'));
- await page.getByRole('button',{name:'불러오기',exact:true}).click();await page.getByRole('status').filter({hasText:'문서를 불러오지 못했습니다.'}).waitFor();
+ await page.getByRole('button',{name:'불러오기',exact:true}).click();await page.getByRole('status').filter({hasText:'관리 문서 검증 실패: 현재 편집 내용을 유지합니다.'}).waitFor();
  assert.deepEqual(await exported(),golden.lexicalState);
  await page.getByRole('button',{name:'다시 실행',exact:true}).click();assert.deepEqual(await exported(),edited);
  await page.evaluate(state=>localStorage.setItem('lexical-tufte-p1',JSON.stringify(state)),golden.lexicalState);

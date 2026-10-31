@@ -1,3 +1,9 @@
+## 2026-10-31 자산 기능 추가 후 밀린 자동 테스트 전수 실행
+
+- f8ed41b의 누적 자산/외부provider 기능 포함 실행. [전체 보고서](VERIFICATION_ASSETS_DEFERRED_2026-10-31.ko.md), [기계 판독 증거](verification/assets-deferred-20261031.json).
+- frozen/static/build/typecheck·unit629·package5·Python16/실제HTTP·revision모델12그룹 통과. browser39개 모두 실행, selector 수정 재실행 포함 최종39/39통과. 이전 자산 등록 UI 실패도 해결. 공식6폭 pixel mask 밖 차이0.
+- E139–E141/M128: lockfile/상태 TDZ, host-only envelope 저장/관리 JSON 출력, chooser 로딩 잔류와 timer/선택 재시도 fixture를 수정했다. 기존 저장/본문/HTML/키보드 회귀 유지. 실제 서비스/OS IME/스크린리더·타 브라우저는 미검증, CI 미실행.
+
 ## 2026-10-31 미뤄둔 자동 테스트 전수 실행
 
 - 원격79d7553의 누적 테스트와 ol value1 reset 수정을 별도 검증 브랜치에 결합했다. [전체 보고서](VERIFICATION_FULL_DEFERRED_2026-10-31.ko.md), [파일별 결과/로그 해시](verification/full-deferred-20261031.json).

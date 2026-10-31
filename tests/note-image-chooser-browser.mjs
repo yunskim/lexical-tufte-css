@@ -59,7 +59,7 @@ try{
  await button('저장').click();
  await button('JSON·HTML 확인').click();
  await page.getByText('JSON과 발행 HTML 검사',{exact:true}).click();
- const read=async()=>JSON.parse(await page.getByRole('textbox',{name:'문서 JSON'}).inputValue());
+ const read=async()=>JSON.parse(await page.getByRole('textbox',{name:'문서 JSON',exact:true}).inputValue());
  const before=await read();
  const note=before.root.children[0].children.find(n=>n.type==='tufte-sidenote');
  assert.ok(note&&note.noteId==='seed-note');

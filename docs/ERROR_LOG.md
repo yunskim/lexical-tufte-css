@@ -985,3 +985,21 @@ inline UI의 paragraph 클릭/End가 주석 anchor 또는 inspector focus를 선
 새 inline UI 전체 실행에서 note insert 후 Undo/Redo의 문서/노트 ID가 복원되지 않았다. insertNote의 update에 HISTORY_PUSH_TAG/discrete가 없어 인접 이력과 합쳐지는 경계를 확인했다. 태그와 동기 commit 후 focus를 적용해 두 폭 회귀 통과.
 
 누적 renderer profile은 ul의 value!=1을 모두 거부했지만 Lexical은 정상 ul에서도1,2,…의 파생값을 저장한다. 실제 목록 깊이/컨테이너 규칙에 따른 순번만 허용하고 임의 value와 비기본 ul.start는 계속 진단 거부한다. 순수 ol의 명시 value1 reset도 이번 미반영 수정을 포함했다. M127. 최초 실패와 수정 후 결과는 전체 보고서에 분리한다.
+
+## E139 — 자산 UI 의존성 lockfile 누락 및 React 상태 TDZ
+
+2026-10-31 자산 누적 검증(f8ed41b): editor-prototype가 editor-ports를 import/package.json에 추가했지만 pnpm-lock에는 없어 frozen install이 실패했다. lockfile을 갱신하고 frozen install을 재통과했다. 다음 build는 effect dependency array에서 assetChooserOpen/assetQuery를 선언 전에 읽어 TS2448/TS2454로 실패했다. 두 상태를 effects 앞에 선언해 build/typecheck/unit629/package5를 재통과했다. 실패한 산출물로 browser를 실행하지 않았다. M128.
+
+## E140 — 외부 자산만 가진 문서의 저장/검사 envelope 누락
+
+host-asset-provider-browser는 연결 후 managed 저장 슬롯이 null임을 재현했다. save가 로컬 assets0개만 보고 raw 저장을 택해 hostAsset locator 문서의 envelope를 저장하지 않았다. 실제 InlineImageNode의 hostAsset 존재를 검사해 관리 문서 저장 경로로 보내도록 수정했다. catalog가 없는 host-only 문서도 locator/revision/alt를 함께 보존한다.
+
+managed-note-assets-browser는 관리 문서 JSON 검사 출력이 없어 timeout했다. 기존 validated exporter의 envelope를 검사 패널에 추가해 저장본과 동일한지 확인한다. 실패 문구와 menu 다음 focus 대상이 자산 UI 추가로 달라진 기존 테스트도 새 명명 계약에 맞춰 수정했다. 문서 불변성/거부/포커스 assertion은 유지했다. M128.
+
+## E141 — chooser 성공/취소 후 resolving 상태 잔류 및 timer fixture 부정확
+
+두 번째 외부 이미지 연결에서 버튼이 로딩 이름/disabled 상태로 남아 timeout했다. closeAssetChooser가 generation을 증가시키므로 요청 finally가 새 generation과 달라 resolving=false를 실행하지 못했다. 닫을 때 명시적으로 로딩 상태를 해제해 재열기/두 번째 연결을 검증했다.
+
+clock.install만 사용한1ms 경계 검사에 실제 경과 시간이 섞여 조기 만료 assertion이 실패했다. Playwright 고정 버전 타입 문서의 권장 순서대로 load 이후 pauseAt을 사용하고 restore rAF는 runFor16으로 진행한다. 선택 재시도 fixture는 실제 노트 안에 두 번째 이미지를 삽입·대상 radio를 명시 선택하며 partial mock은 rev1만 실패하게 하여 rev2 성공 요청을 재시도하지 않는지 검사한다. 기대1ms/5초/60초 경계·정확한 locator call 비교는 완화하지 않았다. M128.
+
+E140 후속 회귀: 관리 문서 JSON textarea 추가 뒤 기존 이미지 chooser/dimensions의 부분 이름 검색이 두 textbox에 일치했다. 두 테스트를 기존 문서 JSON의 exact accessible name으로 이관했고 내용·크기·보존 assertion은 유지한다. 최초 실패와 재실행을 보고서에서 분리한다.

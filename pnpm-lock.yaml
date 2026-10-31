@@ -17,6 +17,9 @@ importers:
       '@lexical-tufte/document':
         specifier: workspace:*
         version: link:../../packages/document
+      '@lexical-tufte/editor-ports':
+        specifier: workspace:*
+        version: link:../../packages/editor-ports
       '@lexical-tufte/lexical':
         specifier: workspace:*
         version: link:../../packages/lexical

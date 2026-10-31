@@ -801,3 +801,9 @@ E137/E138: 테스트 파일 작성만으로 통과 처리하지 않는다. 전�
 fixture는 실제 Lexical factory와 canonical exporter로 구성하고 strict importer의 손실 진단을 우회하지 않는다. load 후 History 등록 테스트는 공개 current entry를 초기화하거나 History를 먼저 등록한다. 구조 삽입은 명시적 history 경계와 commit 후 focus로 검증한다. 파생 listitem.value는 실제 start/nested-container 순번과 대조하고 ul의 임의 번호 속성과 구분한다.
 
 E004/E005/M004의 공식 shell 설치→smoke, E124/M113의 동일 venv pytest/HTTP, E133/M123의 실제 Undo/Redo, E134/M124의 독립 DOM harness와 E135/M125의 fail-closed 출력 정책을 시작/종료에 점검한다. 실제 OS IME/스크린리더·자산 등록 미구현은 자동화 통과로 해결하지 않는다.
+
+## M128 — 자산 UI의 상태·저장·타이머 실행 게이트
+
+E139: workspace 직접 의존성 추가 시 manifest/lockfile을 함께 갱신하고 frozen install→build 결과를 먼저 회수한다. effect dependency array의 상태는 해당 hook 앞에 선언한다.
+E140: 로컬 catalog 개수와 외부 hostAsset 참조 존재를 구분해 envelope 저장 경로를 선택한다. 검사 출력은 별도 조립하지 않고 strict exporter의 같은 envelope를 사용한다. 새 UI로 바뀐 접근성 이름/실제 focus 순서를 명시 이관하고 문서 무변경 검사는 유지한다.
+E141: 취소/성공 close로 generation을 무효화하면 loading 해제 책임도 close에서 가진다. 같은 창 재열기·두 번째 연결을 검사한다. timer 테스트는 load 후 pauseAt/runFor로 실제 시간 혼입을 차단하며 두 이미지/두 revision fixture의 실패·성공 조건을 각각 확인한다. 기존 M004/M113/M123/M124/M127의 환경·같은 Python·실제 이력/DOM/독립 탭 규칙을 시작/종료에 점검한다.

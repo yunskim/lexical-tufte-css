@@ -39,7 +39,7 @@ try{
       },
       async resolve(locator){
         window.__hostCalls.resolve.push(locator);
-        if(window.__hostMode==='throw'||(window.__hostMode==='partial'&&locator.assetId==='remote-image'))throw Error('Temporary provider outage');
+        if(window.__hostMode==='throw'||(window.__hostMode==='partial'&&locator.assetId==='remote-image'&&locator.revisionId==='rev-1'))throw Error('Temporary provider outage');
         if(window.__hostMode==='invalid')return null;
         return {assetId:locator.assetId,revisionId:locator.revisionId||'rev-2',
           mediaType:'image/svg+xml',url:'/fixture.svg',
@@ -49,6 +49,7 @@ try{
   });
   await page.clock.install({time:new Date('2026-10-31T12:00:00.000Z')});
   await page.goto(url);
+  await page.clock.pauseAt(new Date('2026-10-31T12:10:00.000Z'));
   const editor=page.getByRole('textbox',{name:'본문과 사이드노트 편집'});
   const button=name=>page.getByRole('button',{name,exact:true});
   await editor.click();
@@ -78,6 +79,7 @@ try{
   assert.equal(images[0].alt,'외부 자산 이미지');
   assert.equal(images[0].assetId,undefined);
   await button('불러오기').click();
+  await page.clock.runFor(16); // Commit the restore requestAnimationFrame while time is paused.
   await page.waitForFunction(()=>window.__hostCalls.resolve.length>=2);
   await button('외부 이미지 URL 다시 확인').click();
   await page.waitForFunction(()=>window.__hostCalls.resolve.length>=3);
@@ -91,7 +93,7 @@ try{
   // Provider errors must be surfaced, not leak as unhandled page exceptions.
   await page.evaluate(()=>{window.__hostMode='throw';});
   await button('외부 이미지 URL 다시 확인').click();
-  await page.getByRole('status',{name:'편집 작업 상태'}).getByText(/재시도합니다/).waitFor();
+  await page.getByRole('status',{name:'편집 작업 상태'}).getByText(/실패 1개, 재시도 예약/).waitFor();
   await page.evaluate(()=>{window.__hostMode='normal';});
   await button('외부 이미지 URL 다시 확인').click();
   await page.getByRole('status',{name:'편집 작업 상태'}).getByText(/갱신: 1\/1개/).waitFor();
@@ -168,10 +170,15 @@ try{
     window.__hostCalls.resolve.length=0;
   });
   await editor.focus();
-  await page.keyboard.press('Control+End');
+  await page.keyboard.press('Control+Home');
+  await page.keyboard.press('Alt+ArrowDown');
+  await page.keyboard.press('End');
   await button('노트 이미지 삽입').click();
   await button('이미지 라이브러리에서 선택').click();
   const secondDialog=page.getByRole('dialog',{name:'문서 이미지 선택'});
+  const targets=secondDialog.getByRole('group',{name:'교체할 노트 이미지 선택'}).getByRole('radio');
+  assert.equal(await targets.count(),2,'Selective retry requires two real note images');
+  await targets.last().check();
   await secondDialog.getByRole('radio',{name:/Remote image/}).check();
   await secondDialog.getByRole('combobox',{name:'버전'}).selectOption('rev-2');
   await secondDialog.getByRole('button',{name:'선택한 외부 이미지 연결'}).click();

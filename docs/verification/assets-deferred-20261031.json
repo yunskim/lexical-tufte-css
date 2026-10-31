@@ -1,0 +1,1647 @@
+{
+  "date": "2026-10-31",
+  "base": "f8ed41bcaf27ceb6e15aa494e77286c812ac4cc1",
+  "unit": {
+    "total": 629,
+    "packages": {
+      "editor-ports": 2,
+      "document": 58,
+      "render": 72,
+      "blog": 77,
+      "lexical": 420
+    },
+    "fail": 0,
+    "skip": 0
+  },
+  "frozenInstall": "pass-after-lockfile-fix",
+  "build": "pass",
+  "typecheck": "pass",
+  "static": "pass",
+  "package": 5,
+  "python": 16,
+  "pythonHTTP": "pass",
+  "revisionModelGroups": 12,
+  "browser": {
+    "total": 39,
+    "pass": 39,
+    "fail": 0,
+    "initial": [
+      {
+        "file": "all-nodes-browser.mjs",
+        "exit": 1,
+        "seconds": 7.54
+      },
+      {
+        "file": "contextual-ui-browser.mjs",
+        "exit": 1,
+        "seconds": 2.82
+      },
+      {
+        "file": "definition-pairs-browser.mjs",
+        "exit": 0,
+        "seconds": 4.23
+      },
+      {
+        "file": "font-proof-browser.mjs",
+        "exit": 0,
+        "seconds": 1.42
+      },
+      {
+        "file": "full-page-pixel-parity-browser.mjs",
+        "exit": 0,
+        "seconds": 0.77
+      },
+      {
+        "file": "host-asset-provider-browser.mjs",
+        "exit": 1,
+        "seconds": 2.12
+      },
+      {
+        "file": "inline-span-browser.mjs",
+        "exit": 0,
+        "seconds": 19.69
+      },
+      {
+        "file": "inline-span-html-browser.mjs",
+        "exit": 0,
+        "seconds": 1.92
+      },
+      {
+        "file": "layout-browser.mjs",
+        "exit": 0,
+        "seconds": 2.88
+      },
+      {
+        "file": "list-kind-browser.mjs",
+        "exit": 0,
+        "seconds": 8.26
+      },
+      {
+        "file": "list-tab-focus-browser.mjs",
+        "exit": 0,
+        "seconds": 3.38
+      },
+      {
+        "file": "managed-note-assets-browser.mjs",
+        "exit": 1,
+        "seconds": 7.14
+      },
+      {
+        "file": "note-browser.mjs",
+        "exit": 0,
+        "seconds": 3.03
+      },
+      {
+        "file": "note-dom-browser.mjs",
+        "exit": 0,
+        "seconds": 2.23
+      },
+      {
+        "file": "note-editing-browser.mjs",
+        "exit": 0,
+        "seconds": 12.82
+      },
+      {
+        "file": "note-export-parity-browser.mjs",
+        "exit": 0,
+        "seconds": 1.88
+      },
+      {
+        "file": "note-image-chooser-browser.mjs",
+        "exit": 0,
+        "seconds": 2.92
+      },
+      {
+        "file": "note-image-dimensions-browser.mjs",
+        "exit": 0,
+        "seconds": 2.67
+      },
+      {
+        "file": "p22d2-semantic-dom-browser.mjs",
+        "exit": 0,
+        "seconds": 1.47
+      },
+      {
+        "file": "publication-browser.mjs",
+        "exit": 0,
+        "seconds": 4.01
+      },
+      {
+        "file": "quotation-editing-browser.mjs",
+        "exit": 0,
+        "seconds": 14.26
+      },
+      {
+        "file": "recovery-browser.mjs",
+        "exit": 0,
+        "seconds": 2.22
+      },
+      {
+        "file": "section-commands-browser.mjs",
+        "exit": 0,
+        "seconds": 4.93
+      },
+      {
+        "file": "server-browser.mjs",
+        "exit": 0,
+        "seconds": 2.33
+      },
+      {
+        "file": "text-format-browser.mjs",
+        "exit": 0,
+        "seconds": 9.1
+      },
+      {
+        "file": "upstream-dom-browser.mjs",
+        "exit": 0,
+        "seconds": 0.52
+      },
+      {
+        "file": "upstream-full-document-editor-browser.mjs",
+        "exit": 0,
+        "seconds": 3.13
+      },
+      {
+        "file": "upstream-full-document-roundtrip-browser.mjs",
+        "exit": 0,
+        "seconds": 1.52
+      },
+      {
+        "file": "upstream-full-document-visual-browser.mjs",
+        "exit": 0,
+        "seconds": 19.34
+      },
+      {
+        "file": "upstream-full-page-baseline-browser.mjs",
+        "exit": 0,
+        "seconds": 1.03
+      },
+      {
+        "file": "upstream-geometry-browser.mjs",
+        "exit": 0,
+        "seconds": 1.4
+      },
+      {
+        "file": "upstream-newthought-sidenote-browser.mjs",
+        "exit": 0,
+        "seconds": 0.67
+      },
+      {
+        "file": "upstream-same-content-epigraphs-browser.mjs",
+        "exit": 0,
+        "seconds": 0.52
+      },
+      {
+        "file": "upstream-same-content-figures-browser.mjs",
+        "exit": 0,
+        "seconds": 1.37
+      },
+      {
+        "file": "upstream-same-content-final-sections-browser.mjs",
+        "exit": 0,
+        "seconds": 0.62
+      },
+      {
+        "file": "upstream-same-content-fundamentals-browser.mjs",
+        "exit": 0,
+        "seconds": 0.88
+      },
+      {
+        "file": "upstream-same-content-getting-started-browser.mjs",
+        "exit": 0,
+        "seconds": 0.57
+      },
+      {
+        "file": "upstream-same-content-opening-browser.mjs",
+        "exit": 0,
+        "seconds": 0.52
+      },
+      {
+        "file": "upstream-same-content-sidenotes-browser.mjs",
+        "exit": 0,
+        "seconds": 1.77
+      }
+    ],
+    "finalSweep": [
+      {
+        "file": "all-nodes-browser.mjs",
+        "exit": 0,
+        "seconds": 6.79
+      },
+      {
+        "file": "contextual-ui-browser.mjs",
+        "exit": 0,
+        "seconds": 3.38
+      },
+      {
+        "file": "definition-pairs-browser.mjs",
+        "exit": 0,
+        "seconds": 4.18
+      },
+      {
+        "file": "font-proof-browser.mjs",
+        "exit": 0,
+        "seconds": 1.32
+      },
+      {
+        "file": "full-page-pixel-parity-browser.mjs",
+        "exit": 0,
+        "seconds": 0.82
+      },
+      {
+        "file": "host-asset-provider-browser.mjs",
+        "exit": 0,
+        "seconds": 3.29
+      },
+      {
+        "file": "inline-span-browser.mjs",
+        "exit": 0,
+        "seconds": 20.03
+      },
+      {
+        "file": "inline-span-html-browser.mjs",
+        "exit": 0,
+        "seconds": 1.98
+      },
+      {
+        "file": "layout-browser.mjs",
+        "exit": 0,
+        "seconds": 2.89
+      },
+      {
+        "file": "list-kind-browser.mjs",
+        "exit": 0,
+        "seconds": 8.0
+      },
+      {
+        "file": "list-tab-focus-browser.mjs",
+        "exit": 0,
+        "seconds": 3.19
+      },
+      {
+        "file": "managed-note-assets-browser.mjs",
+        "exit": 0,
+        "seconds": 4.04
+      },
+      {
+        "file": "note-browser.mjs",
+        "exit": 0,
+        "seconds": 2.92
+      },
+      {
+        "file": "note-dom-browser.mjs",
+        "exit": 0,
+        "seconds": 2.12
+      },
+      {
+        "file": "note-editing-browser.mjs",
+        "exit": 0,
+        "seconds": 13.33
+      },
+      {
+        "file": "note-export-parity-browser.mjs",
+        "exit": 0,
+        "seconds": 2.01
+      },
+      {
+        "file": "note-image-chooser-browser.mjs",
+        "exit": 1,
+        "seconds": 2.22
+      },
+      {
+        "file": "note-image-dimensions-browser.mjs",
+        "exit": 1,
+        "seconds": 2.04
+      },
+      {
+        "file": "p22d2-semantic-dom-browser.mjs",
+        "exit": 0,
+        "seconds": 0.97
+      },
+      {
+        "file": "publication-browser.mjs",
+        "exit": 0,
+        "seconds": 2.64
+      },
+      {
+        "file": "quotation-editing-browser.mjs",
+        "exit": 0,
+        "seconds": 11.96
+      },
+      {
+        "file": "recovery-browser.mjs",
+        "exit": 0,
+        "seconds": 3.02
+      },
+      {
+        "file": "section-commands-browser.mjs",
+        "exit": 0,
+        "seconds": 6.04
+      },
+      {
+        "file": "server-browser.mjs",
+        "exit": 0,
+        "seconds": 2.32
+      },
+      {
+        "file": "text-format-browser.mjs",
+        "exit": 0,
+        "seconds": 9.58
+      },
+      {
+        "file": "upstream-dom-browser.mjs",
+        "exit": 0,
+        "seconds": 0.62
+      },
+      {
+        "file": "upstream-full-document-editor-browser.mjs",
+        "exit": 0,
+        "seconds": 3.32
+      },
+      {
+        "file": "upstream-full-document-roundtrip-browser.mjs",
+        "exit": 0,
+        "seconds": 1.57
+      },
+      {
+        "file": "upstream-full-document-visual-browser.mjs",
+        "exit": 0,
+        "seconds": 23.93
+      },
+      {
+        "file": "upstream-full-page-baseline-browser.mjs",
+        "exit": 0,
+        "seconds": 1.42
+      },
+      {
+        "file": "upstream-geometry-browser.mjs",
+        "exit": 0,
+        "seconds": 1.78
+      },
+      {
+        "file": "upstream-newthought-sidenote-browser.mjs",
+        "exit": 0,
+        "seconds": 0.72
+      },
+      {
+        "file": "upstream-same-content-epigraphs-browser.mjs",
+        "exit": 0,
+        "seconds": 0.62
+      },
+      {
+        "file": "upstream-same-content-figures-browser.mjs",
+        "exit": 0,
+        "seconds": 1.27
+      },
+      {
+        "file": "upstream-same-content-final-sections-browser.mjs",
+        "exit": 0,
+        "seconds": 0.82
+      },
+      {
+        "file": "upstream-same-content-fundamentals-browser.mjs",
+        "exit": 0,
+        "seconds": 0.67
+      },
+      {
+        "file": "upstream-same-content-getting-started-browser.mjs",
+        "exit": 0,
+        "seconds": 0.52
+      },
+      {
+        "file": "upstream-same-content-opening-browser.mjs",
+        "exit": 0,
+        "seconds": 0.52
+      },
+      {
+        "file": "upstream-same-content-sidenotes-browser.mjs",
+        "exit": 0,
+        "seconds": 2.18
+      }
+    ],
+    "selectorRetests": [
+      {
+        "file": "note-image-chooser-browser.mjs",
+        "exit": 0,
+        "seconds": 2.73
+      },
+      {
+        "file": "note-image-dimensions-browser.mjs",
+        "exit": 0,
+        "seconds": 2.78
+      }
+    ],
+    "effective": [
+      {
+        "file": "all-nodes-browser.mjs",
+        "exit": 0,
+        "seconds": 6.79,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "contextual-ui-browser.mjs",
+        "exit": 0,
+        "seconds": 3.38,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "definition-pairs-browser.mjs",
+        "exit": 0,
+        "seconds": 4.18,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "font-proof-browser.mjs",
+        "exit": 0,
+        "seconds": 1.32,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "full-page-pixel-parity-browser.mjs",
+        "exit": 0,
+        "seconds": 0.82,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "host-asset-provider-browser.mjs",
+        "exit": 0,
+        "seconds": 3.29,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "inline-span-browser.mjs",
+        "exit": 0,
+        "seconds": 20.03,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "inline-span-html-browser.mjs",
+        "exit": 0,
+        "seconds": 1.98,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "layout-browser.mjs",
+        "exit": 0,
+        "seconds": 2.89,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "list-kind-browser.mjs",
+        "exit": 0,
+        "seconds": 8.0,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "list-tab-focus-browser.mjs",
+        "exit": 0,
+        "seconds": 3.19,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "managed-note-assets-browser.mjs",
+        "exit": 0,
+        "seconds": 4.04,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "note-browser.mjs",
+        "exit": 0,
+        "seconds": 2.92,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "note-dom-browser.mjs",
+        "exit": 0,
+        "seconds": 2.12,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "note-editing-browser.mjs",
+        "exit": 0,
+        "seconds": 13.33,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "note-export-parity-browser.mjs",
+        "exit": 0,
+        "seconds": 2.01,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "note-image-chooser-browser.mjs",
+        "exit": 1,
+        "seconds": 2.22,
+        "finalExit": 0,
+        "selectorRetest": true
+      },
+      {
+        "file": "note-image-dimensions-browser.mjs",
+        "exit": 1,
+        "seconds": 2.04,
+        "finalExit": 0,
+        "selectorRetest": true
+      },
+      {
+        "file": "p22d2-semantic-dom-browser.mjs",
+        "exit": 0,
+        "seconds": 0.97,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "publication-browser.mjs",
+        "exit": 0,
+        "seconds": 2.64,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "quotation-editing-browser.mjs",
+        "exit": 0,
+        "seconds": 11.96,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "recovery-browser.mjs",
+        "exit": 0,
+        "seconds": 3.02,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "section-commands-browser.mjs",
+        "exit": 0,
+        "seconds": 6.04,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "server-browser.mjs",
+        "exit": 0,
+        "seconds": 2.32,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "text-format-browser.mjs",
+        "exit": 0,
+        "seconds": 9.58,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "upstream-dom-browser.mjs",
+        "exit": 0,
+        "seconds": 0.62,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "upstream-full-document-editor-browser.mjs",
+        "exit": 0,
+        "seconds": 3.32,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "upstream-full-document-roundtrip-browser.mjs",
+        "exit": 0,
+        "seconds": 1.57,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "upstream-full-document-visual-browser.mjs",
+        "exit": 0,
+        "seconds": 23.93,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "upstream-full-page-baseline-browser.mjs",
+        "exit": 0,
+        "seconds": 1.42,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "upstream-geometry-browser.mjs",
+        "exit": 0,
+        "seconds": 1.78,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "upstream-newthought-sidenote-browser.mjs",
+        "exit": 0,
+        "seconds": 0.72,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "upstream-same-content-epigraphs-browser.mjs",
+        "exit": 0,
+        "seconds": 0.62,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "upstream-same-content-figures-browser.mjs",
+        "exit": 0,
+        "seconds": 1.27,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "upstream-same-content-final-sections-browser.mjs",
+        "exit": 0,
+        "seconds": 0.82,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "upstream-same-content-fundamentals-browser.mjs",
+        "exit": 0,
+        "seconds": 0.67,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "upstream-same-content-getting-started-browser.mjs",
+        "exit": 0,
+        "seconds": 0.52,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "upstream-same-content-opening-browser.mjs",
+        "exit": 0,
+        "seconds": 0.52,
+        "finalExit": 0,
+        "selectorRetest": false
+      },
+      {
+        "file": "upstream-same-content-sidenotes-browser.mjs",
+        "exit": 0,
+        "seconds": 2.18,
+        "finalExit": 0,
+        "selectorRetest": false
+      }
+    ]
+  },
+  "visual": {
+    "widths": [
+      375,
+      759,
+      760,
+      761,
+      1024,
+      1440
+    ],
+    "outsideVerifiedIframePixelDifference": 0
+  },
+  "manualNotRun": [
+    "OS IME",
+    "screenreader",
+    "physical touch/other browsers",
+    "live external DAM service"
+  ],
+  "ci": "not-run",
+  "runtime": {
+    "node": "v24.22.1",
+    "pnpm": "11.25.0"
+  },
+  "sourceHashes": {
+    "pnpm-lock.yaml": "6f1e6e24888d5cdb3804f158cd3ae068fbbdeea0e4cd0d225fa85069139b031c",
+    "examples/editor/src/main.tsx": "0a30e0d69c70328645a453a5d17d4319fd1ce66487aad3f3ac0c023292f8dfe5",
+    "tests/all-nodes-browser.mjs": "6a2df97b87e6bc698588a357f8c56bca0d4195a72ebc8972da64c09007b474b2",
+    "tests/contextual-ui-browser.mjs": "255e2d0534ea782d672d1252d4740ba77def199163d76f057a355d7df232c562",
+    "tests/host-asset-provider-browser.mjs": "084515b608d2d5d18ff4e9c9584414c321b0c08357ca06437a0864b928857ef0",
+    "tests/note-image-chooser-browser.mjs": "c69dda037b41967b0a8e2c72acd808825b670a743bff61e69927192d9c7d1418",
+    "tests/note-image-dimensions-browser.mjs": "b33391b811214987c17afcf3c92d9e0ef683ae55307cbcc30c97e5f67288a407"
+  },
+  "logs": [
+    {
+      "path": "verification-runs/assets-20261031/browser/all-nodes-browser.mjs.log",
+      "sha256": "343d47bb9eacb0c3059dda00a303c5363a77110594bd930e9000d70509915663",
+      "tail": [
+        "",
+        "locator.waitFor: Timeout 5000ms exceeded.",
+        "Call log:",
+        "\u001b[2m  - waiting for getByRole('status').filter({ hasText: '문서를 불러오지 못했습니다.' }) to be visible\u001b[22m",
+        "",
+        "    at /workspace/scratch/259060c11b99/lexical-tufte-css/tests/all-nodes-browser.mjs:36:133 {",
+        "  name: 'TimeoutError'",
+        "}",
+        "",
+        "Node.js v24.22.1"
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/contextual-ui-browser.mjs.log",
+      "sha256": "00aab3aff57f8de848a840c4161c7f7f112d2ea8fc19663da51a3fd8c2313797",
+      "tail": [
+        "    at file:///workspace/scratch/259060c11b99/lexical-tufte-css/tests/contextual-ui-browser.mjs:93:9 {",
+        "  generatedMessage: true,",
+        "  code: 'ERR_ASSERTION',",
+        "  actual: false,",
+        "  expected: true,",
+        "  operator: 'strictEqual',",
+        "  diff: 'simple'",
+        "}",
+        "",
+        "Node.js v24.22.1"
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/definition-pairs-browser.mjs.log",
+      "sha256": "dcbe607645e2be7795a46c293ae808b2ddbfdb655d426b860595e4adb5b21a22",
+      "tail": [
+        "P2.2.b definition browser: pair move/delete, final-pair rejection, JSON save/reopen, canonical HTML, undo/redo PASS."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/font-proof-browser.mjs.log",
+      "sha256": "9bdc915b36876721e126abe4c1cf9f3cb3ef2e48b85df874721fb8cac1a73885",
+      "tail": [
+        "{\"test\":\"R13 Source Han Serif/Sans renamed proof subsets, disjoint ranges, actual custom fonts, Latin isolation, source table advances and browser reference metrics, self CSP and blocked-font fallback\",\"originalComparison\":false,\"knownKoreanFallback\":false,\"fallbackFonts\":[{\"familyName\":\"DejaVu Serif\",\"postScriptName\":\"DejaVuSerif\",\"isCustomFont\":false,\"glyphCount\":36}],\"fontRequests\":8,\"delayedSwap\":{\"delayMs\":150,\"before\":{\"width\":518.484375,\"height\":38.390625},\"after\":{\"width\":828,\"height\":38.390625}},\"woff2Bytes\":45172,\"metrics\":[{\"selector\":\"#serif-hangul\",\"width\":828,\"height\":38.390625},{\"selector\":\"#serif-hanja\",\"width\":336,\"height\":38.390625},{\"selector\":\"#serif-punct\",\"width\":293,\"height\":38.390625},{\"selector\":\"#serif-jamo\",\"width\":92,\"height\":38.390625},{\"selector\":\"#sans-hangul\",\"width\":792,\"height\":38.390625},{\"selector\":\"#sans-hanja\",\"width\":336,\"height\":38.390625},{\"selector\":\"#sans-punct\",\"width\":298,\"height\":38.390625},{\"selector\":\"#sans-jamo\",\"width\":88,\"height\":38.390625},{\"selector\":\"#serif .sidenote\",\"width\":666,\"height\":38.390625},{\"selector\":\"#serif figcaption\",\"width\":586,\"height\":38.390625},{\"selector\":\"#serif td\",\"width\":78.640625,\"height\":40.390625},{\"selector\":\"#sans .sidenote\",\"width\":666,\"height\":38.390625},{\"selector\":\"#sans figcaption\",\"width\":586,\"height\":38.390625},{\"selector\":\"#sans td\",\"width\":75.640625,\"height\":40.390625}]}"
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/full-page-pixel-parity-browser.mjs.log",
+      "sha256": "97833aaf9e806e649fb45c3daa294444ed0906b8094d7e78d13aa0f801bee1b8",
+      "tail": [
+        "Full-page pixel comparator offline regressions: cases written."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/host-asset-provider-browser.mjs.log",
+      "sha256": "0defbbd376ff054f45a4b920de5fcf85bbea236a8ac61aac6ffcea14d40c68ab",
+      "tail": [
+        "    at file:///workspace/scratch/259060c11b99/lexical-tufte-css/tests/host-asset-provider-browser.mjs:72:10 {",
+        "  generatedMessage: true,",
+        "  code: 'ERR_ASSERTION',",
+        "  actual: null,",
+        "  expected: true,",
+        "  operator: '==',",
+        "  diff: 'simple'",
+        "}",
+        "",
+        "Node.js v24.22.1"
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/inline-span-browser.mjs.log",
+      "sha256": "3e82a821e4d30db4e0394c41b6edcd3c45c6cd342945f4fdbd53aa7828e9465d",
+      "tail": [
+        "P2.2.b.1 1440px: real selection, wrap/unwrap undo/redo, save/reopen and composition cancellation/guard PASS.",
+        "P2.2.b.1 375px: real selection, wrap/unwrap undo/redo, save/reopen and composition cancellation/guard PASS."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/inline-span-html-browser.mjs.log",
+      "sha256": "c2b97c4b792c48a808a76d86413f7626e0b6307166fb405ddf426a6d6ea2de78",
+      "tail": [
+        "P2.2.b.1 inline HTML: four kinds, rich link text, direction/alignment, native and publisher roundtrips; unsupported Tufte attributes reject."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/layout-browser.mjs.log",
+      "sha256": "bfe3fe2116b3ebaeb57ae2cd05ddc159cc4da26b77ca662d408075e64237fedc",
+      "tail": [
+        "P1.4 layout: caption/cell editing, JSON roundtrip, direct-child publication structure and reference CSS geometry passed at 1440/761/760/759/375px."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/list-kind-browser.mjs.log",
+      "sha256": "15c4c1c405ab871c7e0f9732e16ec7bb84ce4ad1c51833b1b4772b3aa97e13ed",
+      "tail": [
+        "P2.2.b list browser: ul/ol conversion, structural indent/outdent, safe unwrap, history, save/reopen, renderer, reject PASS."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/list-tab-focus-browser.mjs.log",
+      "sha256": "b3d073dd38f17793b93873704f5190cd6593ac0495ca957d8b2b9cd118e5863f",
+      "tail": [
+        "K4 1440px: ul/ol depth19/20, reject focus, payload and external button navigation PASS",
+        "K4 375px: ul/ol depth19/20, reject focus, payload and external button navigation PASS"
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/managed-note-assets-browser.mjs.log",
+      "sha256": "69edbf206a6d4133479242b0facbe7c470bebea77204499065f81e6fa4ce3a50",
+      "tail": [
+        "",
+        "locator.inputValue: Timeout 5000ms exceeded.",
+        "Call log:",
+        "\u001b[2m  - waiting for getByRole('textbox', { name: '관리 문서 JSON' })\u001b[22m",
+        "",
+        "    at /workspace/scratch/259060c11b99/lexical-tufte-css/tests/managed-note-assets-browser.mjs:103:80 {",
+        "  name: 'TimeoutError'",
+        "}",
+        "",
+        "Node.js v24.22.1"
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/note-browser.mjs.log",
+      "sha256": "ea308fc1f545bf643dc89b2a0190e29a067ed7cedca63ee7a3b66b6d2703ae54",
+      "tail": [
+        "P1.1 Chromium: insertion, keyboard entry/exit, bold/italic/code/link/image, nested rejection, JSON save/reload and HTML structure passed."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/note-dom-browser.mjs.log",
+      "sha256": "b1e3d6c38aff1c5570195530692acf72a20f8e7eba9e20ab9a880b4221cc1c2b",
+      "tail": [
+        "P1.3 DOM: both note kinds, editing/publication separation, label-input-payload adjacency, JSON immutability and upstream mobile CSS toggles passed."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/note-editing-browser.mjs.log",
+      "sha256": "7bbbe929d9ffcf9e137cbf3594577bc515d752629b7c8c2e044d26711bc4827b",
+      "tail": [
+        "  },",
+        "  {",
+        "    \"name\": \"committed Korean composition undoes without a leftover marker\",",
+        "    \"status\": \"passed\"",
+        "  },",
+        "  {",
+        "    \"name\": \"Delete at note end exits without deleting payload\",",
+        "    \"status\": \"passed\"",
+        "  }",
+        "]"
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/note-export-parity-browser.mjs.log",
+      "sha256": "1e68ffc10d91409d14879233c64e03965f5cc958499d782040fe5971a7317b1d",
+      "tail": [
+        "Note HTML parity: rich notes, figure notes and newthought split-parent/negative cases agree between Lexical and publisher (IDs normalized only)."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/note-image-chooser-browser.mjs.log",
+      "sha256": "fe35d72fb5bd3e67a55e0157d2dfffe940138db46795dbccc2e1bfaa424994f3",
+      "tail": [
+        "Wagtail-style note image chooser: mobile grid, second-image selection, metadata, JSON/HTML and cancel covered."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/note-image-dimensions-browser.mjs.log",
+      "sha256": "b4453e50271770e99ddc48d4f442e27c67b34ae6e1d6671f05b6d403d58d0b1f",
+      "tail": [
+        "Note image properties UI: valid, invalid, restore and cleared dimensions covered."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/p22d2-semantic-dom-browser.mjs.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tail": []
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/publication-browser.mjs.log",
+      "sha256": "5b37f55c5dedbaad42113d8a8fbfb6a1b14bcd152d93367d4b6af0844630f053",
+      "tail": [
+        "Publication regression: real definition/cite editing, strict document export, code/ImageQuilt, 5 embed ratios and both Tufte wrappers at 5 widths under enforced CSP (no inline styles/scripts)."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/quotation-editing-browser.mjs.log",
+      "sha256": "c9b7f710d7a6bf6bd6c3fe41855d564ec5efdf334b4544ca8830846d4ad18540",
+      "tail": [
+        "Quotation editing UI 1440px PASS",
+        "Quotation editing UI 375px PASS"
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/recovery-browser.mjs.log",
+      "sha256": "8a7b9067c2149c25021b422d5865fe9d5c4d8855594394dde950d7fffceffd09",
+      "tail": [
+        "Recovery actual UI: early pagehide flush, two-tab isolation, exact damaged-JSON download, cleanup cancellation and explicit deletion PASS."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/section-commands-browser.mjs.log",
+      "sha256": "7390a1b6f861903338bc65574c727590a51222decaa33d6b14a8c73faf06e799",
+      "tail": [
+        "P2.2.a actual React commands: explicit section wrap/add/split/merge, h2/h3/paragraph, note rejection, undo/redo, save/reopen and authoritative render PASS."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/server-browser.mjs.log",
+      "sha256": "32ed579cb7488fa866ea1b85063ac7ff2d7ff89e549268779758ae2383ae7772",
+      "tail": [
+        "Server/browser semantic and geometry parity: 5 widths; no-JS mobile toggles and article namespaces passed."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/text-format-browser.mjs.log",
+      "sha256": "2e8122698430c69772c62b70ed180fb8b1eae734836bfa964d3770cc4268af5a",
+      "tail": [
+        "R10: body/note/link format bits, combinations, toggle off/on, undo/redo, edit, reopen, combined CSS and semantic publication passed."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/upstream-dom-browser.mjs.log",
+      "sha256": "f42c9b689143c776d0f325d1aa426f2c3f1f87b96d05c1a97635683733a3d071",
+      "tail": [
+        "P2.2.e DOM comparison: {\"upstream\":{\"sections\":9,\"notes\":7,\"epigraphs\":3,\"fullwidthFigures\":2},\"published\":{\"sections\":1,\"notes\":2,\"epigraphs\":0,\"fullwidthFigures\":1},\"comparisonLimitation\":\"Independent server fixture does not contain an upstream newthought/sidenote pairing\",\"upstreamSectionOutline\":[{\"index\":1,\"heading\":null,\"directChildren\":[\"p\",\"p\",\"p\",\"p\"],\"notes\":0,\"figures\":0,\"tables\":0},{\"index\":2,\"heading\":\"Getting Started\",\"directChildren\":[\"h2\",\"p\",\"pre\",\"p\"],\"notes\":0,\"figures\":0,\"tables\":0},{\"index\":3,\"heading\":\"Fundamentals\",\"directChildren\":[\"h2\",\"h3\",\"p\",\"p\",\"blockquote\",\"p\",\"p\",\"h3\",\"p\",\"p\",\"p\",\"p\",\"p\",\"p\"],\"notes\":3,\"figures\":0,\"tables\":0},{\"index\":4,\"heading\":\"Epigraphs\",\"directChildren\":[\"h2\",\"div\",\"p\"],\"notes\":0,\"figures\":0,\"tables\":0},{\"index\":5,\"heading\":\"Sidenotes: Footnotes and Marginal Notes\",\"directChildren\":[\"h2\",\"p\",\"p\",\"p\",\"pre\",\"p\",\"p\",\"p\",\"p\",\"p\",\"pre\",\"p\"],\"notes\":2,\"figures\":0,\"tables\":0},{\"index\":6,\"heading\":\"Figures\",\"directChildren\":[\"h2\",\"p\",\"p\",\"figure\",\"p\",\"p\",\"figure\",\"p\",\"pre\",\"figure\",\"p\"],\"notes\":2,\"figures\":3,\"tables\":0},{\"index\":7,\"heading\":\"Code\",\"directChildren\":[\"h2\",\"p\",\"p\",\"pre\"],\"notes\":0,\"figures\":0,\"tables\":0},{\"index\":8,\"heading\":\"ImageQuilts\",\"directChildren\":[\"h2\",\"p\",\"p\",\"figure\",\"p\",\"figure\"],\"notes\":0,\"figures\":2,\"tables\":0},{\"index\":9,\"heading\":\"Epilogue\",\"directChildren\":[\"h2\",\"p\"],\"notes\":0,\"figures\":0,\"tables\":0}],\"publishedFixtureSectionOutline\":[{\"index\":1,\"heading\":null,\"directChildren\":[\"p\",\"p\",\"figure\",\"figure\",\"table\",\"table\",\"div\"],\"notes\":2,\"figures\":2,\"tables\":3}],\"comparisonScope\":\"upstream page vs independent server-document fixture; not same-content parity\"}"
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/upstream-full-document-editor-browser.mjs.log",
+      "sha256": "a577eb05499e38c136fc832ebe0c601f1c748137ec3a7b8006e2d371168b2683",
+      "tail": [
+        "Nine-section real React editor: load, keyboard input, undo/redo, save/reload, immutable eight sections and pure publication parity."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/upstream-full-document-roundtrip-browser.mjs.log",
+      "sha256": "e8dd0d52fbf7e0388446b5f42b108c06888ca7c15985f2e6d787430c3a16bb4c",
+      "tail": [
+        "All-nine-section document: pinned DOM/7 notes, safe iframe/code exceptions, v1->v2 strict Lexical persistence/reopen, one isolated edit, and six iframe CSS viewport checks."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/upstream-full-document-visual-browser.mjs.log",
+      "sha256": "6b0365da6d5fd56efc7bc4259a43ce70e297559b4ace2c1f15cbd0ef796c9304",
+      "tail": [
+        "Pinned full-page pixel parity 375px: exact outside iframe, 9 sections, 5 images, 4 ET Book faces, 7 notes.",
+        "Pinned full-page pixel parity 759px: exact outside iframe, 9 sections, 5 images, 4 ET Book faces, 7 notes.",
+        "Pinned full-page pixel parity 760px: exact outside iframe, 9 sections, 5 images, 4 ET Book faces, 7 notes.",
+        "Pinned full-page pixel parity 761px: exact outside iframe, 9 sections, 5 images, 4 ET Book faces, 7 notes.",
+        "Pinned full-page pixel parity 1024px: exact outside iframe, 9 sections, 5 images, 4 ET Book faces, 7 notes.",
+        "Pinned full-page pixel parity 1440px: exact outside iframe, 9 sections, 5 images, 4 ET Book faces, 7 notes.",
+        "Full-page RGBA parity asserted beyond one verified iframe mask."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/upstream-full-page-baseline-browser.mjs.log",
+      "sha256": "bd4eda65eff6993aec1df52b39cf0b266a240bc9c96fd3969eba28696a24e94d",
+      "tail": [
+        "Upstream full-page reference 1440px: {\"sections\":9,\"notes\":7,\"epigraphs\":3,\"fullwidthFigures\":2,\"invalidNotes\":0,\"hasNewthoughtNote\":true,\"sectionHeadings\":[null,\"Getting Started\",\"Fundamentals\",\"Epigraphs\",\"Sidenotes: Footnotes and Marginal Notes\",\"Figures\",\"Code\",\"ImageQuilts\",\"Epilogue\"],\"articleChildren\":[\"h1\",\"p\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\"],\"viewportWidth\":1440,\"documentWidth\":1440}",
+        "Upstream full-page reference 1024px: {\"sections\":9,\"notes\":7,\"epigraphs\":3,\"fullwidthFigures\":2,\"invalidNotes\":0,\"hasNewthoughtNote\":true,\"sectionHeadings\":[null,\"Getting Started\",\"Fundamentals\",\"Epigraphs\",\"Sidenotes: Footnotes and Marginal Notes\",\"Figures\",\"Code\",\"ImageQuilts\",\"Epilogue\"],\"articleChildren\":[\"h1\",\"p\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\"],\"viewportWidth\":1024,\"documentWidth\":1024}",
+        "Upstream full-page reference 761px: {\"sections\":9,\"notes\":7,\"epigraphs\":3,\"fullwidthFigures\":2,\"invalidNotes\":0,\"hasNewthoughtNote\":true,\"sectionHeadings\":[null,\"Getting Started\",\"Fundamentals\",\"Epigraphs\",\"Sidenotes: Footnotes and Marginal Notes\",\"Figures\",\"Code\",\"ImageQuilts\",\"Epilogue\"],\"articleChildren\":[\"h1\",\"p\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\"],\"viewportWidth\":761,\"documentWidth\":761}",
+        "Upstream full-page reference 760px: {\"sections\":9,\"notes\":7,\"epigraphs\":3,\"fullwidthFigures\":2,\"invalidNotes\":0,\"hasNewthoughtNote\":true,\"sectionHeadings\":[null,\"Getting Started\",\"Fundamentals\",\"Epigraphs\",\"Sidenotes: Footnotes and Marginal Notes\",\"Figures\",\"Code\",\"ImageQuilts\",\"Epilogue\"],\"articleChildren\":[\"h1\",\"p\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\"],\"viewportWidth\":760,\"documentWidth\":760}",
+        "Upstream full-page reference 759px: {\"sections\":9,\"notes\":7,\"epigraphs\":3,\"fullwidthFigures\":2,\"invalidNotes\":0,\"hasNewthoughtNote\":true,\"sectionHeadings\":[null,\"Getting Started\",\"Fundamentals\",\"Epigraphs\",\"Sidenotes: Footnotes and Marginal Notes\",\"Figures\",\"Code\",\"ImageQuilts\",\"Epilogue\"],\"articleChildren\":[\"h1\",\"p\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\"],\"viewportWidth\":759,\"documentWidth\":759}",
+        "Upstream full-page reference 375px: {\"sections\":9,\"notes\":7,\"epigraphs\":3,\"fullwidthFigures\":2,\"invalidNotes\":0,\"hasNewthoughtNote\":true,\"sectionHeadings\":[null,\"Getting Started\",\"Fundamentals\",\"Epigraphs\",\"Sidenotes: Footnotes and Marginal Notes\",\"Figures\",\"Code\",\"ImageQuilts\",\"Epilogue\"],\"articleChildren\":[\"h1\",\"p\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\"],\"viewportWidth\":375,\"documentWidth\":375}"
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/upstream-geometry-browser.mjs.log",
+      "sha256": "1774fb61cb6e9ed2b7221ee777f54ff69593660547ecac7257974c0b9eef3138",
+      "tail": [
+        "Tufte geometry 1440px: [{\"name\":\"upstream\",\"article\":{\"x\":180,\"y\":8,\"width\":1260,\"height\":10533.25},\"section\":{\"x\":180,\"y\":255.5,\"width\":1260,\"height\":825},\"firstParagraph\":{\"x\":180,\"y\":291.5,\"width\":693,\"height\":150},\"note\":{\"x\":942.296875,\"y\":2372.65625,\"width\":346.5,\"height\":21.5},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1},{\"name\":\"published\",\"article\":{\"x\":180,\"y\":8,\"width\":1260,\"height\":2131.5},\"section\":{\"x\":180,\"y\":255.5,\"width\":1260,\"height\":1809},\"firstParagraph\":{\"x\":180,\"y\":291.5,\"width\":693,\"height\":32},\"note\":{\"x\":942.296875,\"y\":296,\"width\":346.5,\"height\":21.5},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1}]",
+        "Tufte geometry 1024px: [{\"name\":\"upstream\",\"article\":{\"x\":128,\"y\":8,\"width\":896,\"height\":12713.5},\"section\":{\"x\":128,\"y\":255.5,\"width\":896,\"height\":1065},\"firstParagraph\":{\"x\":128,\"y\":291.5,\"width\":492.796875,\"height\":180},\"note\":{\"x\":670.078125,\"y\":2961.65625,\"width\":246.390625,\"height\":21.5},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1},{\"name\":\"published\",\"article\":{\"x\":128,\"y\":8,\"width\":896,\"height\":2131.5},\"section\":{\"x\":128,\"y\":255.5,\"width\":896,\"height\":1809},\"firstParagraph\":{\"x\":128,\"y\":291.5,\"width\":492.796875,\"height\":32},\"note\":{\"x\":670.078125,\"y\":296,\"width\":246.390625,\"height\":21.5},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1}]",
+        "Tufte geometry 761px: [{\"name\":\"upstream\",\"article\":{\"x\":95.125,\"y\":8,\"width\":665.875,\"height\":15757.046875},\"section\":{\"x\":95.125,\"y\":255.5,\"width\":665.875,\"height\":1365},\"firstParagraph\":{\"x\":95.125,\"y\":291.5,\"width\":366.21875,\"height\":240},\"note\":{\"x\":497.953125,\"y\":3711.65625,\"width\":183.109375,\"height\":21.5},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1},{\"name\":\"published\",\"article\":{\"x\":95.125,\"y\":8,\"width\":665.875,\"height\":2131.5},\"section\":{\"x\":95.125,\"y\":255.5,\"width\":665.875,\"height\":1809},\"firstParagraph\":{\"x\":95.125,\"y\":291.5,\"width\":366.21875,\"height\":32},\"note\":{\"x\":497.953125,\"y\":296,\"width\":183.109375,\"height\":21.5},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1}]",
+        "Tufte geometry 760px: [{\"name\":\"upstream\",\"article\":{\"x\":60.796875,\"y\":8,\"width\":638.390625,\"height\":10745.59375},\"section\":{\"x\":60.796875,\"y\":255.5,\"width\":638.390625,\"height\":885},\"firstParagraph\":{\"x\":60.796875,\"y\":291.5,\"width\":638.390625,\"height\":150},\"note\":{\"x\":0,\"y\":0,\"width\":0,\"height\":0},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1},{\"name\":\"published\",\"article\":{\"x\":60.796875,\"y\":8,\"width\":638.390625,\"height\":3197.5},\"section\":{\"x\":60.796875,\"y\":255.5,\"width\":638.390625,\"height\":2875},\"firstParagraph\":{\"x\":60.796875,\"y\":291.5,\"width\":638.390625,\"height\":32},\"note\":{\"x\":0,\"y\":0,\"width\":0,\"height\":0},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1}]"
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/upstream-newthought-sidenote-browser.mjs.log",
+      "sha256": "02ac853f7789de63ff8329b25369c625c7aab0d81335f475243ab024838d9100",
+      "tail": [
+        "Newthought/sidenote split-parent DOM and focusable mobile checkbox preserve Tufte CSS adjacency."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/upstream-same-content-epigraphs-browser.mjs.log",
+      "sha256": "9392144922f7b983c71de03768e5ed78cb7f9249960673f59c56cc67d42e74da",
+      "tail": [
+        "Same-content upstream Epigraphs: three blockquotes, direct text/paragraphs, footers, cite, em/code. Only structural indentation omitted."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/upstream-same-content-figures-browser.mjs.log",
+      "sha256": "10e159b95d98382bda19e9bad6977208ee72f9c2590d2fc21cbd8e8c9733f65b",
+      "tail": [
+        "Figures: 11 complete blocks, two rich notes, strict DOM except modern iframe/code, and 375/759/760/761/1024/1440px iframe CSS geometry parity."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/upstream-same-content-final-sections-browser.mjs.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tail": []
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/upstream-same-content-fundamentals-browser.mjs.log",
+      "sha256": "8534ed7de271c6101f52419a71ba851f8b486d0b6da1683d9994a2f925a8c686",
+      "tail": [
+        "Pinned Fundamentals same-content: 14 blocks including quote[cite], p.sans and three real notes, exact DOM except generated note IDs and block indentation."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/upstream-same-content-getting-started-browser.mjs.log",
+      "sha256": "443c9a02c83e85b53ab54313eb7a995c4902f0630488aae22b1e5e8f1b7b24f9",
+      "tail": [
+        "Same-content Getting Started section: heading, paragraphs, inline code, links, pre/code preserved."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/upstream-same-content-opening-browser.mjs.log",
+      "sha256": "ea45882015ab1712ab8e0b34c329649f818355e8ba644cb65c7a6e8d7de81779",
+      "tail": [
+        "Same-content upstream opening section: 4 paragraphs, text and links preserved."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/browser/upstream-same-content-sidenotes-browser.mjs.log",
+      "sha256": "dce51c3af4be98f1b660261a57ee354078c76b7cc07941dd50fa9b0c4a3df318",
+      "tail": [
+        "Pinned same-content Sidenotes section: twelve source blocks, exact rich text and code, two note control sets and 375/760/761/1440px responsive toggles; generated IDs and two source-only control whitespace gaps normalized."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/check-final.log",
+      "sha256": "bfe6507d10624edea94d8933a73a5c7ef9d39a3b348ce843b8ac7d9d40e3bc3c",
+      "tail": [
+        "packages/lexical test: ✔ R05 stale recovery location does not mutate or throw (1.859074ms)",
+        "packages/lexical test: ℹ tests 420",
+        "packages/lexical test: ℹ suites 0",
+        "packages/lexical test: ℹ pass 420",
+        "packages/lexical test: ℹ fail 0",
+        "packages/lexical test: ℹ cancelled 0",
+        "packages/lexical test: ℹ skipped 0",
+        "packages/lexical test: ℹ todo 0",
+        "packages/lexical test: ℹ duration_ms 3287.215865",
+        "packages/lexical test: Done"
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/check-fixes.log",
+      "sha256": "bf7c4eaac35140abd7d53b11436d2eef63db47f7b10289f2faf67895f970f4f5",
+      "tail": [
+        "packages/lexical test: ✔ R05 stale recovery location does not mutate or throw (0.737537ms)",
+        "packages/lexical test: ℹ tests 420",
+        "packages/lexical test: ℹ suites 0",
+        "packages/lexical test: ℹ pass 420",
+        "packages/lexical test: ℹ fail 0",
+        "packages/lexical test: ℹ cancelled 0",
+        "packages/lexical test: ℹ skipped 0",
+        "packages/lexical test: ℹ todo 0",
+        "packages/lexical test: ℹ duration_ms 3407.404604",
+        "packages/lexical test: Done"
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/check-initial.log",
+      "sha256": "b717d7606e23ad58c348b03e1a95b69997824b56e7d1523fec54634c412548a5",
+      "tail": [
+        "examples/editor build: src/main.tsx(524,23): error TS2454: Variable 'assetQuery' is used before being assigned.",
+        "examples/editor build: src/main.tsx(535,6): error TS2448: Block-scoped variable 'assetChooserOpen' used before its declaration.",
+        "examples/editor build: src/main.tsx(535,6): error TS2454: Variable 'assetChooserOpen' is used before being assigned.",
+        "examples/editor build: Failed",
+        "/workspace/scratch/259060c11b99/lexical-tufte-css/examples/editor:",
+        "[ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL] @lexical-tufte/editor-prototype@0.0.0 build: `tsc --noEmit && vite build`",
+        "Exit status 2",
+        "[ELIFECYCLE] Command failed with exit code 2.",
+        "[ELIFECYCLE] Command failed with exit code 2.",
+        "[ELIFECYCLE] Command failed with exit code 2."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/check-retest.log",
+      "sha256": "fe5f23d8bbbaecda0a75d5855a927fe80a2615f2cc4a699b1500fa46544d6909",
+      "tail": [
+        "packages/lexical test: ✔ R05 stale recovery location does not mutate or throw (1.297358ms)",
+        "packages/lexical test: ℹ tests 420",
+        "packages/lexical test: ℹ suites 0",
+        "packages/lexical test: ℹ pass 420",
+        "packages/lexical test: ℹ fail 0",
+        "packages/lexical test: ℹ cancelled 0",
+        "packages/lexical test: ℹ skipped 0",
+        "packages/lexical test: ℹ todo 0",
+        "packages/lexical test: ℹ duration_ms 3571.984355",
+        "packages/lexical test: Done"
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/chooser-build.log",
+      "sha256": "d36f082de43b405a95dbae0b969778a08613d1e8f9bc93971105a9082dccd65f",
+      "tail": [
+        "dist/index.html                   0.34 kB │ gzip:   0.28 kB",
+        "dist/assets/index-C4c6fNxd.css    7.34 kB │ gzip:   2.10 kB",
+        "dist/assets/index-DwFDmjBe.js   657.37 kB │ gzip: 198.33 kB",
+        "",
+        "✓ built in 359ms",
+        "[plugin builtin:vite-reporter] ",
+        "(!) Some chunks are larger than 500 kB after minification. Consider:",
+        "- Using dynamic import() to code-split the application",
+        "- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting",
+        "- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/all-nodes-browser.mjs.log",
+      "sha256": "85e730a38c4d22f1cbab86bc533121f9855751ca2b80b65560fc7527cd7b2c46",
+      "tail": [
+        "R02/R03.d browser: history boundary and actual React editor loads all 33 types, edits definition text, saves/reopens without losing code tokens, note IDs or structure."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/contextual-ui-browser.mjs.log",
+      "sha256": "acb046ad3909544ac14d647e186cee4964328326bdfe4578c0ae36a8a42b5cb7",
+      "tail": [
+        "Contextual UI: formatting, selection snapshot restoration, Escape and Tab focus targets, schema-filtered inserts, undo and 375px bounds PASS."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/definition-pairs-browser.mjs.log",
+      "sha256": "dcbe607645e2be7795a46c293ae808b2ddbfdb655d426b860595e4adb5b21a22",
+      "tail": [
+        "P2.2.b definition browser: pair move/delete, final-pair rejection, JSON save/reopen, canonical HTML, undo/redo PASS."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/font-proof-browser.mjs.log",
+      "sha256": "9bdc915b36876721e126abe4c1cf9f3cb3ef2e48b85df874721fb8cac1a73885",
+      "tail": [
+        "{\"test\":\"R13 Source Han Serif/Sans renamed proof subsets, disjoint ranges, actual custom fonts, Latin isolation, source table advances and browser reference metrics, self CSP and blocked-font fallback\",\"originalComparison\":false,\"knownKoreanFallback\":false,\"fallbackFonts\":[{\"familyName\":\"DejaVu Serif\",\"postScriptName\":\"DejaVuSerif\",\"isCustomFont\":false,\"glyphCount\":36}],\"fontRequests\":8,\"delayedSwap\":{\"delayMs\":150,\"before\":{\"width\":518.484375,\"height\":38.390625},\"after\":{\"width\":828,\"height\":38.390625}},\"woff2Bytes\":45172,\"metrics\":[{\"selector\":\"#serif-hangul\",\"width\":828,\"height\":38.390625},{\"selector\":\"#serif-hanja\",\"width\":336,\"height\":38.390625},{\"selector\":\"#serif-punct\",\"width\":293,\"height\":38.390625},{\"selector\":\"#serif-jamo\",\"width\":92,\"height\":38.390625},{\"selector\":\"#sans-hangul\",\"width\":792,\"height\":38.390625},{\"selector\":\"#sans-hanja\",\"width\":336,\"height\":38.390625},{\"selector\":\"#sans-punct\",\"width\":298,\"height\":38.390625},{\"selector\":\"#sans-jamo\",\"width\":88,\"height\":38.390625},{\"selector\":\"#serif .sidenote\",\"width\":666,\"height\":38.390625},{\"selector\":\"#serif figcaption\",\"width\":586,\"height\":38.390625},{\"selector\":\"#serif td\",\"width\":78.640625,\"height\":40.390625},{\"selector\":\"#sans .sidenote\",\"width\":666,\"height\":38.390625},{\"selector\":\"#sans figcaption\",\"width\":586,\"height\":38.390625},{\"selector\":\"#sans td\",\"width\":75.640625,\"height\":40.390625}]}"
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/full-page-pixel-parity-browser.mjs.log",
+      "sha256": "97833aaf9e806e649fb45c3daa294444ed0906b8094d7e78d13aa0f801bee1b8",
+      "tail": [
+        "Full-page pixel comparator offline regressions: cases written."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/host-asset-provider-browser.mjs.log",
+      "sha256": "45c164708733640dcc3114c2a755ce0e6ba6dfa8b3ebc755224288cb03174faf",
+      "tail": [
+        "Host asset search, revisions, resolve, persistence and reload regressions written."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/inline-span-browser.mjs.log",
+      "sha256": "3e82a821e4d30db4e0394c41b6edcd3c45c6cd342945f4fdbd53aa7828e9465d",
+      "tail": [
+        "P2.2.b.1 1440px: real selection, wrap/unwrap undo/redo, save/reopen and composition cancellation/guard PASS.",
+        "P2.2.b.1 375px: real selection, wrap/unwrap undo/redo, save/reopen and composition cancellation/guard PASS."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/inline-span-html-browser.mjs.log",
+      "sha256": "c2b97c4b792c48a808a76d86413f7626e0b6307166fb405ddf426a6d6ea2de78",
+      "tail": [
+        "P2.2.b.1 inline HTML: four kinds, rich link text, direction/alignment, native and publisher roundtrips; unsupported Tufte attributes reject."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/layout-browser.mjs.log",
+      "sha256": "bfe3fe2116b3ebaeb57ae2cd05ddc159cc4da26b77ca662d408075e64237fedc",
+      "tail": [
+        "P1.4 layout: caption/cell editing, JSON roundtrip, direct-child publication structure and reference CSS geometry passed at 1440/761/760/759/375px."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/list-kind-browser.mjs.log",
+      "sha256": "15c4c1c405ab871c7e0f9732e16ec7bb84ce4ad1c51833b1b4772b3aa97e13ed",
+      "tail": [
+        "P2.2.b list browser: ul/ol conversion, structural indent/outdent, safe unwrap, history, save/reopen, renderer, reject PASS."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/list-tab-focus-browser.mjs.log",
+      "sha256": "b3d073dd38f17793b93873704f5190cd6593ac0495ca957d8b2b9cd118e5863f",
+      "tail": [
+        "K4 1440px: ul/ol depth19/20, reject focus, payload and external button navigation PASS",
+        "K4 375px: ul/ol depth19/20, reject focus, payload and external button navigation PASS"
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/managed-note-assets-browser.mjs.log",
+      "sha256": "e1386bbc1e87bc57cef55e8e409791735ee385664de3bdbe92f4697c8e0f5c00",
+      "tail": [
+        "Managed image catalog, same-envelope save/restore, publication, duplicate and corruption regressions written."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/note-browser.mjs.log",
+      "sha256": "ea308fc1f545bf643dc89b2a0190e29a067ed7cedca63ee7a3b66b6d2703ae54",
+      "tail": [
+        "P1.1 Chromium: insertion, keyboard entry/exit, bold/italic/code/link/image, nested rejection, JSON save/reload and HTML structure passed."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/note-dom-browser.mjs.log",
+      "sha256": "b1e3d6c38aff1c5570195530692acf72a20f8e7eba9e20ab9a880b4221cc1c2b",
+      "tail": [
+        "P1.3 DOM: both note kinds, editing/publication separation, label-input-payload adjacency, JSON immutability and upstream mobile CSS toggles passed."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/note-editing-browser.mjs.log",
+      "sha256": "7bbbe929d9ffcf9e137cbf3594577bc515d752629b7c8c2e044d26711bc4827b",
+      "tail": [
+        "  },",
+        "  {",
+        "    \"name\": \"committed Korean composition undoes without a leftover marker\",",
+        "    \"status\": \"passed\"",
+        "  },",
+        "  {",
+        "    \"name\": \"Delete at note end exits without deleting payload\",",
+        "    \"status\": \"passed\"",
+        "  }",
+        "]"
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/note-export-parity-browser.mjs.log",
+      "sha256": "1e68ffc10d91409d14879233c64e03965f5cc958499d782040fe5971a7317b1d",
+      "tail": [
+        "Note HTML parity: rich notes, figure notes and newthought split-parent/negative cases agree between Lexical and publisher (IDs normalized only)."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/note-image-chooser-browser.mjs.log",
+      "sha256": "60ee788484c05baf05b918a180c54278f4abee86b1930f20a21e259a8166d093",
+      "tail": [
+        "    1) <textarea readonly aria-label=\"문서 JSON\">{↵  \"root\": {↵    \"children\": [↵      {↵        \"…</textarea> aka getByRole('textbox', { name: '문서 JSON', exact: true })",
+        "    2) <textarea readonly aria-label=\"관리 문서 JSON\"></textarea> aka getByRole('textbox', { name: '관리 문서 JSON' })",
+        "",
+        "Call log:",
+        "\u001b[2m  - waiting for getByRole('textbox', { name: '문서 JSON' })\u001b[22m",
+        "",
+        "    at read (/workspace/scratch/259060c11b99/lexical-tufte-css/tests/note-image-chooser-browser.mjs:62:82)",
+        "    at /workspace/scratch/259060c11b99/lexical-tufte-css/tests/note-image-chooser-browser.mjs:63:21",
+        "",
+        "Node.js v24.22.1"
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/note-image-dimensions-browser.mjs.log",
+      "sha256": "9c8d6b9c9c86c1e3425c6c0a2c128ab76c146466682780a10f3a99b5cf94b4e3",
+      "tail": [
+        "locator.inputValue: Error: strict mode violation: getByRole('textbox', { name: '문서 JSON' }) resolved to 2 elements:",
+        "    1) <textarea readonly aria-label=\"문서 JSON\">{↵  \"root\": {↵    \"children\": [↵      {↵        \"…</textarea> aka getByRole('textbox', { name: '문서 JSON', exact: true })",
+        "    2) <textarea readonly aria-label=\"관리 문서 JSON\"></textarea> aka getByRole('textbox', { name: '관리 문서 JSON' })",
+        "",
+        "Call log:",
+        "\u001b[2m  - waiting for getByRole('textbox', { name: '문서 JSON' })\u001b[22m",
+        "",
+        "    at /workspace/scratch/259060c11b99/lexical-tufte-css/tests/note-image-dimensions-browser.mjs:57:73",
+        "",
+        "Node.js v24.22.1"
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/p22d2-semantic-dom-browser.mjs.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tail": []
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/publication-browser.mjs.log",
+      "sha256": "5b37f55c5dedbaad42113d8a8fbfb6a1b14bcd152d93367d4b6af0844630f053",
+      "tail": [
+        "Publication regression: real definition/cite editing, strict document export, code/ImageQuilt, 5 embed ratios and both Tufte wrappers at 5 widths under enforced CSP (no inline styles/scripts)."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/quotation-editing-browser.mjs.log",
+      "sha256": "c9b7f710d7a6bf6bd6c3fe41855d564ec5efdf334b4544ca8830846d4ad18540",
+      "tail": [
+        "Quotation editing UI 1440px PASS",
+        "Quotation editing UI 375px PASS"
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/recovery-browser.mjs.log",
+      "sha256": "8a7b9067c2149c25021b422d5865fe9d5c4d8855594394dde950d7fffceffd09",
+      "tail": [
+        "Recovery actual UI: early pagehide flush, two-tab isolation, exact damaged-JSON download, cleanup cancellation and explicit deletion PASS."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/section-commands-browser.mjs.log",
+      "sha256": "7390a1b6f861903338bc65574c727590a51222decaa33d6b14a8c73faf06e799",
+      "tail": [
+        "P2.2.a actual React commands: explicit section wrap/add/split/merge, h2/h3/paragraph, note rejection, undo/redo, save/reopen and authoritative render PASS."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/server-browser.mjs.log",
+      "sha256": "32ed579cb7488fa866ea1b85063ac7ff2d7ff89e549268779758ae2383ae7772",
+      "tail": [
+        "Server/browser semantic and geometry parity: 5 widths; no-JS mobile toggles and article namespaces passed."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/text-format-browser.mjs.log",
+      "sha256": "2e8122698430c69772c62b70ed180fb8b1eae734836bfa964d3770cc4268af5a",
+      "tail": [
+        "R10: body/note/link format bits, combinations, toggle off/on, undo/redo, edit, reopen, combined CSS and semantic publication passed."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/upstream-dom-browser.mjs.log",
+      "sha256": "f42c9b689143c776d0f325d1aa426f2c3f1f87b96d05c1a97635683733a3d071",
+      "tail": [
+        "P2.2.e DOM comparison: {\"upstream\":{\"sections\":9,\"notes\":7,\"epigraphs\":3,\"fullwidthFigures\":2},\"published\":{\"sections\":1,\"notes\":2,\"epigraphs\":0,\"fullwidthFigures\":1},\"comparisonLimitation\":\"Independent server fixture does not contain an upstream newthought/sidenote pairing\",\"upstreamSectionOutline\":[{\"index\":1,\"heading\":null,\"directChildren\":[\"p\",\"p\",\"p\",\"p\"],\"notes\":0,\"figures\":0,\"tables\":0},{\"index\":2,\"heading\":\"Getting Started\",\"directChildren\":[\"h2\",\"p\",\"pre\",\"p\"],\"notes\":0,\"figures\":0,\"tables\":0},{\"index\":3,\"heading\":\"Fundamentals\",\"directChildren\":[\"h2\",\"h3\",\"p\",\"p\",\"blockquote\",\"p\",\"p\",\"h3\",\"p\",\"p\",\"p\",\"p\",\"p\",\"p\"],\"notes\":3,\"figures\":0,\"tables\":0},{\"index\":4,\"heading\":\"Epigraphs\",\"directChildren\":[\"h2\",\"div\",\"p\"],\"notes\":0,\"figures\":0,\"tables\":0},{\"index\":5,\"heading\":\"Sidenotes: Footnotes and Marginal Notes\",\"directChildren\":[\"h2\",\"p\",\"p\",\"p\",\"pre\",\"p\",\"p\",\"p\",\"p\",\"p\",\"pre\",\"p\"],\"notes\":2,\"figures\":0,\"tables\":0},{\"index\":6,\"heading\":\"Figures\",\"directChildren\":[\"h2\",\"p\",\"p\",\"figure\",\"p\",\"p\",\"figure\",\"p\",\"pre\",\"figure\",\"p\"],\"notes\":2,\"figures\":3,\"tables\":0},{\"index\":7,\"heading\":\"Code\",\"directChildren\":[\"h2\",\"p\",\"p\",\"pre\"],\"notes\":0,\"figures\":0,\"tables\":0},{\"index\":8,\"heading\":\"ImageQuilts\",\"directChildren\":[\"h2\",\"p\",\"p\",\"figure\",\"p\",\"figure\"],\"notes\":0,\"figures\":2,\"tables\":0},{\"index\":9,\"heading\":\"Epilogue\",\"directChildren\":[\"h2\",\"p\"],\"notes\":0,\"figures\":0,\"tables\":0}],\"publishedFixtureSectionOutline\":[{\"index\":1,\"heading\":null,\"directChildren\":[\"p\",\"p\",\"figure\",\"figure\",\"table\",\"table\",\"div\"],\"notes\":2,\"figures\":2,\"tables\":3}],\"comparisonScope\":\"upstream page vs independent server-document fixture; not same-content parity\"}"
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/upstream-full-document-editor-browser.mjs.log",
+      "sha256": "a577eb05499e38c136fc832ebe0c601f1c748137ec3a7b8006e2d371168b2683",
+      "tail": [
+        "Nine-section real React editor: load, keyboard input, undo/redo, save/reload, immutable eight sections and pure publication parity."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/upstream-full-document-roundtrip-browser.mjs.log",
+      "sha256": "e8dd0d52fbf7e0388446b5f42b108c06888ca7c15985f2e6d787430c3a16bb4c",
+      "tail": [
+        "All-nine-section document: pinned DOM/7 notes, safe iframe/code exceptions, v1->v2 strict Lexical persistence/reopen, one isolated edit, and six iframe CSS viewport checks."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/upstream-full-document-visual-browser.mjs.log",
+      "sha256": "6b0365da6d5fd56efc7bc4259a43ce70e297559b4ace2c1f15cbd0ef796c9304",
+      "tail": [
+        "Pinned full-page pixel parity 375px: exact outside iframe, 9 sections, 5 images, 4 ET Book faces, 7 notes.",
+        "Pinned full-page pixel parity 759px: exact outside iframe, 9 sections, 5 images, 4 ET Book faces, 7 notes.",
+        "Pinned full-page pixel parity 760px: exact outside iframe, 9 sections, 5 images, 4 ET Book faces, 7 notes.",
+        "Pinned full-page pixel parity 761px: exact outside iframe, 9 sections, 5 images, 4 ET Book faces, 7 notes.",
+        "Pinned full-page pixel parity 1024px: exact outside iframe, 9 sections, 5 images, 4 ET Book faces, 7 notes.",
+        "Pinned full-page pixel parity 1440px: exact outside iframe, 9 sections, 5 images, 4 ET Book faces, 7 notes.",
+        "Full-page RGBA parity asserted beyond one verified iframe mask."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/upstream-full-page-baseline-browser.mjs.log",
+      "sha256": "bd4eda65eff6993aec1df52b39cf0b266a240bc9c96fd3969eba28696a24e94d",
+      "tail": [
+        "Upstream full-page reference 1440px: {\"sections\":9,\"notes\":7,\"epigraphs\":3,\"fullwidthFigures\":2,\"invalidNotes\":0,\"hasNewthoughtNote\":true,\"sectionHeadings\":[null,\"Getting Started\",\"Fundamentals\",\"Epigraphs\",\"Sidenotes: Footnotes and Marginal Notes\",\"Figures\",\"Code\",\"ImageQuilts\",\"Epilogue\"],\"articleChildren\":[\"h1\",\"p\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\"],\"viewportWidth\":1440,\"documentWidth\":1440}",
+        "Upstream full-page reference 1024px: {\"sections\":9,\"notes\":7,\"epigraphs\":3,\"fullwidthFigures\":2,\"invalidNotes\":0,\"hasNewthoughtNote\":true,\"sectionHeadings\":[null,\"Getting Started\",\"Fundamentals\",\"Epigraphs\",\"Sidenotes: Footnotes and Marginal Notes\",\"Figures\",\"Code\",\"ImageQuilts\",\"Epilogue\"],\"articleChildren\":[\"h1\",\"p\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\"],\"viewportWidth\":1024,\"documentWidth\":1024}",
+        "Upstream full-page reference 761px: {\"sections\":9,\"notes\":7,\"epigraphs\":3,\"fullwidthFigures\":2,\"invalidNotes\":0,\"hasNewthoughtNote\":true,\"sectionHeadings\":[null,\"Getting Started\",\"Fundamentals\",\"Epigraphs\",\"Sidenotes: Footnotes and Marginal Notes\",\"Figures\",\"Code\",\"ImageQuilts\",\"Epilogue\"],\"articleChildren\":[\"h1\",\"p\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\"],\"viewportWidth\":761,\"documentWidth\":761}",
+        "Upstream full-page reference 760px: {\"sections\":9,\"notes\":7,\"epigraphs\":3,\"fullwidthFigures\":2,\"invalidNotes\":0,\"hasNewthoughtNote\":true,\"sectionHeadings\":[null,\"Getting Started\",\"Fundamentals\",\"Epigraphs\",\"Sidenotes: Footnotes and Marginal Notes\",\"Figures\",\"Code\",\"ImageQuilts\",\"Epilogue\"],\"articleChildren\":[\"h1\",\"p\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\"],\"viewportWidth\":760,\"documentWidth\":760}",
+        "Upstream full-page reference 759px: {\"sections\":9,\"notes\":7,\"epigraphs\":3,\"fullwidthFigures\":2,\"invalidNotes\":0,\"hasNewthoughtNote\":true,\"sectionHeadings\":[null,\"Getting Started\",\"Fundamentals\",\"Epigraphs\",\"Sidenotes: Footnotes and Marginal Notes\",\"Figures\",\"Code\",\"ImageQuilts\",\"Epilogue\"],\"articleChildren\":[\"h1\",\"p\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\"],\"viewportWidth\":759,\"documentWidth\":759}",
+        "Upstream full-page reference 375px: {\"sections\":9,\"notes\":7,\"epigraphs\":3,\"fullwidthFigures\":2,\"invalidNotes\":0,\"hasNewthoughtNote\":true,\"sectionHeadings\":[null,\"Getting Started\",\"Fundamentals\",\"Epigraphs\",\"Sidenotes: Footnotes and Marginal Notes\",\"Figures\",\"Code\",\"ImageQuilts\",\"Epilogue\"],\"articleChildren\":[\"h1\",\"p\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\"],\"viewportWidth\":375,\"documentWidth\":375}"
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/upstream-geometry-browser.mjs.log",
+      "sha256": "afbcf842b1c100f8f74968abe835bf159598a467ee5d3aff1a0ed1a03d74b726",
+      "tail": [
+        "Tufte geometry 1440px: [{\"name\":\"upstream\",\"article\":{\"x\":180,\"y\":8,\"width\":1260,\"height\":10533.25},\"section\":{\"x\":180,\"y\":255.5,\"width\":1260,\"height\":825},\"firstParagraph\":{\"x\":180,\"y\":291.5,\"width\":693,\"height\":150},\"note\":{\"x\":942.296875,\"y\":2372.65625,\"width\":346.5,\"height\":21.5},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1},{\"name\":\"published\",\"article\":{\"x\":180,\"y\":8,\"width\":1260,\"height\":2131.5},\"section\":{\"x\":180,\"y\":255.5,\"width\":1260,\"height\":1809},\"firstParagraph\":{\"x\":180,\"y\":291.5,\"width\":693,\"height\":32},\"note\":{\"x\":942.296875,\"y\":296,\"width\":346.5,\"height\":21.5},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1}]",
+        "Tufte geometry 1024px: [{\"name\":\"upstream\",\"article\":{\"x\":128,\"y\":8,\"width\":896,\"height\":12713.5},\"section\":{\"x\":128,\"y\":255.5,\"width\":896,\"height\":1065},\"firstParagraph\":{\"x\":128,\"y\":291.5,\"width\":492.796875,\"height\":180},\"note\":{\"x\":670.078125,\"y\":2961.65625,\"width\":246.390625,\"height\":21.5},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1},{\"name\":\"published\",\"article\":{\"x\":128,\"y\":8,\"width\":896,\"height\":2131.5},\"section\":{\"x\":128,\"y\":255.5,\"width\":896,\"height\":1809},\"firstParagraph\":{\"x\":128,\"y\":291.5,\"width\":492.796875,\"height\":32},\"note\":{\"x\":670.078125,\"y\":296,\"width\":246.390625,\"height\":21.5},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1}]",
+        "Tufte geometry 761px: [{\"name\":\"upstream\",\"article\":{\"x\":95.125,\"y\":8,\"width\":665.875,\"height\":15757.046875},\"section\":{\"x\":95.125,\"y\":255.5,\"width\":665.875,\"height\":1365},\"firstParagraph\":{\"x\":95.125,\"y\":291.5,\"width\":366.21875,\"height\":240},\"note\":{\"x\":497.953125,\"y\":3711.65625,\"width\":183.109375,\"height\":21.5},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1},{\"name\":\"published\",\"article\":{\"x\":95.125,\"y\":8,\"width\":665.875,\"height\":2131.5},\"section\":{\"x\":95.125,\"y\":255.5,\"width\":665.875,\"height\":1809},\"firstParagraph\":{\"x\":95.125,\"y\":291.5,\"width\":366.21875,\"height\":32},\"note\":{\"x\":497.953125,\"y\":296,\"width\":183.109375,\"height\":21.5},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1}]",
+        "Tufte geometry 760px: [{\"name\":\"upstream\",\"article\":{\"x\":60.796875,\"y\":8,\"width\":638.390625,\"height\":10745.59375},\"section\":{\"x\":60.796875,\"y\":255.5,\"width\":638.390625,\"height\":885},\"firstParagraph\":{\"x\":60.796875,\"y\":291.5,\"width\":638.390625,\"height\":150},\"note\":{\"x\":0,\"y\":0,\"width\":0,\"height\":0},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1},{\"name\":\"published\",\"article\":{\"x\":60.796875,\"y\":8,\"width\":638.390625,\"height\":3197.5},\"section\":{\"x\":60.796875,\"y\":255.5,\"width\":638.390625,\"height\":2875},\"firstParagraph\":{\"x\":60.796875,\"y\":291.5,\"width\":638.390625,\"height\":32},\"note\":{\"x\":0,\"y\":0,\"width\":0,\"height\":0},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1}]",
+        "Tufte geometry 759px: [{\"name\":\"upstream\",\"article\":{\"x\":60.71875,\"y\":8,\"width\":637.546875,\"height\":10745.109375},\"section\":{\"x\":60.71875,\"y\":255.5,\"width\":637.546875,\"height\":885},\"firstParagraph\":{\"x\":60.71875,\"y\":291.5,\"width\":637.546875,\"height\":150},\"note\":{\"x\":0,\"y\":0,\"width\":0,\"height\":0},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1},{\"name\":\"published\",\"article\":{\"x\":60.71875,\"y\":8,\"width\":637.546875,\"height\":3197.5},\"section\":{\"x\":60.71875,\"y\":255.5,\"width\":637.546875,\"height\":2875},\"firstParagraph\":{\"x\":60.71875,\"y\":291.5,\"width\":637.546875,\"height\":32},\"note\":{\"x\":0,\"y\":0,\"width\":0,\"height\":0},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1}]",
+        "Tufte geometry 375px: [{\"name\":\"upstream\",\"article\":{\"x\":30,\"y\":8,\"width\":315,\"height\":17568.6875},\"section\":{\"x\":30,\"y\":255.5,\"width\":315,\"height\":1635},\"firstParagraph\":{\"x\":30,\"y\":291.5,\"width\":315,\"height\":300},\"note\":{\"x\":0,\"y\":0,\"width\":0,\"height\":0},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1},{\"name\":\"published\",\"article\":{\"x\":30,\"y\":8,\"width\":315,\"height\":3197.5},\"section\":{\"x\":30,\"y\":255.5,\"width\":315,\"height\":2875},\"firstParagraph\":{\"x\":30,\"y\":291.5,\"width\":315,\"height\":32},\"note\":{\"x\":0,\"y\":0,\"width\":0,\"height\":0},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1}]"
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/upstream-newthought-sidenote-browser.mjs.log",
+      "sha256": "02ac853f7789de63ff8329b25369c625c7aab0d81335f475243ab024838d9100",
+      "tail": [
+        "Newthought/sidenote split-parent DOM and focusable mobile checkbox preserve Tufte CSS adjacency."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/upstream-same-content-epigraphs-browser.mjs.log",
+      "sha256": "9392144922f7b983c71de03768e5ed78cb7f9249960673f59c56cc67d42e74da",
+      "tail": [
+        "Same-content upstream Epigraphs: three blockquotes, direct text/paragraphs, footers, cite, em/code. Only structural indentation omitted."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/upstream-same-content-figures-browser.mjs.log",
+      "sha256": "10e159b95d98382bda19e9bad6977208ee72f9c2590d2fc21cbd8e8c9733f65b",
+      "tail": [
+        "Figures: 11 complete blocks, two rich notes, strict DOM except modern iframe/code, and 375/759/760/761/1024/1440px iframe CSS geometry parity."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/upstream-same-content-final-sections-browser.mjs.log",
+      "sha256": "dde6932b05ce965e7483cae4c34729eaf5ab9926104015d898bcc4ec51b8ffd6",
+      "tail": [
+        "Same-content upstream sections 7–9: code, imagequilts and epilogue; strict DOM parity, no omitted nodes or inline whitespace normalization."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/upstream-same-content-fundamentals-browser.mjs.log",
+      "sha256": "8534ed7de271c6101f52419a71ba851f8b486d0b6da1683d9994a2f925a8c686",
+      "tail": [
+        "Pinned Fundamentals same-content: 14 blocks including quote[cite], p.sans and three real notes, exact DOM except generated note IDs and block indentation."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/upstream-same-content-getting-started-browser.mjs.log",
+      "sha256": "443c9a02c83e85b53ab54313eb7a995c4902f0630488aae22b1e5e8f1b7b24f9",
+      "tail": [
+        "Same-content Getting Started section: heading, paragraphs, inline code, links, pre/code preserved."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/upstream-same-content-opening-browser.mjs.log",
+      "sha256": "ea45882015ab1712ab8e0b34c329649f818355e8ba644cb65c7a6e8d7de81779",
+      "tail": [
+        "Same-content upstream opening section: 4 paragraphs, text and links preserved."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/final/upstream-same-content-sidenotes-browser.mjs.log",
+      "sha256": "dce51c3af4be98f1b660261a57ee354078c76b7cc07941dd50fa9b0c4a3df318",
+      "tail": [
+        "Pinned same-content Sidenotes section: twelve source blocks, exact rich text and code, two note control sets and 375/760/761/1440px responsive toggles; generated IDs and two source-only control whitespace gaps normalized."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/focused/all-nodes-browser.mjs.log",
+      "sha256": "85e730a38c4d22f1cbab86bc533121f9855751ca2b80b65560fc7527cd7b2c46",
+      "tail": [
+        "R02/R03.d browser: history boundary and actual React editor loads all 33 types, edits definition text, saves/reopens without losing code tokens, note IDs or structure."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/focused/contextual-ui-browser.mjs.log",
+      "sha256": "acb046ad3909544ac14d647e186cee4964328326bdfe4578c0ae36a8a42b5cb7",
+      "tail": [
+        "Contextual UI: formatting, selection snapshot restoration, Escape and Tab focus targets, schema-filtered inserts, undo and 375px bounds PASS."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/focused/host-asset-provider-browser.mjs.log",
+      "sha256": "a20ad83d96bdb2fe43b59b420ed79e1144686c4cc48e49481b09121a272cc2b1",
+      "tail": [
+        "    at file:///workspace/scratch/259060c11b99/lexical-tufte-css/tests/host-asset-provider-browser.mjs:104:10 {",
+        "  generatedMessage: false,",
+        "  code: 'ERR_ASSERTION',",
+        "  actual: 8,",
+        "  expected: 7,",
+        "  operator: 'strictEqual',",
+        "  diff: 'simple'",
+        "}",
+        "",
+        "Node.js v24.22.1"
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/focused/managed-note-assets-browser.mjs.log",
+      "sha256": "e1386bbc1e87bc57cef55e8e409791735ee385664de3bdbe92f4697c8e0f5c00",
+      "tail": [
+        "Managed image catalog, same-envelope save/restore, publication, duplicate and corruption regressions written."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/host-chooser-retest.log",
+      "sha256": "45c164708733640dcc3114c2a755ce0e6ba6dfa8b3ebc755224288cb03174faf",
+      "tail": [
+        "Host asset search, revisions, resolve, persistence and reload regressions written."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/host-clock-retest.log",
+      "sha256": "c6795ebfa13f818ca52759417345a987a54bfa8fabcd18538b214e4583ac1650",
+      "tail": [
+        "",
+        "locator.click: Timeout 30000ms exceeded.",
+        "Call log:",
+        "\u001b[2m  - waiting for getByRole('dialog', { name: '문서 이미지 선택' }).getByRole('button', { name: '선택한 외부 이미지 연결' })\u001b[22m",
+        "",
+        "    at /workspace/scratch/259060c11b99/lexical-tufte-css/tests/host-asset-provider-browser.mjs:179:65 {",
+        "  name: 'TimeoutError'",
+        "}",
+        "",
+        "Node.js v24.22.1"
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/host-selective-retest.log",
+      "sha256": "6a98d36598d120693261a07ff6f85671e5cc410e941f93c7e3c5e4004555e091",
+      "tail": [
+        "",
+        "locator.click: Timeout 30000ms exceeded.",
+        "Call log:",
+        "\u001b[2m  - waiting for getByRole('dialog', { name: '문서 이미지 선택' }).getByRole('button', { name: '선택한 외부 이미지 연결' })\u001b[22m",
+        "",
+        "    at /workspace/scratch/259060c11b99/lexical-tufte-css/tests/host-asset-provider-browser.mjs:184:65 {",
+        "  name: 'TimeoutError'",
+        "}",
+        "",
+        "Node.js v24.22.1"
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/http.log",
+      "sha256": "34ec031e9067e8b718f3ebfd97d72270893a0bace86b16fa302ecea8a64612a7",
+      "tail": [
+        "Actual TypeScript client -> Python HTTP -> SQLite: save/read/list/checksum/CAS/denied access/CSRF/delete PASS."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/install-final.log",
+      "sha256": "9142eeb0638dfeb219f5a3ca9fa505dd95fd8f0e216dce759d5159c17673f624",
+      "tail": [
+        "Scope: all 7 workspace projects",
+        "Already up to date",
+        "Done in 521ms using pnpm v11.25.0"
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/install-repair.log",
+      "sha256": "1e180e4a12bc6fd2068d3614832b3d76d56e4686d67e799e69828fb173d47714",
+      "tail": [
+        "Scope: all 7 workspace projects",
+        "Already up to date",
+        "Done in 520ms using pnpm v11.25.0"
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/install.log",
+      "sha256": "07b0cbc5a4b10f93c9447dc36ee54a1ae360abad5103327c6dd73c37e38fe412",
+      "tail": [
+        "",
+        "✓ Lockfile passes supply-chain policies (96 entries in 8.6s)",
+        "[ERR_PNPM_OUTDATED_LOCKFILE] Cannot install with \"frozen-lockfile\" because pnpm-lock.yaml is not up to date with <ROOT>/examples/editor/package.json",
+        "",
+        "Note that in CI environments this setting is true by default. If you still need to run install in such cases, use \"pnpm install --no-frozen-lockfile\"",
+        "",
+        "  Failure reason:",
+        "  specifiers in the lockfile don't match specifiers in package.json:",
+        "* 1 dependencies were added: @lexical-tufte/editor-ports@workspace:*",
+        ""
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/package-final.log",
+      "sha256": "0db51b0fca40e7709cbac5198c03d3431bf2fbb4fdd2acb4086f4faf428e8a73",
+      "tail": [
+        "Checking packed JS imports and editor roundtrip (15s limit).",
+        "R13 five tarballs: full LICENSE/notices/OFL, packed JS imports, fresh declarations, strict editor roundtrip, renderer/blog and SQL exports PASS. No publishing."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/package-fixes.log",
+      "sha256": "0db51b0fca40e7709cbac5198c03d3431bf2fbb4fdd2acb4086f4faf428e8a73",
+      "tail": [
+        "Checking packed JS imports and editor roundtrip (15s limit).",
+        "R13 five tarballs: full LICENSE/notices/OFL, packed JS imports, fresh declarations, strict editor roundtrip, renderer/blog and SQL exports PASS. No publishing."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/package.log",
+      "sha256": "0db51b0fca40e7709cbac5198c03d3431bf2fbb4fdd2acb4086f4faf428e8a73",
+      "tail": [
+        "Checking packed JS imports and editor roundtrip (15s limit).",
+        "R13 five tarballs: full LICENSE/notices/OFL, packed JS imports, fresh declarations, strict editor roundtrip, renderer/blog and SQL exports PASS. No publishing."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/python.log",
+      "sha256": "83fe887bf2e071686a61f255d961399ea4f2b3e5cca225beaf688f129b33d50d",
+      "tail": [
+        "................                                                         [100%]",
+        "=============================== warnings summary ===============================",
+        "../../../../tmp/tufte-assets-venv/lib/python3.12/site-packages/fastapi/testclient.py:1",
+        "  /tmp/tufte-assets-venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.",
+        "    from starlette.testclient import TestClient as TestClient  # noqa",
+        "",
+        "-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html",
+        "16 passed, 1 warning in 0.62s"
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/revision.log",
+      "sha256": "0335599f3a53a5ca42eae6a88f038e8925de7b8552d77628ece28183ba0f090a",
+      "tail": [
+        "Publish revision model: 12 assertions groups passed (pure proposal model, NOT production store)."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/selector-retest/note-image-chooser-browser.mjs.log",
+      "sha256": "fe35d72fb5bd3e67a55e0157d2dfffe940138db46795dbccc2e1bfaa424994f3",
+      "tail": [
+        "Wagtail-style note image chooser: mobile grid, second-image selection, metadata, JSON/HTML and cancel covered."
+      ]
+    },
+    {
+      "path": "verification-runs/assets-20261031/selector-retest/note-image-dimensions-browser.mjs.log",
+      "sha256": "b4453e50271770e99ddc48d4f442e27c67b34ae6e1d6671f05b6d403d58d0b1f",
+      "tail": [
+        "Note image properties UI: valid, invalid, restore and cleared dimensions covered."
+      ]
+    }
+  ]
+}

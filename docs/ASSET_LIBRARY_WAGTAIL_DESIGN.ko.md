@@ -1,6 +1,6 @@
 # 문서 자산 라이브러리 — Wagtail 참고 구현 계약
 
-상태: 3차 설계 검토 반영 / 제품 UI 미구현. 2026-10-31 누적 검증의 `managed-note-assets-browser.mjs` 실패를 해결하기 위한 구현 기준.
+상태: 프로토타입 구현 및 누적 자동 검증 실행 확인. [실행 범위](VERIFICATION_ASSETS_DEFERRED_2026-10-31.ko.md); 전체 제품 수락과 수동 접근성 검증은 별도다. 2026-10-31 누적 검증의 `managed-note-assets-browser.mjs` 실패를 해결하기 위한 구현 기준.
 
 ## 원칙
 
@@ -28,10 +28,10 @@ Wagtail의 이미지 라이브러리처럼 **등록 → 검색·선택 → 문�
 - [ ] A2: 노트 이미지 선택/연결 명령. alt 보존, `assetId/src/width/height` 동시 반영, Undo/Redo.
 - [ ] A3: canonical envelope 저장·불러오기·발행, 기존 관리 문서 덮어쓰기 확인, 오류 상태.
 - [ ] A4: 자산 포함 recovery snapshot 복원, 손상된 관리 문서 거부.
-- [ ] A5: `managed-note-assets-browser.mjs` 포함 전체 테스트 재실행 및 검증 보고서 갱신.
+- [x] A5: `managed-note-assets-browser.mjs` 포함 전체 테스트 재실행 및 검증 보고서 갱신.
 - [ ] A6: Wagtail형 이미지 chooser의 검색/필터/미리보기와 호스트 `AssetProvider` 연동. A1–A5와 분리해 진행.
 
-테스트를 skip하거나 성공으로 바꾸지 않는다. UI 없는 현재 상태는 2026-10-31 보고서 기준 브라우저 37/38 통과이며 전체 통과가 아니다.
+테스트를 skip하거나 성공으로 바꾸지 않는다. 이전 UI 미구현 상태의37/38은 과거 이력이다. 후속 누적 검증에서 자산 등록·host provider를 포함해39/39통과했다. A1–A4/A6의 전체 기능 수락은 테스트로 확인한 범위와 구분한다.
 
 ## 설계 재검토 (2026-10-31, 세 차례)
 

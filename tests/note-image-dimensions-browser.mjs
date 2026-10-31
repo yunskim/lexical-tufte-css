@@ -54,7 +54,7 @@ try{
  assert.equal(await image.getAttribute('height'),'240');
  await page.getByRole('button',{name:'JSON·HTML 확인'}).click();
  await page.getByText('JSON과 발행 HTML 검사',{exact:true}).click();
- const json=JSON.parse(await page.getByRole('textbox',{name:'문서 JSON'}).inputValue());
+ const json=JSON.parse(await page.getByRole('textbox',{name:'문서 JSON',exact:true}).inputValue());
  const note=json.root.children[0].children.find(node=>node.type==='tufte-sidenote');
  assert.ok(note);
  const stored=note.children.find(node=>node.type==='tufte-inline-image');

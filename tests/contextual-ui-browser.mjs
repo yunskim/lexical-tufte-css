@@ -90,7 +90,7 @@ try{
  await editor.locator('h3').click({button:'right'});await group.waitFor();
  await page.waitForFunction(()=>document.activeElement?.textContent==='본문 문단');
  await page.keyboard.press('Tab');await group.waitFor({state:'hidden'});
- assert.equal(await page.locator('.actions button').first().evaluate(element=>element===document.activeElement),true);
+ assert.equal(await page.getByRole('button',{name:'문서 이미지 자산 등록',exact:true}).evaluate(element=>element===document.activeElement),true);
  assert.equal(await page.locator('.block-context-menu.is-floating').count(),0);
  assert.equal(await page.evaluate(()=>document.activeElement?.matches('#tufte-block-menu button')),false);
  await editor.locator('h3').click({button:'right'});await group.waitFor();
