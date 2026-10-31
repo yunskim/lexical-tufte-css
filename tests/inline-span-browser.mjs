@@ -195,7 +195,10 @@ try{
  for(const kind of ['sans','numeral','danger']){
   await editor.locator('.newthought').click();await action(`인라인 ${kind}`).click();
   const changed=await snapshot();
-  assert.equal(collect(changed.root).find(n=>n.type==='tufte-span').kind,kind);
+  const inlineSpans=collect(changed.root).filter(node=>node.type==='tufte-span');
+  assert.equal(inlineSpans.length,1,'Changing inline kind must not duplicate semantic spans');
+  assert.equal(inlineSpans[0].kind,kind,'Toolbar must update the existing inline span kind');
+  assert.equal(inlineSpans[0].children.map(node=>node.text).join(''),'selected','Changing inline kind must preserve selected text');
   await page.getByRole('button',{name:'실행 취소',exact:true}).click();
   const undoneKind=await snapshot();
   assert.deepEqual(undoneKind,wrapped,'Kind change is one undo step');
