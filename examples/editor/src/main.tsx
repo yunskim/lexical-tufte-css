@@ -350,37 +350,43 @@ function EditorUI(){
   const [hostResolving,setHostResolving]=useState(false);
   const hostResolveGeneration=useRef(0);
   const expiryRefreshTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
+  const expiryRefreshDeadline=useRef<number|null>(null);
+  const retryRefreshTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
+  const refreshFailures=useRef(0);
+  const lastHostRefresh=useRef(0);
+  function clearExpiryRefresh(){
+    if(expiryRefreshTimer.current!==null)clearTimeout(expiryRefreshTimer.current);
+    expiryRefreshTimer.current=null;
+    expiryRefreshDeadline.current=null;
+  }
+  function clearRetryRefresh(){
+    if(retryRefreshTimer.current!==null)clearTimeout(retryRefreshTimer.current);
+    retryRefreshTimer.current=null;
+  }
   function scheduleExpiryRefresh(expiresAt?:string){
     if(!expiresAt)return;
     const expiry=Date.parse(expiresAt);
     if(!Number.isFinite(expiry))return;
     const delay=Math.max(1000,expiry-Date.now()-60_000);
-    // Preserve an earlier deadline if several images have expiring URLs.
     const deadline=Date.now()+delay;
     if(expiryRefreshDeadline.current!==null&&expiryRefreshDeadline.current<=deadline)return;
-    if(expiryRefreshTimer.current!==null)clearTimeout(expiryRefreshTimer.current);
+    clearExpiryRefresh();
     expiryRefreshDeadline.current=deadline;
     expiryRefreshTimer.current=setTimeout(()=>{
       expiryRefreshTimer.current=null;expiryRefreshDeadline.current=null;
       void refreshHostAssetURLs();
     },Math.min(delay,2_147_483_647));
   }
-  const expiryRefreshDeadline=useRef<number|null>(null);
-  useEffect(()=>()=>{if(expiryRefreshTimer.current!==null)clearTimeout(expiryRefreshTimer.current);},[]);
-  const refreshFailures=useRef(0);
-  const lastHostRefresh=useRef(0);
   function scheduleRefreshRetry(){
     refreshFailures.current=Math.min(refreshFailures.current+1,6);
     const delay=Math.min(300_000,5000*2**(refreshFailures.current-1));
-    const deadline=Date.now()+delay;
-    if(expiryRefreshDeadline.current!==null&&expiryRefreshDeadline.current<=deadline)return;
-    if(expiryRefreshTimer.current!==null)clearTimeout(expiryRefreshTimer.current);
-    expiryRefreshDeadline.current=deadline;
-    expiryRefreshTimer.current=setTimeout(()=>{
-      expiryRefreshTimer.current=null;expiryRefreshDeadline.current=null;
+    clearRetryRefresh();
+    retryRefreshTimer.current=setTimeout(()=>{
+      retryRefreshTimer.current=null;
       void refreshHostAssetURLs();
     },delay);
   }
+  useEffect(()=>()=>{clearExpiryRefresh();clearRetryRefresh();},[]);
   useEffect(()=>{
     if(!hostAssets.current||!hostNamespaceValid)return;
     const onResume=()=>{
@@ -413,6 +419,7 @@ function EditorUI(){
       setStatus('외부 이미지 갱신을 위한 호스트 설정이 없습니다.');return;
     }
     const generation=++refreshGeneration.current;
+    clearRetryRefresh();
     lastHostRefresh.current=Date.now();
     const images:Array<{key:string;assetId:string;revisionId?:string}>=[];
     editor.getEditorState().read(()=>{
@@ -450,7 +457,7 @@ function EditorUI(){
         },{tag:HISTORY_PUSH_TAG,discrete:true});
         scheduleExpiryRefresh(resolved.expiresAt);
       }
-      if(failed){scheduleRefreshRetry();}else{refreshFailures.current=0;}
+      if(failed){scheduleRefreshRetry();}else{refreshFailures.current=0;clearRetryRefresh();}
       setStatus('외부 이미지 URL 갱신: '+refreshed+'/'+images.length+'개.'+(failed?' 실패 '+failed+'개, 재시도 예약.':''));
     }catch{if(generation===refreshGeneration.current){scheduleRefreshRetry();setStatus('외부 이미지 URL 갱신 중 오류가 발생했습니다. 재시도합니다.');}}
     finally{if(generation===refreshGeneration.current)setRefreshingHostAssets(false);}
