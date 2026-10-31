@@ -334,6 +334,38 @@ function EditorUI(){
   const [noteImages,setNoteImages]=useState<NoteImageChoice[]>([]);
   // Local document catalog. External AssetProvider remains read-only.
   const [documentAssets,setDocumentAssets]=useState<Array<{id:string;src:string;mimeType:string;width?:number;height?:number}>>([]);
+  function connectDocumentAsset(asset:{id:string;src:string;width?:number;height?:number}){
+    let imageKey:string|null=null;
+    editor.getEditorState().read(()=>{
+      const selection=$getSelection();
+      const note=selection?$isRangeSelection(selection)?containingNote(selection.anchor.getNode()):null:null;
+      const collect=(node:LexicalNode):void=>{
+        if(imageKey!==null)return;
+        if(node instanceof InlineImageNode){imageKey=node.getKey();return;}
+        if($isElementNode(node))node.getChildren().forEach(collect);
+      };
+      if(note)note.getChildren().forEach(collect);
+      // A catalog action may move focus out of the editor. The prototype
+      // has a single seeded note, so prefer that note before other images.
+      if(imageKey===null){
+        const root=$getRoot();
+        const findSeed=(node:LexicalNode):void=>{
+          if(imageKey!==null)return;
+          if(node instanceof NoteNode&&node.getNoteId()==='seed-note')node.getChildren().forEach(collect);
+          else if($isElementNode(node))node.getChildren().forEach(findSeed);
+        };
+        findSeed(root);
+      }
+    });
+    if(imageKey===null){setStatus('연결할 노트 이미지가 없습니다.');return;}
+    const key:string=imageKey;
+    editor.update(()=>{
+      const image=$getNodeByKey(key);
+      if(!(image instanceof InlineImageNode)||!containingNote(image))return;
+      image.setDocumentAsset(asset);
+    },{tag:HISTORY_PUSH_TAG,discrete:true});
+    setStatus('선택한 노트 이미지에 문서 자산을 연결했습니다.');
+  }
   function registerDocumentImage(){
     const id=window.prompt('자산 ID');if(id===null)return;
     const src=window.prompt('이미지 URL');if(src===null)return;
@@ -783,7 +815,7 @@ function EditorUI(){
     <section role="group" aria-label="문서 이미지 자산">
       <button type="button" onClick={registerDocumentImage}>문서 이미지 자산 등록</button>
       <p>문서 자산 {documentAssets.length}개</p>
-      <ul>{documentAssets.map(asset=><li key={asset.id}>{asset.id} · {asset.mimeType} · {asset.width??'?'}×{asset.height??'?'}</li>)}</ul>
+      <ul>{documentAssets.map(asset=><li key={asset.id}>{asset.id} · {asset.mimeType} · {asset.width??'?'}×{asset.height??'?'} <button type="button" onClick={()=>connectDocumentAsset(asset)}>선택한 노트 이미지에 {asset.id} 연결</button></li>)}</ul>
     </section>
     <div className="actions"><button onClick={save}>저장</button><button onClick={restore}>불러오기</button><button onClick={restoreRecovery} disabled={!recoveryAvailable}>복구용 사본 열기</button><button onClick={exportRecovery} disabled={!recoveryAvailable}>복구본 JSON 내보내기</button><button onClick={deleteRecovery} disabled={!recoveryAvailable}>복구본 정리</button><button onClick={exportDocument}>JSON·HTML 확인</button><button onClick={()=>{editor.update($loadLayoutFixture,{tag:HISTORY_PUSH_TAG});setStatus('레이아웃 예제를 불러왔습니다. 실행 취소할 수 있습니다.');}}>레이아웃 예제 불러오기</button></div>
     <details><summary>JSON과 발행 HTML 검사</summary><label>JSON<textarea ref={textarea} aria-label="문서 JSON" value={json} readOnly/></label><label>HTML<textarea aria-label="발행 HTML" value={html} readOnly/></label></details>
