@@ -293,7 +293,7 @@ try{
   // A manual refresh is still allowed to supersede that pending automatic request.
   await page.evaluate(()=>{window.__hostMode='normal';});
   await button('외부 이미지 URL 다시 확인').click();
-  await page.getByRole('status',{name:'편집 작업 상태'}).getByText(/갱신: 2\\/2개/).waitFor();
+  await page.getByRole('status',{name:'편집 작업 상태'}).getByText(/갱신: 2\/2개/).waitFor();
   const afterManualOverride=await page.evaluate(()=>window.__hostCalls.resolve.length);
   assert.equal(afterManualOverride,beforeDuplicateResume+2,
     'Manual refresh must resolve both images despite a pending automatic refresh');
@@ -336,7 +336,8 @@ try{
   await page.clock.runFor(60_001);
   await page.evaluate(()=>window.dispatchEvent(new Event('pageshow')));
   await page.waitForFunction(count=>window.__hostCalls.resolve.length>count,beforeResume);
-  // Deleting an image during a pending resolve must not resurrect the removed node.
+  // Keep the deletion scenario independent from the prior image selection and
+  // resume tests: wait for a fresh pending request before removing its node.
   await page.evaluate(()=>{window.__hostMode='deferred';window.__hostPendingResolves=[];});
   await button('외부 이미지 URL 다시 확인').click();
   await page.waitForFunction(()=>window.__hostPendingResolves.length===1);
@@ -350,7 +351,7 @@ try{
       mediaType:'image/svg+xml',url:'/obsolete.svg',
       expiresAt:new Date(Date.now()+120_000).toISOString()});
   });
-  await page.getByRole('status',{name:'편집 작업 상태'}).getByText(/외부 이미지 URL 갱신:/).waitFor();
+  await page.waitForFunction(()=>window.__hostPendingResolves.length===0);
   assert.equal(await page.locator('[data-note-id] img').count(),beforeDelete-1,
     'A delayed provider response must not restore a deleted image');
   assert.equal(await page.locator('[data-note-id] img[src="/obsolete.svg"]').count(),0,
