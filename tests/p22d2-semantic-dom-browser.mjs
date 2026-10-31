@@ -79,15 +79,26 @@ try{
  assert.equal(beforeSemantics.notes.length,(fixtureCounts['tufte-sidenote']??0)+(fixtureCounts['tufte-marginnote']??0),'published note count must match canonical fixture');
  assert.equal(beforeSemantics.lists.length,0,'base fixture intentionally has no lists');
  assert.equal(beforeSemantics.quotations.length,0,'base fixture intentionally has no quotations');
- const enriched=JSON.parse(JSON.stringify(saved.value));
- enriched.lexicalState.root.children[0].children.push(
-  {type:'list',version:1,listType:'number',tag:'ol',start:3,children:[
-   {type:'listitem',version:1,value:3,children:[{type:'text',version:1,text:'Numbered item',format:0}]}
-  ]},
-  {type:'quote',version:1,cite:'https://example.org/source',children:[
-   {type:'paragraph',version:1,children:[{type:'text',version:1,text:'Quoted text',format:0}]}
-  ]}
- );
+ const makeEnrichedFixture=base=>{
+  const document=JSON.parse(JSON.stringify(base));
+  document.lexicalState.root.children[0].children.push(
+   {type:'list',version:1,listType:'number',tag:'ol',start:3,children:[
+    {type:'listitem',version:1,value:3,children:[{type:'text',version:1,text:'Numbered item',format:0}]}
+   ]},
+   {type:'quote',version:1,cite:'https://example.org/source',children:[
+    {type:'paragraph',version:1,children:[{type:'text',version:1,text:'Quoted text',format:0}]}
+   ]}
+  );
+  return document;
+ };
+ const enriched=makeEnrichedFixture(saved.value);
+ // Invalid schema must fail closed rather than silently dropping unsupported nodes.
+ const invalid=JSON.parse(JSON.stringify(enriched));
+ invalid.lexicalState.root.children[0].children.push({type:'future-unsupported-block',version:1,children:[]});
+ const rejectedLoad=loadDocumentIntoEditor(makeEditor(),invalid);
+ assert.equal(rejectedLoad.ok,false,'unknown canonical block must be rejected during load');
+ const rejectedPublication=renderArticle(invalid);
+ assert.equal(rejectedPublication.ok,false,'unknown canonical block must be rejected during publication');
  const enrichedEditor=makeEditor();
  const enrichedLoaded=loadDocumentIntoEditor(enrichedEditor,enriched);
  assert.equal(enrichedLoaded.ok,true,JSON.stringify(enrichedLoaded.diagnostics));
