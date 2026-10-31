@@ -105,6 +105,23 @@ try{
   assert.deepEqual(await semantic(roundtrip.b.html),await semantic(pure.html));
   assert.equal((await semantic(pure.html)).length,2);
   assert.match((await semantic(pure.html))[1].text,/Second/);
+  // Keyboard activation must return focus to the editor with the moved quote selected.
+  await lastSection().locator('.epigraph > blockquote').last().click();
+  await keyboardAction('Epigraph 항목 위로','Space');
+  assert.match(await lastSection().locator('.epigraph > blockquote').first().innerText(),/Second/);
+  const focusMoved=await snapshot();
+  await page.getByRole('button',{name:'실행 취소',exact:true}).click();
+  assert.deepEqual(await snapshot(),appended);
+  await page.getByRole('button',{name:'다시 실행',exact:true}).click();
+  assert.deepEqual(await snapshot(),focusMoved);
+  await lastSection().locator('.epigraph > blockquote').first().click();
+  await keyboardAction('Epigraph 항목 아래로','Enter');
+  assert.deepEqual(await snapshot(),appended);
+  // The quote selected for a move must remain the active edit target.
+  await page.keyboard.insertText(' Focus retained');
+  assert.match(await lastSection().locator('.epigraph > blockquote').last().innerText(),/Focus retained/);
+  const focusEdited=await snapshot();
+  assert.match(JSON.stringify(focusEdited),/Focus retained/);
   // Boundary actions must not mutate the canonical document.
   await lastSection().locator('.epigraph > blockquote').first().click();
   const boundaryBefore=await snapshot();
