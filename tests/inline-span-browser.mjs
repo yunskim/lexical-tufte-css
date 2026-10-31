@@ -23,9 +23,15 @@ try{
  const toolbar=page.getByRole('toolbar',{name:'노트 편집',exact:true});
  const action=name=>toolbar.getByRole('button',{name,exact:true});
  const snapshot=async()=>{
-  await page.getByRole('button',{name:'JSON·HTML 확인',exact:true}).click();
-  if(!await page.locator('details').evaluate(element=>element.open))await page.getByText('JSON과 발행 HTML 검사',{exact:true}).click();
-  return JSON.parse(await page.getByRole('textbox',{name:'문서 JSON',exact:true}).inputValue());
+  const json=page.getByRole('textbox',{name:'문서 JSON',exact:true});
+  // Only open the inspector when needed: repeatedly clicking its toggle can
+  // close the panel and invalidate the JSON textbox locator.
+  if(!await json.isVisible()){
+   await page.getByRole('button',{name:'JSON·HTML 확인',exact:true}).click();
+   if(!await page.locator('details').evaluate(element=>element.open))
+    await page.getByText('JSON과 발행 HTML 검사',{exact:true}).click();
+  }
+  return JSON.parse(await json.inputValue());
  };
  const collect=node=>[node,...(node.children?.flatMap(collect)??[])];
  // Exercise the prototype's real localStorage restore path with the F01-F09
