@@ -244,14 +244,17 @@ try{
   assert.notDeepEqual(changed,baseline,buttonName+' must change canonical editor JSON');
   assert.ok(collect(changed.root).some(node=>node.type===nodeType||(nodeType==='quote'&&node.type==='tufte-quote')),buttonName+' must create a semantic node');
   await page.getByRole('button',{name:'실행 취소',exact:true}).click();
-  assert.deepEqual(await snapshot(),baseline,buttonName+' undo must restore JSON');
-  assert.equal(publish(await snapshot()),baselineHTML,buttonName+' undo must restore published HTML');
+  const undone=await snapshot();
+  assert.deepEqual(undone,baseline,buttonName+' undo must restore JSON');
+  assert.equal(publish(undone),baselineHTML,buttonName+' undo must restore published HTML');
   await page.getByRole('button',{name:'다시 실행',exact:true}).click();
-  assert.deepEqual(await snapshot(),changed,buttonName+' redo must restore JSON');
-  assert.equal(publish(await snapshot()),changedHTML,buttonName+' redo must restore published HTML');
+  const redone=await snapshot();
+  assert.deepEqual(redone,changed,buttonName+' redo must restore JSON');
+  assert.equal(publish(redone),changedHTML,buttonName+' redo must restore published HTML');
   await page.getByRole('button',{name:'실행 취소',exact:true}).click();
-  assert.deepEqual(await snapshot(),baseline,buttonName+' cleanup undo must restore baseline before next command');
-  assert.equal(publish(await snapshot()),baselineHTML,buttonName+' cleanup undo must restore baseline publication');
+  const cleaned=await snapshot();
+  assert.deepEqual(cleaned,baseline,buttonName+' cleanup undo must restore baseline before next command');
+  assert.equal(publish(cleaned),baselineHTML,buttonName+' cleanup undo must restore baseline publication');
  }
  // Note insertion uses the real editor toolbar and generates a fresh ID.
  await focusInsertionPoint();
