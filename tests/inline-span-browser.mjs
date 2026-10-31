@@ -268,7 +268,9 @@ try{
  assert.notDeepEqual(noteChanged,noteBaseline,'note toolbar insertion must modify canonical JSON');
  const noteIds=state=>collect(state.root).filter(node=>node.type==='tufte-sidenote').map(node=>node.noteId);
  const existingNoteIds=new Set(noteIds(noteBaseline));
- assert.ok(noteIds(noteChanged).some(id=>typeof id==='string'&&id.length>0&&!existingNoteIds.has(id)),'note toolbar must create a sidenote with a fresh nonempty ID');
+ const insertedNoteIds=noteIds(noteChanged);
+ assert.equal(insertedNoteIds.length,existingNoteIds.size+1,'one toolbar action must insert exactly one sidenote');
+ assert.ok(insertedNoteIds.some(id=>typeof id==='string'&&id.length>0&&!existingNoteIds.has(id)),'note toolbar must create a sidenote with a fresh nonempty ID');
  const noteChangedHTML=noteDoc(noteChanged);
  assert.notEqual(noteChangedHTML,noteBaselineHTML,'note insertion must change published HTML');
  await page.getByRole('button',{name:'실행 취소',exact:true}).click();
