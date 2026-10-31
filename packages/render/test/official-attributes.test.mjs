@@ -167,3 +167,31 @@ test('F03 unsafe URL and invalid target fail closed with exact property paths',(
   assert.ok(result.diagnostics.some(d=>d.code===code&&d.path.endsWith('.'+key)),JSON.stringify(result.diagnostics));
  }
 });
+
+test('F01-F09 common direction and alignment publish as semantic attributes',()=>{
+ const doc=fixture();
+ const section=doc.lexicalState.root.children[0];
+ section.direction='rtl';
+ section.format='center';
+ section.children.push(element('paragraph',[text('Aligned')],{direction:'ltr',format:'right'}));
+ const before=structuredClone(doc);
+ const result=renderArticle(doc);
+ assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+ assert.match(result.html,/<section[^>]*dir="rtl"[^>]*class="tufte-align-center"/);
+ assert.match(result.html,/<p[^>]*dir="ltr"[^>]*class="tufte-align-right">Aligned<\/p>/);
+ assert.deepEqual(doc,before);
+});
+
+test('F01 root nondefault direction or alignment is rejected with exact path',()=>{
+ for(const [key,value] of [['direction','rtl'],['format','center']]){
+  const doc=fixture();
+  doc.lexicalState.root[key]=value;
+  assert.equal(validateDocument(doc).ok,true);
+  const before=structuredClone(doc);
+  const result=renderArticle(doc);
+  assert.equal(result.ok,false);
+  assert.equal(result.html,null);
+  assert.ok(result.diagnostics.some(d=>d.code==='UNSUPPORTED_RENDER_PROPERTY'&&d.path==='$.lexicalState.root.'+key),JSON.stringify(result.diagnostics));
+  assert.deepEqual(doc,before);
+ }
+});
