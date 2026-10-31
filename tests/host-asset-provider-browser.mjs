@@ -22,6 +22,7 @@ try{
   page.on('pageerror',error=>errors.push(error.message));
   await page.addInitScript(()=>{
     window.__hostCalls={search:[],revisions:[],resolve:[]};
+    window.__hostMode='normal';
     window.lexicalTufteAssetNamespace='test-host';
     window.lexicalTufteAssetProvider={
       async search(query,signal){
@@ -37,6 +38,8 @@ try{
       },
       async resolve(locator){
         window.__hostCalls.resolve.push(locator);
+        if(window.__hostMode==='throw')throw Error('Temporary provider outage');
+        if(window.__hostMode==='invalid')return null;
         return {assetId:locator.assetId,revisionId:locator.revisionId||'rev-2',
           mediaType:'image/svg+xml',url:'/fixture.svg',
           expiresAt:new Date(Date.now()+3600_000).toISOString()};
@@ -76,6 +79,20 @@ try{
   await page.waitForFunction(()=>window.__hostCalls.resolve.length>=2);
   await button('외부 이미지 URL 다시 확인').click();
   await page.waitForFunction(()=>window.__hostCalls.resolve.length>=3);
+  // Invalid resolver responses must leave the existing image reference intact.
+  await page.evaluate(()=>{window.__hostMode='invalid';});
+  await button('외부 이미지 URL 다시 확인').click();
+  await page.getByRole('status',{name:'편집 작업 상태'}).getByText(/재시도 예약/).waitFor();
+  const afterInvalid=await page.evaluate(()=>document.querySelector('[data-note-id="seed-note"] img')?.getAttribute('src'));
+  assert.equal(afterInvalid,'/fixture.svg');
+
+  // Provider errors must be surfaced, not leak as unhandled page exceptions.
+  await page.evaluate(()=>{window.__hostMode='throw';});
+  await button('외부 이미지 URL 다시 확인').click();
+  await page.getByRole('status',{name:'편집 작업 상태'}).getByText(/재시도합니다/).waitFor();
+  await page.evaluate(()=>{window.__hostMode='normal';});
+  await button('외부 이미지 URL 다시 확인').click();
+  await page.getByRole('status',{name:'편집 작업 상태'}).getByText(/갱신: 1\/1개/).waitFor();
   assert.deepEqual(errors,[]);
   console.log('Host asset search, revisions, resolve, persistence and reload regressions written.');
 }finally{
