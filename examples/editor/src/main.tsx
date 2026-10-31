@@ -1,3 +1,4 @@
+import type {AssetProvider,AssetSummary,AssetRevision} from '@lexical-tufte/editor-ports';
 import {validateDocument, type TufteDocument} from '@lexical-tufte/document';
 import {useEffect, useRef, useState, type MouseEvent} from 'react';
 import {createRoot} from 'react-dom/client';
@@ -335,6 +336,39 @@ function EditorUI(){
   const [noteImages,setNoteImages]=useState<NoteImageChoice[]>([]);
   // Local document catalog. External AssetProvider remains read-only.
   const [documentAssets,setDocumentAssets]=useState<Array<{id:string;src:string;mimeType:string;width?:number;height?:number}>>([]);
+  // The embedding host may provide this capability; the standalone example
+  // intentionally does not create a network client or bind to Magnolia Works.
+  const hostAssets=useRef<AssetProvider|null>(
+    (window as Window & {lexicalTufteAssetProvider?:AssetProvider}).lexicalTufteAssetProvider??null);
+  const [hostResults,setHostResults]=useState<AssetSummary[]>([]);
+  const [hostRevisions,setHostRevisions]=useState<AssetRevision[]>([]);
+  const [hostAssetId,setHostAssetId]=useState<string|null>(null);
+  const [hostRevisionId,setHostRevisionId]=useState<string|null>(null);
+  const [hostLoading,setHostLoading]=useState(false);
+  const [hostError,setHostError]=useState('');
+  useEffect(()=>{
+    const provider=hostAssets.current;
+    if(!provider||!assetChooserOpen)return;
+    const controller=new AbortController();
+    let current=true;
+    setHostLoading(true);setHostError('');
+    provider.search({text:assetQuery,mediaTypes:['image/png','image/jpeg','image/webp','image/svg+xml'],limit:40},controller.signal)
+      .then(page=>{if(current)setHostResults(page.items.filter(item=>item.mediaType.startsWith('image/')));})
+      .catch(()=>{if(current)setHostError('외부 이미지 검색에 실패했습니다.');})
+      .finally(()=>{if(current)setHostLoading(false);});
+    return()=>{current=false;controller.abort();};
+  },[assetChooserOpen,assetQuery]);
+  useEffect(()=>{
+    const provider=hostAssets.current;
+    if(!provider||!assetChooserOpen||!hostAssetId)return;
+    const controller=new AbortController();
+    let current=true;
+    setHostRevisions([]);setHostRevisionId(null);
+    provider.revisions(hostAssetId,{limit:40},controller.signal)
+      .then(page=>{if(current)setHostRevisions(page.items);})
+      .catch(()=>{if(current)setHostError('외부 자산 버전을 조회하지 못했습니다.');});
+    return()=>{current=false;controller.abort();};
+  },[assetChooserOpen,hostAssetId]);
   const [assetChooserOpen,setAssetChooserOpen]=useState(false);
   const [assetQuery,setAssetQuery]=useState('');
   const [assetChoice,setAssetChoice]=useState<string|null>(null);
@@ -948,6 +982,22 @@ function EditorUI(){
           <img src={asset.src} alt="" width="72" height="54" loading="lazy"/>
           {asset.id} · {asset.mimeType} · {asset.width??'?'}×{asset.height??'?'}</label>
         </li>)}</ul>
+        {hostAssets.current&&<section aria-label="외부 이미지 자산">
+          <h3>호스트 이미지</h3>
+          {hostLoading&&<p role="status">검색 중…</p>}
+          {hostError&&<p role="alert">{hostError}</p>}
+          <ul>{hostResults.map(item=><li key={item.id}>
+            <label><input type="radio" name="host-asset" checked={hostAssetId===item.id}
+              onChange={()=>{setHostAssetId(item.id);setHostRevisionId(null);setAssetChoice(null);}}/>
+              {item.title} · {item.mediaType}</label>
+          </li>)}</ul>
+          {hostAssetId&&<label>버전
+            <select value={hostRevisionId??''} onChange={event=>setHostRevisionId(event.target.value||null)}>
+              <option value="">최신 버전</option>
+              {hostRevisions.map(revision=><option key={revision.id} value={revision.id}>{revision.id}</option>)}
+            </select>
+          </label>}
+        </section>}
         <button type="button" onClick={closeAssetChooser}>취소</button>
         <button type="button" disabled={!assetChoice||!assetTargetKey} onClick={connectChosenAsset}>선택한 이미지 연결</button>
       </div>
