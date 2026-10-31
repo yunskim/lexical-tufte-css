@@ -99,8 +99,10 @@ try{
   const matchingNodes=state=>collect(state.root).filter(node=>node.type===nodeType||(nodeType==='quote'&&node.type==='tufte-quote'));
   if(nodeType==='tufte-sidenote')
    assert.ok(matchingNodes(changed).length>matchingNodes(baseline).length,buttonName+' must add a new sidenote');
-  else
+  else{
+   assert.ok(matchingNodes(changed).length>0,buttonName+' must leave the requested semantic block in the document');
    assert.notDeepEqual(matchingNodes(changed),matchingNodes(baseline),buttonName+' must create or transform the requested structural block');
+  }
   const beforeHTML=renderArticle({...representative,lexicalState:baseline});
   const changedHTML=renderArticle({...representative,lexicalState:changed});
   assert.equal(beforeHTML.ok,true,JSON.stringify(beforeHTML.diagnostics));
