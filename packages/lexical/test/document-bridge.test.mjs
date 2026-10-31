@@ -961,3 +961,10 @@ for(const [name,load] of [['strict',loadDocumentIntoEditor],['migrated',loadMigr
   }finally{unregister();}
  });
 }
+
+test('root presentation remains in canonical editor storage even when publication is deferred',()=>{
+ const doc=fixture();doc.lexicalState.root.direction='rtl';doc.lexicalState.root.format='right';const before=structuredClone(doc);
+ const e=editor(),loaded=loadDocumentIntoEditor(e,doc);assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
+ const exported=exportEditorToDocument(e,doc);assert.equal(exported.ok,true,JSON.stringify(exported.diagnostics));
+ assert.equal(exported.value.lexicalState.root.direction,'rtl');assert.equal(exported.value.lexicalState.root.format,'right');assert.deepEqual(doc,before);
+});

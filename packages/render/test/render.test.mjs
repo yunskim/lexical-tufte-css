@@ -444,3 +444,13 @@ test('host references cannot contain nested URL or host links',()=>{
   assert.ok(result.diagnostics.some(x=>x.code==='INVALID_CHILD'||x.code==='NESTED_LINK'),JSON.stringify(result.diagnostics));
  }
 });
+
+for(const [field,value] of [['direction','rtl'],['direction','ltr'],['format','center'],['format','right']])test(`root ${field}:${value} cannot silently disappear during publication`,()=>{
+ const d=fixture();d.lexicalState.root[field]=value;const before=structuredClone(d);
+ assert.equal(validateDocument(d).ok,true);
+ const result=renderArticle(d);assert.equal(result.ok,false);assert.equal(result.html,null);
+ assert.ok(result.diagnostics.some(x=>x.code==='UNSUPPORTED_RENDER_PROPERTY'&&x.path===`$.lexicalState.root.${field}`));assert.deepEqual(d,before);
+});
+test('default root direction/alignment remain publishable',()=>{
+ const d=fixture();d.lexicalState.root.direction=null;d.lexicalState.root.format='';const r=renderArticle(d);assert.equal(r.ok,true,JSON.stringify(r.diagnostics));
+});

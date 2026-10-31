@@ -7,6 +7,8 @@ export function validateRenderProfile(doc:TufteDocument):Diagnostic[]{
  function visit(n:JsonNode,path:string,listDepth=0){
   const add=(key:string,message:string)=>{if(diagnostics.length<100)diagnostics.push({code:'UNSUPPORTED_RENDER_PROPERTY',path:path+(key?'.'+key:''),message});};
   if(!supported.has(n.type)){if(diagnostics.length<100)diagnostics.push({code:'UNSUPPORTED_RENDER_NODE',path:path+'.type',message:`${n.type} has schema but no ${RENDER_PROFILE} renderer`});return;}
+  // Root has no dedicated HTML wrapper; do not discard its presentation fields.
+  if(n.type==='root')for(const key of ['direction','format'] as const)if(n[key])add(key,'Root presentation is not yet published');
   if('children'in n){
    // Lexical serializes structural list depth as listitem.indent. Nesting
    // already expresses that depth in HTML; other indentation stays unsupported.

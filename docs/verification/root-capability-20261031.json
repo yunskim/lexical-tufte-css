@@ -1,0 +1,73 @@
+{
+  "base": "27cad1a91c41ebc3195ede4c5902fed6e7a1a5d2",
+  "task": "P2.2.d.1 initial matrix/root capability",
+  "status": "partial",
+  "initialNewFailures": 4,
+  "addedTests": 6,
+  "check": {
+    "unit": 594,
+    "lexical": 401,
+    "render": 57,
+    "fail": 0,
+    "skip": 0,
+    "build": "pass",
+    "typecheck": "pass",
+    "static": "pass"
+  },
+  "package": 5,
+  "notRun": [
+    "browser",
+    "pixel",
+    "Python",
+    "CI"
+  ],
+  "hashes": {
+    "packages/render/src/profile.ts": "b7d605998c2c92cc2cd863de2fb0c5792180bbb6c73bd7f6bc114d8172c5c77c",
+    "packages/render/test/render.test.mjs": "bbe0a4e2b56cf03edceebf9378a93dc5792f93b7ac8775ecd674b9a915195923",
+    "packages/lexical/test/document-bridge.test.mjs": "afacce79639fed6a3b069468bc72920bc4134127743fc7506fdaa6212c29199e"
+  },
+  "logs": {
+    "capability-before.log": {
+      "sha256": "5954645b044efdd4834e49628cbdb565286aa91af4da36dda50667b90ef71ca5",
+      "tail": [
+        "      at Test.run (node:internal/test_runner/test:1467:12)",
+        "      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {",
+        "    generatedMessage: true,",
+        "    code: 'ERR_ASSERTION',",
+        "    actual: true,",
+        "    expected: false,",
+        "    operator: 'strictEqual',",
+        "    diff: 'simple'",
+        "  }"
+      ]
+    },
+    "capability-check.log": {
+      "sha256": "5a8fb4e8053939b03e3d8d03c27dc91c754ba1d5b4457635585d5c94a88df36a",
+      "tail": [
+        "packages/lexical test: ℹ tests 401",
+        "packages/lexical test: ℹ suites 0",
+        "packages/lexical test: ℹ pass 401",
+        "packages/lexical test: ℹ fail 0",
+        "packages/lexical test: ℹ cancelled 0",
+        "packages/lexical test: ℹ skipped 0",
+        "packages/lexical test: ℹ todo 0",
+        "packages/lexical test: ℹ duration_ms 3353.311581",
+        "packages/lexical test: Done"
+      ]
+    },
+    "capability-package.log": {
+      "sha256": "c74a5a61f53d2bd74e343402336cbc9c0fba2380182ac2d0a23d134d8490908b",
+      "tail": [
+        "examples/editor build: [plugin builtin:vite-reporter] ",
+        "examples/editor build: (!) Some chunks are larger than 500 kB after minification. Consider:",
+        "examples/editor build: - Using dynamic import() to code-split the application",
+        "examples/editor build: - Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting",
+        "examples/editor build: - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.",
+        "examples/editor build: ✓ built in 315ms",
+        "examples/editor build: Done",
+        "Checking packed JS imports and editor roundtrip (15s limit).",
+        "R13 five tarballs: full LICENSE/notices/OFL, packed JS imports, fresh declarations, strict editor roundtrip, renderer/blog and SQL exports PASS. No publishing."
+      ]
+    }
+  }
+}

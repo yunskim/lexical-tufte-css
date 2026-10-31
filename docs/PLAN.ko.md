@@ -187,7 +187,7 @@ P1 gate: 완료. 노트 편집 회귀와 SSR 출력의 실제 브라우저 비�
     - [x] P2.2.c.1 이미 구현된 생성·출처 추가 명령을 기준으로 기존 노드의 속성/내용 수정, 출처·인용 삭제, 복수 epigraph 항목 관리의 지원/거부 경계를 정한다. [명령 계약·구현 체크리스트](QUOTATION_COMMANDS_P22C.ko.md)에 범위 설계 완료; C1.a URL/삭제 명령·예제 UI 구현, check551·quotation63·UI1440/375px·package5개 통과. C1.b epigraph 내부 항목 추가/이동 구현·회귀 검증 완료. 최종 check564·집중45·UI1440/375px. C2 전체 수락은 별도 미완료.
     - [ ] P2.2.c.2 선택 위치·동일 블록 원자성·undo/redo·JSON→발행 HTML·재열기·스크린리더 읽기 순서를 회귀 검증한다. [자동화 결과](VERIFICATION_QUOTATION_ACCESS_2026-10-31.ko.md): Tab/Shift+Tab17버튼·1440/375px·DOM 본문/출처/문헌 순서 통과. 실제 스크린리더 낭독 검증은 P6.2/P6.6에 남아 미완료.
   - [ ] P2.2.d F01–F09 직렬화·발행 지원 경계 통합 검증. F04 전체 폰트/시각 증거는 P4와 연결.
-    - [ ] P2.2.d.1 `NODE_SCHEMA`에서 허용되는 타입/속성과 editor import/export 및 순수 renderer capability를 기능별 매트릭스로 대조한다. 구현하지 않은 속성은 침묵 변환 대신 진단·발행 차단.
+    - [ ] P2.2.d.1 `NODE_SCHEMA`에서 허용되는 타입/속성과 editor import/export 및 순수 renderer capability를 기능별 매트릭스로 대조한다. 구현하지 않은 속성은 침묵 변환 대신 진단·발행 차단. [F01–F09 첫18타입 대조](CAPABILITY_F01_F09_P22D.ko.md), root 방향/정렬 침묵 손실 E135 수정·check594 통과. 목록/나머지 타입 전수 대조는 미완료.
     - [ ] P2.2.d.2 F01–F09 대표/거부 fixture에 대해 편집→JSON 저장→재열기→HTML 발행→semantic DOM 비교를 실행하고 명령별 history/IME/접근성 증거를 남긴다.
   - [ ] P2.2.e 공식 Tufte CSS 1.9.0 고정 예제 `index.html`의 의미 있는 DOM 요소·부모/자식·순서·CSS direct-child 관계를 전수 대조한다. `fixtures/tufte/inventory.json`의 selector 목록과 별개로 예제 DOM → F01–F22 → 문서 schema → Lexical node/command → 순수 renderer HTML의 대응표와 대표/거부 fixture를 작성한다. 한 논리 노드가 여러 HTML 요소로 출력되는 note처럼 1:n 관계를 명시하고, 비지원·의도적 차이는 진단/ADR에 남긴다. **P2.2의 기능별 수락 전에 대응표의 관련 행을 먼저 확인한다.**
 - [ ] P2.3 F10–F19 노트·그림·표·코드·embed 구현.

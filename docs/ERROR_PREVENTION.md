@@ -789,3 +789,7 @@ E059/M052 및 E067/M060의 선행 대책을 그림 주석 명령·회귀 테스�
 ## M124 — document 전체를 교체하는 검증 harness 격리
 
 E134: 보조 harness의 mount/dispose가 body를 교체하는지 읽고 주 UI 수명과 분리한다. 별도 탭에서 canonical DOM 재열기를 수행하고 종료한다. 주 편집기를 재생성하거나 locator timeout을 늘려 원인을 숨기지 않는다. 실제 주 UI 후속 명령을 포함해 재검증한다. 종료에 E133/M123과 M122의 history/선택 범위를 재점검했고 다음 C2 키보드/포커스 검증에서 적용한다.
+
+## M125 — wrapper 없는 노드의 속성 지원 분리
+
+E135: 자식만 반환하는 renderer 경로는 schema 공통 필드를 자동으로 지원한다고 간주하지 않는다. nondefault direction/format/indent를 출력·명시 진단 중 하나로 처리하고 경로 포함 html:null·입력 불변성 회귀를 둔다. 저장 capability와 발행 capability를 나눠 저장 원본을 지우지 않는다. root 새4개 거부/기본값1개/editor 저장1개를 실행했다. 시작/종료에 E128/M118·E133/M123·E134/M124와 schema/profile 구분을 점검했다. 다음 목록 start/value의 조건부 출력 대조에서 적용한다.

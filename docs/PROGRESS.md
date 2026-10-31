@@ -1,3 +1,10 @@
+## 2026-10-31 P2.2.d.1 capability 대조 시작·root 손실 차단
+
+- [F01–F09 첫18타입 매트릭스](CAPABILITY_F01_F09_P22D.ko.md) 작성. schema/editor/renderer와 공통 필드를 분리했다. 모든 타입/필드 조합 실행 완료는 아니다.
+- E135/M125: root 방향/정렬의 schema-valid 값이 발행에서 사라짐을 새4개 실패로 재현했다. nondefault는 위치 포함 진단·html:null, 기본값 성공과 editor canonical 저장 보존 회귀 포함6개 추가.
+- frozen 의존 환경의 pnpm check594개(Lexical401/render57, 실패/skip0)·build/typecheck/static 및 package5개 통과. browser/full pixel/Python/CI는 미실행. [소스/로그 증거](verification/root-capability-20261031.json).
+- 시작/종료에 E128/M118·E133/M123·E134/M124를 점검했다. P2.2.d.1은 미완료이며 다음은 목록 start/value와 나머지 타입/속성 정책 대조다.
+
 ## 2026-10-31 C2.c Tab·DOM 읽기 순서 자동화
 
 - 실제 Tab/Shift+Tab으로 인용 버튼17개 정/역순 도달·종료와 편집된 발행 HTML의 blockquote 본문→footer→cite 순서 검사. 기존 명령/이력/텍스트/DOM재열기 검사를 포함한 browser1440/375px 통과.
