@@ -124,6 +124,17 @@ try{
  const reopenedDOM=await inspect(enrichedAfterHTML.html);
  assert.deepEqual(reopenedDOM,savedDOM,'list and quotation semantic DOM must survive actual Lexical reopen');
  const reopenedSemantics=await semantics(enrichedAfterHTML.html);
+ const enrichedStructure=await page.evaluate(source=>{
+  const doc=new DOMParser().parseFromString(source,'text/html');
+  const article=doc.querySelector('article');
+  return {
+   lists:[...article.querySelectorAll('ol,ul')].map(list=>({tag:list.localName,items:[...list.children].filter(child=>child.localName==='li').length,other:[...list.children].filter(child=>child.localName!=='li').length})),
+   quotes:[...article.querySelectorAll('blockquote')].map(quote=>({text:quote.textContent.trim(),tag:quote.localName}))
+  };
+ },enrichedAfterHTML.html);
+ assert.ok(enrichedStructure.lists.some(list=>list.tag==='ol'&&list.items>0&&list.other===0),'ordered list must contain direct semantic li children');
+ assert.ok(enrichedStructure.quotes.some(quote=>quote.tag==='blockquote'&&quote.text.includes('Quoted text')),'quotation must remain a semantic blockquote');
+
  assert.ok(reopenedSemantics.lists.some(list=>list.tag==='ol'&&list.start==='3'&&list.items.some(item=>item.text.includes('Numbered item'))),'reopened numbered list must publish');
  assert.ok(reopenedSemantics.quotations.some(quote=>quote.cite==='https://example.org/source'&&quote.text.includes('Quoted text')),'reopened quotation must publish');
 
@@ -132,6 +143,33 @@ try{
 
  // Verify keyboard-operable note toggles in the actual published DOM.
  await page.setContent(afterHTML.html);
+ const accessibility=await page.evaluate(()=>{
+  const article=document.querySelector('article');
+  const inputs=[...article.querySelectorAll('input.margin-toggle')];
+  const ids=inputs.map(input=>input.id);
+  const labels=[...article.querySelectorAll('label')];
+  const notes=inputs.map(input=>({
+   id:input.id,
+   idMatches:article.querySelectorAll('[id]').length && [...article.querySelectorAll('[id]')].filter(node=>node.id===input.id).length,
+   associated:labels.filter(label=>label.control===input).length,
+   payload:input.nextElementSibling?.matches('.sidenote,.marginnote')??false
+  }));
+  const lists=[...article.querySelectorAll('ol,ul')].map(list=>({
+   directItems:[...list.children].filter(node=>node.localName==='li').length,
+   nonItemChildren:[...list.children].filter(node=>node.localName!=='li').length
+  }));
+  const quotes=[...article.querySelectorAll('blockquote')].map(quote=>({
+   text:quote.textContent.trim(),nested:!!quote.querySelector('blockquote')
+  }));
+  return {ids,notes,lists,quotes};
+ });
+ assert.equal(new Set(accessibility.ids).size,accessibility.ids.length,'note toggle ids must be unique');
+ for(const note of accessibility.notes){
+  assert.equal(note.idMatches,1,'note id must be unique throughout the article');
+  assert.equal(note.associated,1,'HTMLLabelElement.control must resolve to the note input');
+  assert.equal(note.payload,true,'note toggle must immediately precede semantic note payload');
+ }
+
  const toggles=page.locator('article input.margin-toggle');
  assert.equal(await toggles.count(),afterSemantics.notes.length,'all canonical notes must render keyboard toggles');
  for(let index=0;index<afterSemantics.notes.length;index++){
