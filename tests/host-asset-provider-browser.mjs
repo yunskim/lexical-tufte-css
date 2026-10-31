@@ -41,6 +41,11 @@ try{
         window.__hostCalls.resolve.push(locator);
         if(window.__hostMode==='throw'||(window.__hostMode==='partial'&&locator.assetId==='remote-image'&&locator.revisionId==='rev-1'))throw Error('Temporary provider outage');
         if(window.__hostMode==='invalid')return null;
+        if(window.__hostMode==='expired'||window.__hostMode==='bad-expiry')
+          return {assetId:locator.assetId,revisionId:locator.revisionId||'rev-2',
+            mediaType:'image/svg+xml',url:'/fixture.svg',
+            expiresAt:window.__hostMode==='expired'
+              ?new Date(Date.now()-1000).toISOString():'not-a-date'};
         return {assetId:locator.assetId,revisionId:locator.revisionId||'rev-2',
           mediaType:'image/svg+xml',url:'/fixture.svg',
           expiresAt:new Date(Date.now()+window.__hostExpiryMs).toISOString()};
@@ -97,6 +102,16 @@ try{
   await page.evaluate(()=>{window.__hostMode='normal';});
   await button('외부 이미지 URL 다시 확인').click();
   await page.getByRole('status',{name:'편집 작업 상태'}).getByText(/갱신: 1\/1개/).waitFor();
+  // Reject a resolved URL whose expiry is already past or cannot be parsed.
+  for(const mode of ['expired','bad-expiry']){
+    await page.evaluate(value=>{window.__hostMode=value;},mode);
+    await button('외부 이미지 URL 다시 확인').click();
+    await page.getByRole('status',{name:'편집 작업 상태'}).getByText(/실패 1개, 재시도 예약/).waitFor();
+  }
+  await page.evaluate(()=>{window.__hostMode='normal';});
+  await button('외부 이미지 URL 다시 확인').click();
+  await page.getByRole('status',{name:'편집 작업 상태'}).getByText(/갱신: 1\/1개/).waitFor();
+
   // An expiring signed URL should refresh 60 seconds before expiration.
   await page.evaluate(()=>{window.__hostExpiryMs=120_000;});
   await button('외부 이미지 URL 다시 확인').click();
