@@ -135,3 +135,35 @@ test('F06 unordered list start is diagnosed instead of silently discarded',()=>{
  assert.ok(published.diagnostics.some(d=>d.code==='UNSUPPORTED_RENDER_PROPERTY'&&d.path.endsWith('.start')),JSON.stringify(published.diagnostics));
  assert.deepEqual(doc,before);
 });
+
+test('F03 _blank link adds noopener and noreferrer without changing stored rel',()=>{
+ const doc=fixture();
+ doc.lexicalState.root.children[0].children.push(element('paragraph',[
+  element('link',[text('External')],{url:'https://example.org/',target:'_blank',rel:'nofollow noopener',title:'Source'})
+ ]));
+ const before=structuredClone(doc);
+ const result=renderArticle(doc);
+ assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+ const tag=result.html.match(/<a [^>]*>External<\/a>/)?.[0];
+ assert.ok(tag,'published anchor missing');
+ assert.match(tag,/target="_blank"/);
+ const tokens=tag.match(/rel="([^"]+)"/)?.[1].split(/\s+/);
+ assert.deepEqual(tokens,['nofollow','noopener','noreferrer']);
+ assert.deepEqual(doc,before,'security rel normalization must not rewrite source JSON');
+});
+
+test('F03 unsafe URL and invalid target fail closed with exact property paths',()=>{
+ for(const [key,value,code] of [
+  ['url','javascript:alert(1)','UNSAFE_URL'],
+  ['target','_parent','INVALID_TARGET']
+ ]){
+  const doc=fixture();
+  doc.lexicalState.root.children[0].children.push(element('paragraph',[
+   element('link',[text('External')],{url:'https://example.org/',target:'_self',[key]:value})
+  ]));
+  const result=renderArticle(doc);
+  assert.equal(result.ok,false);
+  assert.equal(result.html,null);
+  assert.ok(result.diagnostics.some(d=>d.code===code&&d.path.endsWith('.'+key)),JSON.stringify(result.diagnostics));
+ }
+});
