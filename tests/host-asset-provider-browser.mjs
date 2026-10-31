@@ -319,6 +319,16 @@ try{
   await changedDialog.getByRole('combobox',{name:'버전'}).selectOption('rev-2');
   await changedDialog.getByRole('button',{name:'선택한 외부 이미지 연결'}).click();
   await changedDialog.waitFor({state:'hidden'});
+  await button('저장').click();
+  const replacedState=await page.evaluate(()=>JSON.parse(localStorage.getItem('lexical-tufte-p1-document')));
+  const replacedImages=[];
+  const collectReplaced=node=>{
+    if(node.type==='tufte-inline-image')replacedImages.push(node);
+    node.children?.forEach(collectReplaced);
+  };
+  collectReplaced(replacedState.lexicalState.root);
+  assert.ok(replacedImages.some(image=>image.hostAsset?.revisionId==='rev-2'),
+    'Revision replacement must be committed before releasing the stale resolve');
   await page.evaluate(()=>{
     const pending=window.__hostPendingResolves.shift();
     pending.resolve({assetId:pending.locator.assetId,revisionId:pending.locator.revisionId,
