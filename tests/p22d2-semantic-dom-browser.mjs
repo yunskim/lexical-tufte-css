@@ -60,9 +60,40 @@ try{
   }));
   return {lists,quotations,notes};
  },html);
+ // The base fixture contains notes but no lists or quotations. Extend the
+ // semantic coverage with independently rendered canonical examples below.
+ const countNodes=(node,counts={})=>{
+  if(node&&typeof node==='object'){
+   if(typeof node.type==='string')counts[node.type]=(counts[node.type]??0)+1;
+   if(Array.isArray(node.children))for(const child of node.children)countNodes(child,counts);
+  }
+  return counts;
+ };
+ const fixtureCounts=countNodes(saved.value.lexicalState.root);
+ assert.ok((fixtureCounts['tufte-sidenote']??0)>0,'fixture must contain a sidenote');
+ assert.ok((fixtureCounts['tufte-marginnote']??0)>0,'fixture must contain a marginnote');
  const beforeSemantics=await semantics(beforeHTML.html);
  const afterSemantics=await semantics(afterHTML.html);
  assert.deepEqual(afterSemantics,beforeSemantics,'list numbering, quotations and note associations must survive reopen');
+
+ assert.equal(beforeSemantics.notes.length,(fixtureCounts['tufte-sidenote']??0)+(fixtureCounts['tufte-marginnote']??0),'published note count must match canonical fixture');
+ assert.equal(beforeSemantics.lists.length,0,'base fixture intentionally has no lists');
+ assert.equal(beforeSemantics.quotations.length,0,'base fixture intentionally has no quotations');
+ const enriched=JSON.parse(JSON.stringify(saved.value));
+ enriched.lexicalState.root.children[0].children.push(
+  {type:'list',version:1,listType:'number',tag:'ol',start:3,children:[
+   {type:'listitem',version:1,value:3,children:[{type:'text',version:1,text:'Numbered item',format:0}]}
+  ]},
+  {type:'quote',version:1,cite:'https://example.org/source',children:[
+   {type:'paragraph',version:1,children:[{type:'text',version:1,text:'Quoted text',format:0}]}
+  ]}
+ );
+ const enrichedPublished=renderArticle(enriched);
+ assert.equal(enrichedPublished.ok,true,JSON.stringify(enrichedPublished.diagnostics));
+ const enrichedSemantics=await semantics(enrichedPublished.html);
+ assert.ok(enrichedSemantics.lists.some(list=>list.tag==='ol'&&list.start==='3'&&list.items.some(item=>item.value==='3'&&item.text.includes('Numbered item'))),'numbered list semantics must be present');
+ assert.ok(enrichedSemantics.quotations.some(quote=>quote.cite==='https://example.org/source'&&quote.text.includes('Quoted text')),'quotation semantics must be present');
+
  for(const note of afterSemantics.notes){
   assert.equal(note.type,'checkbox','note toggle must remain a checkbox');
   assert.equal(note.labels.length,1,'note toggle must retain one matching label');
