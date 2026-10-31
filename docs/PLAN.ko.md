@@ -191,10 +191,11 @@ P1 gate: 완료. 노트 편집 회귀와 SSR 출력의 실제 브라우저 비�
     - [ ] P2.2.d.2 F01–F09 대표/거부 fixture에 대해 편집→JSON 저장→재열기→HTML 발행→semantic DOM 비교를 실행하고 명령별 history/IME/접근성 증거를 남긴다.
       - [x] 대표·거부 fixture 및 실제 Lexical 저장·재열기·semantic DOM 비교 테스트 작성. `tests/p22d2-semantic-dom-browser.mjs`, `packages/lexical/test/document-bridge.test.mjs`. **이번 추가분 실행 전이며 완료 판정 아님.**
       - [ ] 명령별 Undo/Redo: P2.2.b의 기존 list/quote/note history 회귀를 F01–F09 대표 fixture에 연결하고 JSON·발행 불변식까지 확인.
+        - [x] 대표 fixture를 실제 Lexical에 로드해 텍스트 수정 → Undo → Redo마다 canonical JSON 및 순수 renderer HTML을 대조하는 테스트 작성(`packages/lexical/test/document-bridge.test.mjs`). 실행 전이며 list/quote/note **개별 구조 명령**의 대표 fixture 연계는 아직 남음.
       - [ ] IME: 기존 Chromium 조합 이벤트·조합 중 명령 거부 테스트를 대표 fixture에 연결. 실제 OS 한글 IME 검증은 P6에 남김.
         - 연결 경로 확인: `examples/editor/src/main.tsx`의 `restore()`는 `localStorage['lexical-tufte-p1']`에서 canonical Lexical JSON을 읽고 `parseCanonicalEditorState` → `replaceEditorDocumentState`를 수행한다. 대표 fixture의 `lexicalState`를 이 키에 저장한 뒤 기존 **불러오기** 버튼을 클릭하는 방식으로 브라우저 테스트를 확장한다. 별도의 테스트 전용 로드 API는 만들지 않는다.
         - 전제 조건(미검증): prototype editor에 등록된 노드가 F01–F09 fixture를 모두 수용하는지 확인하고, 실제 로드 후 JSON 스냅샷·발행 결과를 검증한다. `JSON·HTML 확인`은 `$generateHtmlFromNodes` 기반 편집기 보조 출력이므로 순수 `renderArticle` 발행 결과와 혼동하지 않는다.
-        - IME 단계(미작성): fixture를 로드한 뒤 편집 가능한 텍스트 노드에 선택 영역을 설정하고 CDP 조합 시작 → 조합 중 구조 명령 거부 → 조합 취소 → canonical JSON 및 순수 renderer HTML 불변을 확인한다. 기존 `tests/inline-span-browser.mjs`의 여러 섹션·인라인 노드 IME 검사는 별도 선행 회귀로 유지한다.
+        - [x] IME 단계 테스트 작성(실행 전): fixture 로드 → 본문 텍스트 선택 → CDP 조합 시작 → 조합 중 **다음 섹션 추가** 명령 실행 후 DOM 섹션 수 불변 → 조합 취소 → canonical JSON 및 순수 renderer HTML·진단 불변(`tests/inline-span-browser.mjs`). 기존 여러 섹션·인라인 노드 IME 검사는 별도 회귀로 유지한다. 실제 OS 한글 IME는 P6.
       - [x] 접근성 자동검사 코드 작성(실행 전): label.control/checkbox 연결, 문서 전체 note ID 유일성, note payload 인접성, 목록·인용 semantic DOM, Space 키 down/up·포커스 유지·체크 상태 복원을 대표 fixture에서 검사. 실제 브라우저 통과 판정과 스크린리더 사용성 검증은 미완료이며 후자는 P6.
       - [ ] 실행 게이트: `pnpm test:p22d2-dom`, 관련 document/lexical/render 단위 회귀를 모아서 실행한 후 실패 수정 및 증거 기록.
         - 일괄 실행 순서(현재 **미실행**): `pnpm build` → `pnpm --filter @lexical-tufte/lexical test` → `node tests/p22d2-semantic-dom-browser.mjs` → `node tests/inline-span-browser.mjs` → `pnpm test:browser`. 빌드가 포함된 독립 명령 `pnpm test:p22d2-dom`도 제공되므로 빌드 중복 실행은 피한다.
