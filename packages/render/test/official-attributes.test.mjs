@@ -92,3 +92,32 @@ test('F03 link metadata survives publication or fails closed with a diagnostic',
  }
  assert.deepEqual(doc,before,'publication must not mutate link attributes');
 });
+
+test('F06 unordered list item with nondefault value must not be silently published',()=>{
+ const doc=fixture();
+ doc.lexicalState.root.children[0].children.push(element('list',[
+  element('listitem',[text('Nondefault bullet')],{value:7})
+ ],{listType:'bullet',tag:'ul',start:1}));
+ assert.equal(validateDocument(doc).ok,true,'schema acceptance is distinct from renderer capability');
+ const before=structuredClone(doc);
+ const result=renderArticle(doc);
+ assert.equal(result.ok,false,'bullet value=7 must be rejected rather than dropped');
+ assert.equal(result.html,null);
+ assert.ok(result.diagnostics.some(d=>d.code==='UNSUPPORTED_RENDER_PROPERTY'&&d.path.includes('value')),JSON.stringify(result.diagnostics));
+ assert.deepEqual(doc,before);
+});
+
+test('F03 host reference is preserved as semantic reference, not fabricated href',()=>{
+ const doc=fixture();
+ doc.lexicalState.root.children[0].children.push(element('paragraph',[
+  element('host-link',[text('Linked title')],{reference:{namespace:'magnolia',kind:'note',id:'note-123'}})
+ ]));
+ assert.equal(validateDocument(doc).ok,true);
+ const before=structuredClone(doc);
+ const result=renderArticle(doc);
+ assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+ assert.match(result.html,/Linked title/);
+ assert.match(result.html,/data-host-/,'host reference metadata must survive publication');
+ assert.doesNotMatch(result.html,/<a\\b[^>]*href="[^"]*"[^>]*>Linked title<\\/a>/,'unresolved reference must not become a guessed URL');
+ assert.deepEqual(doc,before);
+});
