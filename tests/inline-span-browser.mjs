@@ -180,6 +180,27 @@ try{
   assert.equal(publish(await snapshot()),changedHTML,buttonName+' redo must restore published HTML');
   await page.getByRole('button',{name:'실행 취소',exact:true}).click();
  }
+ // Note insertion uses the real editor toolbar and generates a fresh ID.
+ await editor.locator('section').last().click();
+ const noteBaseline=await snapshot();
+ const noteDoc=state=>{
+  const result=renderArticle({schemaVersion:1,id:'inline-span-case',locale:'ko-KR',title:'인라인 속성',assets:[],lexicalState:state});
+  assert.equal(result.ok,true,JSON.stringify(result.diagnostics));
+  return result.html;
+ };
+ const noteBaselineHTML=noteDoc(noteBaseline);
+ await action('노트 삽입').click();
+ const noteChanged=await snapshot();
+ assert.notDeepEqual(noteChanged,noteBaseline,'note toolbar insertion must modify canonical JSON');
+ assert.ok(collect(noteChanged.root).some(node=>node.type==='tufte-sidenote'),'note toolbar must create a sidenote');
+ const noteChangedHTML=noteDoc(noteChanged);
+ assert.notEqual(noteChangedHTML,noteBaselineHTML,'note insertion must change published HTML');
+ await page.getByRole('button',{name:'실행 취소',exact:true}).click();
+ assert.deepEqual(await snapshot(),noteBaseline,'note undo must restore canonical JSON');
+ assert.equal(noteDoc(await snapshot()),noteBaselineHTML,'note undo must restore published HTML');
+ await page.getByRole('button',{name:'다시 실행',exact:true}).click();
+ assert.deepEqual(await snapshot(),noteChanged,'note redo must preserve generated note ID and JSON');
+ assert.equal(noteDoc(await snapshot()),noteChangedHTML,'note redo must restore published HTML');
  assert.deepEqual(errors,[]);
  console.log(`P2.2.b.1 ${width}px: real selection, wrap/unwrap undo/redo, save/reopen and composition cancellation/guard PASS.`);
  await page.close();
