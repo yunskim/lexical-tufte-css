@@ -39,6 +39,11 @@ try{
       },
       async resolve(locator){
         window.__hostCalls.resolve.push(locator);
+        if(window.__hostMode==='deferred'){
+          return await new Promise(resolve=>{
+            (window.__hostPendingResolves??=[]).push({locator,resolve});
+          });
+        }
         if(window.__hostMode==='throw'||(window.__hostMode==='partial'&&locator.assetId==='remote-image'&&locator.revisionId==='rev-1'))throw Error('Temporary provider outage');
         if(window.__hostMode==='invalid')return null;
         if(window.__hostMode==='expired'||window.__hostMode==='bad-expiry')
@@ -242,6 +247,28 @@ try{
     {assetId:'remote-image',revisionId:'rev-2'}
   ],'Earliest expiry triggers a full refresh of both linked revisions');
   await page.evaluate(()=>{delete window.__hostExpiryByRevision;});
+
+  // A delayed older response cannot overwrite a newer successful URL.
+  await page.evaluate(()=>{window.__hostMode='deferred';window.__hostPendingResolves=[];});
+  await button('외부 이미지 URL 다시 확인').click();
+  await page.waitForFunction(()=>window.__hostPendingResolves.length===1);
+  await page.evaluate(()=>{window.__hostMode='normal';});
+  await button('외부 이미지 URL 다시 확인').click();
+  await page.getByRole('status',{name:'편집 작업 상태'}).getByText(/갱신: 2\/2개/).waitFor();
+  const afterNewerRefresh=await page.evaluate(()=>window.__hostCalls.resolve.length);
+  await page.evaluate(()=>{
+    const pending=window.__hostPendingResolves.shift();
+    pending.resolve({assetId:pending.locator.assetId,
+      revisionId:pending.locator.revisionId,mediaType:'image/svg+xml',
+      url:'/obsolete.svg',expiresAt:new Date(Date.now()+120_000).toISOString()});
+  });
+  await page.waitForFunction(()=>window.__hostPendingResolves.length===0);
+  assert.equal(await page.evaluate(()=>window.__hostCalls.resolve.length),afterNewerRefresh,
+    'Stale completion must not issue more resolve calls');
+  assert.equal(await page.evaluate(()=>
+    [...document.querySelectorAll('[data-note-id] img')]
+      .some(image=>image.getAttribute('src')==='/obsolete.svg')),false,
+    'Stale provider response must not overwrite the latest image URL');
 
   // Returning to a visible tab after the 60-second cooldown rechecks URLs.
   const beforeResume=await page.evaluate(()=>window.__hostCalls.resolve.length);
