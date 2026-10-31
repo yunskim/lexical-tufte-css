@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@lexical-tufte/document": "workspace:*",
+    "@lexical-tufte/editor-ports": "workspace:*",
     "@lexical-tufte/lexical": "workspace:*",
     "lexical": "0.52.0",
     "@lexical/react": "0.52.0",
