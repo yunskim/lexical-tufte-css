@@ -194,6 +194,10 @@ P1 gate: 완료. 노트 편집 회귀와 SSR 출력의 실제 브라우저 비�
       - [ ] IME: 기존 Chromium 조합 이벤트·조합 중 명령 거부 테스트를 대표 fixture에 연결. 실제 OS 한글 IME 검증은 P6에 남김.
       - [ ] 접근성: label/checkbox 관계, note payload 인접성, 목록·인용 의미 구조, 키보드 포커스/스크린리더 경계를 대표 fixture에서 검사. 실제 스크린리더는 P6.
       - [ ] 실행 게이트: `pnpm test:p22d2-dom`, 관련 document/lexical/render 단위 회귀를 모아서 실행한 후 실패 수정 및 증거 기록.
+        - 일괄 실행 순서(현재 **미실행**): `pnpm build` → `pnpm --filter @lexical-tufte/lexical test` → `node tests/p22d2-semantic-dom-browser.mjs` → `node tests/inline-span-browser.mjs` → `pnpm test:browser`. 빌드가 포함된 독립 명령 `pnpm test:p22d2-dom`도 제공되므로 빌드 중복 실행은 피한다.
+        - 수락 기준: 대표 fixture JSON 저장/재열기·semantic DOM 동등성, 목록 시작 번호·인용 cite, 노트 ID/label.control/Space 키, 거부 fixture 로드·발행 실패 및 기존 문서 불변성, History의 실패 유지/정상 교체 초기화, IME 취소 후 JSON·HTML 보존.
+        - 실패 분류: fixture 자체 schema 부적합 / Lexical 직렬화·history / renderer 의미 구조 / Chromium 키보드·IME / 기존 회귀. 실패를 기록하고 수정한 뒤 해당 범위 재실행; 실행 전에는 완료 체크하지 않는다.
+        - 범위 제한: Chromium의 CDP 조합 이벤트는 실제 OS 한국어 IME·스크린리더 검증을 대체하지 않는다(P6).
   - [ ] P2.2.e 공식 Tufte CSS 1.9.0 고정 예제 `index.html`의 의미 있는 DOM 요소·부모/자식·순서·CSS direct-child 관계를 전수 대조한다. `fixtures/tufte/inventory.json`의 selector 목록과 별개로 예제 DOM → F01–F22 → 문서 schema → Lexical node/command → 순수 renderer HTML의 대응표와 대표/거부 fixture를 작성한다. 한 논리 노드가 여러 HTML 요소로 출력되는 note처럼 1:n 관계를 명시하고, 비지원·의도적 차이는 진단/ADR에 남긴다. **P2.2의 기능별 수락 전에 대응표의 관련 행을 먼저 확인한다.**
 - [ ] P2.3 F10–F19 노트·그림·표·코드·embed 구현.
   - [ ] P2.3.a 노트 F10–F12: note 종류 전환/텍스트·이미지 편집/삭제/이동, anchor/ID 일체성, copy/paste/undo/redo, 복수 article 번호와 모바일 fallback.
