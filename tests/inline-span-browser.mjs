@@ -117,11 +117,13 @@ try{
   assert.equal(changedHTML.ok,true,JSON.stringify(changedHTML.diagnostics));
   assert.notEqual(changedHTML.html,beforeHTML.html,buttonName+' must modify representative publication');
   await page.getByRole('button',{name:'실행 취소',exact:true}).click();
-  assert.deepEqual(await snapshot(),baseline,buttonName+' undo must restore representative JSON');
-  assert.equal(renderArticle({...representative,lexicalState:await snapshot()}).html,beforeHTML.html,buttonName+' undo must restore representative publication');
+  const undone=await snapshot();
+  assert.deepEqual(undone,baseline,buttonName+' undo must restore representative JSON');
+  assert.equal(renderArticle({...representative,lexicalState:undone}).html,beforeHTML.html,buttonName+' undo must restore representative publication');
   await page.getByRole('button',{name:'다시 실행',exact:true}).click();
-  assert.deepEqual(await snapshot(),changed,buttonName+' redo must restore representative JSON');
-  assert.equal(renderArticle({...representative,lexicalState:await snapshot()}).html,changedHTML.html,buttonName+' redo must restore representative publication');
+  const redone=await snapshot();
+  assert.deepEqual(redone,changed,buttonName+' redo must restore representative JSON');
+  assert.equal(renderArticle({...representative,lexicalState:redone}).html,changedHTML.html,buttonName+' redo must restore representative publication');
  }
  await page.evaluate(()=>localStorage.removeItem('lexical-tufte-p1'));
  await page.reload();
