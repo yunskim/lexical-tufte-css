@@ -988,3 +988,51 @@ test('P2.2.d.2 F01-F09 canonical reopen and publication remain identical',async(
  assert.equal(after.ok,true,JSON.stringify(after.diagnostics));
  assert.equal(after.html,before.html,'reopening must not alter published semantic HTML');
 });
+
+test('P2.2.d.2 root presentation survives reopen but publication rejects it',async()=>{
+ const {renderArticle}=await import('../../render/dist/index.js');
+ const original=fixture();
+ original.lexicalState.root.direction='rtl';
+ const source=editor();
+ const loaded=loadDocumentIntoEditor(source,original);
+ assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
+ const first=exportEditorToDocument(source,original);
+ assert.equal(first.ok,true,JSON.stringify(first.diagnostics));
+ const destination=editor();
+ const reopened=loadDocumentIntoEditor(destination,JSON.parse(JSON.stringify(first.value)));
+ assert.equal(reopened.ok,true,JSON.stringify(reopened.diagnostics));
+ const second=exportEditorToDocument(destination,first.value);
+ assert.equal(second.ok,true,JSON.stringify(second.diagnostics));
+ assert.equal(second.value.lexicalState.root.direction,'rtl');
+ assert.deepEqual(second.value.lexicalState,first.value.lexicalState);
+ const published=renderArticle(second.value);
+ assert.equal(published.ok,false);
+ assert.equal(published.html,null);
+ assert.ok(published.diagnostics.some(d=>d.code==='UNSUPPORTED_RENDER_PROPERTY'&&d.path==='$.lexicalState.root.direction'),JSON.stringify(published.diagnostics));
+});
+
+test('P2.2.d.2 unsupported list numbering remains canonical across reopen and fails publication',async()=>{
+ const {renderArticle}=await import('../../render/dist/index.js');
+ const original=fixture();
+ original.lexicalState.root.children[0].children.push({
+  type:'list',version:1,listType:'bullet',tag:'ul',start:7,children:[
+   {type:'listitem',version:1,value:1,children:[{type:'text',version:1,text:'Bullet',format:0}]}
+  ]
+ });
+ assert.equal(validateDocument(original).ok,true);
+ const source=editor();
+ const loaded=loadDocumentIntoEditor(source,original);
+ assert.equal(loaded.ok,true,JSON.stringify(loaded.diagnostics));
+ const first=exportEditorToDocument(source,original);
+ assert.equal(first.ok,true,JSON.stringify(first.diagnostics));
+ const destination=editor();
+ const reopened=loadDocumentIntoEditor(destination,JSON.parse(JSON.stringify(first.value)));
+ assert.equal(reopened.ok,true,JSON.stringify(reopened.diagnostics));
+ const second=exportEditorToDocument(destination,first.value);
+ assert.equal(second.ok,true,JSON.stringify(second.diagnostics));
+ assert.deepEqual(second.value.lexicalState,first.value.lexicalState);
+ const published=renderArticle(second.value);
+ assert.equal(published.ok,false);
+ assert.equal(published.html,null);
+ assert.ok(published.diagnostics.some(d=>d.code==='UNSUPPORTED_RENDER_PROPERTY'&&d.path.endsWith('.start')),JSON.stringify(published.diagnostics));
+});
