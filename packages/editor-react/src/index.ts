@@ -14,3 +14,5 @@ export interface TufteEditorProps {
 export {ToolbarIcon, type ToolbarIconName} from './toolbar.js';
 
 export {SelectionToolbar} from './SelectionToolbar.js';
+
+export {canOpenBlockMenu,blockMenuCapabilities,NO_BLOCK_MENU_ACTIONS,type BlockMenuCapabilities} from './blockMenuCapabilities.js';
