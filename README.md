@@ -2,7 +2,7 @@
 
 Lexical 기반 Tufte CSS 편집기와 블로그 운영용 TypeScript 라이브러리.
 
-현재 단계: P0·P1·P2.1 완료. 노트 편집 prototype을 실행할 수 있습니다. 전체 편집기 및 npm 배포 패키지는 아직 완성되지 않았습니다.
+현재 단계: 공식 Tufte CSS 예제의 DOM·편집·저장/재열기·발행 및 지정 화면 너비 시각 대조까지 자동 검증했습니다. 다만 전체 제품·운영 배포·접근성 수락과 npm 배포 완료를 뜻하지 않습니다. 상세 범위는 아래 최신 검증 보고서를 확인하세요.
 
 - [구현 계획 및 실행 체크리스트](docs/PLAN.ko.md)
 - [2026-10-17 구현 계획 독립 재점검과 남은 게이트](docs/PLAN_AUDIT_2026-10-17.ko.md)
@@ -64,29 +64,13 @@ pnpm test:browser
 
 ## 최신 통합 실행 검증
 
-2026-10-19 DOMParser 후속: **단위·통합318개 / Python16개 / browser16개 실행 파일 / package4개 / 실제TS→Python HTTP 왕복** 통과. 신규 정규식 escape 오류를 수정했으며 제품 구현 변경은 없습니다. [최신 DOM 대조 보고서](docs/VERIFICATION_DOMPARSER_2026-10-19.ko.md). 전체 페이지 DOM/시각 parity는 계속 미완료이며 CI는 생략했습니다.
+**2026-11-01 검증 보고서**: [누적 자동 테스트 실행](docs/VERIFICATION_DEFERRED_2026-11-01.ko.md) · [검증 로그·해시](docs/verification/deferred-20261101.json)
 
-2026-10-18 upstream 대조 후속: **단위·통합316개 / Python16개 / browser15개 실행 파일 / package4개 / 실제TS→Python HTTP 왕복** 통과. 신규 구조 비교3개 포함. 전체 원본 페이지의 DOM/시각 parity는 아직 입증하지 않았습니다. [최신 대조 검증 보고서](docs/VERIFICATION_UPSTREAM_2026-10-18.ko.md), CI 생략.
+- 단위 테스트 629개, 브라우저 테스트 파일 39개, Python 테스트 16개 통과.
+- 빌드·타입 검사, 패키지 검사 5개, TS→Python HTTP→SQLite 왕복, 발행 revision 모델 검증 통과.
+- 공식 Tufte CSS 예제 9개 섹션·60개 블록·7개 노트의 DOM·편집·저장/재열기·발행 대조 통과.
+- 375/759/760/761/1024/1440px 시각 비교에서 검증된 iframe 마스크 밖 차이 0.
+- 호스트 자산 URL 자동 갱신 중복 방지·수동 갱신 우선·revision 교체·이미지 삭제 경계에 대한 회귀 검증 포함.
+- **CI는 실행하지 않았습니다.** 실제 DAM 연동, OS별 실제 IME, 스크린리더, 물리 터치, 타 브라우저 검증도 아직 수행하지 않았습니다.
 
-2026-10-18 누적 테스트 완료: **단위·통합297개 / Python16개 / 브라우저15개 실행 파일 / 패키지4개 / 실제 TS→Python HTTP 왕복** 통과. 정의목록 이동·목록 키 우선순위·메뉴 overflow 및 타입/테스트 회귀를 수정했습니다. CI 생략. [최신 실행 보고서](docs/VERIFICATION_2026-10-18.ko.md)에 완료 증거와 남은 범위를 기록했습니다.
-
-**주의:** 아래의 통과 결과는 각각 명시된 검증 커밋만을 대상으로 한다. 이후의 블록 메뉴·인라인 span 명령·직접 의존성 수정은 회귀 테스트 코드를 작성했지만 아직 일괄 실행하지 않았다. [진행 기록](docs/PROGRESS.md)의 미검증 상태를 우선 확인한다.
-
-
-2026-10-17 메뉴 후속(main85ac2c3): **266개 단위·통합 / Python16개 / browser12개 실행 파일 / package4개 / 실제 TS→Python HTTP 왕복** 모두 통과. 코드 수정·새 테스트 실패 없음, CI 생략. [최신 메뉴 검증 보고서](docs/VERIFICATION_MENU_2026-10-17.ko.md).
-
-2026-10-17 컨텍스트 UI 후속 검증: 단위·통합266개, Python16개, 패키지4개 및 실제 우클릭/키보드/선택 toolbar 회귀를 실행했습니다. 우클릭 명령이 이전 선택에 적용되는 오류를 수정했습니다. 최종 결과와 범위는 [UI 검증 보고서](docs/VERIFICATION_CONTEXT_UI_2026-10-17.ko.md)를 따릅니다. CI 생략.
-
-2026-10-17 Recovery HTTP 후속 검증 완료: **단위·통합253개 + Python16개 + 브라우저11개 + 패키지4개** 통과. 실제 TypeScript 클라이언트→Python HTTP→SQLite 왕복도 통과했습니다. CI 생략. [최신 후속 보고서](docs/VERIFICATION_RECOVERY_HTTP_2026-10-17.ko.md)에 수정 사항과 미완료 운영 연결을 기록했습니다.
-
-2026-10-17 최신 main 재검증 완료: **237개 단위·통합 테스트, 브라우저 11개 실행 파일, 패키지 4개 소비 검사 통과**. 타입·상태 선택자·폰트 paint 회귀를 수정했습니다. CI 생략. 아래 날짜별 결과는 당시 기록이며 현재 판정과 미완료 범위는 [최신 보고서](docs/VERIFICATION_2026-10-17.ko.md)를 따릅니다.
-
-2026-10-16: 단위/통합 테스트 140개(실패·skip0), 브라우저 실행 파일 6개 및 고정 lock 설치/타입/빌드 검사 통과. CI는 생략합니다. [검증 보고서와 미완료 범위](docs/VERIFICATION_2026-10-16.ko.md)를 확인하세요. 현재 구현분의 검증이며 전체 제품 완료 선언은 아닙니다.
-
-2026-10-16 R02 후속 완료: 공통33종 registry와 전체 노드 golden, 실제 React 저장/재열기를 검증했습니다. 현재 로컬 전체 검사는 **178개 + 브라우저7개 통과**입니다. [R02 왕복 계약과 갱신 절차](docs/ROUNDTRIP_R02.ko.md)를 따릅니다. HTML 발행/편집 명령의 전체 지원을 뜻하지 않습니다.
-
-R03.d 문서 교체 이력 계약과 검증: [HISTORY_R03.ko.md](docs/HISTORY_R03.ko.md). 최신 로컬 검증은 단위·통합180개 및 브라우저7개 통과, CI 생략.
-
-R11 공개 snapshot 생명주기: [packages/blog](packages/blog), [구현·검증 계약](docs/PUBLICATION_LIFECYCLE_R11.ko.md). 최신 로컬 검증은 단위·통합201개 및 브라우저8개 통과, CI 생략.
-
-R13 폰트·패키지 검증: [정책과 결과](docs/LICENSE_AND_FONTS_R13.ko.md). 최신 로컬 검증은 단위·통합201개·브라우저9개 및 패키지4개 소비 검사 통과. `pnpm package:check`는 로컬 tarball만 검사하며 발행하지 않는다. 본명조/본고딕 WOFF2는 대표 문자 검증용이며 전체 생산 폰트 연결은 P4다.
+이 수치는 위 보고서에 기록된 검증 대상 코드의 결과입니다. 이후 변경 사항에는 자동으로 적용되지 않습니다. 과거 실행 내역은 [진행 기록](docs/PROGRESS.md)과 `docs/VERIFICATION_*.ko.md`에서 확인할 수 있습니다.
