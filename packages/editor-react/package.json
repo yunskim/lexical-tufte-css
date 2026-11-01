@@ -28,7 +28,8 @@
   },
   "dependencies": {
     "@lexical-tufte/document": "workspace:*",
-    "@lexical-tufte/editor-ports": "workspace:*"
+    "@lexical-tufte/editor-ports": "workspace:*",
+    "@lexical-tufte/lexical": "workspace:*"
   },
   "devDependencies": {
     "typescript": "6.0.2",
