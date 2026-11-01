@@ -24,7 +24,8 @@
   "peerDependencies": {
     "@lexical/react": "0.52.0",
     "lexical": "0.52.0",
-    "react": "19.2.0"
+    "react": "19.2.0",
+    "@lexical/rich-text": "0.52.0"
   },
   "dependencies": {
     "@lexical-tufte/document": "workspace:*",
