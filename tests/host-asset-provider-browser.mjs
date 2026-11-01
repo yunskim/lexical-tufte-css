@@ -355,6 +355,18 @@ try{
   await page.locator('[data-note-id] img').first().click();
   await page.keyboard.press('Backspace');
   await page.waitForFunction(count=>document.querySelectorAll('[data-note-id] img').length<count,beforeDelete);
+  // Verify Backspace changed the Lexical document, not just the rendered DOM.
+  await button('저장').click();
+  const afterDeleteState=await page.evaluate(()=>
+    JSON.parse(localStorage.getItem('lexical-tufte-p1-document')));
+  const remainingImages=[];
+  const collectRemaining=node=>{
+    if(node.type==='tufte-inline-image')remainingImages.push(node);
+    node.children?.forEach(collectRemaining);
+  };
+  collectRemaining(afterDeleteState.lexicalState.root);
+  assert.equal(remainingImages.length,beforeDelete-1,
+    'Backspace must remove an image from the persisted Lexical tree');
   await page.evaluate(()=>{
     const pending=window.__hostPendingResolves.shift();
     pending.resolve({assetId:pending.locator.assetId,revisionId:pending.locator.revisionId,
