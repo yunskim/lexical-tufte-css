@@ -23,7 +23,7 @@ import {
 import {canonicalBlockType,exportCanonicalEditorState,parseCanonicalEditorState,loadDocumentIntoEditor,exportEditorToDocument,registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,registerQuotationCommands,APPEND_TUFTE_EPIGRAPH_ITEM_COMMAND,MOVE_TUFTE_EPIGRAPH_ITEM_COMMAND,SET_TUFTE_QUOTE_CITE_COMMAND,REMOVE_TUFTE_QUOTATION_COMMAND,INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_SECTION_CITE_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,registerListKeyboardCommands,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,SET_TUFTE_LIST_KIND_COMMAND,CHANGE_TUFTE_LIST_INDENT_COMMAND,UNWRAP_TUFTE_LIST_COMMAND,registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND,WRAP_TUFTE_SPAN_COMMAND,UNWRAP_TUFTE_SPAN_COMMAND,registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_PAIR_COMMAND,MOVE_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_LIST_COMMAND,registerSectionCommands,WRAP_TUFTE_ROOT_COMMAND,INSERT_TUFTE_SECTION_COMMAND,SPLIT_TUFTE_SECTION_COMMAND,MERGE_TUFTE_SECTION_COMMAND,SET_TUFTE_BLOCK_COMMAND,inspectEditorStructure,focusStructureIssue,type StructureIssue,replaceEditorDocumentState,TUFTE_NODES,NoteNode, InlineImageNode, $createSidenoteNode, $createMarginnoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, registerNoteEdgeTypingGuard} from '@lexical-tufte/lexical';
 import {NODE_SCHEMA} from '@lexical-tufte/document';
 import {NoteImagePanel,type NoteImageChoice,type ImagePresentation} from './NoteImagePanel.js';
-import {ToolbarIcon, SelectionToolbar, type ToolbarIconName} from '@lexical-tufte/editor-react';
+import {ToolbarIcon, SelectionToolbar, canOpenBlockMenu, blockMenuCapabilities, NO_BLOCK_MENU_ACTIONS, type BlockMenuCapabilities, type ToolbarIconName} from '@lexical-tufte/editor-react';
 import './style.css';
 
 const EDITOR_SHORTCUTS:Record<string,string>={굵게:'Ctrl/Cmd+B',기울임:'Ctrl/Cmd+I','실행 취소':'Ctrl/Cmd+Z','다시 실행':'Ctrl/Cmd+Shift+Z'};
@@ -32,42 +32,6 @@ function IconButton({name,label,onClick,onMouseDown}:{name:ToolbarIconName;label
 }
 
 
-function canOpenBlockMenu(node:LexicalNode):boolean{
- let hasEditableBlock=false;
- for(let current:LexicalNode|null=node;current;current=current.getParent()){
-  if(current instanceof NoteNode)return false;
-  const type=canonicalBlockType(current.getType());
-  if(['table','tablerow','tablecell','figure','image'].includes(type))return false;
-  if(['paragraph','heading','quote'].includes(type))hasEditableBlock=true;
-  if(type==='root')break;
- }
- return hasEditableBlock;
-}
-type BlockMenuCapabilities={paragraph:boolean;heading:boolean;insert:boolean};
-const NO_BLOCK_MENU_ACTIONS:BlockMenuCapabilities={paragraph:false,heading:false,insert:false};
-/** Match the structural preconditions of section/list/quotation commands before showing actions. */
-function blockMenuCapabilities(node:LexicalNode):BlockMenuCapabilities{
- if(!canOpenBlockMenu(node))return NO_BLOCK_MENU_ACTIONS;
- let selected:LexicalNode|null=node;
- while(selected&&!['paragraph','heading','quote'].includes(canonicalBlockType(selected.getType())))selected=selected.getParent();
- if(!selected)return NO_BLOCK_MENU_ACTIONS;
- const selectedBlock=selected;
- const parent=selectedBlock.getParent();
- const children=$isElementNode(selectedBlock)?selectedBlock.getChildren():[];
- const canConvert=(target:'paragraph'|'heading')=>
-  (canonicalBlockType(selectedBlock.getType())==='paragraph'||canonicalBlockType(selectedBlock.getType())==='heading')&&
-  Boolean(parent&&NODE_SCHEMA[canonicalBlockType(parent.getType())]?.children?.includes(target))&&
-  children.every(child=>NODE_SCHEMA[target]?.children?.includes(canonicalBlockType(child.getType())));
- let section:LexicalNode|null=node;
- while(section&&canonicalBlockType(section.getType())!=='tufte-section')section=section.getParent();
- let direct:LexicalNode=node;
- if(section){
-  while(direct.getParent()&&!direct.getParent()!.is(section))direct=direct.getParent()!;
- }
- const insert=Boolean(section&&section.getParent()?.getType()==='root'&&
-  direct.getParent()?.is(section)&&NODE_SCHEMA['tufte-section']?.children?.includes(canonicalBlockType(direct.getType())));
- return {paragraph:canConvert('paragraph'),heading:canConvert('heading'),insert};
-}
 function BlockContextMenu(){
  const [editor]=useLexicalComposerContext();
  const [open,setOpen]=useState(false);
