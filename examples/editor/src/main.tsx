@@ -23,7 +23,7 @@ import {
 import {canonicalBlockType,exportCanonicalEditorState,parseCanonicalEditorState,loadDocumentIntoEditor,exportEditorToDocument,registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,registerQuotationCommands,APPEND_TUFTE_EPIGRAPH_ITEM_COMMAND,MOVE_TUFTE_EPIGRAPH_ITEM_COMMAND,SET_TUFTE_QUOTE_CITE_COMMAND,REMOVE_TUFTE_QUOTATION_COMMAND,INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_SECTION_CITE_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,registerListKeyboardCommands,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,SET_TUFTE_LIST_KIND_COMMAND,CHANGE_TUFTE_LIST_INDENT_COMMAND,UNWRAP_TUFTE_LIST_COMMAND,registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND,WRAP_TUFTE_SPAN_COMMAND,UNWRAP_TUFTE_SPAN_COMMAND,registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_PAIR_COMMAND,MOVE_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_LIST_COMMAND,registerSectionCommands,WRAP_TUFTE_ROOT_COMMAND,INSERT_TUFTE_SECTION_COMMAND,SPLIT_TUFTE_SECTION_COMMAND,MERGE_TUFTE_SECTION_COMMAND,SET_TUFTE_BLOCK_COMMAND,inspectEditorStructure,focusStructureIssue,type StructureIssue,replaceEditorDocumentState,TUFTE_NODES,NoteNode, InlineImageNode, $createSidenoteNode, $createMarginnoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, registerNoteEdgeTypingGuard} from '@lexical-tufte/lexical';
 import {NODE_SCHEMA} from '@lexical-tufte/document';
 import {NoteImagePanel,type NoteImageChoice,type ImagePresentation} from './NoteImagePanel.js';
-import {ToolbarIcon, type ToolbarIconName} from '@lexical-tufte/editor-react';
+import {ToolbarIcon, SelectionToolbar, type ToolbarIconName} from '@lexical-tufte/editor-react';
 import './style.css';
 
 const EDITOR_SHORTCUTS:Record<string,string>={굵게:'Ctrl/Cmd+B',기울임:'Ctrl/Cmd+I','실행 취소':'Ctrl/Cmd+Z','다시 실행':'Ctrl/Cmd+Shift+Z'};
@@ -31,64 +31,6 @@ function IconButton({name,label,onClick,onMouseDown}:{name:ToolbarIconName;label
  return <button type="button" aria-label={label} title={EDITOR_SHORTCUTS[label]?`${label} (${EDITOR_SHORTCUTS[label]})`:label} onMouseDown={onMouseDown} onClick={onClick}><ToolbarIcon name={name}/></button>;
 }
 
-type InlineAction='bold'|'italic'|'underline'|'strikethrough'|'code'|'highlight';
-const INLINE_ACTIONS:ReadonlyArray<{id:InlineAction;label:string;icon:ToolbarIconName}>=[
- {id:'bold',label:'굵게',icon:'bold'},
- {id:'italic',label:'기울임',icon:'italic'},
- {id:'underline',label:'밑줄',icon:'underline'},
- {id:'strikethrough',label:'취소선',icon:'strike'},
- {id:'code',label:'코드',icon:'code'},
- {id:'highlight',label:'마크',icon:'highlight'}
-];
-
-function SelectionToolbar(){
- const [editor]=useLexicalComposerContext();
- const [position,setPosition]=useState<{top:number;left:number}|null>(null);
- const dismissed=useRef(false);
- const toolbarRef=useRef<HTMLDivElement|null>(null);
- useEffect(()=>{
-  const update=()=>{
-   if(editor.isComposing()){setPosition(null);return;}
-   if(document.activeElement?.closest('.selection-toolbar'))return;
-   const root=editor.getRootElement();
-   const selection=window.getSelection();
-   if(!root||!selection||selection.isCollapsed||selection.rangeCount===0||!root.contains(selection.anchorNode)||!root.contains(selection.focusNode)){
-    setPosition(null);dismissed.current=false;return;
-   }
-   if(dismissed.current)return;
-   let selected=false;
-   editor.getEditorState().read(()=>{const s=$getSelection();selected=$isRangeSelection(s)&&!s.isCollapsed();});
-   if(!selected){setPosition(null);return;}
-   const rect=selection.getRangeAt(0).getBoundingClientRect();
-   if(rect.width===0&&rect.height===0){setPosition(null);return;}
-   const width=Math.min(340,Math.max(0,window.innerWidth-24));
-   const half=width/2;
-   setPosition({top:rect.top>=56?rect.top-52:Math.max(8,Math.min(window.innerHeight-52,rect.bottom+8)),left:Math.max(half+12,Math.min(window.innerWidth-half-12,rect.left+rect.width/2))});
-  };
-  const onKeyDown=(event:KeyboardEvent)=>{
-   if(event.altKey&&event.shiftKey&&event.key.toLowerCase()==='f'&&!event.ctrlKey&&!event.metaKey){
-    if(!editor.getRootElement()?.contains(document.activeElement)||editor.isComposing())return;
-    const selection=window.getSelection();
-    if(!selection||selection.isCollapsed||selection.rangeCount===0||dismissed.current)return;
-    update();
-    requestAnimationFrame(()=>toolbarRef.current?.querySelector<HTMLButtonElement>('button')?.focus());
-    event.preventDefault();
-   }
-  };
-  editor.getRootElement()?.addEventListener('keydown',onKeyDown);
-  const unregister=editor.registerUpdateListener(()=>requestAnimationFrame(update));
-  document.addEventListener('selectionchange',update);
-  window.addEventListener('resize',update);
-  window.addEventListener('scroll',update,true);
-  document.addEventListener('compositionstart',update,true);
-  document.addEventListener('compositionend',update,true);
-  return ()=>{editor.getRootElement()?.removeEventListener('keydown',onKeyDown);unregister();document.removeEventListener('selectionchange',update);window.removeEventListener('resize',update);window.removeEventListener('scroll',update,true);document.removeEventListener('compositionstart',update,true);document.removeEventListener('compositionend',update,true);};
- },[editor]);
- if(!position)return null;
- return <div ref={toolbarRef} className="selection-toolbar" role="toolbar" aria-label="선택 영역 서식" style={{top:position.top,left:position.left}} onMouseDown={e=>e.preventDefault()} onKeyDown={e=>{if(e.key==='Escape'){e.preventDefault();dismissed.current=true;setPosition(null);editor.focus();}}}>
-  {INLINE_ACTIONS.map(action=><IconButton key={action.id} name={action.icon} label={action.label} onMouseDown={e=>e.preventDefault()} onClick={()=>editor.dispatchCommand(FORMAT_TEXT_COMMAND,action.id)}/>)}
- </div>;
-}
 
 function canOpenBlockMenu(node:LexicalNode):boolean{
  let hasEditableBlock=false;
