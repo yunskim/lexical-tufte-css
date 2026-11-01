@@ -329,6 +329,11 @@ try{
   collectReplaced(replacedState.lexicalState.root);
   assert.ok(replacedImages.some(image=>image.hostAsset?.revisionId==='rev-2'),
     'Revision replacement must be committed before releasing the stale resolve');
+  assert.equal(replacedImages.length,2,
+    'Changing a revision must not insert or remove an image');
+  assert.deepEqual(replacedImages.map(image=>image.hostAsset?.revisionId).sort(),
+    ['rev-1','rev-2'],
+    'The revision change must preserve the other linked image');
   await page.evaluate(()=>{
     const pending=window.__hostPendingResolves.shift();
     pending.resolve({assetId:pending.locator.assetId,revisionId:pending.locator.revisionId,
