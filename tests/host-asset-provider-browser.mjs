@@ -314,7 +314,8 @@ try{
   await page.evaluate(()=>{window.__hostMode='normal';});
   await button('이미지 라이브러리에서 선택').click();
   const changedDialog=page.getByRole('dialog',{name:'문서 이미지 선택'});
-  await changedDialog.getByRole('group',{name:'교체할 노트 이미지 선택'}).getByRole('radio').first().check();
+  const revisionTargets=changedDialog.getByRole('group',{name:'교체할 노트 이미지 선택'}).getByRole('radio');
+  await revisionTargets.first().check();
   await changedDialog.getByRole('radio',{name:/Remote image/}).check();
   await changedDialog.getByRole('combobox',{name:'버전'}).selectOption('rev-2');
   await changedDialog.getByRole('button',{name:'선택한 외부 이미지 연결'}).click();
@@ -334,6 +335,9 @@ try{
   assert.deepEqual(replacedImages.map(image=>image.hostAsset?.revisionId).sort(),
     ['rev-1','rev-2'],
     'The revision change must preserve the other linked image');
+  assert.ok(replacedImages.every(image=>image.hostAsset?.namespace==='test-host'&&
+    image.hostAsset.assetId==='remote-image'),
+    'Both images must retain the host namespace and asset identity');
   await page.evaluate(()=>{
     const pending=window.__hostPendingResolves.shift();
     pending.resolve({assetId:pending.locator.assetId,revisionId:pending.locator.revisionId,
