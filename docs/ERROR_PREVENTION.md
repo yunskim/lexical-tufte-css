@@ -807,3 +807,9 @@ E004/E005/M004의 공식 shell 설치→smoke, E124/M113의 동일 venv pytest/H
 E139: workspace 직접 의존성 추가 시 manifest/lockfile을 함께 갱신하고 frozen install→build 결과를 먼저 회수한다. effect dependency array의 상태는 해당 hook 앞에 선언한다.
 E140: 로컬 catalog 개수와 외부 hostAsset 참조 존재를 구분해 envelope 저장 경로를 선택한다. 검사 출력은 별도 조립하지 않고 strict exporter의 같은 envelope를 사용한다. 새 UI로 바뀐 접근성 이름/실제 focus 순서를 명시 이관하고 문서 무변경 검사는 유지한다.
 E141: 취소/성공 close로 generation을 무효화하면 loading 해제 책임도 close에서 가진다. 같은 창 재열기·두 번째 연결을 검사한다. timer 테스트는 load 후 pauseAt/runFor로 실제 시간 혼입을 차단하며 두 이미지/두 revision fixture의 실패·성공 조건을 각각 확인한다. 기존 M004/M113/M123/M124/M127의 환경·같은 Python·실제 이력/DOM/독립 탭 규칙을 시작/종료에 점검한다.
+
+## M129 — 비동기 이미지 변경의 UI·저장·노드 선택 검증
+
+E142: manual supersession을 지원하면 실제 UI 버튼도 pending 중 사용할 수 있어야 한다. stable accessible name과 aria-busy로 상태를 분리한다. 자동 갱신 coalescing·수동 새 generation·stale 응답 차단을 실제 버튼으로 검사한다.
+E143: 저장 확인창을 명시 승인하고 checkpoint의 실제 새 값을 검사한다. 교체 대상은 이전과 다른 revision을 선택하며 다른 이미지 JSON/host identity를 그대로 비교한다. 단순 some(revision) 존재 검사나 과거 저장본으로 보존을 주장하지 않는다.
+E144: 클릭 이미지가 실제 Lexical NodeSelection인지 연결하고 native Backspace 후 저장 JSON에서 삭제를 확인한다. 늦은 응답은 삭제된 key/바뀐 locator에 적용하지 않으며 fixture의 나머지 요청은 완료시켜 최종 상태를 검사한다. 기존 M004/M113/M123/M124/M127/M128의 환경·고정 시계·이력/독립 DOM·저장 계약을 시작/종료에 재점검한다.

@@ -308,6 +308,14 @@ try{
     'Superseded automatic request must not continue to the second image');
 
   // Changing the target image while resolve is pending must discard the stale result.
+  page.once('dialog',dialog=>{assert.equal(dialog.type(),'confirm');void dialog.accept();});
+  await button('저장').click();
+  const beforeReplacementImages=await page.evaluate(()=>{
+    const saved=JSON.parse(localStorage.getItem('lexical-tufte-p1-document')),images=[];
+    const scan=node=>{if(node.type==='tufte-inline-image')images.push(node);node.children?.forEach(scan);};scan(saved.lexicalState.root);return images;
+  });
+  assert.equal(beforeReplacementImages.length,2);
+  const replacementRevision=beforeReplacementImages[0].hostAsset.revisionId==='rev-1'?'rev-2':'rev-1';
   await page.evaluate(()=>{window.__hostMode='deferred';window.__hostPendingResolves=[];});
   await button('외부 이미지 URL 다시 확인').click();
   await page.waitForFunction(()=>window.__hostPendingResolves.length===1);
@@ -317,9 +325,10 @@ try{
   const revisionTargets=changedDialog.getByRole('group',{name:'교체할 노트 이미지 선택'}).getByRole('radio');
   await revisionTargets.first().check();
   await changedDialog.getByRole('radio',{name:/Remote image/}).check();
-  await changedDialog.getByRole('combobox',{name:'버전'}).selectOption('rev-2');
+  await changedDialog.getByRole('combobox',{name:'버전'}).selectOption(replacementRevision);
   await changedDialog.getByRole('button',{name:'선택한 외부 이미지 연결'}).click();
   await changedDialog.waitFor({state:'hidden'});
+  page.once('dialog',dialog=>{assert.equal(dialog.type(),'confirm');void dialog.accept();});
   await button('저장').click();
   const replacedState=await page.evaluate(()=>JSON.parse(localStorage.getItem('lexical-tufte-p1-document')));
   const replacedImages=[];
@@ -328,12 +337,12 @@ try{
     node.children?.forEach(collectReplaced);
   };
   collectReplaced(replacedState.lexicalState.root);
-  assert.ok(replacedImages.some(image=>image.hostAsset?.revisionId==='rev-2'),
+  assert.equal(replacedImages[0].hostAsset.revisionId,replacementRevision,
     'Revision replacement must be committed before releasing the stale resolve');
   assert.equal(replacedImages.length,2,
     'Changing a revision must not insert or remove an image');
-  assert.deepEqual(replacedImages.map(image=>image.hostAsset?.revisionId).sort(),
-    ['rev-1','rev-2'],
+  assert.notEqual(replacedImages[0].hostAsset.revisionId,beforeReplacementImages[0].hostAsset.revisionId);
+  assert.deepEqual(replacedImages[1],beforeReplacementImages[1],
     'The revision change must preserve the other linked image');
   assert.ok(replacedImages.every(image=>image.hostAsset?.namespace==='test-host'&&
     image.hostAsset.assetId==='remote-image'),
@@ -365,6 +374,7 @@ try{
   await page.keyboard.press('Backspace');
   await page.waitForFunction(count=>document.querySelectorAll('[data-note-id] img').length<count,beforeDelete);
   // Verify Backspace changed the Lexical document, not just the rendered DOM.
+  page.once('dialog',dialog=>{assert.equal(dialog.type(),'confirm');void dialog.accept();});
   await button('저장').click();
   const afterDeleteState=await page.evaluate(()=>
     JSON.parse(localStorage.getItem('lexical-tufte-p1-document')));
@@ -377,6 +387,7 @@ try{
   assert.equal(remainingImages.length,beforeDelete-1,
     'Backspace must remove an image from the persisted Lexical tree');
   await page.evaluate(()=>{
+    window.__hostMode='normal';
     const pending=window.__hostPendingResolves.shift();
     pending.resolve({assetId:pending.locator.assetId,revisionId:pending.locator.revisionId,
       mediaType:'image/svg+xml',url:'/obsolete.svg',

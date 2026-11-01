@@ -14,9 +14,9 @@ import {$createLinkNode} from '@lexical/link';
 import {$isHeadingNode} from '@lexical/rich-text';
 import {$generateHtmlFromNodes} from '@lexical/html';
 import {
-  $getRoot, $getSelection, $isRangeSelection, $isNodeSelection, $isElementNode, $isTextNode, $createRangeSelection, $setSelection,
+  $getRoot, $getNearestNodeFromDOMNode, $createNodeSelection, $getSelection, $isRangeSelection, $isNodeSelection, $isElementNode, $isTextNode, $createRangeSelection, $setSelection,
   $createParagraphNode, $createTextNode, $createLineBreakNode, $isParagraphNode, $getNodeByKey,
-  FORMAT_TEXT_COMMAND, KEY_ESCAPE_COMMAND, KEY_ARROW_DOWN_COMMAND, KEY_ENTER_COMMAND,
+  FORMAT_TEXT_COMMAND, CLICK_COMMAND, KEY_ESCAPE_COMMAND, KEY_ARROW_DOWN_COMMAND, KEY_ENTER_COMMAND,
   SELECTION_INSERT_CLIPBOARD_NODES_COMMAND, COPY_COMMAND, CUT_COMMAND, PASTE_COMMAND, KEY_BACKSPACE_COMMAND, KEY_DELETE_COMMAND, HISTORY_PUSH_TAG, UNDO_COMMAND, REDO_COMMAND,
   COMMAND_PRIORITY_HIGH, type LexicalNode, type EditorState, type RangeSelection,
 } from 'lexical';
@@ -849,6 +849,13 @@ function EditorUI(){
     setStatus('본문으로 돌아왔습니다.');return true;
   }
   useEffect(()=>{
+    const selectNoteImage=editor.registerCommand(CLICK_COMMAND,event=>{
+      if(!(event.target instanceof HTMLImageElement))return false;
+      const node=$getNearestNodeFromDOMNode(event.target);
+      if(!(node instanceof InlineImageNode)||!containingNote(node))return false;
+      const selection=$createNodeSelection();selection.add(node.getKey());$setSelection(selection);
+      event.preventDefault();editor.focus();return true;
+    },COMMAND_PRIORITY_HIGH);
     const escape=editor.registerCommand(KEY_ESCAPE_COMMAND,event=>{
       if(!leaveNote())return false;event?.preventDefault();return true;
     },COMMAND_PRIORITY_HIGH);
@@ -924,7 +931,7 @@ function EditorUI(){
       event?.preventDefault();s.insertLineBreak();return true;
     },COMMAND_PRIORITY_HIGH);
     const typing=registerNoteEdgeTypingGuard(editor);
-    return()=>{escape();down();typing();copying();cutting();pasting();plainPaste();backspace();forwardDelete();composing();enter();};
+    return()=>{selectNoteImage();escape();down();typing();copying();cutting();pasting();plainPaste();backspace();forwardDelete();composing();enter();};
   },[editor]);
   function insertNote(kind:'sidenote'|'marginnote'='sidenote'){
     editor.update(()=>{
@@ -1192,8 +1199,8 @@ function EditorUI(){
         <button type="button" disabled={!assetChoice||!assetTargetKey} onClick={connectChosenAsset}>선택한 이미지 연결</button>
       </div>
     </div>}
-    {hostAssets.current&&<button type="button" disabled={refreshingHostAssets}
-      onClick={()=>void refreshHostAssetURLs()}>{refreshingHostAssets?'외부 이미지 갱신 중…':'외부 이미지 URL 다시 확인'}</button>}
+    {hostAssets.current&&<button type="button" aria-busy={refreshingHostAssets}
+      onClick={()=>void refreshHostAssetURLs()}>외부 이미지 URL 다시 확인</button>}
     <section role="group" aria-label="문서 이미지 자산">
       <button type="button" onClick={registerDocumentImage}>문서 이미지 자산 등록</button>
       <button ref={assetChooserTrigger} type="button" onClick={openAssetChooser}>이미지 라이브러리에서 선택</button>

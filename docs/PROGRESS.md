@@ -1,3 +1,9 @@
+## 2026-11-01 밀린 자동 테스트 전수 실행
+
+- e0efb2c 이후 수정 포함 [전체 보고서](VERIFICATION_DEFERRED_2026-11-01.ko.md), [기계 판독 증거](verification/deferred-20261101.json).
+- frozen/static/build/typecheck·unit629·package5·Python16/HTTP·revision모델12그룹 통과. 최종 코드의 browser39/39통과, 공식6폭 pixel mask 밖 차이0. 실제 OS IME/스크린리더/서비스·타 브라우저 미검증, CI 미실행.
+- E142–E144/M129: 수동 갱신 버튼 supersession 경로, revision 저장 확인/독립 이미지 비교, 이미지 클릭→NodeSelection→실제 Backspace 삭제와 늦은 resolve 검사를 수정했다. 기존 generation guard/문서 JSON/HTML/페이지 오류 검사는 유지했다.
+
 ## 2026-10-31 자산 기능 추가 후 밀린 자동 테스트 전수 실행
 
 - f8ed41b의 누적 자산/외부provider 기능 포함 실행. [전체 보고서](VERIFICATION_ASSETS_DEFERRED_2026-10-31.ko.md), [기계 판독 증거](verification/assets-deferred-20261031.json).

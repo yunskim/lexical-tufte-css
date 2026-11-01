@@ -1,5 +1,7 @@
 # 자산 기능 추가 후 누적 테스트 — 2026-10-31
 
+후속 누적 변경의 실행 결과는 [2026-11-01 검증](VERIFICATION_DEFERRED_2026-11-01.ko.md)을 따른다. 아래는 당시 기준 이력이다.
+
 기준 `f8ed41b`와 이번 수정. 이전 `VERIFICATION_FULL_DEFERRED_2026-10-31.ko.md`의 자산 UI 미구현 실패 이후 추가된 Wagtail 참고 로컬 catalog/chooser 및 host provider 기능을 포함한다.
 
 | 검사 | 최종 결과 |

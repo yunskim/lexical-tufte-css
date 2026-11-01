@@ -1,0 +1,814 @@
+{
+  "date": "2026-11-01",
+  "base": "e0efb2c4f680f7f077a185a0bbace97e9236e0b8",
+  "unit": {
+    "total": 629,
+    "packages": {
+      "editor-ports": 2,
+      "document": 58,
+      "render": 72,
+      "blog": 77,
+      "lexical": 420
+    },
+    "fail": 0,
+    "skip": 0
+  },
+  "frozenInstall": "pass",
+  "build": "pass",
+  "typecheck": "pass",
+  "static": "pass",
+  "package": 5,
+  "pythonTests": 16,
+  "pythonHTTP": "pass",
+  "revisionModelGroups": 12,
+  "browser": {
+    "total": 39,
+    "pass": 39,
+    "fail": 0,
+    "files": [
+      {
+        "file": "all-nodes-browser.mjs",
+        "exit": 0,
+        "seconds": 4.94
+      },
+      {
+        "file": "contextual-ui-browser.mjs",
+        "exit": 0,
+        "seconds": 2.32
+      },
+      {
+        "file": "definition-pairs-browser.mjs",
+        "exit": 0,
+        "seconds": 3.23
+      },
+      {
+        "file": "font-proof-browser.mjs",
+        "exit": 0,
+        "seconds": 0.92
+      },
+      {
+        "file": "full-page-pixel-parity-browser.mjs",
+        "exit": 0,
+        "seconds": 0.57
+      },
+      {
+        "file": "host-asset-provider-browser.mjs",
+        "exit": 0,
+        "seconds": 3.37
+      },
+      {
+        "file": "inline-span-browser.mjs",
+        "exit": 0,
+        "seconds": 15.2
+      },
+      {
+        "file": "inline-span-html-browser.mjs",
+        "exit": 0,
+        "seconds": 1.37
+      },
+      {
+        "file": "layout-browser.mjs",
+        "exit": 0,
+        "seconds": 2.08
+      },
+      {
+        "file": "list-kind-browser.mjs",
+        "exit": 0,
+        "seconds": 6.88
+      },
+      {
+        "file": "list-tab-focus-browser.mjs",
+        "exit": 0,
+        "seconds": 2.28
+      },
+      {
+        "file": "managed-note-assets-browser.mjs",
+        "exit": 0,
+        "seconds": 2.88
+      },
+      {
+        "file": "note-browser.mjs",
+        "exit": 0,
+        "seconds": 2.12
+      },
+      {
+        "file": "note-dom-browser.mjs",
+        "exit": 0,
+        "seconds": 1.62
+      },
+      {
+        "file": "note-editing-browser.mjs",
+        "exit": 0,
+        "seconds": 9.25
+      },
+      {
+        "file": "note-export-parity-browser.mjs",
+        "exit": 0,
+        "seconds": 1.22
+      },
+      {
+        "file": "note-image-chooser-browser.mjs",
+        "exit": 0,
+        "seconds": 1.97
+      },
+      {
+        "file": "note-image-dimensions-browser.mjs",
+        "exit": 0,
+        "seconds": 1.87
+      },
+      {
+        "file": "p22d2-semantic-dom-browser.mjs",
+        "exit": 0,
+        "seconds": 0.67
+      },
+      {
+        "file": "publication-browser.mjs",
+        "exit": 0,
+        "seconds": 1.77
+      },
+      {
+        "file": "quotation-editing-browser.mjs",
+        "exit": 0,
+        "seconds": 9.39
+      },
+      {
+        "file": "recovery-browser.mjs",
+        "exit": 0,
+        "seconds": 1.57
+      },
+      {
+        "file": "section-commands-browser.mjs",
+        "exit": 0,
+        "seconds": 4.02
+      },
+      {
+        "file": "server-browser.mjs",
+        "exit": 0,
+        "seconds": 1.52
+      },
+      {
+        "file": "text-format-browser.mjs",
+        "exit": 0,
+        "seconds": 8.14
+      },
+      {
+        "file": "upstream-dom-browser.mjs",
+        "exit": 0,
+        "seconds": 0.31
+      },
+      {
+        "file": "upstream-full-document-editor-browser.mjs",
+        "exit": 0,
+        "seconds": 2.42
+      },
+      {
+        "file": "upstream-full-document-roundtrip-browser.mjs",
+        "exit": 0,
+        "seconds": 1.07
+      },
+      {
+        "file": "upstream-full-document-visual-browser.mjs",
+        "exit": 0,
+        "seconds": 14.11
+      },
+      {
+        "file": "upstream-full-page-baseline-browser.mjs",
+        "exit": 0,
+        "seconds": 0.63
+      },
+      {
+        "file": "upstream-geometry-browser.mjs",
+        "exit": 0,
+        "seconds": 0.82
+      },
+      {
+        "file": "upstream-newthought-sidenote-browser.mjs",
+        "exit": 0,
+        "seconds": 0.41
+      },
+      {
+        "file": "upstream-same-content-epigraphs-browser.mjs",
+        "exit": 0,
+        "seconds": 0.37
+      },
+      {
+        "file": "upstream-same-content-figures-browser.mjs",
+        "exit": 0,
+        "seconds": 0.62
+      },
+      {
+        "file": "upstream-same-content-final-sections-browser.mjs",
+        "exit": 0,
+        "seconds": 0.37
+      },
+      {
+        "file": "upstream-same-content-fundamentals-browser.mjs",
+        "exit": 0,
+        "seconds": 0.36
+      },
+      {
+        "file": "upstream-same-content-getting-started-browser.mjs",
+        "exit": 0,
+        "seconds": 0.37
+      },
+      {
+        "file": "upstream-same-content-opening-browser.mjs",
+        "exit": 0,
+        "seconds": 0.36
+      },
+      {
+        "file": "upstream-same-content-sidenotes-browser.mjs",
+        "exit": 0,
+        "seconds": 1.47
+      }
+    ]
+  },
+  "visual": {
+    "widths": [
+      375,
+      759,
+      760,
+      761,
+      1024,
+      1440
+    ],
+    "outsideVerifiedIframePixelDifference": 0
+  },
+  "manualNotRun": [
+    "OS IME",
+    "screenreader",
+    "physical touch/other browsers",
+    "live DAM service"
+  ],
+  "ci": "not-run",
+  "sourceHashes": {
+    "examples/editor/src/main.tsx": "c6677fd912b86bb669992e006daf34d235620dd536e60057b6b5f9c8290f9a53",
+    "tests/all-nodes-browser.mjs": "6a2df97b87e6bc698588a357f8c56bca0d4195a72ebc8972da64c09007b474b2",
+    "tests/contextual-ui-browser.mjs": "255e2d0534ea782d672d1252d4740ba77def199163d76f057a355d7df232c562",
+    "tests/definition-pairs-browser.mjs": "cb74d91ba80752e2afe060ed92c39d34d2eb496a1bf9fb787ff1e917ebeb191f",
+    "tests/font-proof-browser.mjs": "e8502f3bf19099d9224c5e3652375fc59b3d73bc2c90472c2e009576e3acaaa4",
+    "tests/full-page-pixel-parity-browser.mjs": "c6072c5302c6fbf60a40f3e5b80599bac5b5a1c1373a39c9822ef21e045ea04a",
+    "tests/host-asset-provider-browser.mjs": "340e625ed274fe2516f140e35f4498438b50b5d6a892c8aa9890cc5d53ec7bb9",
+    "tests/inline-span-browser.mjs": "73f3b56b8b03a7abadb908903a77e8c3c4d83b7157fe689c168dbc5fdd2a29e8",
+    "tests/inline-span-html-browser.mjs": "cd73da10af1d8fad8b8cd1bcab365f179545fad4c1e32557986998cfc7f1f4a6",
+    "tests/layout-browser.mjs": "2ea9a87dc0813ab6fcc46d1e59879d034b0bf293662571f6d1c95e0b7388f321",
+    "tests/list-kind-browser.mjs": "86f8cd09549630825c808cd6de3d8ecd349f7c0e4937796b31e5af6a7b4f7ae0",
+    "tests/list-tab-focus-browser.mjs": "b7080b0f91687ee8d909c1d897c9cbc1da2c8bfedfa39ae9a9650bde0c4cde59",
+    "tests/managed-note-assets-browser.mjs": "69371a67611a5299f405495e9cbfb6cd18451b205093ff623fcf45f1099fbd0a",
+    "tests/note-browser.mjs": "6f2a51fbaed2a3b15127232870002af4f16b8667071e1f861bc7fdde49e58228",
+    "tests/note-dom-browser.mjs": "e835aad0cfbe845059aaf821929cfe0559f4c5586b5bc1047f7dfad5543a0c11",
+    "tests/note-editing-browser.mjs": "b827f1a90da52cb9eb7e97984305a76d7535f20efb96379d9ed3104869b9ac42",
+    "tests/note-export-parity-browser.mjs": "11e81b1a73d0d2f754d285c577f7af6c03b0ca21a13287c86e2f46bba2f529b1",
+    "tests/note-image-chooser-browser.mjs": "c69dda037b41967b0a8e2c72acd808825b670a743bff61e69927192d9c7d1418",
+    "tests/note-image-dimensions-browser.mjs": "b33391b811214987c17afcf3c92d9e0ef683ae55307cbcc30c97e5f67288a407",
+    "tests/p22d2-semantic-dom-browser.mjs": "4171a5523e566b28dca2af3d6445a19254ad5107cb55ab6ce3a5f7d5c9e14e12",
+    "tests/publication-browser.mjs": "2bfbfae603d81bd0fd95135dacbfe9b3710e8fb89c68d17df43598a79c180dd0",
+    "tests/quotation-editing-browser.mjs": "eba92e41356d95a714099dd2156343344f355cb95c444c034e9f6037565ab130",
+    "tests/recovery-browser.mjs": "abc1fda60125e1203de02e66ce34a1a6ec9212ddadf0f0115a84b59078c79967",
+    "tests/section-commands-browser.mjs": "c63b74ae5c263bc7c5cf614b029c12b78143ff2e19e27a8834f034acebd433c0",
+    "tests/server-browser.mjs": "a14c9f7f09f0c22c0d69a9e17c8f3c98fed42dbeda12e23638e91a9d151f36e0",
+    "tests/text-format-browser.mjs": "6541e2f3cfc3c816dc1febfaa1c79bf45c2aad6e972259efdcc4b64820f25210",
+    "tests/upstream-dom-browser.mjs": "f6f6b985a0993d2d6769c37e4373697411f9ae5b19fc4124be4e9db77cb07681",
+    "tests/upstream-full-document-editor-browser.mjs": "913fc4eb8d153a8ff580df0b78dfa42bc7c9c594f2d3623a739f702e03385d0c",
+    "tests/upstream-full-document-roundtrip-browser.mjs": "e39293eae68a6bcec5e7796311e9f3b93cd40c0a81e0f74b53b6f9b96196c8cf",
+    "tests/upstream-full-document-visual-browser.mjs": "4c119437185d03459469f3b8e8ccf7c2ca941d08e12ade79d03a7a3d3d570c1c",
+    "tests/upstream-full-page-baseline-browser.mjs": "fe07d45db93d7214af270e4148f5bde1ce3e9a9b3d5a18ff2170b72e40d6d2a2",
+    "tests/upstream-geometry-browser.mjs": "afb359d8fe4fe9c582ea7981b0b6c17270989618e45f7e2713b65a4d8595d92a",
+    "tests/upstream-newthought-sidenote-browser.mjs": "a87228b7afc0e65a9d5b1fb7ebc91f3dd3c020362d46bcf86318f9c228521dd0",
+    "tests/upstream-same-content-epigraphs-browser.mjs": "7e50e4948173b0ff3562c74899f8d70ead78b02568789e04e6a910b0363dbeec",
+    "tests/upstream-same-content-figures-browser.mjs": "0a59aa78bb7881ceb2d8be58c423c2f0f3318998acf11af86a3aa9767ec6e029",
+    "tests/upstream-same-content-final-sections-browser.mjs": "6f3c1ecd88c7d1b88488d922fabe918f5e574de8e5644fbfe740ed9fa2fe009e",
+    "tests/upstream-same-content-fundamentals-browser.mjs": "3392aa027f0097713fa6c7156c1aa0f53e1a38ace3aaeab5e666fdc3947394ba",
+    "tests/upstream-same-content-getting-started-browser.mjs": "e426b5295e23713a718b4291b71637ccc6617ff5c16d611fa516dadd37e371d5",
+    "tests/upstream-same-content-opening-browser.mjs": "992dcd4367174aaa3c74b4cda4529b90d87e641d3d3a66c1722a07537b0eceb7",
+    "tests/upstream-same-content-sidenotes-browser.mjs": "954c8103988f1509435e96ed4c220cfd7daf3640c852b3155da113de4bf1b948"
+  },
+  "logs": [
+    {
+      "file": "verification-runs/deferred-20261101/asset-sync.log",
+      "sha256": "eb08802abb14aec1d8af21561330f42636b0eeada04ac23167fcf5cd7eaa5b69",
+      "tail": [
+        "Pinned upstream visual asset img/exports-imports.png (804996 bytes)",
+        "Pinned upstream visual asset img/rhino.png (527896 bytes)",
+        "Pinned upstream visual asset img/napoleons-march.png (399321 bytes)",
+        "Pinned upstream visual asset img/imagequilt-chinese-calligraphy.png (424264 bytes)",
+        "Pinned upstream visual asset img/imagequilt-animal-sounds.png (204461 bytes)",
+        "Pinned upstream visual asset et-book/et-book-roman-line-figures/et-book-roman-line-figures.woff (44016 bytes)",
+        "Pinned upstream visual asset et-book/et-book-display-italic-old-style-figures/et-book-display-italic-old-style-figures.woff (43780 bytes)",
+        "Pinned upstream visual asset et-book/et-book-bold-line-figures/et-book-bold-line-figures.woff (45364 bytes)",
+        "Pinned upstream visual asset et-book/et-book-roman-old-style-figures/et-book-roman-old-style-figures.woff (43900 bytes)",
+        "All nine pinned visual assets downloaded and Git-blob verified."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/all-nodes-browser.mjs.log",
+      "sha256": "85e730a38c4d22f1cbab86bc533121f9855751ca2b80b65560fc7527cd7b2c46",
+      "tail": [
+        "R02/R03.d browser: history boundary and actual React editor loads all 33 types, edits definition text, saves/reopens without losing code tokens, note IDs or structure."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/contextual-ui-browser.mjs.log",
+      "sha256": "acb046ad3909544ac14d647e186cee4964328326bdfe4578c0ae36a8a42b5cb7",
+      "tail": [
+        "Contextual UI: formatting, selection snapshot restoration, Escape and Tab focus targets, schema-filtered inserts, undo and 375px bounds PASS."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/definition-pairs-browser.mjs.log",
+      "sha256": "dcbe607645e2be7795a46c293ae808b2ddbfdb655d426b860595e4adb5b21a22",
+      "tail": [
+        "P2.2.b definition browser: pair move/delete, final-pair rejection, JSON save/reopen, canonical HTML, undo/redo PASS."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/font-proof-browser.mjs.log",
+      "sha256": "9bdc915b36876721e126abe4c1cf9f3cb3ef2e48b85df874721fb8cac1a73885",
+      "tail": [
+        "{\"test\":\"R13 Source Han Serif/Sans renamed proof subsets, disjoint ranges, actual custom fonts, Latin isolation, source table advances and browser reference metrics, self CSP and blocked-font fallback\",\"originalComparison\":false,\"knownKoreanFallback\":false,\"fallbackFonts\":[{\"familyName\":\"DejaVu Serif\",\"postScriptName\":\"DejaVuSerif\",\"isCustomFont\":false,\"glyphCount\":36}],\"fontRequests\":8,\"delayedSwap\":{\"delayMs\":150,\"before\":{\"width\":518.484375,\"height\":38.390625},\"after\":{\"width\":828,\"height\":38.390625}},\"woff2Bytes\":45172,\"metrics\":[{\"selector\":\"#serif-hangul\",\"width\":828,\"height\":38.390625},{\"selector\":\"#serif-hanja\",\"width\":336,\"height\":38.390625},{\"selector\":\"#serif-punct\",\"width\":293,\"height\":38.390625},{\"selector\":\"#serif-jamo\",\"width\":92,\"height\":38.390625},{\"selector\":\"#sans-hangul\",\"width\":792,\"height\":38.390625},{\"selector\":\"#sans-hanja\",\"width\":336,\"height\":38.390625},{\"selector\":\"#sans-punct\",\"width\":298,\"height\":38.390625},{\"selector\":\"#sans-jamo\",\"width\":88,\"height\":38.390625},{\"selector\":\"#serif .sidenote\",\"width\":666,\"height\":38.390625},{\"selector\":\"#serif figcaption\",\"width\":586,\"height\":38.390625},{\"selector\":\"#serif td\",\"width\":78.640625,\"height\":40.390625},{\"selector\":\"#sans .sidenote\",\"width\":666,\"height\":38.390625},{\"selector\":\"#sans figcaption\",\"width\":586,\"height\":38.390625},{\"selector\":\"#sans td\",\"width\":75.640625,\"height\":40.390625}]}"
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/full-page-pixel-parity-browser.mjs.log",
+      "sha256": "97833aaf9e806e649fb45c3daa294444ed0906b8094d7e78d13aa0f801bee1b8",
+      "tail": [
+        "Full-page pixel comparator offline regressions: cases written."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/host-asset-provider-browser.mjs.log",
+      "sha256": "45c164708733640dcc3114c2a755ce0e6ba6dfa8b3ebc755224288cb03174faf",
+      "tail": [
+        "Host asset search, revisions, resolve, persistence and reload regressions written."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/inline-span-browser.mjs.log",
+      "sha256": "3e82a821e4d30db4e0394c41b6edcd3c45c6cd342945f4fdbd53aa7828e9465d",
+      "tail": [
+        "P2.2.b.1 1440px: real selection, wrap/unwrap undo/redo, save/reopen and composition cancellation/guard PASS.",
+        "P2.2.b.1 375px: real selection, wrap/unwrap undo/redo, save/reopen and composition cancellation/guard PASS."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/inline-span-html-browser.mjs.log",
+      "sha256": "c2b97c4b792c48a808a76d86413f7626e0b6307166fb405ddf426a6d6ea2de78",
+      "tail": [
+        "P2.2.b.1 inline HTML: four kinds, rich link text, direction/alignment, native and publisher roundtrips; unsupported Tufte attributes reject."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/layout-browser.mjs.log",
+      "sha256": "bfe3fe2116b3ebaeb57ae2cd05ddc159cc4da26b77ca662d408075e64237fedc",
+      "tail": [
+        "P1.4 layout: caption/cell editing, JSON roundtrip, direct-child publication structure and reference CSS geometry passed at 1440/761/760/759/375px."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/list-kind-browser.mjs.log",
+      "sha256": "15c4c1c405ab871c7e0f9732e16ec7bb84ce4ad1c51833b1b4772b3aa97e13ed",
+      "tail": [
+        "P2.2.b list browser: ul/ol conversion, structural indent/outdent, safe unwrap, history, save/reopen, renderer, reject PASS."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/list-tab-focus-browser.mjs.log",
+      "sha256": "b3d073dd38f17793b93873704f5190cd6593ac0495ca957d8b2b9cd118e5863f",
+      "tail": [
+        "K4 1440px: ul/ol depth19/20, reject focus, payload and external button navigation PASS",
+        "K4 375px: ul/ol depth19/20, reject focus, payload and external button navigation PASS"
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/managed-note-assets-browser.mjs.log",
+      "sha256": "e1386bbc1e87bc57cef55e8e409791735ee385664de3bdbe92f4697c8e0f5c00",
+      "tail": [
+        "Managed image catalog, same-envelope save/restore, publication, duplicate and corruption regressions written."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/note-browser.mjs.log",
+      "sha256": "ea308fc1f545bf643dc89b2a0190e29a067ed7cedca63ee7a3b66b6d2703ae54",
+      "tail": [
+        "P1.1 Chromium: insertion, keyboard entry/exit, bold/italic/code/link/image, nested rejection, JSON save/reload and HTML structure passed."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/note-dom-browser.mjs.log",
+      "sha256": "b1e3d6c38aff1c5570195530692acf72a20f8e7eba9e20ab9a880b4221cc1c2b",
+      "tail": [
+        "P1.3 DOM: both note kinds, editing/publication separation, label-input-payload adjacency, JSON immutability and upstream mobile CSS toggles passed."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/note-editing-browser.mjs.log",
+      "sha256": "7bbbe929d9ffcf9e137cbf3594577bc515d752629b7c8c2e044d26711bc4827b",
+      "tail": [
+        "  },",
+        "  {",
+        "    \"name\": \"committed Korean composition undoes without a leftover marker\",",
+        "    \"status\": \"passed\"",
+        "  },",
+        "  {",
+        "    \"name\": \"Delete at note end exits without deleting payload\",",
+        "    \"status\": \"passed\"",
+        "  }",
+        "]"
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/note-export-parity-browser.mjs.log",
+      "sha256": "1e68ffc10d91409d14879233c64e03965f5cc958499d782040fe5971a7317b1d",
+      "tail": [
+        "Note HTML parity: rich notes, figure notes and newthought split-parent/negative cases agree between Lexical and publisher (IDs normalized only)."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/note-image-chooser-browser.mjs.log",
+      "sha256": "fe35d72fb5bd3e67a55e0157d2dfffe940138db46795dbccc2e1bfaa424994f3",
+      "tail": [
+        "Wagtail-style note image chooser: mobile grid, second-image selection, metadata, JSON/HTML and cancel covered."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/note-image-dimensions-browser.mjs.log",
+      "sha256": "b4453e50271770e99ddc48d4f442e27c67b34ae6e1d6671f05b6d403d58d0b1f",
+      "tail": [
+        "Note image properties UI: valid, invalid, restore and cleared dimensions covered."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/p22d2-semantic-dom-browser.mjs.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tail": []
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/publication-browser.mjs.log",
+      "sha256": "5b37f55c5dedbaad42113d8a8fbfb6a1b14bcd152d93367d4b6af0844630f053",
+      "tail": [
+        "Publication regression: real definition/cite editing, strict document export, code/ImageQuilt, 5 embed ratios and both Tufte wrappers at 5 widths under enforced CSP (no inline styles/scripts)."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/quotation-editing-browser.mjs.log",
+      "sha256": "c9b7f710d7a6bf6bd6c3fe41855d564ec5efdf334b4544ca8830846d4ad18540",
+      "tail": [
+        "Quotation editing UI 1440px PASS",
+        "Quotation editing UI 375px PASS"
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/recovery-browser.mjs.log",
+      "sha256": "8a7b9067c2149c25021b422d5865fe9d5c4d8855594394dde950d7fffceffd09",
+      "tail": [
+        "Recovery actual UI: early pagehide flush, two-tab isolation, exact damaged-JSON download, cleanup cancellation and explicit deletion PASS."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/section-commands-browser.mjs.log",
+      "sha256": "7390a1b6f861903338bc65574c727590a51222decaa33d6b14a8c73faf06e799",
+      "tail": [
+        "P2.2.a actual React commands: explicit section wrap/add/split/merge, h2/h3/paragraph, note rejection, undo/redo, save/reopen and authoritative render PASS."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/server-browser.mjs.log",
+      "sha256": "32ed579cb7488fa866ea1b85063ac7ff2d7ff89e549268779758ae2383ae7772",
+      "tail": [
+        "Server/browser semantic and geometry parity: 5 widths; no-JS mobile toggles and article namespaces passed."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/text-format-browser.mjs.log",
+      "sha256": "2e8122698430c69772c62b70ed180fb8b1eae734836bfa964d3770cc4268af5a",
+      "tail": [
+        "R10: body/note/link format bits, combinations, toggle off/on, undo/redo, edit, reopen, combined CSS and semantic publication passed."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/upstream-dom-browser.mjs.log",
+      "sha256": "f42c9b689143c776d0f325d1aa426f2c3f1f87b96d05c1a97635683733a3d071",
+      "tail": [
+        "P2.2.e DOM comparison: {\"upstream\":{\"sections\":9,\"notes\":7,\"epigraphs\":3,\"fullwidthFigures\":2},\"published\":{\"sections\":1,\"notes\":2,\"epigraphs\":0,\"fullwidthFigures\":1},\"comparisonLimitation\":\"Independent server fixture does not contain an upstream newthought/sidenote pairing\",\"upstreamSectionOutline\":[{\"index\":1,\"heading\":null,\"directChildren\":[\"p\",\"p\",\"p\",\"p\"],\"notes\":0,\"figures\":0,\"tables\":0},{\"index\":2,\"heading\":\"Getting Started\",\"directChildren\":[\"h2\",\"p\",\"pre\",\"p\"],\"notes\":0,\"figures\":0,\"tables\":0},{\"index\":3,\"heading\":\"Fundamentals\",\"directChildren\":[\"h2\",\"h3\",\"p\",\"p\",\"blockquote\",\"p\",\"p\",\"h3\",\"p\",\"p\",\"p\",\"p\",\"p\",\"p\"],\"notes\":3,\"figures\":0,\"tables\":0},{\"index\":4,\"heading\":\"Epigraphs\",\"directChildren\":[\"h2\",\"div\",\"p\"],\"notes\":0,\"figures\":0,\"tables\":0},{\"index\":5,\"heading\":\"Sidenotes: Footnotes and Marginal Notes\",\"directChildren\":[\"h2\",\"p\",\"p\",\"p\",\"pre\",\"p\",\"p\",\"p\",\"p\",\"p\",\"pre\",\"p\"],\"notes\":2,\"figures\":0,\"tables\":0},{\"index\":6,\"heading\":\"Figures\",\"directChildren\":[\"h2\",\"p\",\"p\",\"figure\",\"p\",\"p\",\"figure\",\"p\",\"pre\",\"figure\",\"p\"],\"notes\":2,\"figures\":3,\"tables\":0},{\"index\":7,\"heading\":\"Code\",\"directChildren\":[\"h2\",\"p\",\"p\",\"pre\"],\"notes\":0,\"figures\":0,\"tables\":0},{\"index\":8,\"heading\":\"ImageQuilts\",\"directChildren\":[\"h2\",\"p\",\"p\",\"figure\",\"p\",\"figure\"],\"notes\":0,\"figures\":2,\"tables\":0},{\"index\":9,\"heading\":\"Epilogue\",\"directChildren\":[\"h2\",\"p\"],\"notes\":0,\"figures\":0,\"tables\":0}],\"publishedFixtureSectionOutline\":[{\"index\":1,\"heading\":null,\"directChildren\":[\"p\",\"p\",\"figure\",\"figure\",\"table\",\"table\",\"div\"],\"notes\":2,\"figures\":2,\"tables\":3}],\"comparisonScope\":\"upstream page vs independent server-document fixture; not same-content parity\"}"
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/upstream-full-document-editor-browser.mjs.log",
+      "sha256": "a577eb05499e38c136fc832ebe0c601f1c748137ec3a7b8006e2d371168b2683",
+      "tail": [
+        "Nine-section real React editor: load, keyboard input, undo/redo, save/reload, immutable eight sections and pure publication parity."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/upstream-full-document-roundtrip-browser.mjs.log",
+      "sha256": "e8dd0d52fbf7e0388446b5f42b108c06888ca7c15985f2e6d787430c3a16bb4c",
+      "tail": [
+        "All-nine-section document: pinned DOM/7 notes, safe iframe/code exceptions, v1->v2 strict Lexical persistence/reopen, one isolated edit, and six iframe CSS viewport checks."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/upstream-full-document-visual-browser.mjs.log",
+      "sha256": "6b0365da6d5fd56efc7bc4259a43ce70e297559b4ace2c1f15cbd0ef796c9304",
+      "tail": [
+        "Pinned full-page pixel parity 375px: exact outside iframe, 9 sections, 5 images, 4 ET Book faces, 7 notes.",
+        "Pinned full-page pixel parity 759px: exact outside iframe, 9 sections, 5 images, 4 ET Book faces, 7 notes.",
+        "Pinned full-page pixel parity 760px: exact outside iframe, 9 sections, 5 images, 4 ET Book faces, 7 notes.",
+        "Pinned full-page pixel parity 761px: exact outside iframe, 9 sections, 5 images, 4 ET Book faces, 7 notes.",
+        "Pinned full-page pixel parity 1024px: exact outside iframe, 9 sections, 5 images, 4 ET Book faces, 7 notes.",
+        "Pinned full-page pixel parity 1440px: exact outside iframe, 9 sections, 5 images, 4 ET Book faces, 7 notes.",
+        "Full-page RGBA parity asserted beyond one verified iframe mask."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/upstream-full-page-baseline-browser.mjs.log",
+      "sha256": "bd4eda65eff6993aec1df52b39cf0b266a240bc9c96fd3969eba28696a24e94d",
+      "tail": [
+        "Upstream full-page reference 1440px: {\"sections\":9,\"notes\":7,\"epigraphs\":3,\"fullwidthFigures\":2,\"invalidNotes\":0,\"hasNewthoughtNote\":true,\"sectionHeadings\":[null,\"Getting Started\",\"Fundamentals\",\"Epigraphs\",\"Sidenotes: Footnotes and Marginal Notes\",\"Figures\",\"Code\",\"ImageQuilts\",\"Epilogue\"],\"articleChildren\":[\"h1\",\"p\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\"],\"viewportWidth\":1440,\"documentWidth\":1440}",
+        "Upstream full-page reference 1024px: {\"sections\":9,\"notes\":7,\"epigraphs\":3,\"fullwidthFigures\":2,\"invalidNotes\":0,\"hasNewthoughtNote\":true,\"sectionHeadings\":[null,\"Getting Started\",\"Fundamentals\",\"Epigraphs\",\"Sidenotes: Footnotes and Marginal Notes\",\"Figures\",\"Code\",\"ImageQuilts\",\"Epilogue\"],\"articleChildren\":[\"h1\",\"p\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\"],\"viewportWidth\":1024,\"documentWidth\":1024}",
+        "Upstream full-page reference 761px: {\"sections\":9,\"notes\":7,\"epigraphs\":3,\"fullwidthFigures\":2,\"invalidNotes\":0,\"hasNewthoughtNote\":true,\"sectionHeadings\":[null,\"Getting Started\",\"Fundamentals\",\"Epigraphs\",\"Sidenotes: Footnotes and Marginal Notes\",\"Figures\",\"Code\",\"ImageQuilts\",\"Epilogue\"],\"articleChildren\":[\"h1\",\"p\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\"],\"viewportWidth\":761,\"documentWidth\":761}",
+        "Upstream full-page reference 760px: {\"sections\":9,\"notes\":7,\"epigraphs\":3,\"fullwidthFigures\":2,\"invalidNotes\":0,\"hasNewthoughtNote\":true,\"sectionHeadings\":[null,\"Getting Started\",\"Fundamentals\",\"Epigraphs\",\"Sidenotes: Footnotes and Marginal Notes\",\"Figures\",\"Code\",\"ImageQuilts\",\"Epilogue\"],\"articleChildren\":[\"h1\",\"p\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\"],\"viewportWidth\":760,\"documentWidth\":760}",
+        "Upstream full-page reference 759px: {\"sections\":9,\"notes\":7,\"epigraphs\":3,\"fullwidthFigures\":2,\"invalidNotes\":0,\"hasNewthoughtNote\":true,\"sectionHeadings\":[null,\"Getting Started\",\"Fundamentals\",\"Epigraphs\",\"Sidenotes: Footnotes and Marginal Notes\",\"Figures\",\"Code\",\"ImageQuilts\",\"Epilogue\"],\"articleChildren\":[\"h1\",\"p\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\"],\"viewportWidth\":759,\"documentWidth\":759}",
+        "Upstream full-page reference 375px: {\"sections\":9,\"notes\":7,\"epigraphs\":3,\"fullwidthFigures\":2,\"invalidNotes\":0,\"hasNewthoughtNote\":true,\"sectionHeadings\":[null,\"Getting Started\",\"Fundamentals\",\"Epigraphs\",\"Sidenotes: Footnotes and Marginal Notes\",\"Figures\",\"Code\",\"ImageQuilts\",\"Epilogue\"],\"articleChildren\":[\"h1\",\"p\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\"],\"viewportWidth\":375,\"documentWidth\":375}"
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/upstream-geometry-browser.mjs.log",
+      "sha256": "afbcf842b1c100f8f74968abe835bf159598a467ee5d3aff1a0ed1a03d74b726",
+      "tail": [
+        "Tufte geometry 1440px: [{\"name\":\"upstream\",\"article\":{\"x\":180,\"y\":8,\"width\":1260,\"height\":10533.25},\"section\":{\"x\":180,\"y\":255.5,\"width\":1260,\"height\":825},\"firstParagraph\":{\"x\":180,\"y\":291.5,\"width\":693,\"height\":150},\"note\":{\"x\":942.296875,\"y\":2372.65625,\"width\":346.5,\"height\":21.5},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1},{\"name\":\"published\",\"article\":{\"x\":180,\"y\":8,\"width\":1260,\"height\":2131.5},\"section\":{\"x\":180,\"y\":255.5,\"width\":1260,\"height\":1809},\"firstParagraph\":{\"x\":180,\"y\":291.5,\"width\":693,\"height\":32},\"note\":{\"x\":942.296875,\"y\":296,\"width\":346.5,\"height\":21.5},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1}]",
+        "Tufte geometry 1024px: [{\"name\":\"upstream\",\"article\":{\"x\":128,\"y\":8,\"width\":896,\"height\":12713.5},\"section\":{\"x\":128,\"y\":255.5,\"width\":896,\"height\":1065},\"firstParagraph\":{\"x\":128,\"y\":291.5,\"width\":492.796875,\"height\":180},\"note\":{\"x\":670.078125,\"y\":2961.65625,\"width\":246.390625,\"height\":21.5},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1},{\"name\":\"published\",\"article\":{\"x\":128,\"y\":8,\"width\":896,\"height\":2131.5},\"section\":{\"x\":128,\"y\":255.5,\"width\":896,\"height\":1809},\"firstParagraph\":{\"x\":128,\"y\":291.5,\"width\":492.796875,\"height\":32},\"note\":{\"x\":670.078125,\"y\":296,\"width\":246.390625,\"height\":21.5},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1}]",
+        "Tufte geometry 761px: [{\"name\":\"upstream\",\"article\":{\"x\":95.125,\"y\":8,\"width\":665.875,\"height\":15757.046875},\"section\":{\"x\":95.125,\"y\":255.5,\"width\":665.875,\"height\":1365},\"firstParagraph\":{\"x\":95.125,\"y\":291.5,\"width\":366.21875,\"height\":240},\"note\":{\"x\":497.953125,\"y\":3711.65625,\"width\":183.109375,\"height\":21.5},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1},{\"name\":\"published\",\"article\":{\"x\":95.125,\"y\":8,\"width\":665.875,\"height\":2131.5},\"section\":{\"x\":95.125,\"y\":255.5,\"width\":665.875,\"height\":1809},\"firstParagraph\":{\"x\":95.125,\"y\":291.5,\"width\":366.21875,\"height\":32},\"note\":{\"x\":497.953125,\"y\":296,\"width\":183.109375,\"height\":21.5},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1}]",
+        "Tufte geometry 760px: [{\"name\":\"upstream\",\"article\":{\"x\":60.796875,\"y\":8,\"width\":638.390625,\"height\":10745.59375},\"section\":{\"x\":60.796875,\"y\":255.5,\"width\":638.390625,\"height\":885},\"firstParagraph\":{\"x\":60.796875,\"y\":291.5,\"width\":638.390625,\"height\":150},\"note\":{\"x\":0,\"y\":0,\"width\":0,\"height\":0},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1},{\"name\":\"published\",\"article\":{\"x\":60.796875,\"y\":8,\"width\":638.390625,\"height\":3197.5},\"section\":{\"x\":60.796875,\"y\":255.5,\"width\":638.390625,\"height\":2875},\"firstParagraph\":{\"x\":60.796875,\"y\":291.5,\"width\":638.390625,\"height\":32},\"note\":{\"x\":0,\"y\":0,\"width\":0,\"height\":0},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1}]",
+        "Tufte geometry 759px: [{\"name\":\"upstream\",\"article\":{\"x\":60.71875,\"y\":8,\"width\":637.546875,\"height\":10745.109375},\"section\":{\"x\":60.71875,\"y\":255.5,\"width\":637.546875,\"height\":885},\"firstParagraph\":{\"x\":60.71875,\"y\":291.5,\"width\":637.546875,\"height\":150},\"note\":{\"x\":0,\"y\":0,\"width\":0,\"height\":0},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1},{\"name\":\"published\",\"article\":{\"x\":60.71875,\"y\":8,\"width\":637.546875,\"height\":3197.5},\"section\":{\"x\":60.71875,\"y\":255.5,\"width\":637.546875,\"height\":2875},\"firstParagraph\":{\"x\":60.71875,\"y\":291.5,\"width\":637.546875,\"height\":32},\"note\":{\"x\":0,\"y\":0,\"width\":0,\"height\":0},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1}]",
+        "Tufte geometry 375px: [{\"name\":\"upstream\",\"article\":{\"x\":30,\"y\":8,\"width\":315,\"height\":17568.6875},\"section\":{\"x\":30,\"y\":255.5,\"width\":315,\"height\":1635},\"firstParagraph\":{\"x\":30,\"y\":291.5,\"width\":315,\"height\":300},\"note\":{\"x\":0,\"y\":0,\"width\":0,\"height\":0},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1},{\"name\":\"published\",\"article\":{\"x\":30,\"y\":8,\"width\":315,\"height\":3197.5},\"section\":{\"x\":30,\"y\":255.5,\"width\":315,\"height\":2875},\"firstParagraph\":{\"x\":30,\"y\":291.5,\"width\":315,\"height\":32},\"note\":{\"x\":0,\"y\":0,\"width\":0,\"height\":0},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1}]"
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/upstream-newthought-sidenote-browser.mjs.log",
+      "sha256": "02ac853f7789de63ff8329b25369c625c7aab0d81335f475243ab024838d9100",
+      "tail": [
+        "Newthought/sidenote split-parent DOM and focusable mobile checkbox preserve Tufte CSS adjacency."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/upstream-same-content-epigraphs-browser.mjs.log",
+      "sha256": "9392144922f7b983c71de03768e5ed78cb7f9249960673f59c56cc67d42e74da",
+      "tail": [
+        "Same-content upstream Epigraphs: three blockquotes, direct text/paragraphs, footers, cite, em/code. Only structural indentation omitted."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/upstream-same-content-figures-browser.mjs.log",
+      "sha256": "10e159b95d98382bda19e9bad6977208ee72f9c2590d2fc21cbd8e8c9733f65b",
+      "tail": [
+        "Figures: 11 complete blocks, two rich notes, strict DOM except modern iframe/code, and 375/759/760/761/1024/1440px iframe CSS geometry parity."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/upstream-same-content-final-sections-browser.mjs.log",
+      "sha256": "dde6932b05ce965e7483cae4c34729eaf5ab9926104015d898bcc4ec51b8ffd6",
+      "tail": [
+        "Same-content upstream sections 7–9: code, imagequilts and epilogue; strict DOM parity, no omitted nodes or inline whitespace normalization."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/upstream-same-content-fundamentals-browser.mjs.log",
+      "sha256": "8534ed7de271c6101f52419a71ba851f8b486d0b6da1683d9994a2f925a8c686",
+      "tail": [
+        "Pinned Fundamentals same-content: 14 blocks including quote[cite], p.sans and three real notes, exact DOM except generated note IDs and block indentation."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/upstream-same-content-getting-started-browser.mjs.log",
+      "sha256": "443c9a02c83e85b53ab54313eb7a995c4902f0630488aae22b1e5e8f1b7b24f9",
+      "tail": [
+        "Same-content Getting Started section: heading, paragraphs, inline code, links, pre/code preserved."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/upstream-same-content-opening-browser.mjs.log",
+      "sha256": "ea45882015ab1712ab8e0b34c329649f818355e8ba644cb65c7a6e8d7de81779",
+      "tail": [
+        "Same-content upstream opening section: 4 paragraphs, text and links preserved."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser/upstream-same-content-sidenotes-browser.mjs.log",
+      "sha256": "dce51c3af4be98f1b660261a57ee354078c76b7cc07941dd50fa9b0c4a3df318",
+      "tail": [
+        "Pinned same-content Sidenotes section: twelve source blocks, exact rich text and code, two note control sets and 375/760/761/1440px responsive toggles; generated IDs and two source-only control whitespace gaps normalized."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/browser-install.log",
+      "sha256": "40c0f5b5e0e1a007539d214e6b1ad270502d6698ca0f2ff31ad7883b1773c4d9",
+      "tail": [
+        "|■■■■■■■■■■■■■■■■                                                                |  20% of 2.3 MiB",
+        "|■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 2.3 MiB",
+        "|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  40% of 2.3 MiB",
+        "|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 2.3 MiB",
+        "|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 2.3 MiB",
+        "|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  70% of 2.3 MiB",
+        "|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 2.3 MiB",
+        "|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 2.3 MiB",
+        "|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 2.3 MiB",
+        "FFMPEG playwright build v1011 downloaded to /root/.cache/ms-playwright/ffmpeg-1011"
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/check-final.log",
+      "sha256": "22a8743309f7e63a4dc5210736e854ddf560cb66d290cec6297fa72c86fe5d22",
+      "tail": [
+        "packages/lexical test: ✔ R05 stale recovery location does not mutate or throw (0.73981ms)",
+        "packages/lexical test: ℹ tests 420",
+        "packages/lexical test: ℹ suites 0",
+        "packages/lexical test: ℹ pass 420",
+        "packages/lexical test: ℹ fail 0",
+        "packages/lexical test: ℹ cancelled 0",
+        "packages/lexical test: ℹ skipped 0",
+        "packages/lexical test: ℹ todo 0",
+        "packages/lexical test: ℹ duration_ms 3304.116728",
+        "packages/lexical test: Done"
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/check.log",
+      "sha256": "deeb28ccd52c2da772fea907575958ae97027c1067b533299af214eee9a169e1",
+      "tail": [
+        "packages/lexical test: ✔ R05 stale recovery location does not mutate or throw (1.032576ms)",
+        "packages/lexical test: ℹ tests 420",
+        "packages/lexical test: ℹ suites 0",
+        "packages/lexical test: ℹ pass 420",
+        "packages/lexical test: ℹ fail 0",
+        "packages/lexical test: ℹ cancelled 0",
+        "packages/lexical test: ℹ skipped 0",
+        "packages/lexical test: ℹ todo 0",
+        "packages/lexical test: ℹ duration_ms 2486.521106",
+        "packages/lexical test: Done"
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/host-delete-retest.log",
+      "sha256": "45c164708733640dcc3114c2a755ce0e6ba6dfa8b3ebc755224288cb03174faf",
+      "tail": [
+        "Host asset search, revisions, resolve, persistence and reload regressions written."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/host-initial.log",
+      "sha256": "bb43f6512e8dac7476b7db5ac48241abfaffe09539bb1366e155094c2d8f3c49",
+      "tail": [
+        "",
+        "locator.click: Timeout 30000ms exceeded.",
+        "Call log:",
+        "\u001b[2m  - waiting for getByRole('button', { name: '외부 이미지 URL 다시 확인', exact: true })\u001b[22m",
+        "",
+        "    at /workspace/scratch/259060c11b99/lexical-tufte-css/tests/host-asset-provider-browser.mjs:260:36 {",
+        "  name: 'TimeoutError'",
+        "}",
+        "",
+        "Node.js v24.22.1"
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/host-manual-retest.log",
+      "sha256": "fe379cb57fbae109acc37071a57fe67a7c04a7efae9635c2ecfdcc3cf22ebe8c",
+      "tail": [
+        "    at file:///workspace/scratch/259060c11b99/lexical-tufte-css/tests/host-asset-provider-browser.mjs:331:10 {",
+        "  generatedMessage: false,",
+        "  code: 'ERR_ASSERTION',",
+        "  actual: false,",
+        "  expected: true,",
+        "  operator: '==',",
+        "  diff: 'simple'",
+        "}",
+        "",
+        "Node.js v24.22.1"
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/host-revision-retest.log",
+      "sha256": "8c8b5b1b28b01df1dd582dc21fb67e2fae44c2c88feb705c3e56bb003bca5864",
+      "tail": [
+        "node:internal/modules/run_main:107",
+        "    triggerUncaughtException(",
+        "    ^",
+        "",
+        "page.waitForFunction: Timeout 30000ms exceeded.",
+        "    at /workspace/scratch/259060c11b99/lexical-tufte-css/tests/host-asset-provider-browser.mjs:375:14 {",
+        "  name: 'TimeoutError'",
+        "}",
+        "",
+        "Node.js v24.22.1"
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/http.log",
+      "sha256": "34ec031e9067e8b718f3ebfd97d72270893a0bace86b16fa302ecea8a64612a7",
+      "tail": [
+        "Actual TypeScript client -> Python HTTP -> SQLite: save/read/list/checksum/CAS/denied access/CSRF/delete PASS."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/image-build.log",
+      "sha256": "000ff772bb74fa891fca6a2d2c2c7dad3318359fcec84bc5c34f1bef3394a1ce",
+      "tail": [
+        "dist/index.html                   0.34 kB │ gzip:   0.28 kB",
+        "dist/assets/index-C4c6fNxd.css    7.34 kB │ gzip:   2.10 kB",
+        "dist/assets/index-Cw3gfvHK.js   657.84 kB │ gzip: 198.48 kB",
+        "",
+        "✓ built in 236ms",
+        "[plugin builtin:vite-reporter] ",
+        "(!) Some chunks are larger than 500 kB after minification. Consider:",
+        "- Using dynamic import() to code-split the application",
+        "- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting",
+        "- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/install.log",
+      "sha256": "5ae603be8d58adf083c4726eda258761c4dae2716d5061a4246d59cce56e8094",
+      "tail": [
+        "Done in 558ms using pnpm v11.25.0",
+        "",
+        "   ╭──────────────────────────────────────────────────────────────────────╮",
+        "   │                                                                      │",
+        "   │                 Update available! 11.25.0 → 12.16.1.                 │",
+        "   │                 Changelog: https://pnpm.io/v/12.16.1                 │",
+        "   │   To update, run: curl -fsSL https://get.pnpm.io/install.sh | sh -   │",
+        "   │                                                                      │",
+        "   ╰──────────────────────────────────────────────────────────────────────╯",
+        ""
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/manual-build.log",
+      "sha256": "bde67047b92290e5b74871672312217c7ab4c4c6032e13982e98037215bf36ae",
+      "tail": [
+        "dist/index.html                   0.34 kB │ gzip:   0.28 kB",
+        "dist/assets/index-C4c6fNxd.css    7.34 kB │ gzip:   2.10 kB",
+        "dist/assets/index-B_o6HT47.js   657.62 kB │ gzip: 198.42 kB",
+        "",
+        "[plugin builtin:vite-reporter] ",
+        "(!) Some chunks are larger than 500 kB after minification. Consider:",
+        "- Using dynamic import() to code-split the application",
+        "- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting",
+        "- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.",
+        "✓ built in 259ms"
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/package-final.log",
+      "sha256": "0db51b0fca40e7709cbac5198c03d3431bf2fbb4fdd2acb4086f4faf428e8a73",
+      "tail": [
+        "Checking packed JS imports and editor roundtrip (15s limit).",
+        "R13 five tarballs: full LICENSE/notices/OFL, packed JS imports, fresh declarations, strict editor roundtrip, renderer/blog and SQL exports PASS. No publishing."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/package.log",
+      "sha256": "0db51b0fca40e7709cbac5198c03d3431bf2fbb4fdd2acb4086f4faf428e8a73",
+      "tail": [
+        "Checking packed JS imports and editor roundtrip (15s limit).",
+        "R13 five tarballs: full LICENSE/notices/OFL, packed JS imports, fresh declarations, strict editor roundtrip, renderer/blog and SQL exports PASS. No publishing."
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/python-install.log",
+      "sha256": "8a86fcedb59d147201687b3d20a4c4d4662382b9112093fd1f560688be78eae2",
+      "tail": [
+        "  Building editable for lexical-tufte-recovery-server (pyproject.toml): started",
+        "  Building editable for lexical-tufte-recovery-server (pyproject.toml): finished with status 'done'",
+        "  Created wheel for lexical-tufte-recovery-server: filename=lexical_tufte_recovery_server-0.1.0-0.editable-py3-none-any.whl size=3111 sha256=b3c862eb2eeedfdd949c0952dd7ca28f31a04f9cd1dee70c25232707f36c9a1f",
+        "  Stored in directory: /tmp/pip-ephem-wheel-cache-gepmk23b/wheels/49/9c/d7/5a5cbfcff69cac9c09e21800ad552fceb435d9c71a30942e82",
+        "Successfully built lexical-tufte-recovery-server",
+        "Installing collected packages: typing-extensions, pygments, pluggy, packaging, iniconfig, idna, h11, click, certifi, annotated-types, annotated-doc, uvicorn, typing-inspection, pytest, pydantic-core, opentelemetry-api, httpcore, anyio, starlette, pydantic, httpx, fastapi, lexical-tufte-recovery-server",
+        "Successfully installed annotated-doc-0.0.5 annotated-types-0.8.0 anyio-4.15.1 certifi-2026.10.23 click-8.5.0 fastapi-0.162.0 h11-0.16.0 httpcore-1.0.9 httpx-0.28.1 idna-3.20 iniconfig-2.3.1 lexical-tufte-recovery-server-0.1.0 opentelemetry-api-1.45.2 packaging-26.3 pluggy-1.7.0 pydantic-2.14.2 pydantic-core-2.50.2 pygments-2.21.0 pytest-9.2.0 starlette-1.10.0 typing-extensions-4.16.0 typing-inspection-0.4.4 uvicorn-0.54.0",
+        "",
+        "[notice] A new release of pip is available: 25.0.1 -> 26.2.2",
+        "[notice] To update, run: python -m pip install --upgrade pip"
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/python.log",
+      "sha256": "39a83f66cd97b212b8da06db3fcafb63f8287a90edbcb1dda3012fe01666dd33",
+      "tail": [
+        "................                                                         [100%]",
+        "=============================== warnings summary ===============================",
+        "../../../../tmp/tufte-nov-venv/lib/python3.12/site-packages/fastapi/testclient.py:1",
+        "  /tmp/tufte-nov-venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.",
+        "    from starlette.testclient import TestClient as TestClient  # noqa",
+        "",
+        "-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html",
+        "16 passed, 1 warning in 0.39s"
+      ]
+    },
+    {
+      "file": "verification-runs/deferred-20261101/revision.log",
+      "sha256": "0335599f3a53a5ca42eae6a88f038e8925de7b8552d77628ece28183ba0f090a",
+      "tail": [
+        "Publish revision model: 12 assertions groups passed (pure proposal model, NOT production store)."
+      ]
+    }
+  ]
+}

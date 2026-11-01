@@ -1003,3 +1003,17 @@ managed-note-assets-browser는 관리 문서 JSON 검사 출력이 없어 timeou
 clock.install만 사용한1ms 경계 검사에 실제 경과 시간이 섞여 조기 만료 assertion이 실패했다. Playwright 고정 버전 타입 문서의 권장 순서대로 load 이후 pauseAt을 사용하고 restore rAF는 runFor16으로 진행한다. 선택 재시도 fixture는 실제 노트 안에 두 번째 이미지를 삽입·대상 radio를 명시 선택하며 partial mock은 rev1만 실패하게 하여 rev2 성공 요청을 재시도하지 않는지 검사한다. 기대1ms/5초/60초 경계·정확한 locator call 비교는 완화하지 않았다. M128.
 
 E140 후속 회귀: 관리 문서 JSON textarea 추가 뒤 기존 이미지 chooser/dimensions의 부분 이름 검색이 두 textbox에 일치했다. 두 테스트를 기존 문서 JSON의 exact accessible name으로 이관했고 내용·크기·보존 assertion은 유지한다. 최초 실패와 재실행을 보고서에서 분리한다.
+
+## E142 — 수동 host 갱신 supersession 경로가 UI에서 차단
+
+2026-11-01 e0efb2c 집중 검증: deferred resolve 도중 두 번째 수동 갱신을 실행하려 했으나 버튼이 disabled이고 이름도 바뀌어30초 timeout했다. 처리 함수는 manual generation supersession을 지원하지만 UI가 이를 막고 있었다. 버튼을 활성 상태/안정된 이름으로 유지하고 aria-busy로 진행 상태를 표시했다. 자동 중복 요청 coalescing은 유지하며 집중 host 회귀로 수동 대체·stale 응답 차단을 확인했다. M129.
+
+## E143 — revision 교체 저장 checkpoint의 확인창/fixture 기대 오류
+
+버튼 수정 후 revision 교체 검사가 이전 저장본을 읽어 실패했다. overwrite 확인창의 기본 dismiss로 새 문서가 저장되지 않은 것이 원인이다. 격리된 테스트에서 confirm 종류 확인 후 명시 승인하고 교체 전2개 이미지를 먼저 저장했다. 대상의 실제 이전 revision과 다른 값을 선택해 변경을 확인하며 나머지 이미지 전체 JSON/namespace/assetId를 그대로 비교한다. 기존 ['rev-1','rev-2'] 고정 기대는 한 이미지만 다른 기존 revision으로 바꾼 실제 결과와 양립하지 않아 before/after 기반 보존 검사로 대체했다. M129.
+
+## E144 — inline note image click이 삭제할 Lexical 노드를 선택하지 않음
+
+revision 검증 이후 Backspace의 DOM 이미지 감소 대기에서30초 timeout했다. 노트 inline image의 createDOM은 비편집 img이며 기존 editor에 이미지 클릭→NodeSelection 연결이 없었다. 노트 내부 InlineImageNode 클릭에만 NodeSelection을 설정하고 editor focus를 복귀시켜 기본 RichText Backspace가 실제 노드를 삭제하도록 연결했다. 데이터 삭제를 DOM 조작으로 흉내내지 않았으며 저장한 canonical JSON에서도 이미지 개수가 감소하는지 검사한다.
+
+삭제 중 resolve fixture는 첫 응답을 반환한 뒤 mode를 normal로 바꿔 나머지 유효 이미지 요청도 끝나게 했다. 모든 후속 요청을 deferred로 방치해 완료 상태를 기다리는 fixture 교착을 막는다. stale URL이 삭제 이미지를 되살리지 않는 기존 검사와 페이지 오류 검사는 유지했다. M129.
