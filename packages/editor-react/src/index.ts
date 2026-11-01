@@ -12,3 +12,5 @@ export interface TufteEditorProps {
 }
 
 export {ToolbarIcon, type ToolbarIconName} from './toolbar.js';
+
+export {SelectionToolbar} from './SelectionToolbar.js';
