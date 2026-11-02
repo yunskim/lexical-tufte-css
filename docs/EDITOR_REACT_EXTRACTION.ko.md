@@ -96,6 +96,28 @@ pnpm package:check
 
 **검증 제한:** 이 단계에서는 GitHub 코드와 정적 계약을 점검했으며, 실제 pnpm 빌드/Playwright는 실행하지 못했다. 브라우저 테스트와 CI 통과를 주장하지 않는다. 따라서 R5·R7 완료 체크박스는 유지하지 않는다. 구현은 추가됐지만 성공 판정은 보류한다.
 
+## 2026-11-03 — 공통 `TufteEditor`의 호스트 이미지 자산 선택기 (R4 일부)
+
+`packages/editor-react/src/HostAssetPicker.tsx`를 추가하고, `TufteEditor`에 유효한 `assetAdapter`·`assetNamespace`가 전달된 경우에만 표시하도록 연결했다. 실제 자산 서비스 없이 확인하는 별도 예제는 `examples/editor/host-assets.html`이다.
+
+- **검색과 버전:** `AssetProvider.search({text,mediaTypes,limit})`로 이미지 자산을 찾고 `revisions(assetId)`로 고정 버전을 선택한다. 기본값은 최신 버전 추적이며 이 경우 영구 참조의 `revisionId`를 생략한다.
+- **기존 이미지 연결:** 현재 문서의 노트 이미지 중 하나를 선택해 `InlineImageNode.setHostAsset()`를 호출한다. 연결된 `hostAsset.namespace/assetId/revisionId?`는 Lexical JSON에 보존하고, 서명된 URL은 `src`로 저장한다.
+- **새 이미지 삽입:** 노트 내부에서 선택한 위치를 포착한 경우 **해당 노트 끝에** 새로운 이미지 노드를 삽입한다. 임의의 문단·표·그림으로 범위를 확대하지 않는다.
+- **검증 및 실패 차단:** resolve 응답의 자산 ID·선택 revision·이미지 MIME·안전한 URL·만료 시각을 확인한다. 대상 이미지/노트가 교체·이동·재식별됐으면 갱신하지 않는다.
+- **비동기 경계:** 검색과 버전 조회는 AbortSignal을 전달하며, resolve는 취소·대상 변경·host adapter/namespace 교체·unmount 시 generation guard를 적용한다. 호스트가 AbortSignal을 무시해도 취소한 응답으로 문서를 변경하지 않는다.
+- **접근성:** 고유 `useId` 제목·검색·대체 텍스트·라디오 그룹, 키보드 Escape·Tab 순환 및 닫기 후 포커스 복귀를 제공한다. 실제 보조기술 수락은 별도다.
+- **호스트 책임:** 인증·권한·자산 업로드·실제 DAM 연결 및 **서명 URL의 만료 후 자동 재해석/재시도**는 이번 공통 컴포넌트 범위 밖이다. 기존 예제의 갱신 코드와 공통 편집기의 완료 상태를 혼동하지 않는다.
+
+`tests/controlled-host-assets-browser.mjs`를 추가하고 `test:host-assets-controlled`, `test:browser`에 연결했다. 서로 다른 namespace의 두 편집기, provider 지연 로딩, MIME 필터, 명시적 revision, JSON host locator, Undo/Redo, 실패 URL·만료·revision 불일치, 취소 후 늦은 resolve, 노트 끝 삽입을 검사하도록 작성했다.
+
+```bash
+pnpm install --frozen-lockfile
+pnpm test:host-assets-controlled
+# 화면 확인: pnpm dev:editor 실행 후 /host-assets.html
+```
+
+**2026-11-03 기존 검증 보고서(`e39b8a1`)는 이번 변경 이전 코드에 대한 결과다.** 이번 변경의 정적 코드·연결 검사 18항목은 통과했으나 새 Playwright 및 전체 타입/빌드 재실행은 아직 수행하지 않았다. 새 검사 통과 전 R4/P3.1.e 전체 완료 처리 금지.
+
 ## 검증 상태
 
 이 문서는 코드 이관 상태와 실행 범위를 함께 추적한다. 2026-11-03 frozen/build/typecheck·unit629·package6·browser40개를 실제 실행해 통과했다. 최신 근거는 [2026-11-03 보고서](VERIFICATION_DEFERRED_2026-11-03.ko.md)를 따른다. 이전 절의 미실행 문구는 당시 이력이며, controlled API의 관찰된 동작 검증과 전체 자산/운영·수동 접근성 수락을 구분한다. R4–R7/P3.1.e 전체 게이트는 유지한다.
