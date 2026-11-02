@@ -14,3 +14,5 @@ export {TufteComposer,type TufteComposerProps} from './TufteComposer.js';
 export {TufteEditingSurface,type TufteEditingSurfaceProps} from './TufteEditingSurface.js';
 
 export {TufteEditor,useTufteAssetContext,type TufteEditorProps,type TufteAssetContextValue} from './TufteEditor.js';
+
+export {HostAssetPicker,type HostAssetPickerProps} from './HostAssetPicker.js';
