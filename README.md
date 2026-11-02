@@ -46,6 +46,15 @@ pnpm test:browser
 
 브라우저 테스트는 개발 서버를 자동으로 시작합니다. `EDITOR_URL`로 실행 중인 별도 서버를 지정할 수 있습니다. 노트 복사·삭제·분할·병합·이동·undo/redo와 Chromium 한글 조합 이벤트는 P1.2에서 검증했습니다. 실제 OS별 IME 및 다른 브라우저는 후속 검증 대상입니다.
 
+## 재사용 편집기 브라우저 예제
+
+`pnpm dev:editor`를 실행한 뒤 개발 서버의 기본 주소에서 다음 경로로 접속할 수 있습니다.
+
+- `/controlled.html` — `TufteEditor`의 두 인스턴스, 외부 문서 교체, readonly, 마운트/언마운트
+- `/host-assets.html` — 서로 다른 namespace를 가진 두 편집기의 **호스트 이미지 선택기**. 실제 DAM이 아닌 예제 `AssetProvider`를 사용합니다.
+
+신규 호스트 자산 선택기 회귀 코드는 `pnpm test:host-assets-controlled`로 실행하도록 추가했습니다. **11월 3일 전수 검증 보고서는 이 선택기 코드 이전 커밋의 결과**로, 새 기능의 빌드·브라우저 통과 여부는 별도 확인이 필요합니다. 새 기능의 범위와 미완료 게이트는 [React 편집기 추출 현황](docs/EDITOR_REACT_EXTRACTION.ko.md)에 기록했습니다.
+
 ## 오류와 개선 기록
 
 - [에러 기록](docs/ERROR_LOG.md)
