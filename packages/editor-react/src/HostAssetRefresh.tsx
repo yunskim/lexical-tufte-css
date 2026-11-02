@@ -1,0 +1,242 @@
+import {useEffect,useState} from 'react';
+import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
+import {$getNodeByKey,$getRoot,$isElementNode,HISTORY_MERGE_TAG,type LexicalNode} from 'lexical';
+import type {AssetLocator,AssetProvider} from '@lexical-tufte/editor-ports';
+import {InlineImageNode} from '@lexical-tufte/lexical';
+import {
+ HOST_ASSET_REFRESH_MARGIN_MS,
+ imageRefreshRetryDelay,isUsableResolvedImage,nextImageRefreshAt
+} from './hostAssetPolicy.js';
+
+type Candidate={
+ key:string;
+ locator:AssetLocator;
+ signature:string;
+ src:string;
+};
+type Tracked={
+ signature:string;
+ nextAt:number;
+ failures:number;
+};
+
+const MAX_TIMER_MS=2_147_483_647;
+const AUTO_REFRESH_PACE_MS=1000;
+
+function fingerprint(candidate:{locator:AssetLocator;src:string}):string{
+ const {assetId,revisionId}=candidate.locator;
+ return JSON.stringify([candidate.locator.namespace,assetId,revisionId??null,candidate.src]);
+}
+
+export interface HostAssetRefreshProps {
+ adapter:AssetProvider;
+ namespace:string;
+}
+
+/**
+ * Per-Lexical-editor refresh controller. Image locators remain stable; only
+ * validated display URLs change. No globals, storage, network client or host auth.
+ *
+ * An absent expiresAt is treated as unknown: do not poll a permanent URL.
+ * Failed resolutions preserve the existing src/locator and retry with backoff.
+ */
+export function HostAssetRefresh({adapter,namespace}:HostAssetRefreshProps){
+ const [editor]=useLexicalComposerContext();
+ const [running,setRunning]=useState(false);
+ const [status,setStatus]=useState('');
+
+ useEffect(()=>{
+  let alive=true;
+  let generation=0;
+  let activeController:AbortController|null=null;
+  let timer:ReturnType<typeof setTimeout>|null=null;
+  let pendingScan=false;
+  const tracked=new Map<string,Tracked>();
+
+  function stopTimer(){
+   if(timer!==null)clearTimeout(timer);
+   timer=null;
+  }
+
+  function collect():Candidate[]{
+   const found:Candidate[]=[];
+   editor.getEditorState().read(()=>{
+    const visit=(node:LexicalNode):void=>{
+     if(node instanceof InlineImageNode){
+      const p=node.getImageProperties();
+      const locator=p.hostAsset;
+      if(locator?.namespace===namespace){
+       const candidate={key:node.getKey(),locator,src:p.src,signature:''};
+       candidate.signature=fingerprint(candidate);
+       found.push(candidate);
+      }
+     }
+     if($isElementNode(node))node.getChildren().forEach(visit);
+    };
+    visit($getRoot());
+   });
+   return found;
+  }
+
+  function live(g:number,controller:AbortController):boolean{
+   return alive&&generation===g&&!controller.signal.aborted;
+  }
+
+  function schedule(){
+   if(!alive)return;
+   stopTimer();
+   const items=collect();
+   const existing=new Set(items.map(item=>item.key));
+   for(const key of tracked.keys())if(!existing.has(key))tracked.delete(key);
+   const now=Date.now();
+   let next=Number.POSITIVE_INFINITY;
+   for(const item of items){
+    const old=tracked.get(item.key);
+    if(!old||old.signature!==item.signature){next=now;break;}
+    next=Math.min(next,old.nextAt);
+   }
+   if(Number.isFinite(next)){
+    timer=setTimeout(()=>{timer=null;void refresh(false);},
+     Math.max(0,Math.min(MAX_TIMER_MS,next-now)));
+   }
+  }
+
+  async function refresh(manual:boolean){
+   if(!alive)return;
+   if(activeController){
+    if(!manual){pendingScan=true;return;}
+    activeController.abort();
+    generation++;
+    activeController=null;
+   }
+   stopTimer();
+   const all=collect();
+   const existing=new Set(all.map(item=>item.key));
+   for(const key of tracked.keys())if(!existing.has(key))tracked.delete(key);
+   const now=Date.now();
+   const due=all.filter(item=>{
+    const old=tracked.get(item.key);
+    return manual||!old||old.signature!==item.signature||old.nextAt<=now;
+   });
+   if(!due.length){
+    if(manual)setStatus(all.length?'연결된 이미지 URL은 아직 갱신할 필요가 없습니다.':'갱신할 호스트 이미지가 없습니다.');
+    schedule();
+    return;
+   }
+   const controller=new AbortController();
+   const current=++generation;
+   activeController=controller;
+   setRunning(true);
+   let succeeded=0,failed=0,skipped=0;
+
+   try{
+    for(const item of due){
+     if(!live(current,controller))break;
+     let resolved;
+     try{
+      resolved=await adapter.resolve(item.locator,controller.signal);
+     }catch{
+      if(!live(current,controller))break;
+      resolved=null;
+     }
+     if(!live(current,controller))break;
+     if(!isUsableResolvedImage(item.locator,resolved)){
+      const previous=tracked.get(item.key);
+      const failures=previous?.signature===item.signature?previous.failures+1:1;
+      tracked.set(item.key,{
+       signature:item.signature,failures,
+       nextAt:Date.now()+imageRefreshRetryDelay(failures)
+      });
+      failed++;
+      continue;
+     }
+
+     // No visible change: record expiry without a Lexical update, so neither
+     // React onChange nor Undo is disturbed by a redundant resolve.
+     if(resolved.url===item.src){
+      tracked.set(item.key,{
+       signature:item.signature,failures:0,
+       nextAt:nextImageRefreshAt(resolved.expiresAt)
+      });
+      succeeded++;
+      continue;
+     }
+
+     let applied=false;
+     editor.update(()=>{
+      if(!live(current,controller))return;
+      const node=$getNodeByKey(item.key);
+      if(!(node instanceof InlineImageNode))return;
+      const p=node.getImageProperties();
+      const candidate={locator:p.hostAsset??{namespace:'',assetId:''},src:p.src};
+      // Protect a selection changed while resolve was in flight. A newer
+      // asset, namespace, revision, or src must never be overwritten.
+      if(fingerprint(candidate)!==item.signature)return;
+      node.setHostAsset(item.locator,resolved.url,p.alt);
+      applied=true;
+     },{tag:HISTORY_MERGE_TAG,discrete:true});
+
+     if(applied){
+      const updated={locator:item.locator,src:resolved.url};
+      tracked.set(item.key,{
+       signature:fingerprint(updated),failures:0,
+       nextAt:nextImageRefreshAt(resolved.expiresAt)
+      });
+      succeeded++;
+     }else{
+      tracked.delete(item.key);
+      skipped++;
+     }
+    }
+   }finally{
+    if(live(current,controller)){
+     activeController=null;
+     setRunning(false);
+     if(failed)setStatus('호스트 이미지 URL 갱신: '+succeeded+'/'+due.length+'개, 실패 '+failed+'개. 자동 재시도 예정.');
+     else if(succeeded||skipped)setStatus('호스트 이미지 URL 갱신: '+succeeded+'/'+due.length+'개'+(skipped?', 변경된 대상 '+skipped+'개 건너뜀':'')+'.');
+     if(pendingScan)pendingScan=false;
+     schedule();
+    }
+   }
+  }
+
+  const unregister=editor.registerUpdateListener(({dirtyElements,dirtyLeaves})=>{
+   if(!alive||dirtyElements.size===0&&dirtyLeaves.size===0)return;
+   // Coalesce document edits while resolve is active, and avoid a synchronous
+   // re-entrant refresh from a Lexical update listener.
+   if(activeController){pendingScan=true;return;}
+   schedule();
+  });
+  const onResume=()=>{
+   if(document.visibilityState==='visible')schedule();
+  };
+  document.addEventListener('visibilitychange',onResume);
+  window.addEventListener('pageshow',onResume);
+  schedule();
+
+  // The manual refresh control uses a stable DOM event that belongs to this
+  // component. It is attached below through a custom event scoped per editor.
+  const root=editor.getRootElement();
+  const listener=()=>void refresh(true);
+  root?.addEventListener('tufte-host-refresh',listener);
+  return()=>{
+   alive=false;generation++;
+   stopTimer();
+   activeController?.abort();activeController=null;
+   unregister();
+   root?.removeEventListener('tufte-host-refresh',listener);
+   document.removeEventListener('visibilitychange',onResume);
+   window.removeEventListener('pageshow',onResume);
+  };
+ },[adapter,editor,namespace]);
+
+ const manual=()=>{
+  const root=editor.getRootElement();
+  root?.dispatchEvent(new Event('tufte-host-refresh'));
+ };
+ return <div className="host-asset-refresh-controls">
+  <button type="button" onClick={manual} disabled={running}
+   aria-busy={running}>호스트 이미지 URL 다시 확인</button>
+  {status&&<p role="status">{status}</p>}
+ </div>;
+}
