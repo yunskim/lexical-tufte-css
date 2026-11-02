@@ -18,3 +18,5 @@ export {SelectionToolbar} from './SelectionToolbar.js';
 export {canOpenBlockMenu,blockMenuCapabilities,NO_BLOCK_MENU_ACTIONS,type BlockMenuCapabilities} from './blockMenuCapabilities.js';
 
 export {BlockContextMenu} from './BlockContextMenu.js';
+
+export {NoteImagePanel,type NoteImageChoice,type ImagePresentation} from './NoteImagePanel.js';
