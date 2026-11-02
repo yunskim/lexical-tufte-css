@@ -11,10 +11,11 @@ export interface TufteEditingSurfaceProps {
  className?:string;
  ariaLabel:string;
  ariaDescribedBy?:string;
+ readonly?:boolean;
 }
 
 export function TufteEditingSurface({
- className='editor',ariaLabel,ariaDescribedBy
+ className='editor',ariaLabel,ariaDescribedBy,readonly=false
 }:TufteEditingSurfaceProps){
  return <>
   <RichTextPlugin
@@ -23,7 +24,7 @@ export function TufteEditingSurface({
   />
   <HistoryPlugin/>
   <TablePlugin/>
-  <SelectionToolbar/>
-  <BlockContextMenu/>
+  {!readonly&&<SelectionToolbar/>}
+  {!readonly&&<BlockContextMenu/>}
  </>;
 }
