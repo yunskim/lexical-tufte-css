@@ -23,9 +23,10 @@
   },
   "peerDependencies": {
     "@lexical/react": "0.52.0",
+    "@lexical/rich-text": "0.52.0",
     "lexical": "0.52.0",
-    "react": "19.2.0",
-    "@lexical/rich-text": "0.52.0"
+    "react": ">=18",
+    "react-dom": ">=18"
   },
   "dependencies": {
     "@lexical-tufte/document": "workspace:*",
@@ -33,7 +34,12 @@
     "@lexical-tufte/lexical": "workspace:*"
   },
   "devDependencies": {
-    "typescript": "6.0.2",
-    "@types/react": "19.2.2"
+    "@lexical/react": "0.52.0",
+    "@lexical/rich-text": "0.52.0",
+    "@types/react": "19.2.2",
+    "lexical": "0.52.0",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "typescript": "6.0.2"
   }
 }
