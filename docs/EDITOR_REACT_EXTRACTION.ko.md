@@ -118,6 +118,31 @@ pnpm test:host-assets-controlled
 
 **2026-11-03 기존 검증 보고서(`e39b8a1`)는 이번 변경 이전 코드에 대한 결과다.** 이번 변경의 정적 코드·연결 검사 18항목은 통과했으나 새 Playwright 및 전체 타입/빌드 재실행은 아직 수행하지 않았다. 새 검사 통과 전 R4/P3.1.e 전체 완료 처리 금지.
 
+## 2026-11-03 — 공통 이미지 URL 수명 관리 (R4 후속, 자동 검증 대기)
+
+`packages/editor-react/src/HostAssetRefresh.tsx`에 **Lexical 편집기 인스턴스별** 호스트 이미지 URL 갱신 컨트롤러를 추가했다. `TufteEditor`가 유효한 `assetAdapter/assetNamespace`를 받으면 노트 이미지 선택기와 별도로 이 컨트롤러를 설치한다. `readonly`에서도 이미지의 표시 URL은 갱신할 수 있으며, 자산 편집 선택기는 표시하지 않는다. 기존 예제의 전역 `window.lexicalTufteAssetProvider`를 사용하지 않는다.
+
+- `hostAsset.namespace`가 현재 편집기의 namespace와 동일한 이미지 **만** 스캔한다. `AssetProvider.resolve()`에는 namespace를 보내지 않고 자산 ID·선택 revision만 전달한다.
+- 자산 locator와 현재 `src`의 조합으로 요청을 추적한다. 새 연결/외부 문서 교체 후 최초 resolve를 수행하고, **만료 60초 전**을 목표로 다음 갱신을 예약한다. 유효기간이 60초 이하인 URL은 남은 시간의 절반 정도 후 재확인해 초당 반복 요청을 피한다.
+- `expiresAt`가 없는 정상 응답은 임의 TTL을 추정하지 않는다. 자동 주기 폴링을 하지 않고 **수동 갱신 버튼**과 추후 문서 변경 시 재확인만 지원한다.
+- 정상 URL이 달라지면 현재 Lexical 노드의 locator·URL·대체 텍스트를 변경 직전에 다시 확인한 뒤 `setHostAsset()`로 `src`만 갱신한다. `HISTORY_MERGE_TAG`로 별도의 사용자 Undo 작업을 추가하지 않으며, 실제 JSON이 변한 경우에는 제어형 `onChange`에 반영된다. 동일 URL이면 Lexical 업데이트 자체를 생략한다.
+- 잘못된 자산 ID·revision·MIME·URL·이미 만료된 시간은 거절한다. 기존 URL/locator를 유지하며 5초부터 지수 백오프로 자동 재시도한다. 수동 갱신 성공 시 오래된 타이머를 교체한다.
+- 각 컴포넌트는 timer·AbortController·세대 번호·캐시·상태를 개별로 갖는다. adapter/namespace 변경 또는 unmount 시 이전 요청·타이머·이벤트 리스너를 정리한다. 응답 사이에 노드가 바뀐 경우 갱신을 적용하지 않는다. 페이지 복귀/가시성 변경 후 예정 시각을 다시 대조한다.
+- 보안: URL 검증은 `HostAssetPicker`와 `HostAssetRefresh`가 같은 `hostAssetPolicy.ts` 함수를 사용한다. 인증/서버 통신 구현과 실제 DAM 업로드는 여전히 **호스트 책임**이다.
+
+**추가한 검사(실행 대기):** `tests/host-asset-refresh-policy.mjs`(순수 URL·버전·만료·백오프) 및 `tests/controlled-host-refresh-browser.mjs`(2개 React 편집기에서 60초 마진·URL 회전·수동 재확인·재시도/재시도 취소·외부 문서 교체·unmount 중 지연 응답·namespace 격리). 둘 다 `pnpm test:host-refresh`에 연결하고 전체 `test:browser` 목록에도 브라우저 파일을 추가했다. 패키지 tarball 소비자 검증도 refresh 컴포넌트와 공개 헬퍼·타입을 포함하도록 확장했다.
+
+```bash
+pnpm install --frozen-lockfile
+pnpm check
+pnpm package:check
+pnpm test:host-assets-controlled
+pnpm test:host-refresh
+pnpm test:browser
+```
+
+**검증 구분:** 2026-11-03 전수 통과 보고서의 기준 `e39b8a1`은 **이번 코드 이전**이다. 이번 신규 갱신 기능의 실제 TypeScript 컴파일·Playwright·CI는 아직 실행하지 않았다. 실제 DAM, 브라우저 수명/백그라운드 제한, 네트워크 권한, 다중 탭, 장시간 성능/누수 계측도 여전히 별도 수락 조건이다. R4/P3.1.e 전체를 완료로 체크하지 않는다.
+
 ## 검증 상태
 
 이 문서는 코드 이관 상태와 실행 범위를 함께 추적한다. 2026-11-03 frozen/build/typecheck·unit629·package6·browser40개를 실제 실행해 통과했다. 최신 근거는 [2026-11-03 보고서](VERIFICATION_DEFERRED_2026-11-03.ko.md)를 따른다. 이전 절의 미실행 문구는 당시 이력이며, controlled API의 관찰된 동작 검증과 전체 자산/운영·수동 접근성 수락을 구분한다. R4–R7/P3.1.e 전체 게이트는 유지한다.
