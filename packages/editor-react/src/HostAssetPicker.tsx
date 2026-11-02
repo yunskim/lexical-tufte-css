@@ -168,7 +168,7 @@ export function HostAssetPicker({adapter,namespace}:HostAssetPickerProps){
     typeof resolved.revisionId==='string'&&resolved.revisionId.trim().length>0&&
     typeof resolved.mediaType==='string'&&resolved.mediaType.startsWith('image/')&&
     typeof resolved.url==='string'&&isSafeURL(resolved.url,'image')&&
-    (resolved.expiresAt===undefined||(Number.isFinite(Date.parse(resolved.expiresAt))&&Date.parse(resolved.expiresAt)>Date.now()));
+    (resolved.expiresAt===undefined||(typeof resolved.expiresAt==='string'&&Number.isFinite(Date.parse(resolved.expiresAt))&&Date.parse(resolved.expiresAt)>Date.now()));
    if(!valid||!resolved){setError('외부 자산 URL·미디어 유형·버전 또는 만료 시간이 유효하지 않습니다.');return;}
    const locator={namespace:fromNamespace,assetId,...(requestedRevision?{revisionId:resolved.revisionId}:{})};
    let applied=false;
