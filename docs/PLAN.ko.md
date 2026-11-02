@@ -10,6 +10,21 @@
 
 기능 구현 순서는 **예제 DOM 대응 확인 → schema 계약 → Lexical 편집/경계 → 순수 renderer HTML → fixture 작성 → 누적 실행 검증**으로 한다. 기본 Lexical 키 입력을 재구현하기보다 문서 schema를 위반할 수 있는 경계에서만 가로채고, 붙여넣기·IME·undo/redo·저장/발행은 동일 불변식을 검사한다. 사용자 요청에 따라 현재 테스트는 작성·누적하고 일괄 실행하기 전까지 관련 체크박스를 완료 처리하지 않는다. 공식 예제의 지원 범위와 제3자 임의 HTML의 지원 범위는 구분한다.
 
+## 2026-11-03 controlled editor 통합 검증 및 다음 게이트
+
+근거: [11월 3일 자동 검증 보고서](VERIFICATION_DEFERRED_2026-11-03.ko.md) · [파일별 결과·해시](verification/deferred-20261103.json). **검증 기준 커밋 `e39b8a1`**, 제품 코드·테스트 기대값 변경 없이 실행. 이전 11월 1일 절은 당시의 이력으로 유지한다.
+
+| 영역 | 이번 검증으로 확인한 사실 | 남은 완료 조건 |
+| --- | --- | --- |
+| `packages/editor-react` 배포 준비 (P3.1.e 일부) | frozen install, 빌드·타입 검사, **6개 tarball**의 packed JS·선언·라이선스·CSS 검사 통과 | 독립 호스트에서의 설치·통합, 공개 API/패키지 소비자 문서·운영 수락 |
+| 제어형 `TufteEditor` (R5 일부) | 실제 React/Lexical 두 인스턴스에서 최초 import 무알림, 값 반영 중복 억제, metadata-only Undo 보존, 유효·무효 외부 교체, readonly, unmount/remount 통과 | 전체 명령·UX의 재사용 패키지 이관, 장시간 반복 mount/unmount·리스너 누수 계측, 호스트 별도 운영 사례 |
+| 자산/호스트 연계 (R4, P3.4 일부) | 기존 mock `AssetProvider`의 검색·revision·만료 URL·교체/삭제 회귀 및 예제 자산 기능 통과 | `TufteEditor`에서 명시적 adapter/namespace를 소비하는 실제 통합 UI, 실제 DAM·업로드·인증/권한·네트워크 실패 수락 |
+| 공통 회귀·Tufte parity | 단위 **629개**, 브라우저 **40/40파일**, Python **16개**, HTTP→SQLite 및 revision 12그룹 통과. 공식 **9섹션·60블록·7노트**, 6개 화면 너비 픽셀 비교(검증된 마스크 외 차이 0) | Firefox/WebKit, OS별 실제 IME·스크린리더·물리 터치, 장문 성능·접근성 수동 수락, 운영 백업/복원 |
+
+**우선 작업:** (1) `TufteEditor`의 호스트 독립 UI와 `AssetProvider` 연결 책임을 분명하게 분리한 소비자 예제를 완성한다. (2) 예제 전용 명령/도구와 실제 자산 선택·갱신 경계 중 재사용해야 할 부분을 단계적으로 이관한다. (3) 다중 편집기 자산 namespace·비동기 갱신·리스너 누수 및 실제 접근성/타 브라우저 게이트를 검증한다. GitHub Pages/정적 데모 배포는 별도 범위이며 운영용 인증·발행 서버를 전제로 하지 않는다.
+
+이 결과만으로 P3.1.e, R4–R7, F01–F22 또는 전체 P3–P7을 완료 처리하지 않는다. Lexical 문서는 정본으로 유지하고 Magnolia Works 전용 코드는 추가하지 않는다. CI는 기존 방침대로 실행하지 않았다.
+
 ## 2026-11-01 누적 검증 이후 게이트 재점검
 
 근거: [누적 자동 테스트 보고서](VERIFICATION_DEFERRED_2026-11-01.ko.md), [파일별 결과·해시](verification/deferred-20261101.json). 이 절은 **검증 증거와 미완료 작업을 분리하는 상태 감사**이며, 아래 F01–F22·P3–P7의 기존 체크박스를 일괄 완료 처리하지 않는다.
