@@ -39,6 +39,18 @@ try{
  assert.equal(await chooser.getAttribute('aria-expanded'),'true');
  const dialog=page.getByRole('dialog',{name:'노트 이미지 선택'});
  await dialog.waitFor();
+ // Each reusable panel instance must bind labels/ARIA to its own inputs.
+ assert.equal(await dialog.evaluate(element=>{
+  const title=document.getElementById(element.getAttribute('aria-labelledby')??'');
+  const description=document.getElementById(element.getAttribute('aria-describedby')??'');
+  const inputs=[...element.querySelectorAll('input[id]')];
+  const labels=[...element.querySelectorAll('label[for]')];
+  return title?.textContent==='노트 이미지 선택'
+   &&description?.textContent?.includes('현재 노트에서 이미지')
+   &&inputs.length>=4
+   &&new Set(inputs.map(input=>input.id)).size===inputs.length
+   &&labels.every(label=>inputs.some(input=>input.id===label.htmlFor));
+ }),true,'Dialog labels and input IDs must resolve within the mounted instance');
  const choices=dialog.getByRole('group',{name:'현재 노트의 이미지 선택'});
  assert.equal(await choices.locator('li').count(),2);
  const bounds=await choices.boundingBox();
