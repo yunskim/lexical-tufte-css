@@ -64,13 +64,14 @@ pnpm test:browser
 
 ## 최신 통합 실행 검증
 
-**2026-11-01 검증 보고서**: [누적 자동 테스트 실행](docs/VERIFICATION_DEFERRED_2026-11-01.ko.md) · [검증 로그·해시](docs/verification/deferred-20261101.json)
+**2026-11-03 검증 보고서**: [누적 자동 테스트 실행](docs/VERIFICATION_DEFERRED_2026-11-03.ko.md) · [검증 로그·해시](docs/verification/deferred-20261103.json)
 
-- 단위 테스트 629개, 브라우저 테스트 파일 39개, Python 테스트 16개 통과.
-- 빌드·타입 검사, 패키지 검사 5개, TS→Python HTTP→SQLite 왕복, 발행 revision 모델 검증 통과.
-- 공식 Tufte CSS 예제 9개 섹션·60개 블록·7개 노트의 DOM·편집·저장/재열기·발행 대조 통과.
-- 375/759/760/761/1024/1440px 시각 비교에서 검증된 iframe 마스크 밖 차이 0.
-- 호스트 자산 URL 자동 갱신 중복 방지·수동 갱신 우선·revision 교체·이미지 삭제 경계에 대한 회귀 검증 포함.
-- **CI는 실행하지 않았습니다.** 실제 DAM 연동, OS별 실제 IME, 스크린리더, 물리 터치, 타 브라우저 검증도 아직 수행하지 않았습니다.
+- frozen 설치·정적 검사·빌드·타입 검사 통과. 단위 테스트 **629개**, 브라우저 테스트 파일 **40개**, Python 테스트 **16개** 통과.
+- 배포용 tarball **6개** 검사 통과(`editor-react` 포함), TS→Python HTTP→SQLite 왕복·발행 revision 모델 12그룹 통과.
+- 새 `TufteEditor`의 제어형 `value/onChange/onError/readonly`, 두 인스턴스 독립성, 외부 교체·Undo 정책, unmount/remount 브라우저 검증 통과.
+- 공식 Tufte CSS 예제 9개 섹션·60개 블록·7개 노트의 DOM·편집·저장/재열기·발행 대조 통과. 375/759/760/761/1024/1440px 시각 비교에서 검증된 iframe 마스크 밖 차이 0.
+- **CI는 실행하지 않았습니다.** 실제 DAM 연동, OS별 실제 IME, 스크린리더, 물리 터치, Firefox/WebKit, 성능·리스너 누수 계측은 여전히 미검증입니다.
 
-이 수치는 위 보고서에 기록된 검증 대상 코드의 결과입니다. 이후 변경 사항에는 자동으로 적용되지 않습니다. 과거 실행 내역은 [진행 기록](docs/PROGRESS.md)과 `docs/VERIFICATION_*.ko.md`에서 확인할 수 있습니다.
+**제어형 편집기 예제:** `pnpm dev:editor` 실행 후 Vite 주소의 `/controlled.html`에서 두 편집기를 함께 확인할 수 있습니다. 상세 API·잔여 게이트는 [React 편집기 추출 현황](docs/EDITOR_REACT_EXTRACTION.ko.md)을 참고하세요.
+
+이 수치는 보고서의 **기준 커밋 `e39b8a1`**에 대한 결과입니다. 이후 코드 변경에 자동 적용되지 않습니다. 과거 실행 기록은 [진행 기록](docs/PROGRESS.md)과 `docs/VERIFICATION_*.ko.md`에서 확인할 수 있습니다.
