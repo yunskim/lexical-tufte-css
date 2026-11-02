@@ -1,7 +1,7 @@
 import {useEffect,useId,useRef,useState,type KeyboardEvent} from 'react';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$getNodeByKey,$getRoot,$getSelection,$isElementNode,$isRangeSelection,$createTextNode,HISTORY_PUSH_TAG,type LexicalNode} from 'lexical';
-import {isSafeURL} from '@lexical-tufte/document';
+import {isUsableResolvedImage} from './hostAssetPolicy.js';
 import type {AssetProvider,AssetRevision,AssetSummary} from '@lexical-tufte/editor-ports';
 import {InlineImageNode,NoteNode,$createInlineImageNode} from '@lexical-tufte/lexical';
 
@@ -158,18 +158,13 @@ export function HostAssetPicker({adapter,namespace}:HostAssetPickerProps){
   const fromAdapter=adapter,fromNamespace=namespace;
   setResolving(true);setError('');
   try{
-   const resolved=await adapter.resolve({
-    assetId,...(requestedRevision?{revisionId:requestedRevision}:{})
-   },controller.signal);
+   const requestLocator={assetId,...(requestedRevision?{revisionId:requestedRevision}:{})};
+   const resolved=await adapter.resolve(requestLocator,controller.signal);
    if(!mounted.current||request!==generation.current||controller.signal.aborted||
     currentConfig.current.adapter!==fromAdapter||currentConfig.current.namespace!==fromNamespace)return;
-   const valid=resolved&&resolved.assetId===assetId&&
-    (!requestedRevision||resolved.revisionId===requestedRevision)&&
-    typeof resolved.revisionId==='string'&&resolved.revisionId.trim().length>0&&
-    typeof resolved.mediaType==='string'&&resolved.mediaType.startsWith('image/')&&
-    typeof resolved.url==='string'&&isSafeURL(resolved.url,'image')&&
-    (resolved.expiresAt===undefined||(typeof resolved.expiresAt==='string'&&Number.isFinite(Date.parse(resolved.expiresAt))&&Date.parse(resolved.expiresAt)>Date.now()));
-   if(!valid||!resolved){setError('외부 자산 URL·미디어 유형·버전 또는 만료 시간이 유효하지 않습니다.');return;}
+   if(!isUsableResolvedImage(requestLocator,resolved)){
+    setError('외부 자산 URL·미디어 유형·버전 또는 만료 시간이 유효하지 않습니다.');return;
+   }
    const locator={namespace:fromNamespace,assetId,...(requestedRevision?{revisionId:resolved.revisionId}:{})};
    let applied=false;
    editor.update(()=>{
