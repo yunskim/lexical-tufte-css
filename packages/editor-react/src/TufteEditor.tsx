@@ -54,6 +54,7 @@ function DocumentBinding({value,onChange,onError,readonly}:DocumentBindingProps)
  const incomingRef=useRef<string|null>(null);
  const emittedRef=useRef<string|null>(null);
  const errorRef=useRef<string|null>(null);
+ const initializedRef=useRef(false);
 
  const report=(error:Error)=>{
   if(errorRef.current!==error.message){
@@ -66,7 +67,7 @@ function DocumentBinding({value,onChange,onError,readonly}:DocumentBindingProps)
  // Register once. Listener callbacks always see the latest host props and never
  // claim that a selection-only update changed document contents.
  useEffect(()=>editor.registerUpdateListener(({dirtyElements,dirtyLeaves})=>{
-  if(dirtyElements.size===0&&dirtyLeaves.size===0)return;
+  if(!initializedRef.current||dirtyElements.size===0&&dirtyLeaves.size===0)return;
   const result=exportEditorToDocument(editor,propsRef.current.value);
   if(!result.ok){
    report(diagnosticError('Editor export rejected',result.diagnostics));
@@ -102,6 +103,7 @@ function DocumentBinding({value,onChange,onError,readonly}:DocumentBindingProps)
    const liveKey=canonicalizeDocument(live.value);
    if(liveKey.ok&&liveKey.value===key){
     emittedRef.current=key;
+    initializedRef.current=true;
     return;
    }
   }
@@ -115,6 +117,7 @@ function DocumentBinding({value,onChange,onError,readonly}:DocumentBindingProps)
    report(diagnosticError('Editor import rejected',result.diagnostics));
    return;
   }
+  initializedRef.current=true;
   errorRef.current=null;
  },[editor,value]);
 
