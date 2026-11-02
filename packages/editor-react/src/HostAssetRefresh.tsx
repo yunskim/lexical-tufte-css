@@ -46,6 +46,8 @@ export function HostAssetRefresh({adapter,namespace}:HostAssetRefreshProps){
  const manualRef=useRef<()=>void>(()=>{});
 
  useEffect(()=>{
+  setRunning(false);
+  setStatus('');
   let alive=true;
   let generation=0;
   let activeController:AbortController|null=null;
@@ -127,6 +129,7 @@ export function HostAssetRefresh({adapter,namespace}:HostAssetRefreshProps){
    const current=++generation;
    activeController=controller;
    setRunning(true);
+   setStatus('호스트 이미지 URL 확인 중…');
    let succeeded=0,failed=0,skipped=0;
 
    try{
