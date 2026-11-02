@@ -6,6 +6,7 @@ import {exportEditorToDocument,loadDocumentIntoEditor} from '@lexical-tufte/lexi
 import {TufteComposer} from './TufteComposer.js';
 import {TufteEditingSurface} from './TufteEditingSurface.js';
 import {HostAssetPicker} from './HostAssetPicker.js';
+import {HostAssetRefresh} from './HostAssetRefresh.js';
 
 /**
  * The Lexical JSON inside value is the only editable document representation.
@@ -152,6 +153,7 @@ export function TufteEditor({
  const assets:TufteAssetContextValue={assetAdapter,assetNamespace};
  return <AssetContext.Provider value={assets}>
   <TufteComposer initialConfig={{namespace,onError:handleError,editable:!readonly,theme:defaultTheme}}>
+   {assetAdapter&&assetNamespace?.trim()&&<HostAssetRefresh adapter={assetAdapter} namespace={assetNamespace}/>}
    {!readonly&&assetAdapter&&assetNamespace?.trim()&&<HostAssetPicker adapter={assetAdapter} namespace={assetNamespace}/>}
    <TufteEditingSurface className={className} ariaLabel={ariaLabel} readonly={readonly}/>
    <DocumentBinding value={value} onChange={onChange} onError={onError} readonly={readonly}/>
