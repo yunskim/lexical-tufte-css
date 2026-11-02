@@ -169,7 +169,9 @@ export function HostAssetRefresh({adapter,namespace}:HostAssetRefreshProps){
      }
 
      let applied=false;
-     editor.update(()=>{
+     let updateFailed=false;
+     try{
+      editor.update(()=>{
       if(!live(current,controller))return;
       const node=$getNodeByKey(item.key);
       if(!(node instanceof InlineImageNode))return;
@@ -180,7 +182,20 @@ export function HostAssetRefresh({adapter,namespace}:HostAssetRefreshProps){
       if(fingerprint(candidate)!==item.signature)return;
       node.setHostAsset(item.locator,safeResolved.url,p.alt);
       applied=true;
-     },{tag:HISTORY_MERGE_TAG,discrete:true});
+      },{tag:HISTORY_MERGE_TAG,discrete:true});
+     }catch{
+      updateFailed=true;
+     }
+     if(updateFailed){
+      const previous=tracked.get(item.key);
+      const failures=previous?.signature===item.signature?previous.failures+1:1;
+      tracked.set(item.key,{
+       signature:item.signature,failures,
+       nextAt:Date.now()+imageRefreshRetryDelay(failures)
+      });
+      failed++;
+      continue;
+     }
 
      if(applied){
       const updated={locator:item.locator,src:safeResolved.url};
