@@ -22,3 +22,6 @@ export {BlockContextMenu} from './BlockContextMenu.js';
 export {NoteImagePanel,type NoteImageChoice,type ImagePresentation} from './NoteImagePanel.js';
 
 export {INLINE_ACTIONS,EDITOR_SHORTCUTS,type InlineAction} from './inlineActions.js';
+
+export {TufteComposer,type TufteComposerProps} from './TufteComposer.js';
+export {TufteEditingSurface,type TufteEditingSurfaceProps} from './TufteEditingSurface.js';
