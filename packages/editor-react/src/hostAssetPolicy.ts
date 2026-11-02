@@ -29,9 +29,12 @@ export function isUsableResolvedImage(
 export function nextImageRefreshAt(expiresAt:string|undefined,now=Date.now()):number{
  if(!expiresAt)return Number.POSITIVE_INFINITY;
  const expiry=Date.parse(expiresAt);
- return Number.isFinite(expiry)
-  ?Math.max(now+1000,expiry-HOST_ASSET_REFRESH_MARGIN_MS)
-  :Number.POSITIVE_INFINITY;
+ if(!Number.isFinite(expiry)||expiry<=now)return Number.POSITIVE_INFINITY;
+ // For short-lived URLs use half the remaining lifetime, rather than
+ // re-requesting once per second inside the 60-second expiry margin.
+ const remaining=expiry-now;
+ const minimum=Math.min(30_000,Math.max(1000,Math.floor(remaining/2)));
+ return Math.max(now+minimum,expiry-HOST_ASSET_REFRESH_MARGIN_MS);
 }
 
 export function imageRefreshRetryDelay(failures:number):number{
