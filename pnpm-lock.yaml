@@ -14,6 +14,9 @@ importers:
 
   examples/editor:
     dependencies:
+      '@lexical-tufte/editor-react':
+        specifier: workspace:*
+        version: link:../../packages/editor-react
       '@lexical-tufte/document':
         specifier: workspace:*
         version: link:../../packages/document
@@ -76,6 +79,40 @@ importers:
 
   packages/document:
     devDependencies:
+      typescript:
+        specifier: 6.0.2
+        version: 6.0.2
+
+  packages/editor-react:
+    dependencies:
+      '@lexical-tufte/document':
+        specifier: workspace:*
+        version: link:../document
+      '@lexical-tufte/editor-ports':
+        specifier: workspace:*
+        version: link:../editor-ports
+      '@lexical-tufte/lexical':
+        specifier: workspace:*
+        version: link:../lexical
+    devDependencies:
+      '@lexical/react':
+        specifier: 0.52.0
+        version: 0.52.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@6.0.2)(yjs@13.6.27)
+      '@lexical/rich-text':
+        specifier: 0.52.0
+        version: 0.52.0(typescript@6.0.2)
+      '@types/react':
+        specifier: 19.2.2
+        version: 19.2.2
+      lexical:
+        specifier: 0.52.0
+        version: 0.52.0(typescript@6.0.2)
+      react:
+        specifier: 19.2.0
+        version: 19.2.0
+      react-dom:
+        specifier: 19.2.0
+        version: 19.2.0(react@19.2.0)
       typescript:
         specifier: 6.0.2
         version: 6.0.2
