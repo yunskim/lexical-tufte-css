@@ -1,10 +1,9 @@
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$getNodeByKey,$getRoot,$isElementNode,HISTORY_MERGE_TAG,type LexicalNode} from 'lexical';
 import type {AssetLocator,AssetProvider} from '@lexical-tufte/editor-ports';
 import {InlineImageNode} from '@lexical-tufte/lexical';
 import {
- HOST_ASSET_REFRESH_MARGIN_MS,
  imageRefreshRetryDelay,isUsableResolvedImage,nextImageRefreshAt
 } from './hostAssetPolicy.js';
 
@@ -44,6 +43,7 @@ export function HostAssetRefresh({adapter,namespace}:HostAssetRefreshProps){
  const [editor]=useLexicalComposerContext();
  const [running,setRunning]=useState(false);
  const [status,setStatus]=useState('');
+ const manualRef=useRef<()=>void>(()=>{});
 
  useEffect(()=>{
   let alive=true;
@@ -214,26 +214,20 @@ export function HostAssetRefresh({adapter,namespace}:HostAssetRefreshProps){
   window.addEventListener('pageshow',onResume);
   schedule();
 
-  // The manual refresh control uses a stable DOM event that belongs to this
-  // component. It is attached below through a custom event scoped per editor.
-  const root=editor.getRootElement();
-  const listener=()=>void refresh(true);
-  root?.addEventListener('tufte-host-refresh',listener);
+  // Wire the click handler directly, avoiding DOM/root replacement coupling.
+  manualRef.current=()=>void refresh(true);
   return()=>{
    alive=false;generation++;
    stopTimer();
    activeController?.abort();activeController=null;
    unregister();
-   root?.removeEventListener('tufte-host-refresh',listener);
+   manualRef.current=()=>{};
    document.removeEventListener('visibilitychange',onResume);
    window.removeEventListener('pageshow',onResume);
   };
  },[adapter,editor,namespace]);
 
- const manual=()=>{
-  const root=editor.getRootElement();
-  root?.dispatchEvent(new Event('tufte-host-refresh'));
- };
+ const manual=()=>manualRef.current();
  return <div className="host-asset-refresh-controls">
   <button type="button" onClick={manual} disabled={running}
    aria-busy={running}>호스트 이미지 URL 다시 확인</button>
