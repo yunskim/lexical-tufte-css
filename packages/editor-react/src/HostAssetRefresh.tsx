@@ -120,6 +120,7 @@ export function HostAssetRefresh({adapter,namespace}:HostAssetRefreshProps){
     return manual||!old||old.signature!==item.signature||old.nextAt<=now;
    });
    if(!due.length){
+    setRunning(false);
     if(manual)setStatus(all.length?'연결된 이미지 URL은 아직 갱신할 필요가 없습니다.':'갱신할 호스트 이미지가 없습니다.');
     schedule();
     return;
