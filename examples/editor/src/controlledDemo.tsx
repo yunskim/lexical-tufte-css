@@ -7,20 +7,24 @@ import '@lexical-tufte/editor-react/styles.css';
 import './style.css';
 
 const source=fixture as unknown as TufteDocument;
-function withText(text:string):TufteDocument{
+function withText(text:string,identity:'first'|'second'):TufteDocument{
  const document=structuredClone(source);
- const update=(node:JsonNode):boolean=>{
-  if(node.type==='text'){node.text=text;return true;}
-  if('children' in node)for(const child of node.children)if(update(child))return true;
-  return false;
+ document.id='controlled-'+identity;
+ let changed=false;
+ const update=(node:JsonNode):void=>{
+  if(node.type==='text'&&!changed){node.text=text;changed=true;}
+  // Labels and toggles must not share the same HTML IDs between editor instances.
+  if(node.type==='tufte-sidenote'||node.type==='tufte-marginnote')node.noteId=identity+'-'+node.noteId;
+  if('children' in node)for(const child of node.children)update(child);
  };
- if(!update(document.lexicalState.root))throw new Error('Fixture has no editable text');
+ update(document.lexicalState.root);
+ if(!changed)throw new Error('Fixture has no editable text');
  return document;
 }
 
 function ControlledExample(){
- const [first,setFirst]=useState(()=>withText('첫 번째 편집기'));
- const [second,setSecond]=useState(()=>withText('두 번째 편집기'));
+ const [first,setFirst]=useState(()=>withText('첫 번째 편집기','first'));
+ const [second,setSecond]=useState(()=>withText('두 번째 편집기','second'));
  const [readonly,setReadonly]=useState(false);
  const [showFirst,setShowFirst]=useState(true);
  const [showSecond,setShowSecond]=useState(true);
@@ -31,7 +35,7 @@ function ControlledExample(){
  return <main>
   <h1>재사용 TufteEditor — 두 인스턴스 검증</h1>
   <div className="actions">
-   <button type="button" onClick={()=>setFirst(withText('외부에서 교체한 문서'))}>첫 번째 문서 교체</button>
+   <button type="button" onClick={()=>setFirst(withText('외부에서 교체한 문서','first'))}>첫 번째 문서 교체</button>
    <button type="button" onClick={()=>setReadonly(value=>!value)}>첫 번째 읽기 전용 전환</button>
    <button type="button" onClick={()=>setShowFirst(value=>!value)}>첫 번째 편집기 마운트 전환</button>
    <button type="button" onClick={()=>setShowSecond(value=>!value)}>두 번째 편집기 마운트 전환</button>
