@@ -5,6 +5,7 @@ import type {AssetProvider} from '@lexical-tufte/editor-ports';
 import {exportEditorToDocument,loadDocumentIntoEditor} from '@lexical-tufte/lexical';
 import {TufteComposer} from './TufteComposer.js';
 import {TufteEditingSurface} from './TufteEditingSurface.js';
+import {HostAssetPicker} from './HostAssetPicker.js';
 
 /**
  * The Lexical JSON inside value is the only editable document representation.
@@ -135,7 +136,8 @@ const defaultTheme={
 
 /**
  * Reusable controlled editor. The optional assetAdapter is provided through
- * context to host-specific UI; this component does not resolve/upload assets.
+ * context and used by the built-in note-image picker. Upload/authentication
+ * stay with the host; the editor never creates an HTTP client.
  */
 export function TufteEditor({
  value,onChange,onError,assetAdapter,assetNamespace,
@@ -150,6 +152,7 @@ export function TufteEditor({
  const assets:TufteAssetContextValue={assetAdapter,assetNamespace};
  return <AssetContext.Provider value={assets}>
   <TufteComposer initialConfig={{namespace,onError:handleError,editable:!readonly,theme:defaultTheme}}>
+   {!readonly&&assetAdapter&&assetNamespace?.trim()&&<HostAssetPicker adapter={assetAdapter} namespace={assetNamespace}/>}
    <TufteEditingSurface className={className} ariaLabel={ariaLabel} readonly={readonly}/>
    <DocumentBinding value={value} onChange={onChange} onError={onError} readonly={readonly}/>
   </TufteComposer>
