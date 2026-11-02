@@ -20,3 +20,5 @@ export {canOpenBlockMenu,blockMenuCapabilities,NO_BLOCK_MENU_ACTIONS,type BlockM
 export {BlockContextMenu} from './BlockContextMenu.js';
 
 export {NoteImagePanel,type NoteImageChoice,type ImagePresentation} from './NoteImagePanel.js';
+
+export {INLINE_ACTIONS,EDITOR_SHORTCUTS,type InlineAction} from './inlineActions.js';
