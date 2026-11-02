@@ -1,4 +1,4 @@
-import {useEffect,useRef,useState,type FormEvent,type KeyboardEvent} from 'react';
+import {useEffect,useId,useRef,useState,type FormEvent,type KeyboardEvent} from 'react';
 
 /** Current-note images, not the document asset catalog; the host identity remains in Lexical. */
 export type NoteImageChoice={
@@ -21,6 +21,8 @@ function pixel(text:string):number|undefined|null{
 
 /** Wagtail-inspired chooser: browse the images in this note, then edit one. */
 export function NoteImagePanel({images,onClose,onSave}:Props){
+ const instanceId=useId();
+ const fields={title:`${instanceId}-title`,description:`${instanceId}-description`,search:`${instanceId}-search`,alt:`${instanceId}-alt`,width:`${instanceId}-width`,height:`${instanceId}-height`};
  const [selectedKey,setSelectedKey]=useState(images[0]?.key??'');
  const [query,setQuery]=useState('');
  const [alt,setAlt]=useState(images[0]?.alt??'');
@@ -62,17 +64,17 @@ export function NoteImagePanel({images,onClose,onSave}:Props){
   }
  }
  return <div className="note-image-backdrop">
-  <section role="dialog" aria-modal="true" aria-labelledby="note-image-title" aria-describedby="note-image-description"
+  <section role="dialog" aria-modal="true" aria-labelledby={fields.title} aria-describedby={fields.description}
    className="note-image-dialog" onKeyDown={keys}>
    <header className="note-image-dialog-head">
-    <div><h2 id="note-image-title">노트 이미지 선택</h2>
-     <p id="note-image-description">현재 노트에서 이미지를 선택하고 표시 속성을 수정합니다.</p></div>
+    <div><h2 id={fields.title}>노트 이미지 선택</h2>
+     <p id={fields.description}>현재 노트에서 이미지를 선택하고 표시 속성을 수정합니다.</p></div>
     <button type="button" aria-label="이미지 선택 취소" onClick={onClose}>닫기</button>
    </header>
    <div className="note-image-body">
     <div role="group" aria-label="현재 노트의 이미지 선택" className="note-image-library">
-     <label htmlFor="note-image-search">이미지 검색</label>
-     <input id="note-image-search" ref={search} type="search" value={query}
+     <label htmlFor={fields.search}>이미지 검색</label>
+     <input id={fields.search} ref={search} type="search" value={query}
       onChange={event=>setQuery(event.target.value)} placeholder="이름·경로·자산 ID"/>
      <ul className="note-image-grid">
       {visible.map(({image,index})=><li key={image.key}>
@@ -93,16 +95,16 @@ export function NoteImagePanel({images,onClose,onSave}:Props){
       <img src={selected.src} alt="" aria-hidden="true"/>
       <small>{selected.src}</small>
      </div>
-     <label htmlFor="note-image-alt">대체 텍스트</label>
-     <input id="note-image-alt" value={alt} onChange={event=>setAlt(event.target.value)}
+     <label htmlFor={fields.alt}>대체 텍스트</label>
+     <input id={fields.alt} value={alt} onChange={event=>setAlt(event.target.value)}
       placeholder="이미지의 내용을 설명해 주세요"/>
      <div className="note-image-sizes">
-      <label htmlFor="note-image-width">너비 (px)
-       <input id="note-image-width" type="text" inputMode="numeric" value={width}
+      <label htmlFor={fields.width}>너비 (px)
+       <input id={fields.width} type="text" inputMode="numeric" value={width}
         onChange={event=>setWidth(event.target.value)} placeholder="자동"/>
       </label>
-      <label htmlFor="note-image-height">높이 (px)
-       <input id="note-image-height" type="text" inputMode="numeric" value={height}
+      <label htmlFor={fields.height}>높이 (px)
+       <input id={fields.height} type="text" inputMode="numeric" value={height}
         onChange={event=>setHeight(event.target.value)} placeholder="자동"/>
       </label>
      </div>
