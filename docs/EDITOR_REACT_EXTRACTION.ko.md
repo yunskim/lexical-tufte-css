@@ -43,6 +43,31 @@ interface TufteEditorProps {
 5. 여러 편집기 사이에서 선택, 타이머, 비동기 resolve, note ID, 이벤트 리스너가 공유되지 않아야 한다.
 6. 단일 파일을 기계적으로 이동한 것만으로 P3.1.e를 완료 처리하지 않는다. 소비자 테스트까지 통과해야 한다.
 
+## 2026-11-02 코드 이관 현황
+
+| 단계 | 실제 변경 | 남은 게이트 |
+| --- | --- | --- |
+| R1 | `packages/editor-react` 생성, React/Lexical peer·개발 의존성 및 pnpm lockfile 등록, `pnpm dev:editor`에서 종속 패키지 빌드 | 설치·독립 소비자 빌드/타입 검사 실실행 |
+| R2 | `ToolbarIcon`과 아이콘 경로를 공통 패키지로 추출 | `IconButton`·명령 레지스트리·단축키 완전 이관 및 회귀 |
+| R3 | `SelectionToolbar`, `BlockContextMenu`, 명령 가능성 판정 분리. 문맥 메뉴는 `useId`로 인스턴스별 ARIA 연결, 선택 툴바 포커스 검사도 해당 인스턴스에 한정 | 다중 인스턴스·IME·키보드·브라우저 회귀 실실행 |
+| R4 | `NoteImagePanel`을 패키지로 이동, 기존 예제 경로는 re-export만 유지. 선택·메뉴·이미지 패널 스타일을 `@lexical-tufte/editor-react/styles.css`로 분리 | AssetProvider 연결·업로드 정책 분리 및 실환경 검증 |
+| 패키지 소비자 게이트 | `scripts/pack-and-check.mjs`와 `scripts/check-package-tarballs.mjs`에 6번째 tarball, React UI JS/TS export와 CSS 포함 검사 추가 | `pnpm package:check` 실행 및 결과 기록 |
+
+**정적 점검 결과:** 변경된 package.json·lockfile 의존성 항목 일치, 기존/이관 이미지 패널 소스 동일성, 추출 CSS 원문 동일성, CSS export와 예제 import 연결, 인스턴스별 문맥 메뉴 ID 사용을 확인했다. 이 점검은 TypeScript 컴파일·실제 브라우저 실행을 대신하지 않는다.
+
+**로컬 실행/수락 명령:**
+
+```bash
+pnpm install --frozen-lockfile
+pnpm build
+pnpm -r typecheck
+pnpm package:check
+pnpm test:contextual-ui
+pnpm test:note-assets
+```
+
+현재 실행 환경에서는 저장소의 로컬 체크아웃과 의존성 설치에 접근할 수 없어 이 명령을 실행하지 않았다. 위 명령이 통과하기 전에는 R1–R4 완료 체크박스를 유지하지 않는다. 노트 이미지 편집은 호스트 자산 검색이 아닌 *선택한 노트 안의 이미지 속성 패널*이며, `AssetProvider` 전체를 이관했다는 뜻이 아니다.
+
 ## 검증 상태
 
-이 문서는 실제 파일 구조에 근거한 **이관 설계**다. 새 패키지 생성·코드 이동·테스트 실행은 아직 수행하지 않았다. 최신 자동 검증 결과는 [2026-11-01 보고서](VERIFICATION_DEFERRED_2026-11-01.ko.md)를 따른다.
+이 문서는 코드 이관 상태를 함께 추적한다. 패키지 생성 및 UI 일부 이동은 반영됐지만, 이관 이후 빌드·타입·브라우저 검증은 아직 실행되지 않았다. 최신 자동 검증 결과는 [2026-11-01 보고서](VERIFICATION_DEFERRED_2026-11-01.ko.md)를 따른다.
