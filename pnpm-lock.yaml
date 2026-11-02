@@ -83,6 +83,12 @@ importers:
         specifier: 6.0.2
         version: 6.0.2
 
+  packages/editor-ports:
+    devDependencies:
+      typescript:
+        specifier: 6.0.2
+        version: 6.0.2
+
   packages/editor-react:
     dependencies:
       '@lexical-tufte/document':
@@ -113,12 +119,6 @@ importers:
       react-dom:
         specifier: 19.2.0
         version: 19.2.0(react@19.2.0)
-      typescript:
-        specifier: 6.0.2
-        version: 6.0.2
-
-  packages/editor-ports:
-    devDependencies:
       typescript:
         specifier: 6.0.2
         version: 6.0.2
