@@ -8,10 +8,12 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    }
+    },
+    "./styles.css": "./src/styles.css"
   },
   "files": [
     "dist",
+    "src/styles.css",
     "LICENSE",
     "THIRD_PARTY_NOTICES.md",
     "licenses"
