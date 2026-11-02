@@ -36,6 +36,7 @@ function ControlledExample(){
   <h1>재사용 TufteEditor — 두 인스턴스 검증</h1>
   <div className="actions">
    <button type="button" onClick={()=>setFirst(withText('외부에서 교체한 문서','first'))}>첫 번째 문서 교체</button>
+   <button type="button" onClick={()=>setFirst(previous=>({...previous,schemaVersion:2} as unknown as TufteDocument))}>첫 번째 잘못된 문서 주입</button>
    <button type="button" onClick={()=>setFirst(document=>({...document,title:'갱신된 제목'}))}>첫 번째 제목 수정</button>
    <button type="button" onClick={()=>setReadonly(value=>!value)}>첫 번째 읽기 전용 전환</button>
    <button type="button" onClick={()=>setShowFirst(value=>!value)}>첫 번째 편집기 마운트 전환</button>
