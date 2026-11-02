@@ -29,5 +29,7 @@ assert.equal(nextImageRefreshAt(new Date(now+3600_000).toISOString(),now),now+35
 assert.equal(imageRefreshRetryDelay(1),5000);
 assert.equal(imageRefreshRetryDelay(2),10000);
 assert.equal(imageRefreshRetryDelay(5),80000);
-assert.equal(imageRefreshRetryDelay(20),160000);
+assert.equal(imageRefreshRetryDelay(6),160000);
+assert.equal(imageRefreshRetryDelay(7),300000);
+assert.equal(imageRefreshRetryDelay(20),300000);
 console.log('Host asset policy: provider response validation, pin/latest, expiry margin, short TTL, capped retry PASS.');
