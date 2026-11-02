@@ -11,6 +11,7 @@ type Mode='normal'|'invalid'|'expired'|'mismatch'|'deferred'|'throw';
 type Deferred={locator:AssetLocator;respond:(result:ResolvedAsset|null)=>void};
 const harness={
  mode:'normal' as Mode,
+ expiryMs:3600_000,
  calls:{search:[] as Array<{namespace:string;text:string}>,revisions:[] as string[],resolve:[] as Array<{namespace:string;locator:AssetLocator}>},
  deferred:[] as Deferred[]
 };
@@ -43,7 +44,7 @@ function provider(namespace:string):AssetProvider{
     revisionId:harness.mode==='mismatch'?'wrong-revision':locator.revisionId??'rev-2',
     mediaType:'image/svg+xml',
     url:harness.mode==='invalid'?'javascript:alert(1)':'/fixture.svg',
-    expiresAt:new Date(Date.now()+(harness.mode==='expired'?-1000:3600_000)).toISOString()
+    expiresAt:new Date(Date.now()+(harness.mode==='expired'?-1000:harness.expiryMs)).toISOString()
    };
   }
  };
@@ -63,14 +64,19 @@ function documentFor(namespace:string):TufteDocument{
 }
 function Demo(){
  const [first,setFirst]=useState(()=>documentFor('alpha'));
+ const [showFirst,setShowFirst]=useState(true);
  const [second,setSecond]=useState(()=>documentFor('beta'));
  const [errors,setErrors]=useState<string[]>([]);
  return <main>
   <h1>호스트 중립 이미지 자산 연결 예제</h1>
+  <div className="actions">
+   <button type="button" onClick={()=>setFirst(documentFor('alpha'))}>Alpha 문서 교체</button>
+   <button type="button" onClick={()=>setShowFirst(visible=>!visible)}>Alpha 마운트 전환</button>
+  </div>
   <section data-testid="host-first">
    <h2>Alpha 편집기</h2>
-   <TufteEditor value={first} onChange={setFirst} onError={error=>setErrors(values=>[...values,error.message])}
-    assetAdapter={firstAdapter} assetNamespace="alpha" ariaLabel="Alpha 편집기"/>
+   {showFirst&&<TufteEditor value={first} onChange={setFirst} onError={error=>setErrors(values=>[...values,error.message])}
+    assetAdapter={firstAdapter} assetNamespace="alpha" ariaLabel="Alpha 편집기"/>}
    <pre data-testid="host-first-json" hidden>{JSON.stringify(first)}</pre>
   </section>
   <section data-testid="host-second">
