@@ -36,6 +36,7 @@ function ControlledExample(){
   <h1>재사용 TufteEditor — 두 인스턴스 검증</h1>
   <div className="actions">
    <button type="button" onClick={()=>setFirst(withText('외부에서 교체한 문서','first'))}>첫 번째 문서 교체</button>
+   <button type="button" onClick={()=>setFirst(document=>({...document,title:'갱신된 제목'}))}>첫 번째 제목 수정</button>
    <button type="button" onClick={()=>setReadonly(value=>!value)}>첫 번째 읽기 전용 전환</button>
    <button type="button" onClick={()=>setShowFirst(value=>!value)}>첫 번째 편집기 마운트 전환</button>
    <button type="button" onClick={()=>setShowSecond(value=>!value)}>두 번째 편집기 마운트 전환</button>
@@ -43,6 +44,7 @@ function ControlledExample(){
   <section data-testid="first-editor">
    <h2>첫 번째</h2>
    <p data-testid="first-changes">변경 알림 {firstChanges}회</p>
+   <p data-testid="first-title">문서 제목: {first.title}</p>
    <p data-testid="first-readonly">읽기 전용 {readonly?'예':'아니오'}</p>
    {showFirst&&<TufteEditor value={first} onChange={document=>{setFirst(document);setFirstChanges(n=>n+1);}} onError={report}
     readonly={readonly} ariaLabel="첫 번째 Tufte 편집기"/>}
