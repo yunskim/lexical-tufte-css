@@ -2,13 +2,7 @@ import type {AssetProvider,AssetSummary,AssetRevision} from '@lexical-tufte/edit
 import {validateDocument,isSafeURL, type TufteDocument} from '@lexical-tufte/document';
 import {useEffect, useRef, useState, type MouseEvent} from 'react';
 import {createRoot} from 'react-dom/client';
-import {LexicalComposer} from '@lexical/react/LexicalComposer';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {RichTextPlugin} from '@lexical/react/LexicalRichTextPlugin';
-import {ContentEditable} from '@lexical/react/LexicalContentEditable';
-import {HistoryPlugin} from '@lexical/react/LexicalHistoryPlugin';
-import {LexicalErrorBoundary} from '@lexical/react/LexicalErrorBoundary';
-import {TablePlugin} from '@lexical/react/LexicalTablePlugin';
 import {$loadLayoutFixture} from './layoutFixture.js';
 import {$createLinkNode} from '@lexical/link';
 import {$isHeadingNode} from '@lexical/rich-text';
@@ -20,9 +14,9 @@ import {
   SELECTION_INSERT_CLIPBOARD_NODES_COMMAND, COPY_COMMAND, CUT_COMMAND, PASTE_COMMAND, KEY_BACKSPACE_COMMAND, KEY_DELETE_COMMAND, HISTORY_PUSH_TAG, UNDO_COMMAND, REDO_COMMAND,
   COMMAND_PRIORITY_HIGH, type LexicalNode, type EditorState, type RangeSelection,
 } from 'lexical';
-import {canonicalBlockType,exportCanonicalEditorState,parseCanonicalEditorState,loadDocumentIntoEditor,exportEditorToDocument,registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,registerQuotationCommands,APPEND_TUFTE_EPIGRAPH_ITEM_COMMAND,MOVE_TUFTE_EPIGRAPH_ITEM_COMMAND,SET_TUFTE_QUOTE_CITE_COMMAND,REMOVE_TUFTE_QUOTATION_COMMAND,INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_SECTION_CITE_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,registerListKeyboardCommands,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,SET_TUFTE_LIST_KIND_COMMAND,CHANGE_TUFTE_LIST_INDENT_COMMAND,UNWRAP_TUFTE_LIST_COMMAND,registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND,WRAP_TUFTE_SPAN_COMMAND,UNWRAP_TUFTE_SPAN_COMMAND,registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_PAIR_COMMAND,MOVE_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_LIST_COMMAND,registerSectionCommands,WRAP_TUFTE_ROOT_COMMAND,INSERT_TUFTE_SECTION_COMMAND,SPLIT_TUFTE_SECTION_COMMAND,MERGE_TUFTE_SECTION_COMMAND,SET_TUFTE_BLOCK_COMMAND,inspectEditorStructure,focusStructureIssue,type StructureIssue,replaceEditorDocumentState,TUFTE_NODES,NoteNode, InlineImageNode, $createSidenoteNode, $createMarginnoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, registerNoteEdgeTypingGuard} from '@lexical-tufte/lexical';
+import {canonicalBlockType,exportCanonicalEditorState,parseCanonicalEditorState,loadDocumentIntoEditor,exportEditorToDocument,registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,registerQuotationCommands,APPEND_TUFTE_EPIGRAPH_ITEM_COMMAND,MOVE_TUFTE_EPIGRAPH_ITEM_COMMAND,SET_TUFTE_QUOTE_CITE_COMMAND,REMOVE_TUFTE_QUOTATION_COMMAND,INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_SECTION_CITE_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,registerListKeyboardCommands,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,SET_TUFTE_LIST_KIND_COMMAND,CHANGE_TUFTE_LIST_INDENT_COMMAND,UNWRAP_TUFTE_LIST_COMMAND,registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND,WRAP_TUFTE_SPAN_COMMAND,UNWRAP_TUFTE_SPAN_COMMAND,registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_PAIR_COMMAND,MOVE_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_LIST_COMMAND,registerSectionCommands,WRAP_TUFTE_ROOT_COMMAND,INSERT_TUFTE_SECTION_COMMAND,SPLIT_TUFTE_SECTION_COMMAND,MERGE_TUFTE_SECTION_COMMAND,SET_TUFTE_BLOCK_COMMAND,inspectEditorStructure,focusStructureIssue,type StructureIssue,replaceEditorDocumentState,NoteNode, InlineImageNode, $createSidenoteNode, $createMarginnoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, registerNoteEdgeTypingGuard} from '@lexical-tufte/lexical';
 import {NODE_SCHEMA} from '@lexical-tufte/document';
-import {ToolbarIcon, SelectionToolbar, BlockContextMenu, NoteImagePanel, INLINE_ACTIONS, EDITOR_SHORTCUTS, type NoteImageChoice, type ImagePresentation, type ToolbarIconName} from '@lexical-tufte/editor-react';
+import {ToolbarIcon, TufteComposer, TufteEditingSurface, NoteImagePanel, INLINE_ACTIONS, EDITOR_SHORTCUTS, type NoteImageChoice, type ImagePresentation, type ToolbarIconName} from '@lexical-tufte/editor-react';
 import './style.css';
 import '@lexical-tufte/editor-react/styles.css';
 
@@ -865,8 +859,7 @@ function EditorUI(){
     {imageChooserOpen&&<NoteImagePanel images={noteImages} onClose={closeNoteImageChooser} onSave={saveNoteImage}/>}
     <p id="help">본문에서 Alt+↓: 다음 노트로 이동 · 노트에서 Escape: 본문으로 이동</p>
     <main>
-      <RichTextPlugin contentEditable={<ContentEditable className="editor" aria-label="본문과 사이드노트 편집" aria-describedby="help"/>} ErrorBoundary={LexicalErrorBoundary}/>
-      <HistoryPlugin/><TablePlugin/><SelectionToolbar/><BlockContextMenu/>
+      <TufteEditingSurface ariaLabel="본문과 사이드노트 편집" ariaDescribedBy="help"/>
     </main>
     <p role="status" aria-label="편집 작업 상태">{status}</p><p role="status" aria-label="자동 복구 저장 상태">{autoSaveState}</p>
     {structureIssues.length>0&&<aside role="alert" aria-label="문서 구조 복구"><p>문서 구조를 수정하세요. 내용은 자동 삭제하지 않으며 HTML 생성은 차단됩니다.</p><ul>{structureIssues.map((issue,i)=><li key={`${issue.key}-${i}`}><button onClick={()=>focusStructureIssue(editor,issue.key)}>{issue.message}</button> <code>{issue.path}</code></li>)}</ul><button onClick={()=>editor.dispatchCommand(UNDO_COMMAND,undefined)}>구조 변경 실행 취소</button><button onClick={recoverStructure} disabled={!checkpoint.current}>마지막 정상 구조로 복구</button></aside>}
@@ -925,4 +918,4 @@ function EditorUI(){
     <p className="notice">프로토타입: 공개 발행·모바일 여백 배치·OS별 실제 IME와 다른 브라우저 검증은 후속 단계에서 진행합니다. 한글 웹폰트 자산 연결은 P4 대상입니다.</p>
   </>;
 }
-createRoot(document.getElementById('root')!).render(<LexicalComposer initialConfig={{namespace:'tufte-p1',nodes:TUFTE_NODES,editorState:seed,onError(error){throw error;},theme:{text:{bold:'text-bold',italic:'text-italic',code:'text-code',underline:'text-underline',strikethrough:'text-strike',underlineStrikethrough:'text-underline-strike',highlight:'text-highlight'}}}}><EditorUI/></LexicalComposer>);
+createRoot(document.getElementById('root')!).render(<TufteComposer initialConfig={{namespace:'tufte-p1',editorState:seed,onError(error){throw error;},theme:{text:{bold:'text-bold',italic:'text-italic',code:'text-code',underline:'text-underline',strikethrough:'text-strike',underlineStrikethrough:'text-underline-strike',highlight:'text-highlight'}}}}><EditorUI/></TufteComposer>);
