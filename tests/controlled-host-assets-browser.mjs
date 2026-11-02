@@ -40,6 +40,8 @@ try{
  await second.getByRole('textbox',{name:'Beta 편집기'}).waitFor();
  const beforeFirst=await getDoc('first'),beforeSecond=await getDoc('second');
  assert.equal(images(beforeFirst).filter(node=>node.hostAsset).length,0);
+ assert.deepEqual(await page.evaluate(()=>window.__hostAssetHarness.calls.search),[],
+  'A host provider must not be queried before the picker opens');
  await pickFirst.click();
  await dialog.waitFor();
  assert.equal(await dialog.getByRole('radio',{name:/alpha-server-note/}).count(),1);
@@ -76,6 +78,18 @@ try{
  await dialog.getByRole('alert').getByText(/유효하지 않습니다/).waitFor();
  assert.deepEqual(await getDoc('second'),beforeSecond);
  await dialog.getByRole('button',{name:'취소'}).click();await dialog.waitFor({state:'hidden'});
+
+ // Expired URLs and explicit revision mismatches must also fail closed.
+ for(const mode of ['expired','mismatch']){
+  await page.evaluate(value=>{window.__hostAssetHarness.mode=value;},mode);
+  await pickSecond.click();await dialog.waitFor();
+  await dialog.getByRole('radio',{name:/Atlas image/}).check();
+  if(mode==='mismatch')await dialog.getByRole('combobox',{name:'버전'}).selectOption('rev-1');
+  await dialog.getByRole('button',{name:'외부 이미지 연결'}).click();
+  await dialog.getByRole('alert').getByText(/유효하지 않습니다/).waitFor();
+  assert.deepEqual(await getDoc('second'),beforeSecond);
+  await dialog.getByRole('button',{name:'취소'}).click();await dialog.waitFor({state:'hidden'});
+ }
 
  // Resolves which ignore AbortSignal must still be ignored after cancellation.
  await page.evaluate(()=>{window.__hostAssetHarness.mode='deferred';});
