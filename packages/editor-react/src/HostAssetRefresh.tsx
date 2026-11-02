@@ -20,7 +20,6 @@ type Tracked={
 };
 
 const MAX_TIMER_MS=2_147_483_647;
-const AUTO_REFRESH_PACE_MS=1000;
 
 function fingerprint(candidate:{locator:AssetLocator;src:string}):string{
  const {assetId,revisionId}=candidate.locator;
