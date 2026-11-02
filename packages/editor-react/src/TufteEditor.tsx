@@ -1,4 +1,4 @@
-import {createContext,useContext,useEffect,useId,useRef,type ReactNode} from 'react';
+import {createContext,useContext,useEffect,useId,useRef} from 'react';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {canonicalizeDocument,type TufteDocument} from '@lexical-tufte/document';
 import type {AssetProvider} from '@lexical-tufte/editor-ports';
@@ -58,7 +58,8 @@ function DocumentBinding({value,onChange,onError,readonly}:DocumentBindingProps)
  const report=(error:Error)=>{
   if(errorRef.current!==error.message){
    errorRef.current=error.message;
-   propsRef.current.onError?.(error);
+   if(propsRef.current.onError)propsRef.current.onError(error);
+   else console.error(error);
   }
  };
 
@@ -95,6 +96,15 @@ function DocumentBinding({value,onChange,onError,readonly}:DocumentBindingProps)
   if(key===incomingRef.current)return;
   incomingRef.current=key;
   if(key===emittedRef.current)return; // parent acknowledged an edit, not a replacement
+  // Metadata-only updates must not erase the user's undo stack.
+  const live=exportEditorToDocument(editor,value);
+  if(live.ok){
+   const liveKey=canonicalizeDocument(live.value);
+   if(liveKey.ok&&liveKey.value===key){
+    emittedRef.current=key;
+    return;
+   }
+  }
   // Set before import because Lexical publishes state updates asynchronously.
   // Import failures are fail-closed: a subsequent valid external value may recover.
   const previous=emittedRef.current;
