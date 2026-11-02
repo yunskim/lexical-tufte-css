@@ -48,12 +48,13 @@ interface TufteEditorProps {
 | 단계 | 실제 변경 | 남은 게이트 |
 | --- | --- | --- |
 | R1 | `packages/editor-react` 생성, React/Lexical peer·개발 의존성 및 pnpm lockfile 등록, `pnpm dev:editor`에서 종속 패키지 빌드 | 설치·독립 소비자 빌드/타입 검사 실실행 |
-| R2 | `ToolbarIcon`과 아이콘 경로를 공통 패키지로 추출 | `IconButton`·명령 레지스트리·단축키 완전 이관 및 회귀 |
+| R2 | `ToolbarIcon`, `INLINE_ACTIONS`, `EDITOR_SHORTCUTS`를 공통 패키지로 추출; 예제와 선택 서식 툴바가 같은 등록표를 공유 | `IconButton` 재사용 컴포넌트화 및 브라우저 회귀 |
 | R3 | `SelectionToolbar`, `BlockContextMenu`, 명령 가능성 판정 분리. 문맥 메뉴는 `useId`로 인스턴스별 ARIA 연결, 선택 툴바 포커스 검사도 해당 인스턴스에 한정 | 다중 인스턴스·IME·키보드·브라우저 회귀 실실행 |
-| R4 | `NoteImagePanel`을 패키지로 이동, 기존 예제 경로는 re-export만 유지. 선택·메뉴·이미지 패널 스타일을 `@lexical-tufte/editor-react/styles.css`로 분리 | AssetProvider 연결·업로드 정책 분리 및 실환경 검증 |
-| 패키지 소비자 게이트 | `scripts/pack-and-check.mjs`와 `scripts/check-package-tarballs.mjs`에 6번째 tarball, React UI JS/TS export와 CSS 포함 검사 추가 | `pnpm package:check` 실행 및 결과 기록 |
+| R4 | `NoteImagePanel`을 패키지로 이동, 예제 경로는 re-export만 유지. 패널 입력·레이블·제목은 `useId`로 인스턴스별 격리. 선택·메뉴·이미지 패널 CSS를 `@lexical-tufte/editor-react/styles.css`로 분리 | AssetProvider 연결·업로드 정책 분리 및 실환경 검증 |
+| R5 일부 | `TufteComposer`가 정본 노드 스키마를 소유하고 `TufteEditingSurface`가 RichText·History·Table·선택·문맥 메뉴 플러그인을 조립. 기존 `examples/editor`에서 두 컴포넌트를 소비 | 문서 `value/onChange/onError/readonly` 제어형 facade, 여러 editor 인스턴스, 플러그인 lifecycle·host API 수락 |
+| 패키지 소비자 게이트 | `scripts/pack-and-check.mjs`와 `scripts/check-package-tarballs.mjs`에 6번째 tarball, React UI·composer·surface JS/TS export, 공통 명령표와 CSS 검사 추가 | `pnpm package:check` 실행 및 결과 기록 |
 
-**정적 점검 결과:** 변경된 package.json·lockfile 의존성 항목 일치, 기존/이관 이미지 패널 소스 동일성, 추출 CSS 원문 동일성, CSS export와 예제 import 연결, 인스턴스별 문맥 메뉴 ID 사용을 확인했다. 이 점검은 TypeScript 컴파일·실제 브라우저 실행을 대신하지 않는다.
+**정적 점검 결과:** 변경된 package.json·lockfile 의존성 항목 일치, 초기 이미지 패널 추출 시 소스 동일성, 추출 CSS 원문 동일성, CSS export와 예제 import 연결, 인스턴스별 문맥 메뉴 ID 사용을 확인했다. 이후 `INLINE_ACTIONS` 미정의 참조를 바로잡고 `TufteComposer`·`TufteEditingSurface`를 추가했으며, 이미지 패널 라벨/ARIA 연관 검사를 기존 브라우저 테스트에 보강했다. 이 점검은 TypeScript 컴파일·실제 브라우저 실행을 대신하지 않는다.
 
 **로컬 실행/수락 명령:**
 
@@ -64,9 +65,10 @@ pnpm -r typecheck
 pnpm package:check
 pnpm test:contextual-ui
 pnpm test:note-assets
+# 별도 실행: node tests/note-image-chooser-browser.mjs
 ```
 
-현재 실행 환경에서는 저장소의 로컬 체크아웃과 의존성 설치에 접근할 수 없어 이 명령을 실행하지 않았다. 위 명령이 통과하기 전에는 R1–R4 완료 체크박스를 유지하지 않는다. 노트 이미지 편집은 호스트 자산 검색이 아닌 *선택한 노트 안의 이미지 속성 패널*이며, `AssetProvider` 전체를 이관했다는 뜻이 아니다.
+현재 실행 환경에서는 저장소의 로컬 체크아웃과 의존성 설치에 접근할 수 없어 이 명령을 실행하지 않았다. 위 명령이 통과하기 전에는 R1–R5 완료 체크박스를 유지하지 않는다. 노트 이미지 편집은 호스트 자산 검색이 아닌 *선택한 노트 안의 이미지 속성 패널*이며, `AssetProvider` 전체를 이관했다는 뜻이 아니다.
 
 ## 검증 상태
 
