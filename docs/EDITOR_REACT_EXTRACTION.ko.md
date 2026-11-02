@@ -124,7 +124,7 @@ pnpm test:host-assets-controlled
 
 - `hostAsset.namespace`가 현재 편집기의 namespace와 동일한 이미지 **만** 스캔한다. `AssetProvider.resolve()`에는 namespace를 보내지 않고 자산 ID·선택 revision만 전달한다.
 - 자산 locator와 현재 `src`의 조합으로 요청을 추적한다. 새 연결/외부 문서 교체 후 최초 resolve를 수행하고, **만료 60초 전**을 목표로 다음 갱신을 예약한다. 유효기간이 60초 이하인 URL은 남은 시간의 절반 정도 후 재확인해 초당 반복 요청을 피한다.
-- `expiresAt`가 없는 정상 응답은 임의 TTL을 추정하지 않는다. 자동 주기 폴링을 하지 않고 **수동 갱신 버튼**과 추후 문서 변경 시 재확인만 지원한다.
+- `expiresAt`가 없는 정상 응답은 임의 TTL을 추정하지 않는다. 자동 주기 폴링을 하지 않고 **수동 갱신 버튼**과 해당 이미지의 URL·locator가 바뀐 경우의 재확인만 지원한다.
 - 정상 URL이 달라지면 현재 Lexical 노드의 locator·URL·대체 텍스트를 변경 직전에 다시 확인한 뒤 `setHostAsset()`로 `src`만 갱신한다. `HISTORY_MERGE_TAG`로 별도의 사용자 Undo 작업을 추가하지 않으며, 실제 JSON이 변한 경우에는 제어형 `onChange`에 반영된다. 동일 URL이면 Lexical 업데이트 자체를 생략한다.
 - 잘못된 자산 ID·revision·MIME·URL·이미 만료된 시간은 거절한다. 기존 URL/locator를 유지하며 5초부터 지수 백오프로 자동 재시도한다. 수동 갱신 성공 시 오래된 타이머를 교체한다.
 - 각 컴포넌트는 timer·AbortController·세대 번호·캐시·상태를 개별로 갖는다. adapter/namespace 변경 또는 unmount 시 이전 요청·타이머·이벤트 리스너를 정리한다. 응답 사이에 노드가 바뀐 경우 갱신을 적용하지 않는다. 페이지 복귀/가시성 변경 후 예정 시각을 다시 대조한다.
@@ -140,6 +140,8 @@ pnpm test:host-assets-controlled
 pnpm test:host-refresh
 pnpm test:browser
 ```
+
+**후속 정적 점검:** 새 컨트롤러·검증 정책·선택기·공개 API·브라우저 fixture·패키지 소비자·문서·스크립트 연결을 GitHub 소스 기준 **33/33 항목 대조**했다. 이는 AST 파싱이나 TypeScript 빌드 및 Playwright 실행 증거가 아니다.
 
 **검증 구분:** 2026-11-03 전수 통과 보고서의 기준 `e39b8a1`은 **이번 코드 이전**이다. 이번 신규 갱신 기능의 실제 TypeScript 컴파일·Playwright·CI는 아직 실행하지 않았다. 실제 DAM, 브라우저 수명/백그라운드 제한, 네트워크 권한, 다중 탭, 장시간 성능/누수 계측도 여전히 별도 수락 조건이다. R4/P3.1.e 전체를 완료로 체크하지 않는다.
 
