@@ -53,7 +53,7 @@ pnpm test:browser
 - `/controlled.html` — `TufteEditor`의 두 인스턴스, 외부 문서 교체, readonly, 마운트/언마운트
 - `/host-assets.html` — 서로 다른 namespace를 가진 두 편집기의 **호스트 이미지 선택기**. 실제 DAM이 아닌 예제 `AssetProvider`를 사용합니다.
 
-신규 호스트 자산 선택기 회귀 코드는 `pnpm test:host-assets-controlled`로 실행하도록 추가했습니다. **11월 3일 전수 검증 보고서는 이 선택기 코드 이전 커밋의 결과**로, 새 기능의 빌드·브라우저 통과 여부는 별도 확인이 필요합니다. 새 기능의 범위와 미완료 게이트는 [React 편집기 추출 현황](docs/EDITOR_REACT_EXTRACTION.ko.md)에 기록했습니다.
+신규 호스트 자산 선택기 회귀 코드는 `pnpm test:host-assets-controlled`로, **서명 URL 만료·재시도·해제·두 편집기 격리** 검증은 `pnpm test:host-refresh`로 실행하도록 추가했습니다. 이미지 URL 자동 갱신 컨트롤러는 호스트의 `AssetProvider.resolve()`를 사용하며 별도의 서버 구현이 없습니다. **11월 3일 전수 검증 보고서는 선택기·URL 갱신 코드 이전 커밋 `e39b8a1`의 결과**로, 새 기능의 빌드·브라우저 통과 여부는 별도 확인이 필요합니다. 새 기능의 범위와 미완료 게이트는 [React 편집기 추출 현황](docs/EDITOR_REACT_EXTRACTION.ko.md)에 기록했습니다.
 
 ## 오류와 개선 기록
 
