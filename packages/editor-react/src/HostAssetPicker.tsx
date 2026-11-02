@@ -165,7 +165,7 @@ export function HostAssetPicker({adapter,namespace}:HostAssetPickerProps){
     currentConfig.current.adapter!==fromAdapter||currentConfig.current.namespace!==fromNamespace)return;
    const valid=resolved&&resolved.assetId===assetId&&
     (!requestedRevision||resolved.revisionId===requestedRevision)&&
-    typeof resolved.revisionId==='string'&&resolved.revisionId.length>0&&
+    typeof resolved.revisionId==='string'&&resolved.revisionId.trim().length>0&&
     typeof resolved.mediaType==='string'&&resolved.mediaType.startsWith('image/')&&
     typeof resolved.url==='string'&&isSafeURL(resolved.url,'image')&&
     (resolved.expiresAt===undefined||(Number.isFinite(Date.parse(resolved.expiresAt))&&Date.parse(resolved.expiresAt)>Date.now()));
