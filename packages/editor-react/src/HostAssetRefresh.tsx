@@ -1,7 +1,8 @@
 import {useEffect,useRef,useState} from 'react';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$getNodeByKey,$getRoot,$isElementNode,HISTORY_MERGE_TAG,type LexicalNode} from 'lexical';
-import type {AssetLocator,AssetProvider} from '@lexical-tufte/editor-ports';
+import type {AssetProvider} from '@lexical-tufte/editor-ports';
+import type {HostAssetLocator} from '@lexical-tufte/document';
 import {InlineImageNode} from '@lexical-tufte/lexical';
 import {
  imageRefreshRetryDelay,isUsableResolvedImage,nextImageRefreshAt
@@ -9,7 +10,7 @@ import {
 
 type Candidate={
  key:string;
- locator:AssetLocator;
+ locator:HostAssetLocator;
  signature:string;
  src:string;
 };
@@ -21,7 +22,7 @@ type Tracked={
 
 const MAX_TIMER_MS=2_147_483_647;
 
-function fingerprint(candidate:{locator:AssetLocator;src:string}):string{
+function fingerprint(candidate:{locator:HostAssetLocator;src:string}):string{
  const {assetId,revisionId}=candidate.locator;
  return JSON.stringify([candidate.locator.namespace,assetId,revisionId??null,candidate.src]);
 }
@@ -133,7 +134,9 @@ export function HostAssetRefresh({adapter,namespace}:HostAssetRefreshProps){
      if(!live(current,controller))break;
      let resolved;
      try{
-      resolved=await adapter.resolve(item.locator,controller.signal);
+      const locator={assetId:item.locator.assetId,
+       ...(item.locator.revisionId?{revisionId:item.locator.revisionId}:{})};
+      resolved=await adapter.resolve(locator,controller.signal);
      }catch{
       if(!live(current,controller))break;
       resolved=null;
