@@ -12,6 +12,7 @@ type Deferred={locator:AssetLocator;respond:(result:ResolvedAsset|null)=>void};
 const harness={
  mode:'normal' as Mode,
  expiryMs:3600_000,
+ url:'/fixture.svg',
  calls:{search:[] as Array<{namespace:string;text:string}>,revisions:[] as string[],resolve:[] as Array<{namespace:string;locator:AssetLocator}>},
  deferred:[] as Deferred[]
 };
@@ -43,7 +44,7 @@ function provider(namespace:string):AssetProvider{
     assetId:locator.assetId,
     revisionId:harness.mode==='mismatch'?'wrong-revision':locator.revisionId??'rev-2',
     mediaType:'image/svg+xml',
-    url:harness.mode==='invalid'?'javascript:alert(1)':'/fixture.svg',
+    url:harness.mode==='invalid'?'javascript:alert(1)':harness.url,
     expiresAt:new Date(Date.now()+(harness.mode==='expired'?-1000:harness.expiryMs)).toISOString()
    };
   }
