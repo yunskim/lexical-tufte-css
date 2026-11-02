@@ -38,6 +38,6 @@ export function nextImageRefreshAt(expiresAt:string|undefined,now=Date.now()):nu
 }
 
 export function imageRefreshRetryDelay(failures:number):number{
- const attempt=Math.max(1,Math.min(6,Math.trunc(failures)));
+ const attempt=Math.max(1,Math.min(10,Math.trunc(failures)));
  return Math.min(HOST_ASSET_RETRY_MAX_MS,HOST_ASSET_RETRY_BASE_MS*2**(attempt-1));
 }
