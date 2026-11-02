@@ -65,6 +65,7 @@ function documentFor(namespace:string):TufteDocument{
 }
 function Demo(){
  const [first,setFirst]=useState(()=>documentFor('alpha'));
+ const [firstChanges,setFirstChanges]=useState(0);
  const [showFirst,setShowFirst]=useState(true);
  const [second,setSecond]=useState(()=>documentFor('beta'));
  const [errors,setErrors]=useState<string[]>([]);
@@ -76,7 +77,8 @@ function Demo(){
   </div>
   <section data-testid="host-first">
    <h2>Alpha 편집기</h2>
-   {showFirst&&<TufteEditor value={first} onChange={setFirst} onError={error=>setErrors(values=>[...values,error.message])}
+   <p data-testid="host-first-changes">변경 알림 {firstChanges}회</p>
+   {showFirst&&<TufteEditor value={first} onChange={value=>{setFirst(value);setFirstChanges(count=>count+1);}} onError={error=>setErrors(values=>[...values,error.message])}
     assetAdapter={firstAdapter} assetNamespace="alpha" ariaLabel="Alpha 편집기"/>}
    <pre data-testid="host-first-json" hidden>{JSON.stringify(first)}</pre>
   </section>
