@@ -10,6 +10,18 @@
 
 기능 구현 순서는 **예제 DOM 대응 확인 → schema 계약 → Lexical 편집/경계 → 순수 renderer HTML → fixture 작성 → 누적 실행 검증**으로 한다. 기본 Lexical 키 입력을 재구현하기보다 문서 schema를 위반할 수 있는 경계에서만 가로채고, 붙여넣기·IME·undo/redo·저장/발행은 동일 불변식을 검사한다. 사용자 요청에 따라 현재 테스트는 작성·누적하고 일괄 실행하기 전까지 관련 체크박스를 완료 처리하지 않는다. 공식 예제의 지원 범위와 제3자 임의 HTML의 지원 범위는 구분한다.
 
+## 2026-11-03 호스트 이미지 선택기 코드 반영 (검증 대기)
+
+`packages/editor-react/src/HostAssetPicker.tsx`로 새 `TufteEditor`의 `AssetProvider` 연결을 구현했다. 검색·버전 조회·URL 확인은 호스트 인터페이스를 통해 수행하고, 이미지 노드의 `hostAsset` 참조를 Lexical JSON에 저장한다. 선택된 노트의 끝에 새 이미지 삽입 또는 기존 노트 이미지 교체만 지원하며, 자산 등록·업로드나 실제 인증 서버는 구현하지 않는다.
+
+- 추가 예제: `examples/editor/host-assets.html` (서로 다른 namespace의 두 편집기, 가짜 호스트 provider)
+- 추가 회귀: `tests/controlled-host-assets-browser.mjs` (자산 검색·MIME 필터·고정 revision·이미지 변경·Undo/Redo·잘못된/만료된 응답·늦은 응답 취소·삽입·namespace 격리)
+- 새 실행 경로: `pnpm test:host-assets-controlled`; 전체 브라우저 회귀 목록에도 추가
+- `scripts/check-package-tarballs.mjs`에 새 public export의 JS·타입 검사 추가
+- **자동 만료 URL 재해석, 업로드, 실제 DAM·인증, 모든 노트 조합 및 장애 시 재시도**는 여전히 별도 구현·검증 대상
+
+코드·계약 정적 점검 18항목 통과. 이번 변경에 대한 **frozen install·빌드·타입검사·Playwright 실실행은 아직 없으며**, [2026-11-03 전수 검증 보고서](VERIFICATION_DEFERRED_2026-11-03.ko.md)는 이 변경 이전 기준 커밋 `e39b8a1`에만 해당한다. 새 R4/P3.1.e 전체 완료를 선언하지 않는다.
+
 ## 2026-11-03 controlled editor 통합 검증 및 다음 게이트
 
 근거: [11월 3일 자동 검증 보고서](VERIFICATION_DEFERRED_2026-11-03.ko.md) · [파일별 결과·해시](verification/deferred-20261103.json). **검증 기준 커밋 `e39b8a1`**, 제품 코드·테스트 기대값 변경 없이 실행. 이전 11월 1일 절은 당시의 이력으로 유지한다.
