@@ -24,6 +24,7 @@ try{
  await page.waitForTimeout(100);assert.equal(await floating.count(),0);
  await page.keyboard.press('ArrowRight');await page.keyboard.press('Shift+F10');
  const group=page.getByRole('menu',{name:'블록 유형',exact:true});await group.waitFor();
+ assert.equal(await page.locator('.block-context-menu > button').first().evaluate(button=>button.getAttribute('aria-controls')===document.querySelector('[role="menu"][aria-label="블록 유형"]')?.id),true);
  await page.waitForFunction(()=>document.activeElement?.textContent==='본문 문단');
  await page.keyboard.press('End');assert.equal(await page.locator(':focus').innerText(),'인용문 삽입');
  await page.keyboard.press('Home');assert.equal(await page.locator(':focus').innerText(),'본문 문단');
@@ -38,7 +39,7 @@ try{
  await editor.locator('section').first().locator('p').first().click({button:'right',position:{x:20,y:10}});
  await group.waitFor();
  // Heading conversion is hidden when the paragraph contains a note that heading schema disallows.
- await page.waitForFunction(()=>document.querySelector('#tufte-block-menu')?.querySelectorAll('[role=menuitem]').length===8);
+ await page.waitForFunction(()=>document.querySelector('[role="menu"][aria-label="블록 유형"]')?.querySelectorAll('[role=menuitem]').length===8);
  assert.equal(await group.getByRole('menuitem',{name:'제목 h3',exact:true}).count(),0);
  assert.equal(await group.getByRole('menuitem',{name:'제목 h2',exact:true}).count(),0);
  assert.equal(await group.getByRole('menuitem',{name:'글머리표 목록 삽입',exact:true}).count(),1);
@@ -92,13 +93,13 @@ try{
  await page.keyboard.press('Tab');await group.waitFor({state:'hidden'});
  assert.equal(await page.getByRole('button',{name:'문서 이미지 자산 등록',exact:true}).evaluate(element=>element===document.activeElement),true);
  assert.equal(await page.locator('.block-context-menu.is-floating').count(),0);
- assert.equal(await page.evaluate(()=>document.activeElement?.matches('#tufte-block-menu button')),false);
+ assert.equal(await page.evaluate(()=>document.activeElement?.matches('[role="menu"][aria-label="블록 유형"] button')),false);
  await editor.locator('h3').click({button:'right'});await group.waitFor();
  await page.waitForFunction(()=>document.activeElement?.textContent==='본문 문단');
  await page.keyboard.press('Shift+Tab');await group.waitFor({state:'hidden'});
  assert.equal(await page.locator('.editor').evaluate(element=>element===document.activeElement),true);
  assert.equal(await page.locator('.block-context-menu.is-floating').count(),0);
- assert.equal(await page.evaluate(()=>document.activeElement?.matches('#tufte-block-menu button')),false);
+ assert.equal(await page.evaluate(()=>document.activeElement?.matches('[role="menu"][aria-label="블록 유형"] button')),false);
 
  await editor.locator('h3').click();await page.keyboard.press('Home');await page.keyboard.down('Shift');await page.keyboard.press('End');await page.keyboard.up('Shift');await floating.waitFor();
  const box=await floating.boundingBox();assert.ok(box.x>=0&&box.x+box.width<=375,JSON.stringify(box));
