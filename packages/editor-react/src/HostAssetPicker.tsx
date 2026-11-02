@@ -28,6 +28,7 @@ export function HostAssetPicker({adapter,namespace}:HostAssetPickerProps){
  const [query,setQuery]=useState('');
  const [targets,setTargets]=useState<ImageTarget[]>([]);
  const [noteKey,setNoteKey]=useState<string|null>(null);
+ const [noteIdentity,setNoteIdentity]=useState<string|null>(null);
  const [targetKey,setTargetKey]=useState<string>('');
  const [results,setResults]=useState<AssetSummary[]>([]);
  const [assetId,setAssetId]=useState('');
@@ -60,11 +61,12 @@ export function HostAssetPicker({adapter,namespace}:HostAssetPickerProps){
  const openPicker=()=>{
   const found:ImageTarget[]=[];
   let currentNote:string|null=null;
+  let currentNoteId:string|null=null;
   editor.getEditorState().read(()=>{
    const selected=$getSelection();
    if($isRangeSelection(selected)){
     for(let node:LexicalNode|null=selected.anchor.getNode();node;node=node.getParent()){
-     if(node instanceof NoteNode){currentNote=node.getKey();break;}
+     if(node instanceof NoteNode){currentNote=node.getKey();currentNoteId=node.getNoteId();break;}
     }
    }
    const visit=(node:LexicalNode,note:NoteNode|null)=>{
@@ -80,6 +82,7 @@ export function HostAssetPicker({adapter,namespace}:HostAssetPickerProps){
   abortResolve();
   setTargets(found);
   setNoteKey(currentNote);
+  setNoteIdentity(currentNoteId);
   setTargetKey(currentNote?INSERT_TARGET:found.length===1?found[0].key:'');
   setAlt(currentNote?'':found.length===1?found[0].alt:'');
   setQuery('');setAssetId('');setRevisionId('');setResults([]);setRevisions([]);
@@ -148,6 +151,8 @@ export function HostAssetPicker({adapter,namespace}:HostAssetPickerProps){
   pendingResolve.current=controller;
   const request=++generation.current;
   const target=targetKey,section=noteKey;
+  const capturedNoteId=noteIdentity;
+  const capturedTargetNoteId=targets.find(item=>item.key===target)?.noteId;
   const requestedRevision=revisionId;
   const selectedAlt=alt;
   const fromAdapter=adapter,fromNamespace=namespace;
@@ -171,18 +176,18 @@ export function HostAssetPicker({adapter,namespace}:HostAssetPickerProps){
     if(request!==generation.current||!editor.isEditable())return;
     if(target===INSERT_TARGET){
      const note=section?$getNodeByKey(section):null;
-     if(!(note instanceof NoteNode))return;
+     if(!(note instanceof NoteNode)||note.getNoteId()!==capturedNoteId)return;
      // Append inside the captured note, not at the dialog's current DOM focus.
      note.append($createInlineImageNode(resolved.url,selectedAlt,undefined,undefined,undefined,locator),$createTextNode(' '));
      applied=true;
     }else{
      const image=$getNodeByKey(target);
      if(!(image instanceof InlineImageNode))return;
-     let withinNote=false;
+     let containingNoteId:string|null=null;
      for(let node:LexicalNode|null=image.getParent();node;node=node.getParent()){
-      if(node instanceof NoteNode){withinNote=true;break;}
+      if(node instanceof NoteNode){containingNoteId=node.getNoteId();break;}
      }
-     if(!withinNote)return;
+     if(!capturedTargetNoteId||containingNoteId!==capturedTargetNoteId)return;
      image.setHostAsset(locator,resolved.url,selectedAlt);
      applied=true;
     }
