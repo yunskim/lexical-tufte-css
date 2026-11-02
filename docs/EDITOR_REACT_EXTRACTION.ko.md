@@ -83,7 +83,7 @@ pnpm test:note-assets
 - **격리와 정리:** 각 인스턴스는 React `useId` 기반 Lexical namespace와 자체 update listener, 문맥 메뉴 상태를 가진다. listener는 컴포넌트 unmount에서 해제한다.
 - **자산:** `useTufteAssetContext()`로 설정을 읽을 수 있도록 했지만 **실제 DAM 검색·업로드·만료 URL 갱신을 이 컴포넌트에서 수행하지는 않는다.** 호스트 통합 단계는 미완료다.
 
-실제 두 인스턴스를 렌더링하는 별도 브라우저 예제를 `examples/editor/controlled.html`에 추가했다. 기존 `examples/editor/index.html`의 저장·발행 프로토타입은 그대로 둔다. 추가한 `tests/controlled-editor-browser.mjs`는 초기 무알림, 첫 인스턴스 편집, 부모 값 반영, 메타데이터만 변경 시 undo 유지, 외부 문서 교체 시 undo 초기화, 읽기 전용, 각각의 unmount/remount와 브라우저 오류를 검사한다.
+실제 두 인스턴스를 렌더링하는 별도 브라우저 예제를 `examples/editor/controlled.html`에 추가했다. 기존 `examples/editor/index.html`의 저장·발행 프로토타입은 그대로 둔다. 추가한 `tests/controlled-editor-browser.mjs`는 초기 무알림, 첫 인스턴스 편집, 부모 값 반영, 메타데이터만 변경 시 undo 유지, 외부 문서 교체 시 undo 초기화, 읽기 전용, 각각의 unmount/remount, 유효하지 않은 외부 문서의 fail-closed 처리·`onError` 보고와 브라우저 오류를 검사한다.
 
 ```bash
 pnpm install --frozen-lockfile
@@ -94,7 +94,7 @@ pnpm package:check
 # 대화형 확인: pnpm dev:editor 실행 후 /controlled.html 방문
 ```
 
-**검증 제한:** 이 단계에서는 GitHub 코드와 정적 계약을 점검했으며, 실제 pnpm 빌드/Playwright는 실행하지 못했다. 따라서 R5·R7 완료 체크박스는 유지하지 않는다. 구현은 추가됐지만 성공 판정은 보류한다.
+**검증 제한:** 이 단계에서는 GitHub 코드와 정적 계약을 점검했으며, 실제 pnpm 빌드/Playwright는 실행하지 못했다. 브라우저 테스트와 CI 통과를 주장하지 않는다. 따라서 R5·R7 완료 체크박스는 유지하지 않는다. 구현은 추가됐지만 성공 판정은 보류한다.
 
 ## 검증 상태
 
