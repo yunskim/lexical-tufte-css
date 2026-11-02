@@ -14,8 +14,8 @@ export function isUsableResolvedImage(
  resolved:ResolvedAsset|null,
  now=Date.now()
 ):resolved is ResolvedAsset{
- return resolved!==null&&
-  resolved.assetId===locator.assetId&&
+ return resolved!==null&&typeof resolved==='object'&&!Array.isArray(resolved)&&
+  typeof resolved.assetId==='string'&&resolved.assetId===locator.assetId&&
   (!locator.revisionId||resolved.revisionId===locator.revisionId)&&
   typeof resolved.revisionId==='string'&&resolved.revisionId.trim().length>0&&
   typeof resolved.mediaType==='string'&&resolved.mediaType.startsWith('image/')&&
