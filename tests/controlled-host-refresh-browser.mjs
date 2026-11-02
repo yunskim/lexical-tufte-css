@@ -28,6 +28,7 @@ try{
  page.setDefaultTimeout(10_000);
  await page.clock.install({time:new Date('2026-11-03T00:00:00.000Z')});
  await page.goto(url);
+ await page.clock.pauseAt(new Date('2026-11-03T00:10:00.000Z'));
  const first=page.getByTestId('host-first'),second=page.getByTestId('host-second');
  const alpha=first.getByRole('textbox',{name:'Alpha 편집기'});
  const beta=second.getByRole('textbox',{name:'Beta 편집기'});
