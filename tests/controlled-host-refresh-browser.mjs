@@ -38,7 +38,7 @@ try{
   window.__hostAssetHarness.calls.resolve.filter(call=>call.namespace==='alpha').length);
  const betaCount=()=>page.evaluate(()=>
   window.__hostAssetHarness.calls.resolve.filter(call=>call.namespace==='beta').length);
- const read=async()=>JSON.parse(await page.getByTestId('host-first-json').innerText());
+ const read=async()=>JSON.parse(await page.getByTestId('host-first-json').textContent());
  const findHost=(doc)=>{
   const hits=[];const visit=node=>{
    if(node.type==='tufte-inline-image'&&node.hostAsset)hits.push(node);
