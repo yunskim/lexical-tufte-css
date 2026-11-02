@@ -67,12 +67,18 @@ try{
  assert.deepEqual(bound[0].hostAsset,{namespace:'alpha',assetId:'atlas',revisionId:'rev-1'});
  const beforeExpiry=await count();
  assert.ok(beforeExpiry>=2,'Picker and initial URL refresh should each resolve the asset');
+ // Signed URL rotates without changing the stable host asset locator.
+ await page.evaluate(()=>{window.__hostAssetHarness.url='/fixture.svg?renewed=1';});
  await page.clock.runFor(59_999);
  assert.equal(await count(),beforeExpiry,'Expiry refresh must not fire before the 60-second margin');
  await page.clock.runFor(1);
  await page.waitForFunction(n=>window.__hostAssetHarness.calls.resolve.filter(call=>call.namespace==='alpha').length>n,beforeExpiry);
  assert.equal(await betaCount(),0,'Alpha timer must not query Beta');
- assert.deepEqual(findHost(await read())[0].hostAsset,bound[0].hostAsset);
+ await page.waitForFunction(()=>document.querySelector('[data-testid="host-first-json"]')?.textContent?.includes('renewed=1'));
+ const afterExpiry=findHost(await read())[0];
+ assert.equal(afterExpiry.src,'/fixture.svg?renewed=1');
+ assert.equal(afterExpiry.alt,bound[0].alt,'URL renewal must preserve alt text');
+ assert.deepEqual(afterExpiry.hostAsset,bound[0].hostAsset,'URL renewal must preserve the pinned locator');
 
  // Manual refresh must replace an obsolete short deadline with a newer long one.
  await page.evaluate(()=>{window.__hostAssetHarness.expiryMs=3600_000;});
