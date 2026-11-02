@@ -91,6 +91,15 @@ try{
   await dialog.getByRole('button',{name:'취소'}).click();await dialog.waitFor({state:'hidden'});
  }
 
+ // Provider exceptions remain a visible, retryable picker error.
+ await page.evaluate(()=>{window.__hostAssetHarness.mode='throw';});
+ await pickSecond.click();await dialog.waitFor();
+ await dialog.getByRole('radio',{name:/Atlas image/}).check();
+ await dialog.getByRole('button',{name:'외부 이미지 연결'}).click();
+ await dialog.getByRole('alert').getByText(/확인하지 못했습니다/).waitFor();
+ assert.deepEqual(await getDoc('second'),beforeSecond);
+ await dialog.getByRole('button',{name:'취소'}).click();await dialog.waitFor({state:'hidden'});
+
  // Resolves which ignore AbortSignal must still be ignored after cancellation.
  await page.evaluate(()=>{window.__hostAssetHarness.mode='deferred';});
  await pickSecond.click();await dialog.waitFor();
