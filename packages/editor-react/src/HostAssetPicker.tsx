@@ -55,7 +55,7 @@ export function HostAssetPicker({adapter,namespace}:HostAssetPickerProps){
   setError('');
   queueMicrotask(()=>trigger.current?.focus());
  };
- useEffect(()=>()=>{mounted.current=false;generation.current++;pendingResolve.current?.abort();},[]);
+ useEffect(()=>{mounted.current=true;return()=>{mounted.current=false;generation.current++;pendingResolve.current?.abort();};},[]);
 
  const openPicker=()=>{
   const found:ImageTarget[]=[];
@@ -81,7 +81,7 @@ export function HostAssetPicker({adapter,namespace}:HostAssetPickerProps){
   setTargets(found);
   setNoteKey(currentNote);
   setTargetKey(currentNote?INSERT_TARGET:found.length===1?found[0].key:'');
-  setAlt('');
+  setAlt(currentNote?'':found.length===1?found[0].alt:'');
   setQuery('');setAssetId('');setRevisionId('');setResults([]);setRevisions([]);
   setError('');setStatus('');
   setOpen(true);
@@ -97,7 +97,7 @@ export function HostAssetPicker({adapter,namespace}:HostAssetPickerProps){
   adapter.search({text:query,mediaTypes:IMAGE_MEDIA,limit:40},controller.signal)
    .then(page=>{
     if(!active)return;
-    setResults(page.items.filter(asset=>asset.mediaType.startsWith('image/')));
+    setResults(page.items.filter(asset=>typeof asset.mediaType==='string'&&asset.mediaType.startsWith('image/')));
    })
    .catch(()=>{if(active)setError('외부 이미지 검색에 실패했습니다.');})
    .finally(()=>{if(active)setSearchBusy(false);});
