@@ -1,3 +1,9 @@
+## 2026-11-03 밀린 테스트 전수 실행 — controlled editor 포함
+
+- e39b8a1 기준, 제품/테스트 수정 없이 frozen/static/build/typecheck·unit629·package6·Python16/HTTP·revision모델12그룹 통과. browser40/40통과, 공식6폭 pixel mask 밖 차이0.
+- 새 controlled editor의 두 인스턴스·onChange/echo·metadata와 Undo·invalid input/onError·외부 교체·readonly·unmount/remount를 실제 브라우저에서 확인했다. [전체 보고서](VERIFICATION_DEFERRED_2026-11-03.ko.md), [기계 판독 증거](verification/deferred-20261103.json).
+- E139–E144/M128–M129의 재발 여부와 환경/독립 DOM/저장 경계를 재점검했고 신규 오류 없음. CI 및 실제 OS IME/스크린리더·타 브라우저/운영 서비스는 미실행. 자동화 범위를 P3.1.e 전체 수락으로 확대하지 않는다.
+
 ## 2026-11-01 밀린 자동 테스트 전수 실행
 
 - e0efb2c 이후 수정 포함 [전체 보고서](VERIFICATION_DEFERRED_2026-11-01.ko.md), [기계 판독 증거](verification/deferred-20261101.json).

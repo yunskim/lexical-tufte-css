@@ -1,5 +1,7 @@
 # 누적 자동 테스트 실행 — 2026-11-01
 
+후속 editor-react/controlled API 추가 이후 검증은 [2026-11-03 보고서](VERIFICATION_DEFERRED_2026-11-03.ko.md)를 따른다. 아래는 당시 기준 이력이다.
+
 기준 `e0efb2c`와 이번 수정. 전일 자산 검증 이후 추가된 pending resolve 중 revision 교체/삭제, host identity·독립 이미지 보존, 자동 중복 갱신 coalescing과 수동 supersession을 포함한다.
 
 | 검사 | 최종 결과 |
