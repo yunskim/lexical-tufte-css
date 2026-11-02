@@ -52,7 +52,6 @@ export function HostAssetRefresh({adapter,namespace}:HostAssetRefreshProps){
   let generation=0;
   let activeController:AbortController|null=null;
   let timer:ReturnType<typeof setTimeout>|null=null;
-  let pendingScan=false;
   const tracked=new Map<string,Tracked>();
 
   function stopTimer(){
@@ -106,7 +105,7 @@ export function HostAssetRefresh({adapter,namespace}:HostAssetRefreshProps){
   async function refresh(manual:boolean){
    if(!alive)return;
    if(activeController){
-    if(!manual){pendingScan=true;return;}
+    if(!manual)return;
     activeController.abort();
     generation++;
     activeController=null;
@@ -156,12 +155,14 @@ export function HostAssetRefresh({adapter,namespace}:HostAssetRefreshProps){
       continue;
      }
 
+     const safeResolved=resolved;
+
      // No visible change: record expiry without a Lexical update, so neither
      // React onChange nor Undo is disturbed by a redundant resolve.
-     if(resolved.url===item.src){
+     if(safeResolved.url===item.src){
       tracked.set(item.key,{
        signature:item.signature,failures:0,
-       nextAt:nextImageRefreshAt(resolved.expiresAt)
+       nextAt:nextImageRefreshAt(safeResolved.expiresAt)
       });
       succeeded++;
       continue;
@@ -177,15 +178,15 @@ export function HostAssetRefresh({adapter,namespace}:HostAssetRefreshProps){
       // Protect a selection changed while resolve was in flight. A newer
       // asset, namespace, revision, or src must never be overwritten.
       if(fingerprint(candidate)!==item.signature)return;
-      node.setHostAsset(item.locator,resolved.url,p.alt);
+      node.setHostAsset(item.locator,safeResolved.url,p.alt);
       applied=true;
      },{tag:HISTORY_MERGE_TAG,discrete:true});
 
      if(applied){
-      const updated={locator:item.locator,src:resolved.url};
+      const updated={locator:item.locator,src:safeResolved.url};
       tracked.set(item.key,{
        signature:fingerprint(updated),failures:0,
-       nextAt:nextImageRefreshAt(resolved.expiresAt)
+       nextAt:nextImageRefreshAt(safeResolved.expiresAt)
       });
       succeeded++;
      }else{
@@ -199,8 +200,7 @@ export function HostAssetRefresh({adapter,namespace}:HostAssetRefreshProps){
      setRunning(false);
      if(failed)setStatus('호스트 이미지 URL 갱신: '+succeeded+'/'+due.length+'개, 실패 '+failed+'개. 자동 재시도 예정.');
      else if(succeeded||skipped)setStatus('호스트 이미지 URL 갱신: '+succeeded+'/'+due.length+'개'+(skipped?', 변경된 대상 '+skipped+'개 건너뜀':'')+'.');
-     if(pendingScan)pendingScan=false;
-     schedule();
+       schedule();
     }
    }
   }
@@ -209,7 +209,7 @@ export function HostAssetRefresh({adapter,namespace}:HostAssetRefreshProps){
    if(!alive||dirtyElements.size===0&&dirtyLeaves.size===0)return;
    // Coalesce document edits while resolve is active, and avoid a synchronous
    // re-entrant refresh from a Lexical update listener.
-   if(activeController){pendingScan=true;return;}
+   if(activeController)return;
    schedule();
   });
   const onResume=()=>{
