@@ -62,6 +62,8 @@ try{
  await picker.waitFor({state:'hidden'});
  await page.waitForFunction(()=>document.querySelector('[data-testid="host-first-json"]')?.textContent?.includes('"hostAsset"'));
  await message.getByText(/갱신: 1\/1개/).waitFor();
+ const initialChangeCount=await first.getByTestId('host-first-changes').innerText();
+ assert.match(initialChangeCount,/1회/,'Initial host connection emits exactly one change, not another for an unchanged URL');
  const firstDocument=await read();
  const bound=findHost(firstDocument);
  assert.equal(bound.length,1);
@@ -80,12 +82,16 @@ try{
  assert.equal(afterExpiry.src,'/fixture.svg?renewed=1');
  assert.equal(afterExpiry.alt,bound[0].alt,'URL renewal must preserve alt text');
  assert.deepEqual(afterExpiry.hostAsset,bound[0].hostAsset,'URL renewal must preserve the pinned locator');
+ assert.match(await first.getByTestId('host-first-changes').innerText(),/2회/,
+  'A genuinely rotated URL must emit one detached controlled document snapshot');
 
  // Manual refresh must replace an obsolete short deadline with a newer long one.
  await page.evaluate(()=>{window.__hostAssetHarness.expiryMs=3600_000;});
  await manual.click();
  await message.getByText(/갱신: 1\/1개/).waitFor();
  const longExpiryCount=await count();
+ assert.match(await first.getByTestId('host-first-changes').innerText(),/2회/,
+  'Manual resolve of an unchanged URL must not emit an onChange');
  await page.clock.runFor(60_001);
  assert.equal(await count(),longExpiryCount,'Old expiry timer must be cancelled by a successful refresh');
 
