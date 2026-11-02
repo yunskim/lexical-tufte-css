@@ -10,6 +10,20 @@
 
 기능 구현 순서는 **예제 DOM 대응 확인 → schema 계약 → Lexical 편집/경계 → 순수 renderer HTML → fixture 작성 → 누적 실행 검증**으로 한다. 기본 Lexical 키 입력을 재구현하기보다 문서 schema를 위반할 수 있는 경계에서만 가로채고, 붙여넣기·IME·undo/redo·저장/발행은 동일 불변식을 검사한다. 사용자 요청에 따라 현재 테스트는 작성·누적하고 일괄 실행하기 전까지 관련 체크박스를 완료 처리하지 않는다. 공식 예제의 지원 범위와 제3자 임의 HTML의 지원 범위는 구분한다.
 
+## 2026-11-03 서명 URL 자동 갱신 구현 (검증 대기)
+
+`TufteEditor`의 호스트 이미지에 `HostAssetRefresh` 수명 관리 컨트롤러를 추가했다. **기존 이미지 참조를 정본으로 유지**하면서 URL만 갱신하고, 각 편집기 인스턴스별 `AbortController`·타이머·세대 번호를 사용한다.
+
+- `hostAssetPolicy.ts`: 미디어·버전·URL·만료 검증과 60초 선제 갱신·5초 이상 지수 백오프
+- `HostAssetRefresh.tsx`: 최초 연결/문서 교체 시 조회, 만료 시간 기반 예약, 수동 재확인, 실패한 원본 보존, 가시성/복귀 재점검, unmount/adapter 변경 중 취소·변경된 노드의 stale 응답 무시
+- `HostAssetPicker.tsx`: 갱신 컨트롤러와 동일한 검증 함수 사용
+- 신규 테스트: `tests/host-asset-refresh-policy.mjs`, `tests/controlled-host-refresh-browser.mjs`; 브라우저 회귀 목록 및 패키지 소비자 검사 연결
+- 호스트 예제: `examples/editor/host-assets.html`에 만료 시간·URL 회전, 문서 교체, 인스턴스 마운트 제어 추가
+
+**현재 게이트:** 이번 신규 기능은 GitHub 코드 작성/정적 대조 단계이고 **실제 빌드·타입·브라우저 테스트는 미실행**이다. 2026-11-03 기존 보고서(기준 `e39b8a1`)의 40/40 통과 결과로 신규 테스트를 통과 처리하지 않는다. 실제 DAM/권한, 물리 기기/다른 브라우저, 다중 탭·장시간 리스너/타이머 계측, 업로드·네트워크 장애 수락은 남아 있다.
+
+**다음 게이트 순서:** frozen install → `pnpm check` → `pnpm package:check` → `pnpm test:host-assets-controlled` → `pnpm test:host-refresh` → 전체 `pnpm test:browser`. 하나라도 실패하면 회귀 코드를 수정하고 재실행한 뒤 실행 근거를 남긴다. CI는 기존 지시대로 생략한다.
+
 ## 2026-11-03 호스트 이미지 선택기 코드 반영 (검증 대기)
 
 `packages/editor-react/src/HostAssetPicker.tsx`로 새 `TufteEditor`의 `AssetProvider` 연결을 구현했다. 검색·버전 조회·URL 확인은 호스트 인터페이스를 통해 수행하고, 이미지 노드의 `hostAsset` 참조를 Lexical JSON에 저장한다. 선택된 노트의 끝에 새 이미지 삽입 또는 기존 노트 이미지 교체만 지원하며, 자산 등록·업로드나 실제 인증 서버는 구현하지 않는다.
