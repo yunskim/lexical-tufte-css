@@ -1,4 +1,4 @@
-import {useEffect,useRef,useState} from 'react';
+import {useEffect,useId,useRef,useState} from 'react';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$isHeadingNode} from '@lexical/rich-text';
 import {$getNodeByKey,$setSelection,$getSelection,$isRangeSelection,$createRangeSelection,HISTORY_PUSH_TAG,type RangeSelection,type LexicalNode} from 'lexical';
@@ -7,6 +7,7 @@ import {canOpenBlockMenu,blockMenuCapabilities,NO_BLOCK_MENU_ACTIONS,type BlockM
 
 export function BlockContextMenu(){
  const [editor]=useLexicalComposerContext();
+ const menuId=useId();
  const [open,setOpen]=useState(false);
  const [available,setAvailable]=useState(false);
  const [blockType,setBlockType]=useState('본문');
@@ -96,7 +97,7 @@ export function BlockContextMenu(){
    setPoint({x:Math.max(8,Math.min(window.innerWidth-260,event.clientX)),y:Math.max(8,Math.min(window.innerHeight-160,event.clientY))});
    menuOpenRef.current=true;
    setOpen(true);
-   requestAnimationFrame(()=>menuRef.current?.querySelector<HTMLButtonElement>('#tufte-block-menu button')?.focus());
+   requestAnimationFrame(()=>menuRef.current?.querySelector<HTMLButtonElement>('[role="menu"] button')?.focus());
   };
   const onKeyboardMenu=(event:KeyboardEvent)=>{
    if(editor.isComposing()||!(event.key==='ContextMenu'||(event.shiftKey&&event.key==='F10')))return;
@@ -116,7 +117,7 @@ export function BlockContextMenu(){
    setPoint({x:Math.max(8,Math.min(window.innerWidth-260,rect.left)),y:Math.max(8,Math.min(window.innerHeight-160,rect.bottom+8))});
    menuOpenRef.current=true;
    setOpen(true);
-   requestAnimationFrame(()=>menuRef.current?.querySelector<HTMLButtonElement>('#tufte-block-menu button')?.focus());
+   requestAnimationFrame(()=>menuRef.current?.querySelector<HTMLButtonElement>('[role="menu"] button')?.focus());
   };
   root.addEventListener('keydown',onKeyboardMenu);
   root.addEventListener('contextmenu',onContext);
@@ -159,9 +160,9 @@ export function BlockContextMenu(){
  },[open,point]);
  useEffect(()=>{if(!available&&!open)setPoint(null);},[available]);
  if(!available&&!open)return null;
- return <div ref={menuRef} className={point&&open?'block-context-menu is-floating':'block-context-menu'} style={point&&open?{left:point.x,top:point.y}:undefined} onKeyDown={event=>{if(event.key==='Escape'){event.preventDefault();restoreTarget();}else if(open&&event.key==='Tab'){event.preventDefault();moveFocusPastMenu(event.shiftKey);}else if(open&&['ArrowDown','ArrowUp','Home','End'].includes(event.key)){const buttons=Array.from(menuRef.current?.querySelectorAll<HTMLButtonElement>('#tufte-block-menu button')??[]);const index=buttons.indexOf(document.activeElement as HTMLButtonElement);if(buttons.length){event.preventDefault();buttons[event.key==='Home'?0:event.key==='End'?buttons.length-1:(index+(event.key==='ArrowDown'?1:-1)+buttons.length)%buttons.length]?.focus();}}}}>
-  <button type="button" aria-haspopup="menu" aria-expanded={open} aria-controls="tufte-block-menu" onMouseDown={event=>event.preventDefault()} onClick={()=>{if(open){closeMenu();return;}let valid=false;editor.getEditorState().read(()=>{const selection=$getSelection();if($isRangeSelection(selection)&&selection.isCollapsed()&&canOpenBlockMenu(selection.anchor.getNode())){captureTarget(selection);valid=true;}});if(!valid)return;menuOpenRef.current=true;setPoint(null);setOpen(true);requestAnimationFrame(()=>menuRef.current?.querySelector<HTMLButtonElement>('#tufte-block-menu button')?.focus());}}>블록 유형: {blockType} ▾</button>
-  {open&&<div id="tufte-block-menu" role="menu" aria-label="블록 유형" aria-orientation="vertical">
+ return <div ref={menuRef} className={point&&open?'block-context-menu is-floating':'block-context-menu'} style={point&&open?{left:point.x,top:point.y}:undefined} onKeyDown={event=>{if(event.key==='Escape'){event.preventDefault();restoreTarget();}else if(open&&event.key==='Tab'){event.preventDefault();moveFocusPastMenu(event.shiftKey);}else if(open&&['ArrowDown','ArrowUp','Home','End'].includes(event.key)){const buttons=Array.from(menuRef.current?.querySelectorAll<HTMLButtonElement>('[role="menu"] button')??[]);const index=buttons.indexOf(document.activeElement as HTMLButtonElement);if(buttons.length){event.preventDefault();buttons[event.key==='Home'?0:event.key==='End'?buttons.length-1:(index+(event.key==='ArrowDown'?1:-1)+buttons.length)%buttons.length]?.focus();}}}}>
+  <button type="button" aria-haspopup="menu" aria-expanded={open} aria-controls={menuId} onMouseDown={event=>event.preventDefault()} onClick={()=>{if(open){closeMenu();return;}let valid=false;editor.getEditorState().read(()=>{const selection=$getSelection();if($isRangeSelection(selection)&&selection.isCollapsed()&&canOpenBlockMenu(selection.anchor.getNode())){captureTarget(selection);valid=true;}});if(!valid)return;menuOpenRef.current=true;setPoint(null);setOpen(true);requestAnimationFrame(()=>menuRef.current?.querySelector<HTMLButtonElement>('[role="menu"] button')?.focus());}}>블록 유형: {blockType} ▾</button>
+  {open&&<div id={menuId} role="menu" aria-label="블록 유형" aria-orientation="vertical">
    {([['paragraph','본문 문단'],['h2','제목 h2'],['h3','제목 h3']] as const).filter(([type])=>type==='paragraph'?capabilities.paragraph:capabilities.heading).map(([type,label])=><button type="button" key={type} role="menuitem" onMouseDown={event=>event.preventDefault()} onClick={()=>restoreTarget(()=>editor.dispatchCommand(SET_TUFTE_BLOCK_COMMAND,type))}>{label}</button>)}
    {capabilities.insert&&<>
     {([['bullet','글머리표 목록 삽입'],['number','번호 목록 삽입']] as const).map(([kind,label])=><button type="button" key={kind} role="menuitem" onMouseDown={event=>event.preventDefault()} onClick={()=>restoreTarget(()=>editor.dispatchCommand(INSERT_TUFTE_LIST_COMMAND,kind))}>{label}</button>)}
