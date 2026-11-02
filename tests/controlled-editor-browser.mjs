@@ -61,6 +61,12 @@ try{
  assert.equal(await firstSection.getByTestId('first-changes').innerText(),editsBefore,
   'Controlled prop echo must not trigger a second change notification');
 
+ // A rejected incoming value must keep the editor unchanged and report onError.
+ await page.getByRole('button',{name:'첫 번째 잘못된 문서 주입'}).click();
+ await page.waitForFunction(()=>document.querySelector('[data-testid="errors"]')?.textContent?.includes('Invalid editor value'));
+ assert.match(await first.innerText(),/고유 변경/);
+ assert.match(await second.innerText(),/두 번째 편집기/);
+
  // Incoming value replaces the canonical document, including undo baseline.
  await page.getByRole('button',{name:'첫 번째 문서 교체'}).click();
  await page.waitForFunction(()=>document.querySelector('[data-testid="first-editor"] .editor')?.textContent?.includes('외부에서 교체한 문서'));
@@ -101,7 +107,7 @@ try{
  await first.waitFor();
  assert.match(await first.innerText(),/외부에서 교체한 문서/);
  assert.match(await first.innerText(),/수정/);
- assert.equal(await page.getByTestId('errors').innerText(),'');
+ assert.match(await page.getByTestId('errors').innerText(),/Invalid editor value/);
  assert.deepEqual(runtimeErrors,[]);
  console.log('Controlled TufteEditor: two instances, single onChange, external replacement + undo boundary, readonly, remount PASS');
 }finally{
