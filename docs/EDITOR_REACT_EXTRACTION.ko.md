@@ -2,11 +2,11 @@
 
 작성: 2026-11-01. 기준 브랜치: `test/full-deferred-20261031`.
 
-## 현재 코드에서 확인한 사실
+## 이관 전 기준에서 확인한 사실 (2026-11-01)
 
 - `examples/editor/src/main.tsx`가 `LexicalComposer`, `RichTextPlugin`, `HistoryPlugin`, `TablePlugin`, 노드·명령 등록, 툴바, 선택 UI, 외부 자산 연결, 저장/복구 상태를 함께 소유한다.
 - `examples/editor/src/NoteImagePanel.tsx`와 `examples/editor/src/style.css`는 예제 경로에 있다.
-- `packages/editor-react`는 아직 없고, `packages/editor-ports`에는 호스트 중립 `AssetProvider` 계약이 있다.
+- *2026-11-01 초기 구조에서는* `packages/editor-react`가 없었다. 현재는 생성되었으며, `packages/editor-ports`의 호스트 중립 `AssetProvider` 계약을 유지한다.
 - `examples/editor/package.json`은 React 19.2.0, Lexical 0.52.0을 직접 의존한다. workspace는 `packages/*`, `examples/*`를 포함한다.
 
 ## 분리할 공개 계약
@@ -22,7 +22,7 @@ interface TufteEditorProps {
 }
 ```
 
-이는 **목표 API 초안**이며 현재 구현된 export가 아니다. `value`는 Lexical JSON을 포함하는 canonical 문서 envelope다. `onChange`는 편집 변경 알림이며 영속 저장 완료 알림이 아니다. 호스트가 문서 저장·revision 충돌·권한·업로드·인증을 책임진다.
+이 계약은 현재 `TufteEditor`의 공개 인터페이스로 구현되었다. (추가로 `ariaLabel`, `className`을 제공한다.) `value`는 Lexical JSON을 포함하는 canonical 문서 envelope다. `onChange`는 편집 변경 알림이며 영속 저장 완료 알림이 아니다. 호스트가 문서 저장·revision 충돌·권한·업로드·인증을 책임진다.
 
 ## 단계별 이관 순서
 
@@ -71,6 +71,30 @@ pnpm test:note-assets
 ```
 
 현재 실행 환경은 GitHub 저장소에 연결된 수정 API는 사용할 수 있지만, 로컬 환경에서 GitHub 주소를 DNS로 해석할 수 없어 코드를 체크아웃하고 의존성을 설치할 수 없다. 따라서 위 명령은 실행하지 않았다. 위 명령이 통과하기 전에는 R1–R5 완료 체크박스를 유지하지 않는다. 노트 이미지 편집은 호스트 자산 검색이 아닌 *선택한 노트 안의 이미지 속성 패널*이며, `AssetProvider` 전체를 이관했다는 뜻이 아니다.
+
+## 2026-11-03 — 제어형 `TufteEditor` 구현 (R5)
+
+`packages/editor-react/src/TufteEditor.tsx`를 추가하고 공개 export를 연결했다. `TufteEditorProps`는 `value/onChange/onError/readonly`에 더해 `className/ariaLabel`을 받으며, 호스트 중립 `assetAdapter/assetNamespace`는 React context로 제공한다.
+
+- **정본:** `TufteDocument.lexicalState`만 편집 상태의 정본이다. JSON 유효성을 검증한 뒤 기존 `loadDocumentIntoEditor`·`exportEditorToDocument` 경계를 이용한다. 렌더된 DOM이나 Markdown을 중간 저장소로 삼지 않는다.
+- **변경 알림:** selection-only 변경은 보고하지 않는다. 편집 결과를 검증한 후 분리된 문서 snapshot으로 `onChange`를 호출한다. 부모가 같은 값을 `value`로 반영할 때 재적용·중복 알림을 막는다. `onChange`는 DB 저장 성공 신호가 아니다.
+- **외부 교체:** 새로운 문서 본문은 엄격한 파서로 교체하며 기존 undo/redo를 초기화한다. 제목·자산 목록 같은 메타데이터만 바뀌었다면 본문과 history는 유지한다. 유효하지 않은 값은 적용하지 않고 `onError`로 보고한다.
+- **읽기 전용:** `editor.setEditable(false)`, `aria-readonly`, 문맥/선택 툴바 비표시를 연결했다.
+- **격리와 정리:** 각 인스턴스는 React `useId` 기반 Lexical namespace와 자체 update listener, 문맥 메뉴 상태를 가진다. listener는 컴포넌트 unmount에서 해제한다.
+- **자산:** `useTufteAssetContext()`로 설정을 읽을 수 있도록 했지만 **실제 DAM 검색·업로드·만료 URL 갱신을 이 컴포넌트에서 수행하지는 않는다.** 호스트 통합 단계는 미완료다.
+
+실제 두 인스턴스를 렌더링하는 별도 브라우저 예제를 `examples/editor/controlled.html`에 추가했다. 기존 `examples/editor/index.html`의 저장·발행 프로토타입은 그대로 둔다. 추가한 `tests/controlled-editor-browser.mjs`는 초기 무알림, 첫 인스턴스 편집, 부모 값 반영, 메타데이터만 변경 시 undo 유지, 외부 문서 교체 시 undo 초기화, 읽기 전용, 각각의 unmount/remount와 브라우저 오류를 검사한다.
+
+```bash
+pnpm install --frozen-lockfile
+pnpm build
+pnpm -r typecheck
+pnpm test:controlled-editor
+pnpm package:check
+# 대화형 확인: pnpm dev:editor 실행 후 /controlled.html 방문
+```
+
+**검증 제한:** 이 단계에서는 GitHub 코드와 정적 계약을 점검했으며, 실제 pnpm 빌드/Playwright는 실행하지 못했다. 따라서 R5·R7 완료 체크박스는 유지하지 않는다. 구현은 추가됐지만 성공 판정은 보류한다.
 
 ## 검증 상태
 
