@@ -47,6 +47,15 @@ try{
  assert.match(await first.innerText(),/고유 변경/);
  assert.doesNotMatch(await second.innerText(),/고유 변경/);
  assert.match(await secondSection.getByTestId('second-changes').innerText(),/0회/);
+ // A host metadata-only update must not reload Lexical content or clear undo.
+ await page.getByRole('button',{name:'첫 번째 제목 수정'}).click();
+ assert.match(await firstSection.getByTestId('first-title').innerText(),/갱신된 제목/);
+ assert.match(await first.innerText(),/고유 변경/);
+ await first.click();
+ await page.keyboard.press('Control+z');
+ await page.waitForFunction(()=>!document.querySelector('[data-testid="first-editor"] .editor')?.textContent?.includes('고유 변경'));
+ await page.keyboard.press('Control+Shift+z');
+ await page.waitForFunction(()=>document.querySelector('[data-testid="first-editor"] .editor')?.textContent?.includes('고유 변경'));
  const editsBefore=await firstSection.getByTestId('first-changes').innerText();
  await delay(100);
  assert.equal(await firstSection.getByTestId('first-changes').innerText(),editsBefore,
