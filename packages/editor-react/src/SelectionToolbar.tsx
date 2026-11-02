@@ -22,7 +22,7 @@ export function SelectionToolbar(){
  useEffect(()=>{
   const update=()=>{
    if(editor.isComposing()){setPosition(null);return;}
-   if(document.activeElement?.closest('.selection-toolbar'))return;
+   if(toolbarRef.current?.contains(document.activeElement))return;
    const root=editor.getRootElement();
    const selection=window.getSelection();
    if(!root||!selection||selection.isCollapsed||selection.rangeCount===0||!root.contains(selection.anchorNode)||!root.contains(selection.focusNode)){
