@@ -63,3 +63,13 @@
  .note-image-choice img,.note-image-preview img{background:#333;}
  .note-image-properties [role=alert]{color:#ffaaa0;}
 }
+
+/* Host asset picker shares the note image dialog layout without provider-specific styling. */
+.host-asset-dialog{max-width:680px;}
+.host-asset-fields{display:flex;flex-direction:column;gap:.8rem;padding:1rem 1.25rem;overflow-y:auto;min-height:0;}
+.host-asset-fields fieldset{border:1px solid #aaa;border-radius:5px;padding:.7rem;min-width:0;max-height:180px;overflow-y:auto;}
+.host-asset-fields legend{font-weight:600;}
+.host-asset-fields fieldset label{font-weight:400;display:flex;align-items:baseline;gap:.5rem;overflow-wrap:anywhere;}
+.host-asset-fields input[type=radio]{width:auto;flex:0 0 auto;}
+.host-asset-fields [role=alert]{color:#a32626;}
+@media(prefers-color-scheme:dark){.host-asset-fields [role=alert]{color:#ffaaa0;}}
