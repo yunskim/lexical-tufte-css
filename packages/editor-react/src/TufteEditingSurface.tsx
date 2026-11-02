@@ -19,7 +19,7 @@ export function TufteEditingSurface({
 }:TufteEditingSurfaceProps){
  return <>
   <RichTextPlugin
-   contentEditable={<ContentEditable className={className} aria-label={ariaLabel} aria-describedby={ariaDescribedBy}/>}
+   contentEditable={<ContentEditable className={className} aria-label={ariaLabel} aria-describedby={ariaDescribedBy} aria-readonly={readonly}/>}
    ErrorBoundary={LexicalErrorBoundary}
   />
   <HistoryPlugin/>
