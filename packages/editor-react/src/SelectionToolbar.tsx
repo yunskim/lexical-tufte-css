@@ -1,17 +1,8 @@
 import {useEffect,useRef,useState} from 'react';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$getSelection,$isRangeSelection,FORMAT_TEXT_COMMAND} from 'lexical';
-import {ToolbarIcon,type ToolbarIconName} from './toolbar.js';
-
-type InlineAction='bold'|'italic'|'underline'|'strikethrough'|'code'|'highlight';
-const INLINE_ACTIONS:ReadonlyArray<{id:InlineAction;label:string;icon:ToolbarIconName}>=[
- {id:'bold',label:'굵게',icon:'bold'},
- {id:'italic',label:'기울임',icon:'italic'},
- {id:'underline',label:'밑줄',icon:'underline'},
- {id:'strikethrough',label:'취소선',icon:'strike'},
- {id:'code',label:'코드',icon:'code'},
- {id:'highlight',label:'마크',icon:'highlight'}
-];
+import {ToolbarIcon} from './toolbar.js';
+import {INLINE_ACTIONS,EDITOR_SHORTCUTS} from './inlineActions.js';
 
 export function SelectionToolbar(){
  const [editor]=useLexicalComposerContext();
@@ -59,7 +50,7 @@ export function SelectionToolbar(){
  },[editor]);
  if(!position)return null;
  return <div ref={toolbarRef} className="selection-toolbar" role="toolbar" aria-label="선택 영역 서식" style={{top:position.top,left:position.left}} onMouseDown={e=>e.preventDefault()} onKeyDown={e=>{if(e.key==='Escape'){e.preventDefault();dismissed.current=true;setPosition(null);editor.focus();}}}>
-  {INLINE_ACTIONS.map(action=><button key={action.id} type="button" aria-label={action.label} title={action.id==='bold'?'굵게 (Ctrl/Cmd+B)':action.id==='italic'?'기울임 (Ctrl/Cmd+I)':action.label} onMouseDown={e=>e.preventDefault()} onClick={()=>editor.dispatchCommand(FORMAT_TEXT_COMMAND,action.id)}><ToolbarIcon name={action.icon}/></button>)}
+  {INLINE_ACTIONS.map(action=><button key={action.id} type="button" aria-label={action.label} title={EDITOR_SHORTCUTS[action.label]?`${action.label} (${EDITOR_SHORTCUTS[action.label]})`:action.label} onMouseDown={e=>e.preventDefault()} onClick={()=>editor.dispatchCommand(FORMAT_TEXT_COMMAND,action.id)}><ToolbarIcon name={action.icon}/></button>)}
  </div>;
 }
 
