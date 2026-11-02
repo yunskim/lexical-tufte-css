@@ -16,3 +16,6 @@ export {TufteEditingSurface,type TufteEditingSurfaceProps} from './TufteEditingS
 export {TufteEditor,useTufteAssetContext,type TufteEditorProps,type TufteAssetContextValue} from './TufteEditor.js';
 
 export {HostAssetPicker,type HostAssetPickerProps} from './HostAssetPicker.js';
+
+export {HostAssetRefresh,type HostAssetRefreshProps} from './HostAssetRefresh.js';
+export {isUsableResolvedImage,nextImageRefreshAt,imageRefreshRetryDelay} from './hostAssetPolicy.js';
