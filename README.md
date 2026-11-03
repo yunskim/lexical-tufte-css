@@ -53,7 +53,7 @@ pnpm test:browser
 - `/controlled.html` — `TufteEditor`의 두 인스턴스, 외부 문서 교체, readonly, 마운트/언마운트
 - `/host-assets.html` — 서로 다른 namespace를 가진 두 편집기의 **호스트 이미지 선택기**. 실제 DAM이 아닌 예제 `AssetProvider`를 사용합니다.
 
-신규 호스트 자산 선택기 회귀 코드는 `pnpm test:host-assets-controlled`로, **서명 URL 만료·재시도·해제·두 편집기 격리** 검증은 `pnpm test:host-refresh`로 실행하도록 추가했습니다. 이미지 URL 자동 갱신 컨트롤러는 호스트의 `AssetProvider.resolve()`를 사용하며 별도의 서버 구현이 없습니다. **11월 3일 전수 검증 보고서는 선택기·URL 갱신 코드 이전 커밋 `e39b8a1`의 결과**로, 새 기능의 빌드·브라우저 통과 여부는 별도 확인이 필요합니다. 새 기능의 범위와 미완료 게이트는 [React 편집기 추출 현황](docs/EDITOR_REACT_EXTRACTION.ko.md)에 기록했습니다.
+신규 호스트 자산 선택기 회귀 코드는 `pnpm test:host-assets-controlled`로, **서명 URL 만료·재시도·해제·두 편집기 격리** 검증은 `pnpm test:host-refresh`로 실행하도록 추가했습니다. 이미지 URL 자동 갱신 컨트롤러는 호스트의 `AssetProvider.resolve()`를 사용하며 별도의 서버 구현이 없습니다. **11월 3일 호스트 자산 검증 보고서에서는 선택기와 URL 자동 갱신까지 포함하여 브라우저 42/42개를 통과했습니다.** 첫 실행 실패 2개는 예제·테스트 fixture 수정 후 재검증했고, 제품 구현과 기존 테스트 기대값은 변경하지 않았습니다. 새 기능의 범위와 미완료 게이트는 [React 편집기 추출 현황](docs/EDITOR_REACT_EXTRACTION.ko.md)에 기록했습니다.
 
 ## 오류와 개선 기록
 
@@ -73,14 +73,15 @@ pnpm test:browser
 
 ## 최신 통합 실행 검증
 
-**2026-11-03 검증 보고서**: [누적 자동 테스트 실행](docs/VERIFICATION_DEFERRED_2026-11-03.ko.md) · [검증 로그·해시](docs/verification/deferred-20261103.json)
+**2026-11-03 호스트 자산 포함 누적 검증**: [검증 보고서](docs/VERIFICATION_HOST_ASSETS_2026-11-03.ko.md) · [파일별 실행·소스 해시·최초 실패 및 수정 증거](docs/verification/host-assets-deferred-20261103.json)
 
-- frozen 설치·정적 검사·빌드·타입 검사 통과. 단위 테스트 **629개**, 브라우저 테스트 파일 **40개**, Python 테스트 **16개** 통과.
-- 배포용 tarball **6개** 검사 통과(`editor-react` 포함), TS→Python HTTP→SQLite 왕복·발행 revision 모델 12그룹 통과.
-- 새 `TufteEditor`의 제어형 `value/onChange/onError/readonly`, 두 인스턴스 독립성, 외부 교체·Undo 정책, unmount/remount 브라우저 검증 통과.
-- 공식 Tufte CSS 예제 9개 섹션·60개 블록·7개 노트의 DOM·편집·저장/재열기·발행 대조 통과. 375/759/760/761/1024/1440px 시각 비교에서 검증된 iframe 마스크 밖 차이 0.
-- **CI는 실행하지 않았습니다.** 실제 DAM 연동, OS별 실제 IME, 스크린리더, 물리 터치, Firefox/WebKit, 성능·리스너 누수 계측은 여전히 미검증입니다.
+- frozen 설치·audit/lint/inventory/font·전체 빌드·타입 검사 **통과**. 단위 테스트 **629개**, 브라우저 테스트 파일 **42/42개**, Python 테스트 **16개** 통과.
+- 배포용 tarball **6개**의 JS·타입·CSS·왕복·SQL/라이선스 검사, TS→Python HTTP→SQLite, 발행 revision 제안 모델 **12그룹** 통과.
+- `TufteEditor`의 controlled API, 두 인스턴스 격리, 호스트 자산 검색·revision·노트 이미지 삽입, URL 만료 60초 전 갱신·재시도·수동 복구·취소 후 늦은 응답 차단을 Chromium에서 검증.
+- 공식 Tufte CSS 예제 9개 섹션·60개 블록·7개 노트의 DOM·편집·저장/재열기·발행 대조 통과. 375/759/760/761/1024/1440px 픽셀 비교에서 검증된 iframe 마스크 밖 차이 0.
+- 첫 실행에서 신규 테스트 두 개가 실패해 **예제 타입 선언 및 브라우저 fixture 세 부분**을 수정한 후 재실행했다. 제품 선택기·자동 갱신 구현과 기존 수락 조건은 완화하지 않았다.
+- **CI는 요청에 따라 실행하지 않았습니다.** 실제 DAM·업로드·인증/권한·운영 네트워크, OS별 실제 IME, 스크린리더, 물리 터치, Firefox/WebKit, 장시간 성능·리스너 누수와 다중 탭은 미검증입니다.
 
-**제어형 편집기 예제:** `pnpm dev:editor` 실행 후 Vite 주소의 `/controlled.html`에서 두 편집기를 함께 확인할 수 있습니다. 상세 API·잔여 게이트는 [React 편집기 추출 현황](docs/EDITOR_REACT_EXTRACTION.ko.md)을 참고하세요.
+**검증 기준:** 보고서는 `558bdcd`와 명시된 fixture 패치 3개를 적용한 소스를 대상으로 합니다. 이는 현재 브랜치에서 확인한 해당 3개 파일과 일치합니다. 이 이후의 코드 변경은 별도 검증해야 합니다. 전체 P3.1.e/R4–R7이나 제품 1.0 완료를 의미하지 않습니다.
 
-이 수치는 보고서의 **기준 커밋 `e39b8a1`**에 대한 결과입니다. 이후 코드 변경에 자동 적용되지 않습니다. 과거 실행 기록은 [진행 기록](docs/PROGRESS.md)과 `docs/VERIFICATION_*.ko.md`에서 확인할 수 있습니다.
+이전 [2026-11-03 controlled editor 전수 검증](docs/VERIFICATION_DEFERRED_2026-11-03.ko.md)과 그 이전 내역은 [진행 기록](docs/PROGRESS.md)에서 확인할 수 있습니다.
