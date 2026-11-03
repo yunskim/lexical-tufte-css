@@ -813,3 +813,10 @@ E141: 취소/성공 close로 generation을 무효화하면 loading 해제 책임
 E142: manual supersession을 지원하면 실제 UI 버튼도 pending 중 사용할 수 있어야 한다. stable accessible name과 aria-busy로 상태를 분리한다. 자동 갱신 coalescing·수동 새 generation·stale 응답 차단을 실제 버튼으로 검사한다.
 E143: 저장 확인창을 명시 승인하고 checkpoint의 실제 새 값을 검사한다. 교체 대상은 이전과 다른 revision을 선택하며 다른 이미지 JSON/host identity를 그대로 비교한다. 단순 some(revision) 존재 검사나 과거 저장본으로 보존을 주장하지 않는다.
 E144: 클릭 이미지가 실제 Lexical NodeSelection인지 연결하고 native Backspace 후 저장 JSON에서 삭제를 확인한다. 늦은 응답은 삭제된 key/바뀐 locator에 적용하지 않으며 fixture의 나머지 요청은 완료시켜 최종 상태를 검사한다. 기존 M004/M113/M123/M124/M127/M128의 환경·고정 시계·이력/독립 DOM·저장 계약을 시작/종료에 재점검한다.
+
+## M130 — 공통 편집기 예제의 타입·실제 선택·가상 시계 게이트
+
+- E145: 새 브라우저 fixture의 전역 harness는 Window 인터페이스 확장으로 선언한다. 정적 대조만으로 TypeScript 통과를 주장하지 않고 frozen install→전체 build/typecheck 결과를 먼저 회수한다.
+- E146/M127: 노트 삽입 테스트는 padding/컨테이너 좌표를 selection 근거로 사용하지 않는다. 실제 편집 TextNode를 클릭한 뒤 DOM selection의 note ID를 단언하고 최종 canonical JSON과 다른 인스턴스 보존을 확인한다.
+- E147/M128: pause한 가상 시계에서 즉시 예약된 callback은 `runFor(0)`으로 실행한다. 초기 callback과 다음 만료 경계를 구분하며, 임의의 1ms를 더해 경계 기준을 이동하지 않는다. 최초 연결뿐 아니라 remount도 같은 규칙을 적용한다.
+- 이번 실행 시작/종료에 E139–E144/M127–M129의 빌드 선행·공식 browser smoke·동일 Python·Undo/저장/독립 DOM·늦은 응답 차단을 점검했다. 다음 공통 편집기 이관에서도 같은 게이트를 적용한다.

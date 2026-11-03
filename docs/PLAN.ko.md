@@ -4,6 +4,10 @@
 상태: P0·P1·P2.1 완료. Chromium 자동 회귀와 조합 이벤트 검증 범위이며, OS별 실제 IME 및 제품 전체 검증은 후속 단계.
 저장소: https://github.com/yunskim/lexical-tufte-css (public, GPL-3.0; 사용자가 생성한 설정 유지).
 
+## 2026-11-03 공통 호스트 자산 누적 검증 결과
+
+아래 같은 날짜의 실행 대기 절은 당시 이력이다. 최신 `558bdcd` + 예제 선언/fixture 수정 소스로 frozen/build/typecheck·unit629·package6·순수 갱신 정책·browser42/42·Python16/실제HTTP·revision모델12그룹을 통과했다. 첫40/42 실패와 수정/재실행은 [최신 보고서](VERIFICATION_HOST_ASSETS_2026-11-03.ko.md)에 기록한다. 공식6폭 pixel 마스크 밖 차이0. 공통 선택기·갱신의 자동화 범위는 검증됐지만 실제 DAM/권한·업로드·장시간 수명·수동 접근성/타 브라우저 수락 및 R4–R7/P3.1.e 전체는 완료 처리하지 않는다. CI 미실행.
+
 ## 구현 우선순위 보완 (2026-10-18)
 
 고정된 공식 Tufte CSS 예제 페이지의 **의미 있는 모든 노드와 조합을 거의 동일한 DOM/CSS 결과로 재현**하는 것이 우선 목표다. CSS selector 전수 조사만으로 DOM 구조의 완전성을 주장하지 않는다. 별도 예제 DOM 대응표로 실제 구조와 조합을 추적한다. Lexical JSON을 유일한 본문 정본으로 유지하며 Lexical 편집 DOM이나 exportDOM을 발행 정본으로 사용하지 않는다. Tufte HTML의 태그 하나마다 Lexical 노드 하나를 강제하지 않고, note의 label/input/span처럼 하나의 논리 노드가 여러 출력 요소에 대응할 수 있다.

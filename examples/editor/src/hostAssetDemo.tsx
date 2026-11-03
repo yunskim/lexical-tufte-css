@@ -16,7 +16,10 @@ const harness={
  calls:{search:[] as Array<{namespace:string;text:string}>,revisions:[] as string[],resolve:[] as Array<{namespace:string;locator:AssetLocator}>},
  deferred:[] as Deferred[]
 };
-(window as Window&{__hostAssetHarness:typeof harness}).__hostAssetHarness=harness;
+declare global {
+ interface Window {__hostAssetHarness:typeof harness}
+}
+window.__hostAssetHarness=harness;
 
 function provider(namespace:string):AssetProvider{
  return {

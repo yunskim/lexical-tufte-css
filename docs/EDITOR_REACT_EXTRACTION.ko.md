@@ -148,3 +148,7 @@ pnpm test:browser
 ## 검증 상태
 
 이 문서는 코드 이관 상태와 실행 범위를 함께 추적한다. 2026-11-03 frozen/build/typecheck·unit629·package6·browser40개를 실제 실행해 통과했다. 최신 근거는 [2026-11-03 보고서](VERIFICATION_DEFERRED_2026-11-03.ko.md)를 따른다. 이전 절의 미실행 문구는 당시 이력이며, controlled API의 관찰된 동작 검증과 전체 자산/운영·수동 접근성 수락을 구분한다. R4–R7/P3.1.e 전체 게이트는 유지한다.
+
+## 2026-11-03 공통 자산 선택기·갱신 실제 검증 완료 범위
+
+`558bdcd` 이후 예제 Window 선언과 신규 브라우저 fixture를 수정하고 build/typecheck·unit629·package6·정책검사·browser42/42·Python16/HTTP를 실행해 통과했다. 최초 신규 2개 실패와 최종 재실행을 구분한 [최신 보고서](VERIFICATION_HOST_ASSETS_2026-11-03.ko.md)를 따른다. 위 절의 실행 대기/40개 통과는 당시 이력이다. 실제 자산 선택·revision/삽입·URL 회전·만료 경계·재시도·늦은 응답 차단의 관찰된 범위는 확인됐으며, 실제 DAM/업로드/권한·장시간 수명/접근성 수락과 R4–R7/P3.1.e 전체 게이트는 계속 남는다.

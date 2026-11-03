@@ -1,3 +1,9 @@
+## 2026-11-03 공통 호스트 자산 선택·자동 URL 갱신 누적 검증
+
+- `558bdcd`에 예제 Window 타입 선언과 신규 브라우저 fixture 2개를 수정해 frozen/static/build/typecheck·unit629·package6·갱신정책·Python16/실제HTTP·revision모델12그룹 통과. browser 첫40/42 → 최종42/42, 공식6폭 pixel 마스크 밖 차이0.
+- E145–E147/M130: 예제 타입 TS2352, 노트 좌표 클릭의 실제 selection 오류, 정지한 가상 시계의 즉시 callback 대기를 수정했다. 제품 갱신/선택기 구현과 실패 차단·JSON·Undo·시간 경계 단언은 유지했다.
+- [최신 보고서](VERIFICATION_HOST_ASSETS_2026-11-03.ko.md), [실패/최종 결과·소스/로그 증거](verification/host-assets-deferred-20261103.json). 실제 DAM/수동 접근성/다른 브라우저·장시간 수명 수락과 R4–R7/P3.1.e 전체 게이트는 유지한다. CI 미실행.
+
 ## 2026-11-03 밀린 테스트 전수 실행 — controlled editor 포함
 
 - e39b8a1 기준, 제품/테스트 수정 없이 frozen/static/build/typecheck·unit629·package6·Python16/HTTP·revision모델12그룹 통과. browser40/40통과, 공식6폭 pixel mask 밖 차이0.

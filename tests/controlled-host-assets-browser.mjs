@@ -119,7 +119,9 @@ try{
  // A new image is inserted into the captured note instead of the dialog focus.
  const note=first.locator('[data-note-id="alpha-server-note"]');
  await note.waitFor();
- await note.click({position:{x:6,y:6}});
+ await note.locator('[data-lexical-text="true"]').first().click();
+ assert.equal(await page.evaluate(()=>window.getSelection()?.anchorNode?.parentElement?.closest('[data-note-id]')?.getAttribute('data-note-id')),
+  'alpha-server-note','Insertion must start with a real caret inside the intended note');
  await pickFirst.click();await dialog.waitFor();
  await dialog.getByRole('radio',{name:'현재 노트에 새 이미지 삽입'}).check();
  await dialog.getByRole('radio',{name:/Photo image/}).check();

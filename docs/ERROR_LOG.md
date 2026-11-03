@@ -1017,3 +1017,15 @@ E140 후속 회귀: 관리 문서 JSON textarea 추가 뒤 기존 이미지 choo
 revision 검증 이후 Backspace의 DOM 이미지 감소 대기에서30초 timeout했다. 노트 inline image의 createDOM은 비편집 img이며 기존 editor에 이미지 클릭→NodeSelection 연결이 없었다. 노트 내부 InlineImageNode 클릭에만 NodeSelection을 설정하고 editor focus를 복귀시켜 기본 RichText Backspace가 실제 노드를 삭제하도록 연결했다. 데이터 삭제를 DOM 조작으로 흉내내지 않았으며 저장한 canonical JSON에서도 이미지 개수가 감소하는지 검사한다.
 
 삭제 중 resolve fixture는 첫 응답을 반환한 뒤 mode를 normal로 바꿔 나머지 유효 이미지 요청도 끝나게 했다. 모든 후속 요청을 deferred로 방치해 완료 상태를 기다리는 fixture 교착을 막는다. stale URL이 삭제 이미지를 되살리지 않는 기존 검사와 페이지 오류 검사는 유지했다. M129.
+
+## E145 — 공통 호스트 자산 예제의 Window 타입 단언으로 빌드 실패
+
+2026-11-03 `558bdcd` 누적 실행의 첫 `pnpm check`에서 `hostAssetDemo.tsx`가 TS2352로 중단됐다. 필수 `__hostAssetHarness` 속성이 없는 Window를 교차 타입으로 직접 단언한 것이 원인이다. `declare global`로 예제 전용 Window 속성을 선언하고 정상 대입하도록 수정했다. 수정 후 전체 build/typecheck·unit629·package6 및 순수 갱신 정책 검사가 통과했다. 런타임 동작 변경 없음. M130.
+
+## E146 — 노트 컨테이너 좌표 클릭이 본문 caret을 선택한 fixture 오류
+
+새 `controlled-host-assets-browser.mjs`의 노트 삽입 검사가 radio 대기에서 실패했다. 독립 브라우저 확인에서 노트 컨테이너 (6,6) 클릭 후 DOM selection은 노트 밖 본문이었다. 실제 노트 TextNode를 클릭하고 selection의 가장 가까운 note ID를 단언하도록 변경했다. 새 이미지의 canonical JSON·host locator 및 다른 편집기 불변성 검사는 유지했고 집중 재실행을 통과했다. M127/M130.
+
+## E147 — 정지한 가상 시계에서 즉시 예약된 갱신 callback 대기
+
+새 `controlled-host-refresh-browser.mjs`가 최초 연결 후 status 대기에서 실패했다. 시계를 pause한 상태라 `setTimeout(0)` 갱신이 아직 실행되지 않았다. 1ms를 진행한 중간 시도는 다음 만료 경계 검사의 기준까지 1ms 이동해 경계 단언에 실패했다. 최초 연결과 remount 뒤 `page.clock.runFor(0)`으로 현재 시각의 예약 callback만 실행해 해결했다. 59,999ms/60,000ms 경계, 실제 URL/locator·onChange, 실패 재시도, 수동 복구, 외부 교체와 unmount의 stale 응답 차단 단언을 유지해 최종 통과했다. 시간 제한을 늘려 우회하지 않았다. M128/M130.

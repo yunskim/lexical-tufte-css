@@ -61,6 +61,7 @@ try{
  await picker.getByRole('button',{name:'외부 이미지 연결'}).click();
  await picker.waitFor({state:'hidden'});
  await page.waitForFunction(()=>document.querySelector('[data-testid="host-first-json"]')?.textContent?.includes('"hostAsset"'));
+ await page.clock.runFor(0);
  await message.getByText(/갱신: 1\/1개/).waitFor();
  const initialChangeCount=await first.getByTestId('host-first-changes').innerText();
  assert.match(initialChangeCount,/1회/,'Initial host connection emits exactly one change, not another for an unchanged URL');
@@ -159,6 +160,7 @@ try{
  assert.deepEqual(await read(),beforeUnmount,'Unmounted refresh must not mutate its parent value');
  await page.getByRole('button',{name:'Alpha 마운트 전환'}).click();
  await alpha.waitFor();
+ await page.clock.runFor(0);
  await message.getByText(/갱신: 1\/1개/).waitFor();
  assert.notEqual(findHost(await read())[0].src,'/obsolete.svg');
  assert.equal(await betaCount(),0);
