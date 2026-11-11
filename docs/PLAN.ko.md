@@ -4,6 +4,17 @@
 상태: P0·P1·P2.1 완료. Chromium 자동 회귀와 조합 이벤트 검증 범위이며, OS별 실제 IME 및 제품 전체 검증은 후속 단계.
 저장소: https://github.com/yunskim/lexical-tufte-css (public, GPL-3.0; 사용자가 생성한 설정 유지).
 
+## 2026-11-11 P3.1.e 재사용 편집기 노트 명령 이관 (실행 검증 대기)
+
+`examples/editor` 전용으로 남아 있던 노트 키보드·클립보드·IME 명령 등록을 `@lexical-tufte/editor-react`의 `TufteNoteInteractionPlugin`으로 이동했다. `TufteEditingSurface`는 이를 인스턴스별로 설치하고 `readonly`에서 해제한다. 기존 예제와 제어형 `TufteEditor`에서 `onNotice`로 호스트 소유 UI 메시지를 처리할 수 있다. 공통 `ToolbarButton`도 도입하여 원래 버튼의 aria-label·title·선택 보존 이벤트를 재사용한다.
+
+- 코드: `packages/editor-react/src/TufteNoteInteractionPlugin.tsx`, `ToolbarButton.tsx`, `TufteEditingSurface.tsx`, `TufteEditor.tsx`, `examples/editor/src/main.tsx`
+- 회귀: `tests/reusable-note-interactions-browser.mjs` (두 제어형 편집기의 노트 진입·복귀/상태 알림 격리·readonly 후 명령 재등록). `pnpm test:note-interactions` 및 전체 browser에 연결; 패키지 JS/TS 소비 검증 확장.
+- 추출한 노트 command effect는 이전 예제의 내용을 변경하지 않은 상태로 이동. GitHub **정적 대조 19/19 통과**. **현재 변경의 빌드·타입·브라우저 실실행은 미확인.**
+- 다음 수락: frozen 설치 → `pnpm check` → `pnpm package:check` → `pnpm test:note-interactions` → 기존 `pnpm test:browser`, 실패 원인·수정·재실행을 기록. CI는 기존 지시에 따라 실행하지 않음.
+
+이전 호스트 자산 검증 [42/42 보고서](VERIFICATION_HOST_ASSETS_2026-11-03.ko.md)는 그때의 소스에 대한 증거로 유지하며 이번 코드까지 통과했다고 해석하지 않는다. P3.1.e 및 R2–R7 완료 판정은 남겨둔다.
+
 ## 2026-11-03 공통 호스트 자산 누적 검증 결과
 
 아래 같은 날짜의 실행 대기 절은 당시 이력이다. 최신 `558bdcd` + 예제 선언/fixture 수정 소스로 frozen/build/typecheck·unit629·package6·순수 갱신 정책·browser42/42·Python16/실제HTTP·revision모델12그룹을 통과했다. 첫40/42 실패와 수정/재실행은 [최신 보고서](VERIFICATION_HOST_ASSETS_2026-11-03.ko.md)에 기록한다. 공식6폭 pixel 마스크 밖 차이0. 공통 선택기·갱신의 자동화 범위는 검증됐지만 실제 DAM/권한·업로드·장시간 수명·수동 접근성/타 브라우저 수락 및 R4–R7/P3.1.e 전체는 완료 처리하지 않는다. CI 미실행.
