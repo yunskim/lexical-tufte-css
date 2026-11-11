@@ -87,7 +87,7 @@ import {canonicalBlockType,
   $insertNotePhrasing
 } from '@lexical-tufte/lexical';
 import {NODE_SCHEMA} from '@lexical-tufte/document';
-import {ToolbarButton as IconButton, TufteComposer, TufteEditingSurface, NoteImagePanel, INLINE_ACTIONS, type NoteImageChoice, type ImagePresentation} from '@lexical-tufte/editor-react';
+import {ToolbarButton as IconButton, TufteComposer, TufteEditingSurface, NoteImagePanel, INLINE_ACTIONS, ENTER_TUFTE_NOTE_COMMAND, LEAVE_TUFTE_NOTE_COMMAND, type NoteImageChoice, type ImagePresentation} from '@lexical-tufte/editor-react';
 import './style.css';
 import '@lexical-tufte/editor-react/styles.css';
 
@@ -799,8 +799,8 @@ function EditorUI(){
       <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(UNWRAP_TUFTE_SPAN_COMMAND,undefined)}>인라인 속성 해제</button>
       <IconButton name="sidenote" label="노트 삽입" onMouseDown={preserve} onClick={()=>insertNote()}/>
       <IconButton name="marginnote" label="여백 주석 삽입" onMouseDown={preserve} onClick={()=>insertNote('marginnote')}/>
-      <button onMouseDown={preserve} onClick={()=>editor.update(()=>{if(!enterNote())setStatus('뒤에 있는 노트를 찾지 못했습니다.');})}>다음 노트로</button>
-      <button onMouseDown={preserve} onClick={()=>editor.update(leaveNote)}>본문으로</button>
+      <button onMouseDown={preserve} onClick={()=>{if(!editor.dispatchCommand(ENTER_TUFTE_NOTE_COMMAND,undefined))setStatus('뒤에 있는 노트를 찾지 못했습니다.');}}>다음 노트로</button>
+      <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(LEAVE_TUFTE_NOTE_COMMAND,undefined)}>본문으로</button>
       {INLINE_ACTIONS.map(action=><IconButton key={action.id} name={action.icon} label={action.label} onMouseDown={preserve} onClick={()=>editor.update(()=>{editor.dispatchCommand(FORMAT_TEXT_COMMAND,action.id);},{tag:HISTORY_PUSH_TAG})}/>)}
       <button onMouseDown={preserve} onClick={()=>insertPayload('link')}>노트 링크 삽입</button>
       <button onMouseDown={preserve} onClick={()=>insertPayload('image')}>노트 이미지 삽입</button>
