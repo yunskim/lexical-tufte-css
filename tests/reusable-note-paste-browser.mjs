@@ -5,8 +5,8 @@ import {chromium} from 'playwright';
 
 /**
  * Regression for the reusable note plugin's PASTE_COMMAND path.
- * Synthetic ClipboardEvent exercises the Chromium/Lexical event handler;
- * this does not claim to simulate an operating system's actual clipboard/IME.
+ * Uses Chromium clipboard permissions and Ctrl+V. Real OS clipboard/IME
+ * acceptance is a separate gate.
  */
 const origin=process.env.EDITOR_URL??'http://127.0.0.1:5198/';
 const url=new URL('controlled.html',origin).href;
@@ -69,21 +69,13 @@ try{
  assert.equal(countTypes(originalNote,'tufte-inline-image'),1);
  assert.equal(countTypes(originalNote,'linebreak'),0);
 
- // Give Lexical a real range selection inside the note, then dispatch the
- // browser clipboard event with only text/plain (no HTML or Lexical payload).
+ // Give Lexical a real range selection, then paste through Chromium's
+ // clipboard integration (as in the existing note-editing-browser suite).
+ await page.context().grantPermissions(['clipboard-read','clipboard-write']);
+ await page.evaluate(()=>navigator.clipboard.writeText('첫째줄\r\n둘째줄'));
  await firstNote.locator('[data-lexical-text="true"]').first().click();
  await page.keyboard.press('End');
- const prevented=await page.evaluate(()=>{
-  const root=document.querySelector('[data-testid="first-editor"] [contenteditable="true"]');
-  if(!root)throw new Error('First editor root is missing');
-  const clipboardData=new DataTransfer();
-  clipboardData.setData('text/plain','첫째줄\r\n둘째줄');
-  const event=new ClipboardEvent('paste',{bubbles:true,cancelable:true,clipboardData});
-  root.dispatchEvent(event);
-  return event.defaultPrevented;
- });
- assert.equal(prevented,true,'The note plain-text paste handler must claim the clipboard event');
-
+ await page.keyboard.press('Control+v');
  await page.waitForFunction(()=>{
   const text=document.querySelector('[data-testid="first-document-json"]')?.textContent??'';
   return text.includes('첫째줄')&&text.includes('둘째줄');
@@ -104,18 +96,10 @@ try{
 
  // A separate paste into the other editor may reuse the same command
  // registration, but it must have its own selection and canonical state.
+ await page.evaluate(()=>navigator.clipboard.writeText('독립-첫줄\n독립-둘째줄'));
  await secondNote.locator('[data-lexical-text="true"]').first().click();
  await page.keyboard.press('End');
- const preventedSecond=await page.evaluate(()=>{
-  const root=document.querySelector('[data-testid="second-editor"] [contenteditable="true"]');
-  if(!root)throw new Error('Second editor root is missing');
-  const clipboardData=new DataTransfer();
-  clipboardData.setData('text/plain','독립-첫줄\n독립-둘째줄');
-  const event=new ClipboardEvent('paste',{bubbles:true,cancelable:true,clipboardData});
-  root.dispatchEvent(event);
-  return event.defaultPrevented;
- });
- assert.equal(preventedSecond,true);
+ await page.keyboard.press('Control+v');
  await page.waitForFunction(()=>{
   const text=document.querySelector('[data-testid="second-document-json"]')?.textContent??'';
   return text.includes('독립-첫줄')&&text.includes('독립-둘째줄');
