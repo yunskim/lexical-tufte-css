@@ -18,6 +18,12 @@ try {
  await editor.waitFor();
  const inNote=()=>page.evaluate(()=>Boolean(window.getSelection()?.anchorNode?.parentElement?.closest('[data-note-id]')));
  await editor.click();await page.keyboard.press('Control+Home');
+ // Shared command API must preserve both prototype toolbar buttons.
+ await page.getByRole('button',{name:'다음 노트로',exact:true}).click();
+ assert.equal(await inNote(),true,'Next-note toolbar uses the shared command');
+ await page.getByRole('button',{name:'본문으로',exact:true}).click();
+ assert.equal(await inNote(),false,'Return-to-body toolbar uses the shared command');
+ await page.keyboard.press('Control+Home');
  await page.keyboard.press('Alt+ArrowDown');
  assert.equal(await inNote(),true,'Alt+Down enters next note');
  await page.keyboard.insertText('검증 ');
