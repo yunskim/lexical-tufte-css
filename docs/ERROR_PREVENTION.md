@@ -1,5 +1,13 @@
 # 재발 방지 대책 및 정기 점검
 
+## M131 — 추출 컴포넌트의 호출자 전수 조사·공유 명령 경계 (E148, 실행 미검증, 2026-11-11)
+
+- 함수나 effect를 공유 패키지로 옮길 때에는 이관한 블록의 본문뿐 아니라 **원본 파일 전체의 외부 호출 지점**과 명령 등록/해제·UI 버튼·테스트 fixture를 검색한다. 정의가 사라진 함수 이름이 예제에 남아 있으면 정적 동일성을 통과로 보지 않는다.
+- Lexical에서 키보드 및 버튼이 같은 동작을 수행해야 하면 공유 `createCommand`/ `registerCommand` 경계로 합치고, 두 경로를 브라우저에서 별도 수락한다. 원본 예제 안에 작동이 동일한 래퍼 함수를 복제해 임시로 통과시키지 않는다.
+- `pnpm check` → `pnpm package:check` → `pnpm test:note-interactions` → `pnpm test:browser` 순서로 실제 실행하며, 실패 시 기록·수정·재실행을 구분한다. GitHub 코드 비교 및 정적 텍스트 검사는 TypeScript 컴파일과 실제 브라우저 동작을 대신하지 않는다.
+- 다음 노트/본문 버튼과 Alt+ArrowDown/Escape, 제어형 두 편집기의 콜백/readonly를 함께 검증한다. 실제 실행 증거를 남기기 전에는 E148을 완료/종료로 바꾸지 않는다.
+
+
 ## M123 — 인라인 구조 삭제의 실제 History 경계
 
 - E133: HISTORY_PUSH_TAG만으로 한 Undo가 보장된다고 가정하지 않는다. Lexical History의 single unchanged text heuristic과 실제 UI selection/reconciliation에서 구조 삭제가 merge되는지 확인한다.
