@@ -32,8 +32,12 @@ function ControlledExample(){
  const [secondChanges,setSecondChanges]=useState(0);
  const [firstNotice,setFirstNotice]=useState('');
  const [secondNotice,setSecondNotice]=useState('');
+ const [firstNoticeCount,setFirstNoticeCount]=useState(0);
+ const [secondNoticeCount,setSecondNoticeCount]=useState(0);
  const [errors,setErrors]=useState<string[]>([]);
  const report=(error:Error)=>setErrors(previous=>[...previous,error.message]);
+ const reportFirstNotice=(message:string)=>{setFirstNotice(message);setFirstNoticeCount(n=>n+1);};
+ const reportSecondNotice=(message:string)=>{setSecondNotice(message);setSecondNoticeCount(n=>n+1);};
  return <main>
   <h1>재사용 TufteEditor — 두 인스턴스 검증</h1>
   <div className="actions">
@@ -48,16 +52,18 @@ function ControlledExample(){
    <h2>첫 번째</h2>
    <p data-testid="first-changes">변경 알림 {firstChanges}회</p>
    <p data-testid="first-notice" role="status">{firstNotice}</p>
+   <p data-testid="first-notice-count">노트 명령 알림 {firstNoticeCount}회</p>
    <p data-testid="first-title">문서 제목: {first.title}</p>
    <p data-testid="first-readonly">읽기 전용 {readonly?'예':'아니오'}</p>
-   {showFirst&&<TufteEditor value={first} onChange={document=>{setFirst(document);setFirstChanges(n=>n+1);}} onError={report} onNotice={setFirstNotice}
+   {showFirst&&<TufteEditor value={first} onChange={document=>{setFirst(document);setFirstChanges(n=>n+1);}} onError={report} onNotice={reportFirstNotice}
     readonly={readonly} ariaLabel="첫 번째 Tufte 편집기"/>}
   </section>
   <section data-testid="second-editor">
    <h2>두 번째</h2>
    <p data-testid="second-changes">변경 알림 {secondChanges}회</p>
    <p data-testid="second-notice" role="status">{secondNotice}</p>
-   {showSecond&&<TufteEditor value={second} onChange={document=>{setSecond(document);setSecondChanges(n=>n+1);}} onNotice={setSecondNotice}
+   <p data-testid="second-notice-count">노트 명령 알림 {secondNoticeCount}회</p>
+   {showSecond&&<TufteEditor value={second} onChange={document=>{setSecond(document);setSecondChanges(n=>n+1);}} onNotice={reportSecondNotice}
     onError={report} ariaLabel="두 번째 Tufte 편집기"/>}
   </section>
   <p role="alert" data-testid="errors">{errors.join(' | ')}</p>
