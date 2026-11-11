@@ -19,6 +19,8 @@ export interface TufteEditorProps {
  value:TufteDocument;
  onChange?:(value:TufteDocument)=>void;
  onError?:(error:Error)=>void;
+ /** Optional UI notice for navigation/clipboard actions; never stored in Lexical JSON. */
+ onNotice?:(message:string)=>void;
  assetAdapter?:AssetProvider;
  assetNamespace?:string;
  readonly?:boolean;
@@ -141,7 +143,7 @@ const defaultTheme={
  * stay with the host; the editor never creates an HTTP client.
  */
 export function TufteEditor({
- value,onChange,onError,assetAdapter,assetNamespace,
+ value,onChange,onError,onNotice,assetAdapter,assetNamespace,
  readonly=false,className='editor',ariaLabel='Tufte 문서 편집'
 }:TufteEditorProps){
  const instanceId=useId();
@@ -155,7 +157,7 @@ export function TufteEditor({
   <TufteComposer initialConfig={{namespace,onError:handleError,editable:!readonly,theme:defaultTheme}}>
    {assetAdapter&&assetNamespace?.trim()&&<HostAssetRefresh adapter={assetAdapter} namespace={assetNamespace}/>}
    {!readonly&&assetAdapter&&assetNamespace?.trim()&&<HostAssetPicker adapter={assetAdapter} namespace={assetNamespace}/>}
-   <TufteEditingSurface className={className} ariaLabel={ariaLabel} readonly={readonly}/>
+   <TufteEditingSurface className={className} ariaLabel={ariaLabel} readonly={readonly} onNotice={onNotice}/>
    <DocumentBinding value={value} onChange={onChange} onError={onError} readonly={readonly}/>
   </TufteComposer>
  </AssetContext.Provider>;
