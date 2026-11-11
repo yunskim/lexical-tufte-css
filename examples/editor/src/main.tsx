@@ -16,13 +16,9 @@ import {
 } from 'lexical';
 import {canonicalBlockType,exportCanonicalEditorState,parseCanonicalEditorState,loadDocumentIntoEditor,exportEditorToDocument,registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,registerQuotationCommands,APPEND_TUFTE_EPIGRAPH_ITEM_COMMAND,MOVE_TUFTE_EPIGRAPH_ITEM_COMMAND,SET_TUFTE_QUOTE_CITE_COMMAND,REMOVE_TUFTE_QUOTATION_COMMAND,INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_SECTION_CITE_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,registerListKeyboardCommands,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,SET_TUFTE_LIST_KIND_COMMAND,CHANGE_TUFTE_LIST_INDENT_COMMAND,UNWRAP_TUFTE_LIST_COMMAND,registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND,WRAP_TUFTE_SPAN_COMMAND,UNWRAP_TUFTE_SPAN_COMMAND,registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_PAIR_COMMAND,MOVE_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_LIST_COMMAND,registerSectionCommands,WRAP_TUFTE_ROOT_COMMAND,INSERT_TUFTE_SECTION_COMMAND,SPLIT_TUFTE_SECTION_COMMAND,MERGE_TUFTE_SECTION_COMMAND,SET_TUFTE_BLOCK_COMMAND,inspectEditorStructure,focusStructureIssue,type StructureIssue,replaceEditorDocumentState,NoteNode, InlineImageNode, $createSidenoteNode, $createMarginnoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, registerNoteEdgeTypingGuard} from '@lexical-tufte/lexical';
 import {NODE_SCHEMA} from '@lexical-tufte/document';
-import {ToolbarIcon, TufteComposer, TufteEditingSurface, NoteImagePanel, INLINE_ACTIONS, EDITOR_SHORTCUTS, type NoteImageChoice, type ImagePresentation, type ToolbarIconName} from '@lexical-tufte/editor-react';
+import {ToolbarButton as IconButton, TufteComposer, TufteEditingSurface, NoteImagePanel, INLINE_ACTIONS, type NoteImageChoice, type ImagePresentation} from '@lexical-tufte/editor-react';
 import './style.css';
 import '@lexical-tufte/editor-react/styles.css';
-
-function IconButton({name,label,onClick,onMouseDown}:{name:ToolbarIconName;label:string;onClick:()=>void;onMouseDown:(event:MouseEvent<HTMLButtonElement>)=>void}){
- return <button type="button" aria-label={label} title={EDITOR_SHORTCUTS[label]?`${label} (${EDITOR_SHORTCUTS[label]})`:label} onMouseDown={onMouseDown} onClick={onClick}><ToolbarIcon name={name}/></button>;
-}
 
 
 
@@ -529,117 +525,6 @@ function EditorUI(){
     }catch{setStatus('복구용 사본을 열지 못했습니다.');}
   }
   const textarea=useRef<HTMLTextAreaElement>(null);
-  function enterNote():boolean {
-    const selection=$getSelection();
-    if(!$isRangeSelection(selection)||!selection.isCollapsed())return false;
-    const anchor=selection.anchor.getNode();
-    const inside=containingNote(anchor);
-    if(inside)return false;
-    const all:LexicalNode[]=[];
-    function visit(n:LexicalNode){all.push(n);if($isElementNode(n))n.getChildren().forEach(visit);}
-    visit($getRoot());
-    const index=all.indexOf(anchor);
-    const next=all.slice(index+1).find(n=>n instanceof NoteNode);
-    if(!(next instanceof NoteNode))return false;
-    next.selectStart();
-    setStatus('노트 안입니다. Escape로 본문에 돌아갑니다.');return true;
-  }
-  function leaveNote():boolean {
-    const selection=$getSelection();
-    if(!$isRangeSelection(selection))return false;
-    const note=containingNote(selection.anchor.getNode());if(!note)return false;
-    let next=note.getNextSibling();
-    if(!next){next=$createTextNode(' ');note.insertAfter(next);}
-    if($isTextNode(next))next.select(0,0);
-    else if($isElementNode(next))next.selectStart();
-    else next.selectPrevious();
-    setStatus('본문으로 돌아왔습니다.');return true;
-  }
-  useEffect(()=>{
-    const selectNoteImage=editor.registerCommand(CLICK_COMMAND,event=>{
-      if(!(event.target instanceof HTMLImageElement))return false;
-      const node=$getNearestNodeFromDOMNode(event.target);
-      if(!(node instanceof InlineImageNode)||!containingNote(node))return false;
-      const selection=$createNodeSelection();selection.add(node.getKey());$setSelection(selection);
-      event.preventDefault();editor.focus();return true;
-    },COMMAND_PRIORITY_HIGH);
-    const escape=editor.registerCommand(KEY_ESCAPE_COMMAND,event=>{
-      if(!leaveNote())return false;event?.preventDefault();return true;
-    },COMMAND_PRIORITY_HIGH);
-    const down=editor.registerCommand(KEY_ARROW_DOWN_COMMAND,event=>{
-      if(!event.altKey||!enterNote())return false;event.preventDefault();return true;
-    },COMMAND_PRIORITY_HIGH);
-    const cutIds=new Set<string>();
-    const copying=editor.registerCommand(COPY_COMMAND,()=>{cutIds.clear();return false;},COMMAND_PRIORITY_HIGH);
-    const cutting=editor.registerCommand(CUT_COMMAND,()=>{
-      cutIds.clear();const s=$getSelection();
-      if($isRangeSelection(s)||$isNodeSelection(s)){
-        const visitCut=(node:LexicalNode):void=>{
-          if(node instanceof NoteNode)cutIds.add(node.getNoteId());
-          if($isElementNode(node))for(const child of node.getChildren())visitCut(child);
-        };
-        for(const node of s.getNodes()){
-          const parentNote=containingNote(node);
-          if(parentNote)cutIds.add(parentNote.getNoteId());
-          visitCut(node);
-        }
-      }
-      return false;
-    },COMMAND_PRIORITY_HIGH);
-    const pasting=editor.registerCommand(SELECTION_INSERT_CLIPBOARD_NODES_COMMAND,({nodes,selection})=>{
-      const notes:NoteNode[]=[];
-      function scan(n:LexicalNode){if(n instanceof NoteNode)notes.push(n);if($isElementNode(n))n.getChildren().forEach(scan);}
-      nodes.forEach(scan);
-      if($isRangeSelection(selection)&&containingNote(selection.anchor.getNode())&&notes.length){
-        setStatus('노트 안에는 다른 노트를 붙여넣을 수 없습니다.');return true;
-      }
-      $reidentifyPastedNotes(nodes,cutIds,()=>crypto.randomUUID());
-      cutIds.clear();
-      if($isRangeSelection(selection)&&containingNote(selection.anchor.getNode())){
-        const phrasing:LexicalNode[]=[];
-        for(const [index,node] of nodes.entries()){
-          if($isParagraphNode(node)){
-            if(index>0)phrasing.push($createLineBreakNode());phrasing.push(...node.getChildren());
-          }else if(!$isElementNode(node)||node.isInline())phrasing.push(node);
-          else {setStatus('노트에는 본문 블록을 붙여넣을 수 없습니다.');return true;}
-        }
-        $insertNotePhrasing(selection,phrasing);return true;
-      }
-      return false;
-    },COMMAND_PRIORITY_HIGH);
-    const plainPaste=editor.registerCommand(PASTE_COMMAND,event=>{
-      const s=$getSelection();
-      if(!$isRangeSelection(s)||!containingNote(s.anchor.getNode())||!(event instanceof ClipboardEvent))return false;
-      const data=event.clipboardData;if(!data||data.getData('application/x-lexical-editor')||data.getData('text/html'))return false;
-      const text=data.getData('text/plain');if(!text)return false;
-      const nodes:LexicalNode[]=[];
-      text.replace(/\r\n?/g,'\n').split('\n').forEach((line,index)=>{
-        if(index)nodes.push($createLineBreakNode());if(line)nodes.push($createTextNode(line));
-      });
-      event.preventDefault();$insertNotePhrasing(s,nodes);return true;
-    },COMMAND_PRIORITY_HIGH);
-    function exitAtEdge(event:KeyboardEvent|null,backward:boolean){
-      const s=$getSelection();if(!$isRangeSelection(s)||!s.isCollapsed())return false;
-      const node=s.anchor.getNode(),note=containingNote(node);
-      if(!note||!$isTextNode(node))return false;
-      const atEdge=backward?node.is(note.getFirstDescendant())&&s.anchor.offset===0:
-        node.is(note.getLastDescendant())&&s.anchor.offset===node.getTextContentSize();
-      if(!atEdge)return false;
-      event?.preventDefault();
-      if(backward)note.selectPrevious();else leaveNote();
-      return true;
-    }
-    const backspace=editor.registerCommand(KEY_BACKSPACE_COMMAND,event=>exitAtEdge(event,true),COMMAND_PRIORITY_HIGH);
-    const forwardDelete=editor.registerCommand(KEY_DELETE_COMMAND,event=>exitAtEdge(event,false),COMMAND_PRIORITY_HIGH);
-    const composing=registerNoteCompositionGuard(editor);
-    const enter=editor.registerCommand(KEY_ENTER_COMMAND,event=>{
-      const s=$getSelection();if(!$isRangeSelection(s)||!containingNote(s.anchor.getNode()))return false;
-      if(event?.isComposing)return false;
-      event?.preventDefault();s.insertLineBreak();return true;
-    },COMMAND_PRIORITY_HIGH);
-    const typing=registerNoteEdgeTypingGuard(editor);
-    return()=>{selectNoteImage();escape();down();typing();copying();cutting();pasting();plainPaste();backspace();forwardDelete();composing();enter();};
-  },[editor]);
   function insertNote(kind:'sidenote'|'marginnote'='sidenote'){
     editor.update(()=>{
       const s=$getSelection();
@@ -859,7 +744,7 @@ function EditorUI(){
     {imageChooserOpen&&<NoteImagePanel images={noteImages} onClose={closeNoteImageChooser} onSave={saveNoteImage}/>}
     <p id="help">본문에서 Alt+↓: 다음 노트로 이동 · 노트에서 Escape: 본문으로 이동</p>
     <main>
-      <TufteEditingSurface ariaLabel="본문과 사이드노트 편집" ariaDescribedBy="help"/>
+      <TufteEditingSurface ariaLabel="본문과 사이드노트 편집" ariaDescribedBy="help" onNotice={setStatus}/>
     </main>
     <p role="status" aria-label="편집 작업 상태">{status}</p><p role="status" aria-label="자동 복구 저장 상태">{autoSaveState}</p>
     {structureIssues.length>0&&<aside role="alert" aria-label="문서 구조 복구"><p>문서 구조를 수정하세요. 내용은 자동 삭제하지 않으며 HTML 생성은 차단됩니다.</p><ul>{structureIssues.map((issue,i)=><li key={`${issue.key}-${i}`}><button onClick={()=>focusStructureIssue(editor,issue.key)}>{issue.message}</button> <code>{issue.path}</code></li>)}</ul><button onClick={()=>editor.dispatchCommand(UNDO_COMMAND,undefined)}>구조 변경 실행 취소</button><button onClick={recoverStructure} disabled={!checkpoint.current}>마지막 정상 구조로 복구</button></aside>}
