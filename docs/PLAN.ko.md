@@ -4,6 +4,12 @@
 상태: P0·P1·P2.1 완료. Chromium 자동 회귀와 조합 이벤트 검증 범위이며, OS별 실제 IME 및 제품 전체 검증은 후속 단계.
 저장소: https://github.com/yunskim/lexical-tufte-css (public, GPL-3.0; 사용자가 생성한 설정 유지).
 
+## 2026-11-11 추출 뒤 잔여 버튼 참조 수정 — E148/M131
+
+노트 플러그인 추출 직후 '다음 노트로'·'본문으로' 버튼이 예제에서 미정의 `enterNote()/leaveNote()`를 호출하는 문제를 정적 대조에서 발견했다. 공통 Lexical `ENTER_TUFTE_NOTE_COMMAND`/`LEAVE_TUFTE_NOTE_COMMAND`를 생성·등록·해제하고 예제 버튼이 이를 dispatch하도록 수정했다. `tests/note-browser.mjs`에 두 버튼을 직접 클릭하는 회귀, packed consumer에 새 public command 검사를 추가했다.
+
+**최신 정적 검토 25/25 통과**. 실제 `pnpm` 설치·빌드·타입 검사·브라우저 테스트는 이번 소스에 대해 실행되지 않았으며, E148의 최종 수락 조건은 유지한다. [11월 11일 정적 검토 및 미실행 게이트](VERIFICATION_NOTE_INTERACTIONS_2026-11-11.ko.md). 기존 11월 3일 42/42 결과는 당시 코드에 한정한다.
+
 ## 2026-11-11 P3.1.e 재사용 편집기 노트 명령 이관 (실행 검증 대기)
 
 `examples/editor` 전용으로 남아 있던 노트 키보드·클립보드·IME 명령 등록을 `@lexical-tufte/editor-react`의 `TufteNoteInteractionPlugin`으로 이동했다. `TufteEditingSurface`는 이를 인스턴스별로 설치하고 `readonly`에서 해제한다. 기존 예제와 제어형 `TufteEditor`에서 `onNotice`로 호스트 소유 UI 메시지를 처리할 수 있다. 공통 `ToolbarButton`도 도입하여 원래 버튼의 aria-label·title·선택 보존 이벤트를 재사용한다.
