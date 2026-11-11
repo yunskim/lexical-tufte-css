@@ -1,6 +1,12 @@
 import type {AssetProvider,AssetSummary,AssetRevision} from '@lexical-tufte/editor-ports';
-import {validateDocument,isSafeURL, type TufteDocument} from '@lexical-tufte/document';
-import {useEffect, useRef, useState, type MouseEvent} from 'react';
+import {
+  validateDocument,
+  isSafeURL,
+  type TufteDocument} from '@lexical-tufte/document';
+import {useEffect,
+  useRef,
+  useState,
+  type MouseEvent} from 'react';
 import {createRoot} from 'react-dom/client';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$loadLayoutFixture} from './layoutFixture.js';
@@ -8,13 +14,78 @@ import {$createLinkNode} from '@lexical/link';
 import {$isHeadingNode} from '@lexical/rich-text';
 import {$generateHtmlFromNodes} from '@lexical/html';
 import {
-  $getRoot, $getNearestNodeFromDOMNode, $createNodeSelection, $getSelection, $isRangeSelection, $isNodeSelection, $isElementNode, $isTextNode, $createRangeSelection, $setSelection,
-  $createParagraphNode, $createTextNode, $createLineBreakNode, $isParagraphNode, $getNodeByKey,
-  FORMAT_TEXT_COMMAND, CLICK_COMMAND, KEY_ESCAPE_COMMAND, KEY_ARROW_DOWN_COMMAND, KEY_ENTER_COMMAND,
-  SELECTION_INSERT_CLIPBOARD_NODES_COMMAND, COPY_COMMAND, CUT_COMMAND, PASTE_COMMAND, KEY_BACKSPACE_COMMAND, KEY_DELETE_COMMAND, HISTORY_PUSH_TAG, UNDO_COMMAND, REDO_COMMAND,
-  COMMAND_PRIORITY_HIGH, type LexicalNode, type EditorState, type RangeSelection,
+  $getRoot,
+  $getSelection,
+  $isRangeSelection,
+  $isElementNode,
+  $createParagraphNode,
+  $createTextNode,
+  $getNodeByKey,
+  FORMAT_TEXT_COMMAND,
+  HISTORY_PUSH_TAG,
+  UNDO_COMMAND,
+  REDO_COMMAND,
+  type LexicalNode,
+  type EditorState,
+  type RangeSelection
 } from 'lexical';
-import {canonicalBlockType,exportCanonicalEditorState,parseCanonicalEditorState,loadDocumentIntoEditor,exportEditorToDocument,registerFigureCommands,INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_FIGURE_WIDTH_COMMAND,INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,registerQuotationCommands,APPEND_TUFTE_EPIGRAPH_ITEM_COMMAND,MOVE_TUFTE_EPIGRAPH_ITEM_COMMAND,SET_TUFTE_QUOTE_CITE_COMMAND,REMOVE_TUFTE_QUOTATION_COMMAND,INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,INSERT_TUFTE_QUOTATION_COMMAND,APPEND_TUFTE_SECTION_CITE_COMMAND,APPEND_TUFTE_ATTRIBUTION_COMMAND,registerListKeyboardCommands,registerListCommands,INSERT_TUFTE_LIST_COMMAND,APPEND_TUFTE_LIST_ITEM_COMMAND,SET_TUFTE_LIST_KIND_COMMAND,CHANGE_TUFTE_LIST_INDENT_COMMAND,UNWRAP_TUFTE_LIST_COMMAND,registerInlineCommands,SET_TUFTE_SPAN_KIND_COMMAND,WRAP_TUFTE_SPAN_COMMAND,UNWRAP_TUFTE_SPAN_COMMAND,registerDefinitionCommands,INSERT_TUFTE_DEFINITION_LIST_COMMAND,APPEND_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_PAIR_COMMAND,MOVE_TUFTE_DEFINITION_PAIR_COMMAND,REMOVE_TUFTE_DEFINITION_LIST_COMMAND,registerSectionCommands,WRAP_TUFTE_ROOT_COMMAND,INSERT_TUFTE_SECTION_COMMAND,SPLIT_TUFTE_SECTION_COMMAND,MERGE_TUFTE_SECTION_COMMAND,SET_TUFTE_BLOCK_COMMAND,inspectEditorStructure,focusStructureIssue,type StructureIssue,replaceEditorDocumentState,NoteNode, InlineImageNode, $createSidenoteNode, $createMarginnoteNode, $createInlineImageNode, $splitNoteAtSelection, $mergeNoteWithNext, $moveNote, $insertNotePhrasing, $reidentifyPastedNotes, registerNoteCompositionGuard, registerNoteEdgeTypingGuard} from '@lexical-tufte/lexical';
+import {canonicalBlockType,
+  exportCanonicalEditorState,
+  parseCanonicalEditorState,
+  loadDocumentIntoEditor,
+  exportEditorToDocument,
+  registerFigureCommands,
+  INSERT_TUFTE_FIGURE_COMMAND,
+  SET_TUFTE_FIGURE_WIDTH_COMMAND,
+  INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,
+  REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,
+  UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,
+  registerQuotationCommands,
+  APPEND_TUFTE_EPIGRAPH_ITEM_COMMAND,
+  MOVE_TUFTE_EPIGRAPH_ITEM_COMMAND,
+  SET_TUFTE_QUOTE_CITE_COMMAND,
+  REMOVE_TUFTE_QUOTATION_COMMAND,
+  INSERT_TUFTE_HORIZONTAL_RULE_COMMAND,
+  INSERT_TUFTE_QUOTATION_COMMAND,
+  APPEND_TUFTE_SECTION_CITE_COMMAND,
+  APPEND_TUFTE_ATTRIBUTION_COMMAND,
+  registerListKeyboardCommands,
+  registerListCommands,
+  INSERT_TUFTE_LIST_COMMAND,
+  APPEND_TUFTE_LIST_ITEM_COMMAND,
+  SET_TUFTE_LIST_KIND_COMMAND,
+  CHANGE_TUFTE_LIST_INDENT_COMMAND,
+  UNWRAP_TUFTE_LIST_COMMAND,
+  registerInlineCommands,
+  SET_TUFTE_SPAN_KIND_COMMAND,
+  WRAP_TUFTE_SPAN_COMMAND,
+  UNWRAP_TUFTE_SPAN_COMMAND,
+  registerDefinitionCommands,
+  INSERT_TUFTE_DEFINITION_LIST_COMMAND,
+  APPEND_TUFTE_DEFINITION_PAIR_COMMAND,
+  REMOVE_TUFTE_DEFINITION_PAIR_COMMAND,
+  MOVE_TUFTE_DEFINITION_PAIR_COMMAND,
+  REMOVE_TUFTE_DEFINITION_LIST_COMMAND,
+  registerSectionCommands,
+  WRAP_TUFTE_ROOT_COMMAND,
+  INSERT_TUFTE_SECTION_COMMAND,
+  SPLIT_TUFTE_SECTION_COMMAND,
+  MERGE_TUFTE_SECTION_COMMAND,
+  SET_TUFTE_BLOCK_COMMAND,
+  inspectEditorStructure,
+  focusStructureIssue,
+  type StructureIssue,
+  replaceEditorDocumentState,
+  NoteNode,
+  InlineImageNode,
+  $createSidenoteNode,
+  $createMarginnoteNode,
+  $createInlineImageNode,
+  $splitNoteAtSelection,
+  $mergeNoteWithNext,
+  $moveNote,
+  $insertNotePhrasing
+} from '@lexical-tufte/lexical';
 import {NODE_SCHEMA} from '@lexical-tufte/document';
 import {ToolbarButton as IconButton, TufteComposer, TufteEditingSurface, NoteImagePanel, INLINE_ACTIONS, type NoteImageChoice, type ImagePresentation} from '@lexical-tufte/editor-react';
 import './style.css';
