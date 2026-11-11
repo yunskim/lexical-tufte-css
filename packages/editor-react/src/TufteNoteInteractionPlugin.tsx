@@ -7,12 +7,16 @@ import {
  CLICK_COMMAND,KEY_ESCAPE_COMMAND,KEY_ARROW_DOWN_COMMAND,KEY_ENTER_COMMAND,
  SELECTION_INSERT_CLIPBOARD_NODES_COMMAND,COPY_COMMAND,CUT_COMMAND,
  PASTE_COMMAND,KEY_BACKSPACE_COMMAND,KEY_DELETE_COMMAND,
- COMMAND_PRIORITY_HIGH,type LexicalNode
+ COMMAND_PRIORITY_HIGH,createCommand,type LexicalNode
 } from 'lexical';
 import {
  NoteNode,InlineImageNode,$insertNotePhrasing,$reidentifyPastedNotes,
  registerNoteCompositionGuard,registerNoteEdgeTypingGuard
 } from '@lexical-tufte/lexical';
+
+/** Public commands let a host toolbar use the same note navigation as the keyboard. */
+export const ENTER_TUFTE_NOTE_COMMAND=createCommand<void>('ENTER_TUFTE_NOTE_COMMAND');
+export const LEAVE_TUFTE_NOTE_COMMAND=createCommand<void>('LEAVE_TUFTE_NOTE_COMMAND');
 
 function containingNote(node:LexicalNode|null):NoteNode|null{
  for(let current=node;current;current=current.getParent()){
@@ -76,6 +80,12 @@ export function TufteNoteInteractionPlugin({onNotice}:TufteNoteInteractionPlugin
     const down=editor.registerCommand(KEY_ARROW_DOWN_COMMAND,event=>{
       if(!event.altKey||!enterNote())return false;event.preventDefault();return true;
     },COMMAND_PRIORITY_HIGH);
+    const enterCommand=editor.registerCommand(
+      ENTER_TUFTE_NOTE_COMMAND,()=>enterNote(),COMMAND_PRIORITY_HIGH
+    );
+    const leaveCommand=editor.registerCommand(
+      LEAVE_TUFTE_NOTE_COMMAND,()=>leaveNote(),COMMAND_PRIORITY_HIGH
+    );
     const cutIds=new Set<string>();
     const copying=editor.registerCommand(COPY_COMMAND,()=>{cutIds.clear();return false;},COMMAND_PRIORITY_HIGH);
     const cutting=editor.registerCommand(CUT_COMMAND,()=>{
@@ -145,7 +155,7 @@ export function TufteNoteInteractionPlugin({onNotice}:TufteNoteInteractionPlugin
       event?.preventDefault();s.insertLineBreak();return true;
     },COMMAND_PRIORITY_HIGH);
     const typing=registerNoteEdgeTypingGuard(editor);
-    return()=>{selectNoteImage();escape();down();typing();copying();cutting();pasting();plainPaste();backspace();forwardDelete();composing();enter();};
+    return()=>{selectNoteImage();escape();down();enterCommand();leaveCommand();typing();copying();cutting();pasting();plainPaste();backspace();forwardDelete();composing();enter();};
   },[editor]);
 
  return null;
