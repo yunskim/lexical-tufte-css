@@ -1,3 +1,10 @@
+## 2026-11-11 P3.1.e 노트 인터랙션·아이콘 버튼 공통화
+
+- `TufteNoteInteractionPlugin`으로 기존 노트 진입/복귀·이미지 선택·클립보드/CUT 재식별·붙여넣기 거부·IME·키보드 가장자리 명령을 이동하고, `TufteEditingSurface`에 설치했다. 제어형 `TufteEditor`에도 `onNotice` 인터페이스 제공.
+- `ToolbarButton`에 기존 12개 예제 버튼의 aria-label/title 및 포커스 보존 `onMouseDown` 연결. 예제의 중복 명령 effect·버튼 정의 제거.
+- 두 편집기 독립 노트 키보드 회귀와 tarball 공개 API 검사를 작성. GitHub 원본 블록 동일성·연결 **정적 검사 19/19**. 빌드·타입·실제 Chromium/전체 suite는 **미실행**. 이전 42/42 통과 증거는 신규 소스로 소급하지 않는다.
+- 후속: frozen/build/타입/패키지/브라우저 검사 → 명령·삽입 UI의 host-neutral API 추가 이관; CI 지시대로 생략.
+
 ## 2026-11-03 공통 호스트 자산 선택·자동 URL 갱신 누적 검증
 
 - `558bdcd`에 예제 Window 타입 선언과 신규 브라우저 fixture 2개를 수정해 frozen/static/build/typecheck·unit629·package6·갱신정책·Python16/실제HTTP·revision모델12그룹 통과. browser 첫40/42 → 최종42/42, 공식6폭 pixel 마스크 밖 차이0.
