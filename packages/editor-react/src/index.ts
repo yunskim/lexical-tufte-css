@@ -21,4 +21,4 @@ export {HostAssetRefresh,type HostAssetRefreshProps} from './HostAssetRefresh.js
 export {isUsableResolvedImage,nextImageRefreshAt,imageRefreshRetryDelay} from './hostAssetPolicy.js';
 
 export {ToolbarButton,type ToolbarButtonProps} from './ToolbarButton.js';
-export {TufteNoteInteractionPlugin,type TufteNoteInteractionPluginProps} from './TufteNoteInteractionPlugin.js';
+export {TufteNoteInteractionPlugin,ENTER_TUFTE_NOTE_COMMAND,LEAVE_TUFTE_NOTE_COMMAND,type TufteNoteInteractionPluginProps} from './TufteNoteInteractionPlugin.js';
