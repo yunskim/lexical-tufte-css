@@ -1,3 +1,9 @@
+## 2026-11-11 노트 플러그인 이관 후 E148 수정·정적 재점검
+
+- 예제의 잔여 `enterNote()/leaveNote()` 호출을 발견하고 플러그인의 공개 `ENTER_TUFTE_NOTE_COMMAND`/`LEAVE_TUFTE_NOTE_COMMAND`로 일원화했다. 키보드/버튼 두 경로를 공유하며 등록 해제도 같은 effect에서 처리한다.
+- 기존 `tests/note-browser.mjs`의 버튼 클릭 회귀 및 패키지 소비자 공개 명령 검사 추가. [정적 검토 25/25·실행 제한](VERIFICATION_NOTE_INTERACTIONS_2026-11-11.ko.md). 오류 E148·대책 M131 기록.
+- 실제 frozen/build/type/browser 미실행. 11월 3일 42/42 결과를 신규 이관으로 소급 적용하지 않는다. CI 미실행.
+
 ## 2026-11-11 P3.1.e 노트 인터랙션·아이콘 버튼 공통화
 
 - `TufteNoteInteractionPlugin`으로 기존 노트 진입/복귀·이미지 선택·클립보드/CUT 재식별·붙여넣기 거부·IME·키보드 가장자리 명령을 이동하고, `TufteEditingSurface`에 설치했다. 제어형 `TufteEditor`에도 `onNotice` 인터페이스 제공.
