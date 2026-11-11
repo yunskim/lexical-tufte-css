@@ -39,6 +39,10 @@ try{
  await first.waitFor();await second.waitFor();
  await first.locator('[data-note-id]').first().waitFor();
  await second.locator('[data-note-id]').first().waitFor();
+ const firstCount=firstSection.getByTestId('first-notice-count');
+ const secondCount=secondSection.getByTestId('second-notice-count');
+ assert.match(await firstCount.innerText(),/0회/);
+ assert.match(await secondCount.innerText(),/0회/);
 
  // The reusable controlled editor must install the same note navigation
  // and clipboard/IME plugin as the original example.
@@ -52,6 +56,8 @@ try{
  });
  assert.equal(await selectionOwner(),'first-editor');
  assert.match(await firstSection.getByTestId('first-notice').innerText(),/노트 안입니다/);
+ assert.match(await firstCount.innerText(),/1회/,'A single note entry must issue exactly one host notice');
+ assert.match(await secondCount.innerText(),/0회/);
  assert.equal(await secondSection.getByTestId('second-notice').innerText(),'');
  await page.keyboard.insertText('공통 플러그인 ');
  await page.waitForFunction(()=>document.querySelector('[data-testid="first-editor"] .editor')?.textContent?.includes('공통 플러그인'));
@@ -65,6 +71,7 @@ try{
  });
  assert.equal(await selectionOwner(),null);
  assert.match(await firstSection.getByTestId('first-notice').innerText(),/본문으로 돌아왔습니다/);
+ assert.match(await firstCount.innerText(),/2회/,'A single note exit must issue exactly one host notice');
 
  await second.click();
  await page.keyboard.press('Control+Home');
@@ -76,8 +83,11 @@ try{
  });
  assert.equal(await selectionOwner(),'second-editor');
  assert.match(await secondSection.getByTestId('second-notice').innerText(),/노트 안입니다/);
+ assert.match(await secondCount.innerText(),/1회/,'Second editor must have one independent note entry');
+ assert.match(await firstCount.innerText(),/2회/,'Second editor must not invoke first editor callback');
  assert.match(await firstSection.getByTestId('first-notice').innerText(),/본문으로 돌아왔습니다/);
  await page.keyboard.press('Escape');
+ assert.match(await secondCount.innerText(),/2회/);
 
  // Readonly unmounts the note interaction handlers; after switching back the
  // original editor instance must still have exactly one functional handler.
@@ -93,8 +103,29 @@ try{
  });
  await page.keyboard.press('Escape');
  assert.match(await firstSection.getByTestId('first-notice').innerText(),/본문으로 돌아왔습니다/);
+ assert.match(await firstCount.innerText(),/4회/,'Re-enabling readonly must not duplicate note handlers');
+ assert.match(await secondCount.innerText(),/2회/);
+
+ // After a full composer unmount/remount, note commands must still register
+ // exactly once and must not deliver messages to the other instance.
+ await page.getByRole('button',{name:'첫 번째 편집기 마운트 전환'}).click();
+ assert.equal(await first.count(),0);
+ await page.getByRole('button',{name:'첫 번째 편집기 마운트 전환'}).click();
+ await first.waitFor();
+ await first.locator('[data-note-id]').first().waitFor();
+ await first.click();await page.keyboard.press('Control+Home');
+ await page.keyboard.press('Alt+ArrowDown');
+ await page.waitForFunction(()=>{
+  const a=window.getSelection()?.anchorNode;
+  const el=a instanceof Element?a:a?.parentElement;
+  return el?.closest('[data-note-id]')?.closest('[data-testid]')?.getAttribute('data-testid')==='first-editor';
+ });
+ assert.match(await firstCount.innerText(),/5회/,'Remount note entry must notify once');
+ await page.keyboard.press('Escape');
+ assert.match(await firstCount.innerText(),/6회/,'Remount note exit must notify once');
+ assert.match(await secondCount.innerText(),/2회/,'Remount must not leak callbacks across editor instances');
  assert.deepEqual(runtimeErrors,[]);
- console.log('Reusable note interactions: Alt+Down/Escape navigation, notices, per-editor isolation, readonly re-registration PASS');
+ console.log('Reusable note interactions: Alt+Down/Escape navigation, notices, per-editor isolation, readonly/remount callback cardinality PASS');
 }finally{
  await browser?.close();
  server?.kill();
