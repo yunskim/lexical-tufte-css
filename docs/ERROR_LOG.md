@@ -1,5 +1,13 @@
 # 에러 기록
 
+## E148 — 노트 플러그인 추출 후 예제 버튼의 미정의 함수 참조 (정적 발견·실행 미검증, 2026-11-11)
+
+- `examples/editor/src/main.tsx`의 `enterNote()`·`leaveNote()` 구현을 `TufteNoteInteractionPlugin`으로 이동하면서, 같은 파일의 **'다음 노트로'와 '본문으로'** 버튼이 이전 함수를 계속 직접 호출했다. 전체 파일 참조 검토에서 남은 두 호출을 발견했다.
+- 원인: 코드 블록 이동의 정적 동일성(19/19)만 확인하고 이관한 함수의 **예제 외부 호출 지점**을 확인하지 않았다. 실제 `pnpm check`를 실행하지 못했으므로 해당 분리 커밋의 성공 여부는 미증명이며, 구체적인 TS diagnostics는 확보하지 않았다.
+- 조치: 공유 플러그인에 `ENTER_TUFTE_NOTE_COMMAND`/`LEAVE_TUFTE_NOTE_COMMAND`를 등록·해제하고, 예제 버튼이 `dispatchCommand`로 재사용하도록 수정했다. `tests/note-browser.mjs`에 두 버튼의 실제 진입/복귀 단언과 패키지 JS 공개 export 검사를 추가했다.
+- 현재 판정: 코드/정적 참조는 수정됨. **빌드·타입·브라우저 실행 미검증**. 이전 11월 3일 42/42 결과를 이 수정의 통과 증거로 사용하지 않는다. 재발 방지는 M131.
+
+
 ## E133 — cite 삭제의 단일 Undo 누락 (명시한 경계 검증 완료)
 
 - P2.2.c C1.a 신규 headless 27개 중 cite 삭제의 Undo와 선택 비교 2개가 실패했다. 선택 비교는 내부 dirty flag까지 동일하다고 기대한 테스트 오류로, 실제 anchor/focus/format/style 동일성을 RangeSelection.is로 검사하도록 고쳤다.
