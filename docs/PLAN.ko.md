@@ -463,3 +463,11 @@ P0–P7의 기능·보안·복구·배포 검증을 마친 후 수행한다. Doc
 - [ ] **P9.7 완료 증거:** 발견 문제별 재현 fixture, 수정 코드, 타입·단위·브라우저·왕복 검증 결과, 검증 commit SHA, 남은 제약을 기록한다. 실행하지 않은 테스트는 완료로 체크하지 않는다. 기존 오류 기록·재발 방지 문서도 필요한 경우 갱신한다.
 
 **완료 조건:** 기존 구현과의 중복 없이 계약·검증·변환의 실제 공백을 해소하고, 수정된 불변조건에 대한 회귀 증거를 남긴다. 감사 결과 결함이 없으면 근거를 남기고 해당 항목을 종료할 수 있다. P9 작업 때문에 P0–P8의 완료 기준이나 우선순위를 소급 변경하지 않는다.
+
+## 2026-11-11 P3.1.e 노트 상호작용 추가 회귀 작성 (Work 실행 대기)
+
+공통 플러그인 변경 이후 실제 소비자 경계에서 빠져 있던 **두 편집기별 onNotice 정확히 한 번 호출**, `readonly`·재마운트, 노트 plain-text CRLF/LF 붙여넣기, link/image/ID/JSON 보존, Rich note Copy/Cut/Paste의 note ID 불변식과 중첩 거부를 테스트로 보강했다.
+
+테스트 파일: `tests/reusable-note-interactions-browser.mjs` 확장, `tests/reusable-note-paste-browser.mjs`와 `tests/reusable-note-clipboard-identity-browser.mjs` 신규. 테스트 fixture만 수정했으며 라이브러리 구현·기존 assertion은 변경하지 않았다.
+
+전용 실행 명령: `pnpm test:note-interactions`, `pnpm test:note-paste`, `pnpm test:note-clipboard`. 전체 `pnpm test:browser`에도 포함된다. **아직 테스트를 실행하지 않았고** Work에서 frozen install → check → package → 집중 테스트 → 전체 브라우저 순으로 실행한다. 실패·수정·재실행 증거는 [11월 11일 검증 기록](VERIFICATION_NOTE_INTERACTIONS_2026-11-11.ko.md)에 추가한다.
