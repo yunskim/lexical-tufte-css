@@ -127,7 +127,8 @@ try{
  await page.keyboard.press('End');
  const beforeReject=await json('first');
  await page.keyboard.press('Control+v');
- await page.getByTestId('first-notice').getByText(/노트 안에는 다른 노트를 붙여넣을 수 없습니다/).waitFor();
+ await page.waitForFunction(()=>document.querySelector('[data-testid="first-notice"]')
+  ?.textContent?.includes('노트 안에는 다른 노트를 붙여넣을 수 없습니다'));
  assert.deepEqual(await json('first'),beforeReject,
   'Nested note paste rejection must be a canonical no-op');
  assert.deepEqual(await json('second'),originalSecond);
