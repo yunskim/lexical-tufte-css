@@ -145,6 +145,29 @@ pnpm test:browser
 
 **검증 구분:** 2026-11-03 전수 통과 보고서의 기준 `e39b8a1`은 **이번 코드 이전**이다. 이번 신규 갱신 기능의 실제 TypeScript 컴파일·Playwright·CI는 아직 실행하지 않았다. 실제 DAM, 브라우저 수명/백그라운드 제한, 네트워크 권한, 다중 탭, 장시간 성능/누수 계측도 여전히 별도 수락 조건이다. R4/P3.1.e 전체를 완료로 체크하지 않는다.
 
+## 2026-11-11 — 재사용 노트 명령과 아이콘 버튼 추출 (R2/R3/R5 후속)
+
+기존 `examples/editor/src/main.tsx`에 남아 있던 노트 편집 상호작용 등록을 **실행 흐름 변경 없이** `packages/editor-react/src/TufteNoteInteractionPlugin.tsx`로 옮겼다. 기존 `TufteEditingSurface`에 플러그인을 한 번 설치하고 `readonly`일 때 언마운트한다.
+
+- 이동 범위: `Alt+↓` 노트 진입, `Escape` 본문 복귀, 노트 이미지 클릭 선택, COPY/CUT 및 붙여넣은 노트 ID 재생성, 본문 블록 붙여넣기 거부, 순수 텍스트 줄바꿈 정규화, 노트 앞/뒤 Backspace·Delete, Enter와 IME 조합 가드. 기존 Lexical command priority와 effect cleanup을 유지한다.
+- `onNotice?(message)`: 플러그인 상태 안내를 호스트가 선택적으로 받는다. React ref로 최신 callback을 사용하므로 새 메시지 처리기를 전달할 때 명령을 중복 등록하지 않는다. 상태 메시지는 **Lexical 문서 JSON에 기록하지 않는다**.
+- `ToolbarButton`: 예제 내 12개 사용처에 동일한 접근성 이름, 단축키 title, `onMouseDown`을 제공한다. 단축키 정의는 기존 공통 `EDITOR_SHORTCUTS`만 사용한다.
+- `TufteEditor`에서도 노트 탐색·붙여넣기/IME 보호가 작동하도록 공유 `TufteEditingSurface`에서 플러그인을 조립한다. 기존 예제에서는 이전 command 등록 effect를 제거해 중복 실행을 막았다.
+- `tests/reusable-note-interactions-browser.mjs`: 독립 `TufteEditor` 두 개의 진입/복귀, 노트 상태 알림의 인스턴스 격리, 텍스트 변경·`readonly` 전후 재등록을 검사하도록 작성했다. `test:note-interactions` 및 전체 브라우저 suite에 포함했다.
+- 배포 tarball 소비자 테스트에 공통 `ToolbarButton`/`TufteNoteInteractionPlugin`의 JS export와 공개 타입 소비를 추가했다.
+
+**검증 상태:** 이전 `2026-11-03` 보고서의 **42/42 브라우저 통과는 이번 추출 전 코드에만 적용**한다. GitHub에 반영된 코드와 이전 명령 블록의 동일성, 조립·타입 export·테스트 스크립트를 확인한 **정적 검사 19/19 통과**. 실제 frozen install·빌드/타입검사·Playwright는 이 변경 이후 **아직 실행하지 않았다**. 모든 명령을 사용 가능한 편집기 기능으로 간주하기 전에 다음 검증이 필요하다.
+
+```bash
+pnpm install --frozen-lockfile
+pnpm check
+pnpm package:check
+pnpm test:note-interactions
+pnpm test:browser
+```
+
+후속은 예제에 남은 삽입 버튼·명령 등록을 호스트 정책과 공통 편집기 동작으로 분류하고, 프런트엔드 독립 소비자에 필요한 공개 UI만 이관하는 것이다. P3.1.e·R2/R3/R5 전체 완료 체크박스는 유지하지 않는다.
+
 ## 검증 상태
 
 이 문서는 코드 이관 상태와 실행 범위를 함께 추적한다. 2026-11-03 frozen/build/typecheck·unit629·package6·browser40개를 실제 실행해 통과했다. 최신 근거는 [2026-11-03 보고서](VERIFICATION_DEFERRED_2026-11-03.ko.md)를 따른다. 이전 절의 미실행 문구는 당시 이력이며, controlled API의 관찰된 동작 검증과 전체 자산/운영·수동 접근성 수락을 구분한다. R4–R7/P3.1.e 전체 게이트는 유지한다.
