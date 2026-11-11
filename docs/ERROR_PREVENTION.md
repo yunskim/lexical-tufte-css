@@ -1,6 +1,6 @@
 # 재발 방지 대책 및 정기 점검
 
-## M131 — 추출 컴포넌트의 호출자 전수 조사·공유 명령 경계 (E148, 실행 미검증, 2026-11-11)
+## M131 — 추출 컴포넌트의 호출자 전수 조사·공유 명령 경계 (E148, 명시한 실행 범위 검증, 2026-11-11)
 
 - 함수나 effect를 공유 패키지로 옮길 때에는 이관한 블록의 본문뿐 아니라 **원본 파일 전체의 외부 호출 지점**과 명령 등록/해제·UI 버튼·테스트 fixture를 검색한다. 정의가 사라진 함수 이름이 예제에 남아 있으면 정적 동일성을 통과로 보지 않는다.
 - Lexical에서 키보드 및 버튼이 같은 동작을 수행해야 하면 공유 `createCommand`/ `registerCommand` 경계로 합치고, 두 경로를 브라우저에서 별도 수락한다. 원본 예제 안에 작동이 동일한 래퍼 함수를 복제해 임시로 통과시키지 않는다.
@@ -828,3 +828,9 @@ E144: 클릭 이미지가 실제 Lexical NodeSelection인지 연결하고 native
 - E146/M127: 노트 삽입 테스트는 padding/컨테이너 좌표를 selection 근거로 사용하지 않는다. 실제 편집 TextNode를 클릭한 뒤 DOM selection의 note ID를 단언하고 최종 canonical JSON과 다른 인스턴스 보존을 확인한다.
 - E147/M128: pause한 가상 시계에서 즉시 예약된 callback은 `runFor(0)`으로 실행한다. 초기 callback과 다음 만료 경계를 구분하며, 임의의 1ms를 더해 경계 기준을 이동하지 않는다. 최초 연결뿐 아니라 remount도 같은 규칙을 적용한다.
 - 이번 실행 시작/종료에 E139–E144/M127–M129의 빌드 선행·공식 browser smoke·동일 Python·Undo/저장/독립 DOM·늦은 응답 차단을 점검했다. 다음 공통 편집기 이관에서도 같은 게이트를 적용한다.
+
+## M132 — 노트 클립보드의 실제 선택과 폰트 기준 환경 고정
+
+- E149/M127/M130: `End`는 논리 노트 끝을 뜻하지 않는다. 노트 TextNode 끝의 Range와 실제 선택의 note ID를 검사하고, 본문 paste 목적지는 노트 자손을 제외한 직접 자식 TextNode로 선택한다. DOM 개수와 분리해 controlled JSON의 linebreak·rich payload·copy/cut identity·중첩 거절/형제 불변성을 검사한다.
+- E150/M055/M057: CJK subset 메트릭과 혼합 텍스트의 라틴 공백 fallback을 구분한다. 실패에 실제 CDP font/폭을 확보하고 기준값을 덮어쓰지 않는다. Linux DejaVu 참조 환경은 해당 browser process의 FONTCONFIG_FILE로 고정하고 명시적 사용자 환경은 존중한다. 다른 OS 및 한글 시스템 fallback 수락을 이 성공으로 대체하지 않는다.
+- 실행 시작/종료에 E139–E148/M127–M131을 점검했다. 빌드 선행·공식 shell smoke·같은 Python 환경·실제 Undo/DOM·가상시계 경계를 유지했고, E148의 버튼/키보드·독립 콜백·cleanup은 실제 브라우저에서 수락했다. 다음 공통 편집기 이관에도 적용한다.

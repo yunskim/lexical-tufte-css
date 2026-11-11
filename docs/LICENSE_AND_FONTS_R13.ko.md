@@ -44,3 +44,7 @@
 - [ ] P4/P6: 전체 생산 폰트 커버리지·굵기·제품 연결·실제 OS fallback·CLS/접근성
 
 2026-10-16 결과: check201/201(실패/skip0), browser9개, package4개 tarball 소비/타입, frozen offline install, diff check 통과. 원본 직접 비교·150ms 지연/차단·별도 한국어 fontconfig 및 재생성 byte 비교도 통과했다. CI는 생략했다.
+
+## 2026-11-11 참조 환경 재현
+
+새 Linux 실행 이미지의 라틴 공백 fallback이 Liberation Serif로 바뀌어 기존 DejaVu 기반 표 너비와 달랐다(E150). `font-proof-browser.mjs`는 Linux에 DejaVu가 있고 명시적 `FONTCONFIG_FILE`이 없을 때 `tests/fixtures/fontconfig-dejavu.conf`를 해당 browser 프로세스에만 적용한다. 기존 8개 custom font 샘플/6개 의미 위치 기준과 오차는 유지한다. OS 전역 fontconfig는 변경하지 않는다. 명시적 폰트 환경과 다른 OS는 별도 수락 대상이다. 이번 검사의 `knownKoreanFallback:false`는 기존 한글 시스템 fallback 한계를 그대로 나타낸다.

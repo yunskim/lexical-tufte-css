@@ -1,3 +1,9 @@
+## 2026-11-11 공통 노트 상호작용·클립보드 누적 실행
+
+- `d4d724f` + 테스트 fixture 수정으로 frozen/static/build/typecheck·unit629·package6·갱신정책·Python16/실제HTTP·revision모델12그룹 통과. browser 최초42/45 → 실패3개 수정 후 최종45/45. 공식6폭 pixel 마스크 밖 차이0.
+- E148/M131의 예제 버튼·공통 공개 명령 경로를 실제 수락했다. 두 controlled 편집기의 탐색·알림 횟수·readonly/remount, CRLF/LF paste·rich payload/ID 보존, copy 새ID·cut 이동ID·중첩 거절/JSON 불변성 통과.
+- E149–E150/M132: 실제 노트/본문 caret을 명시하고 Linux 폰트 검사 process의 DejaVu 참조 환경을 고정했다. 제품 코드·기준값·허용 오차 변경 없음. [최신 보고서](VERIFICATION_DEFERRED_2026-11-11.ko.md), [소스/로그·최초/최종 증거](verification/deferred-20261111.json). 실제 OS/운영·장시간 수락과 전체 게이트는 유지. CI 미실행.
+
 ## 2026-11-11 노트 플러그인 이관 후 E148 수정·정적 재점검
 
 - 예제의 잔여 `enterNote()/leaveNote()` 호출을 발견하고 플러그인의 공개 `ENTER_TUFTE_NOTE_COMMAND`/`LEAVE_TUFTE_NOTE_COMMAND`로 일원화했다. 키보드/버튼 두 경로를 공유하며 등록 해제도 같은 effect에서 처리한다.

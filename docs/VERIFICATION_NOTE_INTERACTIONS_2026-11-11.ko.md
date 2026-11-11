@@ -1,5 +1,7 @@
 # 2026-11-11 재사용 노트 상호작용 분리 — 정적 검토 기록
 
+> 후속 Work 실행을 완료했다. build/typecheck·unit629·package6·browser45/45 및 실패/수정 범위는 [실행 보고서](VERIFICATION_DEFERRED_2026-11-11.ko.md)를 따른다. 아래 정적 검토와 실행 대기 기록은 당시 이력이다.
+
 범위: `test/full-deferred-20261031` 브랜치의 `TufteNoteInteractionPlugin`, `ToolbarButton`, `TufteEditingSurface`, `TufteEditor`, 예제 소비자 및 관련 회귀 테스트.
 
 ## 코드·검사 범위

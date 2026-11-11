@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import {createServer} from 'node:http';
 import {readFileSync,existsSync,writeFileSync} from 'node:fs';
 import {join} from 'node:path';
+import {fileURLToPath} from 'node:url';
 import {chromium} from 'playwright';
 const root=new URL('../fixtures/fonts/proof/',import.meta.url),manifest=JSON.parse(readFileSync(new URL('manifest.json',root),'utf8'));
 const files=new Map([['/fonts.css',{file:'fonts.css',type:'text/css'}],...manifest.sources.flatMap(source=>source.chunks.map(chunk=>['/'+chunk.file,{file:chunk.file,type:'font/woff2'}]))]);
@@ -18,7 +19,15 @@ const server=createServer((req,res)=>{
  else{res.writeHead(404);res.end();}
 });
 await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const url=`http://127.0.0.1:${server.address().port}`;
-const browser=await chromium.launch({headless:true,...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{}),args:['--no-sandbox']}).catch(error=>{server.close();throw error;});
+// The reference's Latin space metrics predate container images that prefer
+// Liberation. Keep this one browser's fallback deterministic, without changing
+// OS fontconfig or weakening the CJK custom-font and reference assertions.
+const fixtureFontconfig=!process.env.FONTCONFIG_FILE&&process.platform==='linux'&&
+ existsSync('/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf')
+ ?fileURLToPath(new URL('./fixtures/fontconfig-dejavu.conf',import.meta.url)):undefined;
+const browser=await chromium.launch({headless:true,
+ ...(fixtureFontconfig?{env:{...process.env,FONTCONFIG_FILE:fixtureFontconfig}}:{}),
+ ...(process.env.CHROMIUM_PATH?{executablePath:process.env.CHROMIUM_PATH}:{}),args:['--no-sandbox']}).catch(error=>{server.close();throw error;});
 try{
  const page=await browser.newPage();const requests=[];page.on('request',req=>{if(req.url().endsWith('.woff2'))requests.push(req.url());});const errors=[];page.on('pageerror',e=>errors.push(e.message));
  const response=await page.goto(url);assert.equal(response.headers()['content-security-policy'],csp);await page.evaluate(()=>document.fonts.ready);assert.deepEqual(requests,[],'Latin-only text must not download CJK subsets');

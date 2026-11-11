@@ -4,6 +4,10 @@
 상태: P0·P1·P2.1 완료. Chromium 자동 회귀와 조합 이벤트 검증 범위이며, OS별 실제 IME 및 제품 전체 검증은 후속 단계.
 저장소: https://github.com/yunskim/lexical-tufte-css (public, GPL-3.0; 사용자가 생성한 설정 유지).
 
+## 2026-11-11 누적 테스트 실제 실행 결과
+
+`d4d724f` + 클립보드/폰트 fixture 수정으로 frozen/build/typecheck·unit629·package6·browser45/45·Python16/실제HTTP·revision모델12그룹을 통과했다. 공식6폭 pixel 마스크 밖 차이0. E148/M131의 예제 버튼·공유 명령과 신규 노트 paste/identity·독립 callback·readonly/remount를 실제 검증했다. [실행 보고서](VERIFICATION_DEFERRED_2026-11-11.ko.md)에 최초42/45 실패와 수정/최종 결과를 구분한다. 아래 실행 대기 절은 당시 이력이다. 제품 전체 R2/R3/R4–R7/P3.1.e, 실제 OS/운영·장시간 수락은 남으며 CI는 미실행이다.
+
 ## 2026-11-11 추출 뒤 잔여 버튼 참조 수정 — E148/M131
 
 노트 플러그인 추출 직후 '다음 노트로'·'본문으로' 버튼이 예제에서 미정의 `enterNote()/leaveNote()`를 호출하는 문제를 정적 대조에서 발견했다. 공통 Lexical `ENTER_TUFTE_NOTE_COMMAND`/`LEAVE_TUFTE_NOTE_COMMAND`를 생성·등록·해제하고 예제 버튼이 이를 dispatch하도록 수정했다. `tests/note-browser.mjs`에 두 버튼을 직접 클릭하는 회귀, packed consumer에 새 public command 검사를 추가했다.

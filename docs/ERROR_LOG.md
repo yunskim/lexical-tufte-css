@@ -1,11 +1,11 @@
 # 에러 기록
 
-## E148 — 노트 플러그인 추출 후 예제 버튼의 미정의 함수 참조 (정적 발견·실행 미검증, 2026-11-11)
+## E148 — 노트 플러그인 추출 후 예제 버튼의 미정의 함수 참조 (실행 검증, 2026-11-11)
 
 - `examples/editor/src/main.tsx`의 `enterNote()`·`leaveNote()` 구현을 `TufteNoteInteractionPlugin`으로 이동하면서, 같은 파일의 **'다음 노트로'와 '본문으로'** 버튼이 이전 함수를 계속 직접 호출했다. 전체 파일 참조 검토에서 남은 두 호출을 발견했다.
 - 원인: 코드 블록 이동의 정적 동일성(19/19)만 확인하고 이관한 함수의 **예제 외부 호출 지점**을 확인하지 않았다. 실제 `pnpm check`를 실행하지 못했으므로 해당 분리 커밋의 성공 여부는 미증명이며, 구체적인 TS diagnostics는 확보하지 않았다.
 - 조치: 공유 플러그인에 `ENTER_TUFTE_NOTE_COMMAND`/`LEAVE_TUFTE_NOTE_COMMAND`를 등록·해제하고, 예제 버튼이 `dispatchCommand`로 재사용하도록 수정했다. `tests/note-browser.mjs`에 두 버튼의 실제 진입/복귀 단언과 패키지 JS 공개 export 검사를 추가했다.
-- 현재 판정: 코드/정적 참조는 수정됨. **빌드·타입·브라우저 실행 미검증**. 이전 11월 3일 42/42 결과를 이 수정의 통과 증거로 사용하지 않는다. 재발 방지는 M131.
+- 당시 판정: 코드/정적 참조 수정, 실행 대기. 후속 Work 실행에서 전체 build/typecheck·unit629·package6 및 `note-browser.mjs`의 두 버튼과 공통 노트 상호작용 검사를 통과했다. E148의 버튼 경로 수정은 이 실행 범위에서 수락한다. [2026-11-11 실행 보고서](VERIFICATION_DEFERRED_2026-11-11.ko.md). 재발 방지는 M131.
 
 
 ## E133 — cite 삭제의 단일 Undo 누락 (명시한 경계 검증 완료)
@@ -1037,3 +1037,15 @@ revision 검증 이후 Backspace의 DOM 이미지 감소 대기에서30초 timeo
 ## E147 — 정지한 가상 시계에서 즉시 예약된 갱신 callback 대기
 
 새 `controlled-host-refresh-browser.mjs`가 최초 연결 후 status 대기에서 실패했다. 시계를 pause한 상태라 `setTimeout(0)` 갱신이 아직 실행되지 않았다. 1ms를 진행한 중간 시도는 다음 만료 경계 검사의 기준까지 1ms 이동해 경계 단언에 실패했다. 최초 연결과 remount 뒤 `page.clock.runFor(0)`으로 현재 시각의 예약 callback만 실행해 해결했다. 59,999ms/60,000ms 경계, 실제 URL/locator·onChange, 실패 재시도, 수동 복구, 외부 교체와 unmount의 stale 응답 차단 단언을 유지해 최종 통과했다. 시간 제한을 늘려 우회하지 않았다. M128/M130.
+
+## E149 — 공통 노트 클립보드 fixture의 시각적 End와 자손 선택 오류
+
+2026-11-11 `d4d724f` 누적 실행에서 신규 paste 검사의 linebreak가 0개였고 identity 검사의 cut/paste ID 복원 대기가 실패했다. 독립 진단 JSON에서 CRLF 텍스트는 노트가 아닌 본문 두 문단에 삽입됐고, cut 후 paste에는 중첩 노트 거절 알림이 발생했다. 원인은 `End`가 시각적 줄 끝의 본문으로 caret을 옮긴 것과 paragraph의 마지막 자손 span이 복사한 노트 내부 링크였던 것이다.
+
+노트 TextNode 끝의 DOM Range를 명시하고 본문 목적지는 paragraph의 직접 자식 TextNode로 제한했다. 붙여넣기 직전 실제 note ID/노트 밖 selection 단언을 추가했다. CRLF→linebreak 1개, 링크/이미지/ID 보존, 복사 ID 유일성, 잘라내기 ID 유지, 중첩 거절 시 canonical JSON 무변경 및 형제 편집기 불변성 기대는 유지해 두 파일을 통과했다. 제품 노트 구현 변경 없음. M127/M130/M132.
+
+## E150 — 컨테이너 라틴 fallback 변경으로 폰트 기준 메트릭 불일치
+
+같은 실행의 `font-proof-browser.mjs`가 serif td 폭 기준 비교에서 실패했다. CDP는 CJK custom font가 실제 사용됐고, 공백은 LiberationSerif였음을 보였다(폭 77px, 기존 기준 78.640625px). 별도 DejaVu-only fontconfig에서 기존 8개 문자 샘플/6개 의미 위치 기준을 모두 통과했다(serif td 79px, 기존 허용 오차 0.5px 내). CJK subset 변경 증거는 없었다.
+
+`tests/fixtures/fontconfig-dejavu.conf`를 추가해 Linux에서 DejaVu가 설치돼 있고 사용자가 FONTCONFIG_FILE을 지정하지 않은 경우 이 폰트 검사 browser 프로세스에만 적용한다. 전역 OS 설정·기준값·픽셀 허용 오차·glyph 단언은 변경하지 않았다. 일반 명령 재실행을 통과했다. `knownKoreanFallback:false`는 남으며 실제 배포 OS의 한글 실패 fallback 수락으로 확대하지 않는다. M055/M057/M132.

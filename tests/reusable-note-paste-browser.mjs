@@ -56,6 +56,17 @@ try{
   for(const child of node.children??[])count+=countTypes(child,type);
   return count;
  };
+ const caretInNote=async note=>{
+  const text=note.locator('[data-lexical-text="true"]').first();
+  await text.click();
+  await text.evaluate(element=>{
+   const range=document.createRange();range.selectNodeContents(element);range.collapse(false);
+   const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);
+   document.dispatchEvent(new Event('selectionchange'));
+  });
+  assert.equal(await page.evaluate(()=>window.getSelection()?.anchorNode?.parentElement?.closest('[data-note-id]')?.getAttribute('data-note-id')),
+   await note.getAttribute('data-note-id'),'Paste caret must remain inside the intended note');
+ };
 
  // The source fixture contains a link and image inside each note, so a
  // plain-text paste must not accidentally replace these nontext descendants.
@@ -73,8 +84,7 @@ try{
  // clipboard integration (as in the existing note-editing-browser suite).
  await page.context().grantPermissions(['clipboard-read','clipboard-write']);
  await page.evaluate(()=>navigator.clipboard.writeText('첫째줄\r\n둘째줄'));
- await firstNote.locator('[data-lexical-text="true"]').first().click();
- await page.keyboard.press('End');
+ await caretInNote(firstNote);
  await page.keyboard.press('Control+v');
  await page.waitForFunction(()=>{
   const text=document.querySelector('[data-testid="first-document-json"]')?.textContent??'';
@@ -97,8 +107,7 @@ try{
  // A separate paste into the other editor may reuse the same command
  // registration, but it must have its own selection and canonical state.
  await page.evaluate(()=>navigator.clipboard.writeText('독립-첫줄\n독립-둘째줄'));
- await secondNote.locator('[data-lexical-text="true"]').first().click();
- await page.keyboard.press('End');
+ await caretInNote(secondNote);
  await page.keyboard.press('Control+v');
  await page.waitForFunction(()=>{
   const text=document.querySelector('[data-testid="second-document-json"]')?.textContent??'';

@@ -80,9 +80,15 @@ try{
  const placeCaretAfterNote=async()=>{
   // The fixture's first paragraph ends in a text span after its sidenote.
   // Do not use Control+End: the full Tufte fixture ends in other block types.
-  const paragraph=first.locator('p').first();
-  await paragraph.locator('[data-lexical-text="true"]').last().click();
-  await page.keyboard.press('End');
+  const text=first.locator('p').first().locator(':scope > [data-lexical-text="true"]').last();
+  await text.click();
+  await text.evaluate(element=>{
+   const range=document.createRange();range.selectNodeContents(element);range.collapse(false);
+   const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);
+   document.dispatchEvent(new Event('selectionchange'));
+  });
+  assert.equal(await page.evaluate(()=>Boolean(window.getSelection()?.anchorNode?.parentElement?.closest('[data-note-id]'))),false,
+   'Copy/move paste must target the body, outside every note');
  };
  const originalFirst=await json('first');
  const originalSecond=await json('second');
@@ -133,8 +139,15 @@ try{
  // leave canonical state identical (not merely keep the DOM count constant).
  await selectNote(copiedId);
  await page.keyboard.press('Control+c');
- await first.locator('[data-note-id="first-server-note"] [data-lexical-text="true"]').first().click();
- await page.keyboard.press('End');
+ const target=first.locator('[data-note-id="first-server-note"] [data-lexical-text="true"]').first();
+ await target.click();
+ await target.evaluate(element=>{
+  const range=document.createRange();range.selectNodeContents(element);range.collapse(false);
+  const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);
+  document.dispatchEvent(new Event('selectionchange'));
+ });
+ assert.equal(await page.evaluate(()=>window.getSelection()?.anchorNode?.parentElement?.closest('[data-note-id]')?.getAttribute('data-note-id')),
+  'first-server-note','Nested paste must actually target the existing note');
  const beforeReject=await json('first');
  await page.keyboard.press('Control+v');
  await page.waitForFunction(()=>document.querySelector('[data-testid="first-notice"]')
