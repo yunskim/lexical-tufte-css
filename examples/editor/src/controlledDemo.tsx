@@ -30,6 +30,8 @@ function ControlledExample(){
  const [showSecond,setShowSecond]=useState(true);
  const [firstChanges,setFirstChanges]=useState(0);
  const [secondChanges,setSecondChanges]=useState(0);
+ const [firstNotice,setFirstNotice]=useState('');
+ const [secondNotice,setSecondNotice]=useState('');
  const [errors,setErrors]=useState<string[]>([]);
  const report=(error:Error)=>setErrors(previous=>[...previous,error.message]);
  return <main>
@@ -45,15 +47,17 @@ function ControlledExample(){
   <section data-testid="first-editor">
    <h2>첫 번째</h2>
    <p data-testid="first-changes">변경 알림 {firstChanges}회</p>
+   <p data-testid="first-notice" role="status">{firstNotice}</p>
    <p data-testid="first-title">문서 제목: {first.title}</p>
    <p data-testid="first-readonly">읽기 전용 {readonly?'예':'아니오'}</p>
-   {showFirst&&<TufteEditor value={first} onChange={document=>{setFirst(document);setFirstChanges(n=>n+1);}} onError={report}
+   {showFirst&&<TufteEditor value={first} onChange={document=>{setFirst(document);setFirstChanges(n=>n+1);}} onError={report} onNotice={setFirstNotice}
     readonly={readonly} ariaLabel="첫 번째 Tufte 편집기"/>}
   </section>
   <section data-testid="second-editor">
    <h2>두 번째</h2>
    <p data-testid="second-changes">변경 알림 {secondChanges}회</p>
-   {showSecond&&<TufteEditor value={second} onChange={document=>{setSecond(document);setSecondChanges(n=>n+1);}}
+   <p data-testid="second-notice" role="status">{secondNotice}</p>
+   {showSecond&&<TufteEditor value={second} onChange={document=>{setSecond(document);setSecondChanges(n=>n+1);}} onNotice={setSecondNotice}
     onError={report} ariaLabel="두 번째 Tufte 편집기"/>}
   </section>
   <p role="alert" data-testid="errors">{errors.join(' | ')}</p>
