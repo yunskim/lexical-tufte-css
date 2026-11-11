@@ -42,3 +42,28 @@ pnpm test:browser
 3. 실제 OS IME, 스크린리더, 타 브라우저 및 장시간 리스너·클립보드 수명 문제를 별도 수락한다.
 
 관련 오류/대책: [E148](ERROR_LOG.md), [M131](ERROR_PREVENTION.md). 기존 실행 검증: [호스트 자산 42/42 보고서](VERIFICATION_HOST_ASSETS_2026-11-03.ko.md).
+
+## 후속 테스트 보강 — 2026-11-11 (테스트 코드 작성, 실행 보류)
+
+기존 이관 기능에서 남아 있던 **실제 Clipboard와 콜백 중복/클린업** 회귀를 보강했다. 제품 라이브러리의 동작은 변경하지 않았다.
+
+- `examples/editor/src/controlledDemo.tsx`: 두 인스턴스별 `onNotice` 호출 횟수와 현재 관리 문서의 **정본 JSON**을 테스트 관찰 용도로 노출한다. 문서 정본/호스트 저장 방식은 변경하지 않는다.
+- `tests/reusable-note-interactions-browser.mjs`: 첫/둘째 편집기에서 노트 진입·복귀가 각각 **한 번의 알림**만 발생하는지 검증하고, `readonly` 왕복 및 editor unmount/remount 후 알림 횟수·상대편 콜백 불변성을 검증한다.
+- `tests/reusable-note-paste-browser.mjs` (신규): Chromium clipboard `Control+v`로 CRLF·LF를 노트에 붙여넣는다. 단일 `linebreak` 정규화, 링크·이미지·노트 ID 보존, 다른 인스턴스의 canonical JSON 무변경을 검사한다.
+- `tests/reusable-note-clipboard-identity-browser.mjs` (신규): **Copy → 새 note ID**, **Cut/Paste → 원래 note ID 유지**, **노트 내부에 다른 노트 붙여넣기 → 진단·JSON 무변경**, 두 인스턴스 격리를 검사한다. 비동기 결과는 DOM 개수만이 아니라 controlled JSON에 기록된 실제 문서 상태를 기다린다.
+- 두 파일을 전체 `test:browser`에 등록하고, 단독 실행용 `test:note-paste`와 묶음 `test:note-clipboard` 명령을 추가했다. OS별 실제 IME/시스템 클립보드 수락을 대체하지 않는다.
+
+**이번 추가 파일의 실제 실행 여부: 미실행.** 11월 3일 통과 42개와 직전 정적 25/25 결과를 이 테스트들의 통과로 소급하지 않는다.
+
+Work에서 실행할 순서:
+
+```bash
+pnpm install --frozen-lockfile
+pnpm check
+pnpm package:check
+pnpm test:note-interactions
+pnpm test:note-clipboard
+pnpm test:browser
+```
+
+`test:note-clipboard`는 신규 paste·identity 두 파일을 실행하며, 기존 `note-editing-browser.mjs`의 프로토타입 클립보드 테스트는 전체 브라우저 실행에서 함께 검증한다. 최초 실패·테스트 fixture 원인·제품 원인을 구분해 보고서에 적고, 실패가 있다면 수락 조건을 약화하지 말고 수정 후 재실행한다.
