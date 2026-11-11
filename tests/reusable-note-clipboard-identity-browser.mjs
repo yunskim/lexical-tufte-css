@@ -47,6 +47,20 @@ try{
   return found;
  };
  const noteIds=doc=>notes(doc).map(note=>note.noteId);
+ const waitCanonicalNotes=(expected,requiredId)=>page.waitForFunction(({expected,requiredId})=>{
+  const raw=document.querySelector('[data-testid="first-document-json"]')?.textContent;
+  if(!raw)return false;
+  try{
+   const parsed=JSON.parse(raw),ids=[];
+   const visit=node=>{
+    if(node.type==='tufte-sidenote'||node.type==='tufte-marginnote')ids.push(node.noteId);
+    node.children?.forEach(visit);
+   };
+   visit(parsed.lexicalState.root);
+   return ids.length===expected&&(!requiredId||ids.includes(requiredId));
+  }catch{return false;}
+ },{expected,requiredId});
+
  const countType=(node,type)=>{
   let count=node.type===type?1:0;
   for(const child of node.children??[])count+=countType(child,type);
@@ -84,9 +98,7 @@ try{
  await page.keyboard.press('Control+c');
  await placeCaretAfterNote();
  await page.keyboard.press('Control+v');
- await page.waitForFunction(count=>document.querySelectorAll(
-  '[data-testid="first-editor"] [data-note-id]'
- ).length===count+1,originalIds.length);
+ await waitCanonicalNotes(originalIds.length+1);
  const afterCopy=await json('first');
  const copiedIds=noteIds(afterCopy);
  assert.equal(copiedIds.length,originalIds.length+1);
@@ -110,9 +122,7 @@ try{
  ));
  await placeCaretAfterNote();
  await page.keyboard.press('Control+v');
- await page.waitForFunction(()=>Boolean(document.querySelector(
-  '[data-testid="first-editor"] [data-note-id="first-server-note"]'
- )));
+ await waitCanonicalNotes(copiedIds.length,'first-server-note');
  const afterMove=await json('first');
  assert.equal(noteIds(afterMove).length,copiedIds.length);
  assert.deepEqual(new Set(noteIds(afterMove)),new Set(copiedIds),
