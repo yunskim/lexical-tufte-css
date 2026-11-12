@@ -224,3 +224,17 @@ pnpm test:browser
 - `pnpm test:note-image-editor` 및 전체 브라우저에 등록했고 기존 chooser/dimensions 테스트는 유지했다. 패키지 JS/TS 소비자 검사에 API를 추가했다.
 
 **테스트 실행 보류:** `pnpm install --frozen-lockfile`, `pnpm check`, `pnpm package:check`, `pnpm test:note-image-editor`, `pnpm test:browser`. 이번 변경은 11월 12일 641/641·46/46 통과 **이후**의 코드이며 해당 수치를 소급 적용하지 않는다. CI도 실행하지 않는다.
+
+
+## 2026-11-12 — P3.1.e 로컬 문서 자산 연결 명령 추출 (실행 검증 보류)
+
+**분리 원칙:** `TufteDocument.assets`의 문서 내부 자산(`assetId`)과 `AssetProvider` 외부 자산(`hostAsset`)을 섞지 않는다. 공통 `HostAssetPicker`는 외부 제공자 검색·revision·resolve를 담당한다. 이번에는 등록된 문서 이미지 자산을 노트의 `InlineImageNode`에 연결하는 명령만 공통화했다.
+
+- `packages/lexical/src/documentAssetCommands.ts`에 `CONNECT_TUFTE_DOCUMENT_ASSET_COMMAND`, `registerDocumentAssetCommands(editor,getAssets,onNotice?)` 추가. 명령 인수는 `assetId/imageKey/noteId/expectedImage?/alt?/onResult?`이고 실제 자산은 **현재 문서의 자산 목록**에서 조회한다. 누락/잘못된 ID·URL·MIME·크기, readonly·조합 입력·변경된 노트/이미지 스냅샷을 무변경 거부한다.
+- `TufteDocumentAssetCommandsPlugin`을 편집기 인스턴스마다 등록하고 최신 `assets`/notice callback을 조회한다. `TufteEditingSurface.documentAssets`와 제어형 `TufteEditor.value.assets`에 연결했다. 성공 시 `setDocumentAsset`/선택적 `setImagePresentation` 및 `HISTORY_PUSH_TAG`만 적용한다.
+- 독립 예제의 기존 로컬 라이브러리 다이얼로그와 단축 자산 버튼은 공통 명령을 호출한다. 선택 당시의 노트 ID·이미지 속성 스냅샷을 다시 확인하고, 성공 시에만 다이얼로그를 닫는다. 예제의 `seed-note` 폴백은 독립 프로토타입 호환으로만 남겨 두며, 범용 명령은 임의 노트를 추측하지 않는다.
+- `packages/lexical/test/document-asset-commands.test.mjs`에 정상/호스트참조→로컬참조/alt 보존/잘못된 자산/오래된 이미지/readonly/목록 갱신/unregister/Undo·Redo를 검증하는 headless 7개 시나리오를 작성했다. 기존 `tests/managed-note-assets-browser.mjs`의 이미지 선택·등록·저장/복구 경계는 유지한다. 신규 `pnpm test:document-assets`에 두 검사를 묶었고 packed JS/TS 공개 API 소비 검사도 확대했다.
+
+**이번에 옮기지 않은 것:** 예제의 혼합 로컬/호스트 검색 창, prompt 기반 문서 자산 등록과 저장/복구, 기존 외부 URL refresh 호환 로직. 기존 `host-asset-provider-browser.mjs`의 타이머/오류/재시도 계약을 한 번에 변경하지 않기 위해 별도로 정리한다. `HostAssetPicker` 기능을 새로 중복 구현하지 않는다.
+
+**테스트 실행 보류:** `pnpm install --frozen-lockfile`, `pnpm check`, `pnpm package:check`, `pnpm test:document-assets`, `pnpm test:note-image-editor`, `pnpm test:browser`. 직전 2026-11-12 unit641/browser46 통과는 이 변경의 검증 결과가 아니다. CI도 실행하지 않는다.

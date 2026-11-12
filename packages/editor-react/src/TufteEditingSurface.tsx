@@ -7,6 +7,8 @@ import {SelectionToolbar} from './SelectionToolbar.js';
 import {BlockContextMenu} from './BlockContextMenu.js';
 import {TufteNoteInteractionPlugin,TufteNoteStructurePlugin} from './TufteNoteInteractionPlugin.js';
 import {TufteNoteImageEditorPlugin} from './TufteNoteImageEditorPlugin.js';
+import {TufteDocumentAssetCommandsPlugin} from './TufteDocumentAssetCommandsPlugin.js';
+import type {AssetRef} from '@lexical-tufte/document';
 
 /** All editable React plugins share the same nearest LexicalComposer. */
 export interface TufteEditingSurfaceProps {
@@ -16,10 +18,11 @@ export interface TufteEditingSurfaceProps {
  readonly?:boolean;
  onNotice?:(message:string)=>void;
  onNoteImageEditorOpenChange?:(open:boolean)=>void;
+ documentAssets?:readonly AssetRef[];
 }
 
 export function TufteEditingSurface({
- className='editor',ariaLabel,ariaDescribedBy,readonly=false,onNotice,onNoteImageEditorOpenChange
+ className='editor',ariaLabel,ariaDescribedBy,readonly=false,onNotice,onNoteImageEditorOpenChange,documentAssets=[]
 }:TufteEditingSurfaceProps){
  return <>
   <RichTextPlugin
@@ -29,6 +32,7 @@ export function TufteEditingSurface({
   <HistoryPlugin/>
   <TablePlugin/>
   <TufteNoteStructurePlugin onNotice={onNotice}/>
+  <TufteDocumentAssetCommandsPlugin assets={documentAssets} onNotice={onNotice}/>
   <TufteNoteImageEditorPlugin readonly={readonly} onNotice={onNotice} onOpenChange={onNoteImageEditorOpenChange}/>
   {!readonly&&<TufteNoteInteractionPlugin onNotice={onNotice}/>}
   {!readonly&&<SelectionToolbar/>}

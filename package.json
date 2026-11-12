@@ -38,7 +38,8 @@
     "test:note-paste": "pnpm build && node tests/reusable-note-paste-browser.mjs",
     "test:note-clipboard": "pnpm build && node tests/reusable-note-paste-browser.mjs && node tests/reusable-note-clipboard-identity-browser.mjs",
     "test:note-structures": "pnpm build && node --test packages/lexical/test/note-structure-commands.test.mjs && node tests/reusable-note-structure-browser.mjs && node tests/note-editing-browser.mjs",
-    "test:note-image-editor": "pnpm build && node tests/reusable-note-image-editor-browser.mjs && node tests/note-image-chooser-browser.mjs && node tests/note-image-dimensions-browser.mjs"
+    "test:note-image-editor": "pnpm build && node tests/reusable-note-image-editor-browser.mjs && node tests/note-image-chooser-browser.mjs && node tests/note-image-dimensions-browser.mjs",
+    "test:document-assets": "pnpm build && node --test packages/lexical/test/document-asset-commands.test.mjs && node tests/managed-note-assets-browser.mjs"
   },
   "devDependencies": {
     "playwright": "1.51.1"

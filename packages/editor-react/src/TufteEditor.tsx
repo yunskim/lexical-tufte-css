@@ -168,7 +168,7 @@ export function TufteEditor({
   <TufteComposer initialConfig={{namespace,onError:handleError,editable:!readonly,theme:defaultTheme}}>
    {assetAdapter&&assetNamespace?.trim()&&<HostAssetRefresh adapter={assetAdapter} namespace={assetNamespace}/>}
    {!readonly&&assetAdapter&&assetNamespace?.trim()&&<HostAssetPicker adapter={assetAdapter} namespace={assetNamespace}/>}
-   <TufteEditingSurface className={className} ariaLabel={ariaLabel} readonly={readonly} onNotice={onNotice} onNoteImageEditorOpenChange={onNoteImageEditorOpenChange}/>
+   <TufteEditingSurface className={className} ariaLabel={ariaLabel} readonly={readonly} onNotice={onNotice} onNoteImageEditorOpenChange={onNoteImageEditorOpenChange} documentAssets={value.assets}/>
    <DocumentBinding value={value} onChange={onChange} onError={onError} readonly={readonly}/>
    <EditorHandle editorRef={editorRef}/>
   </TufteComposer>

@@ -83,7 +83,7 @@ import {canonicalBlockType,
   $insertNotePhrasing
 } from '@lexical-tufte/lexical';
 import {NODE_SCHEMA} from '@lexical-tufte/document';
-import {ToolbarButton as IconButton, TufteComposer, TufteEditingSurface, INLINE_ACTIONS, ENTER_TUFTE_NOTE_COMMAND, LEAVE_TUFTE_NOTE_COMMAND, INSERT_TUFTE_NOTE_COMMAND, SPLIT_TUFTE_NOTE_COMMAND, MERGE_TUFTE_NOTE_COMMAND, MOVE_TUFTE_NOTE_COMMAND, OPEN_TUFTE_NOTE_IMAGE_EDITOR_COMMAND} from '@lexical-tufte/editor-react';
+import {ToolbarButton as IconButton, TufteComposer, TufteEditingSurface, INLINE_ACTIONS, ENTER_TUFTE_NOTE_COMMAND, LEAVE_TUFTE_NOTE_COMMAND, INSERT_TUFTE_NOTE_COMMAND, SPLIT_TUFTE_NOTE_COMMAND, MERGE_TUFTE_NOTE_COMMAND, MOVE_TUFTE_NOTE_COMMAND, OPEN_TUFTE_NOTE_IMAGE_EDITOR_COMMAND, CONNECT_TUFTE_DOCUMENT_ASSET_COMMAND} from '@lexical-tufte/editor-react';
 import './style.css';
 import '@lexical-tufte/editor-react/styles.css';
 
@@ -317,15 +317,15 @@ function EditorUI(){
   const [assetChoice,setAssetChoice]=useState<string|null>(null);
   const [assetTargetKey,setAssetTargetKey]=useState<string|null>(null);
   const [assetAlt,setAssetAlt]=useState('');
-  const [assetTargets,setAssetTargets]=useState<Array<{key:string;noteId:string;alt:string;src:string}>>([]);
+  const [assetTargets,setAssetTargets]=useState<Array<{key:string;noteId:string;alt:string;src:string;expectedImage:string}>>([]);
   function openAssetChooser(){
-    const targets:Array<{key:string;noteId:string;alt:string;src:string}>=[];
+    const targets:Array<{key:string;noteId:string;alt:string;src:string;expectedImage:string}>=[];
     editor.getEditorState().read(()=>{
       const scan=(node:LexicalNode,noteId:string|null):void=>{
         const currentNote=node instanceof NoteNode?node.getNoteId():noteId;
         if(node instanceof InlineImageNode&&currentNote!==null){
           const properties=node.getImageProperties();
-          targets.push({key:node.getKey(),noteId:currentNote,alt:properties.alt,src:properties.src});
+          targets.push({key:node.getKey(),noteId:currentNote,alt:properties.alt,src:properties.src,expectedImage:JSON.stringify(properties)});
         }
         if($isElementNode(node))node.getChildren().forEach(child=>scan(child,currentNote));
       };
@@ -337,22 +337,15 @@ function EditorUI(){
     setAssetQuery('');setAssetChoice(null);setAssetChooserOpen(true);
   }
   function connectChosenAsset(){
-    const asset=documentAssets.find(item=>item.id===assetChoice);
-    if(!asset||!assetTargetKey){setStatus('이미지와 연결 대상을 모두 선택하세요.');return;}
-    let valid=false;
-    editor.getEditorState().read(()=>{
-      const node=$getNodeByKey(assetTargetKey!);
-      valid=node instanceof InlineImageNode&&containingNote(node)!==null;
+    const target=assetTargets.find(item=>item.key===assetTargetKey);
+    if(!assetChoice||!target){setStatus('이미지와 연결 대상을 모두 선택하세요.');return;}
+    let applied=false;
+    editor.dispatchCommand(CONNECT_TUFTE_DOCUMENT_ASSET_COMMAND,{
+      assetId:assetChoice,imageKey:target.key,noteId:target.noteId,
+      expectedImage:target.expectedImage,alt:assetAlt,
+      onResult:success=>{applied=success;}
     });
-    if(!valid){setStatus('연결 대상 이미지가 변경되었습니다. 다시 선택하세요.');return;}
-    const key=assetTargetKey;
-    const alt=assetAlt;
-    editor.update(()=>{
-      const node=$getNodeByKey(key);
-      if(node instanceof InlineImageNode&&containingNote(node))node.setDocumentAsset(asset).setImagePresentation(alt,asset.width,asset.height);
-    },{tag:HISTORY_PUSH_TAG,discrete:true});
-    setStatus('선택한 노트 이미지에 문서 자산을 연결했습니다.');
-    closeAssetChooser();
+    if(applied)closeAssetChooser();
   }
 
   const assetChooserTrigger=useRef<HTMLButtonElement>(null);
@@ -385,36 +378,38 @@ function EditorUI(){
   documentAssetsRef.current=documentAssets;
 
   function connectDocumentAsset(asset:{id:string;src:string;width?:number;height?:number}){
-    let imageKey:string|null=null;
+    const selected:{target:{imageKey:string;noteId:string;expectedImage:string}|null}={target:null};
     editor.getEditorState().read(()=>{
       const selection=$getSelection();
-      const note=selection?$isRangeSelection(selection)?containingNote(selection.anchor.getNode()):null:null;
+      const note=selection&&$isRangeSelection(selection)?containingNote(selection.anchor.getNode()):null;
       const collect=(node:LexicalNode):void=>{
-        if(imageKey!==null)return;
-        if(node instanceof InlineImageNode){imageKey=node.getKey();return;}
+        if(selected.target!==null)return;
+        if(node instanceof InlineImageNode){
+          const parent=containingNote(node);
+          if(parent)selected.target={imageKey:node.getKey(),noteId:parent.getNoteId(),
+            expectedImage:JSON.stringify(node.getImageProperties())};
+          return;
+        }
         if($isElementNode(node))node.getChildren().forEach(collect);
       };
       if(note)note.getChildren().forEach(collect);
-      // A catalog action may move focus out of the editor. The prototype
-      // has a single seeded note, so prefer that note before other images.
-      if(imageKey===null){
-        const root=$getRoot();
+      // Compatibility only: the old standalone prototype prefers seed-note.
+      // Reusable commands never guess a target across notes.
+      if(selected.target===null){
         const findSeed=(node:LexicalNode):void=>{
-          if(imageKey!==null)return;
+          if(selected.target!==null)return;
           if(node instanceof NoteNode&&node.getNoteId()==='seed-note')node.getChildren().forEach(collect);
           else if($isElementNode(node))node.getChildren().forEach(findSeed);
         };
-        findSeed(root);
+        findSeed($getRoot());
       }
     });
-    if(imageKey===null){setStatus('연결할 노트 이미지가 없습니다.');return;}
-    const key:string=imageKey;
-    editor.update(()=>{
-      const image=$getNodeByKey(key);
-      if(!(image instanceof InlineImageNode)||!containingNote(image))return;
-      image.setDocumentAsset(asset);
-    },{tag:HISTORY_PUSH_TAG,discrete:true});
-    setStatus('선택한 노트 이미지에 문서 자산을 연결했습니다.');
+    const target=selected.target as {imageKey:string;noteId:string;expectedImage:string}|null;
+    if(target===null){setStatus('연결할 노트 이미지가 없습니다.');return;}
+    editor.dispatchCommand(CONNECT_TUFTE_DOCUMENT_ASSET_COMMAND,{
+      assetId:asset.id,imageKey:target.imageKey,noteId:target.noteId,
+      expectedImage:target.expectedImage
+    });
   }
   function registerDocumentImage(){
     const id=window.prompt('자산 ID');if(id===null)return;
@@ -749,7 +744,7 @@ function EditorUI(){
     </div>
     <p id="help">본문에서 Alt+↓: 다음 노트로 이동 · 노트에서 Escape: 본문으로 이동</p>
     <main>
-      <TufteEditingSurface ariaLabel="본문과 사이드노트 편집" ariaDescribedBy="help" onNotice={setStatus} onNoteImageEditorOpenChange={setImageChooserOpen}/>
+      <TufteEditingSurface ariaLabel="본문과 사이드노트 편집" ariaDescribedBy="help" onNotice={setStatus} onNoteImageEditorOpenChange={setImageChooserOpen} documentAssets={documentAssets}/>
     </main>
     <p role="status" aria-label="편집 작업 상태">{status}</p><p role="status" aria-label="자동 복구 저장 상태">{autoSaveState}</p>
     {structureIssues.length>0&&<aside role="alert" aria-label="문서 구조 복구"><p>문서 구조를 수정하세요. 내용은 자동 삭제하지 않으며 HTML 생성은 차단됩니다.</p><ul>{structureIssues.map((issue,i)=><li key={`${issue.key}-${i}`}><button onClick={()=>focusStructureIssue(editor,issue.key)}>{issue.message}</button> <code>{issue.path}</code></li>)}</ul><button onClick={()=>editor.dispatchCommand(UNDO_COMMAND,undefined)}>구조 변경 실행 취소</button><button onClick={recoverStructure} disabled={!checkpoint.current}>마지막 정상 구조로 복구</button></aside>}

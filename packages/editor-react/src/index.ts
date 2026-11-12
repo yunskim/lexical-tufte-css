@@ -8,6 +8,8 @@ export {BlockContextMenu} from './BlockContextMenu.js';
 
 export {NoteImagePanel,type NoteImageChoice,type ImagePresentation} from './NoteImagePanel.js';
 export {TufteNoteImageEditorPlugin,OPEN_TUFTE_NOTE_IMAGE_EDITOR_COMMAND,type TufteNoteImageEditorPluginProps} from './TufteNoteImageEditorPlugin.js';
+export {TufteDocumentAssetCommandsPlugin,type TufteDocumentAssetCommandsPluginProps} from './TufteDocumentAssetCommandsPlugin.js';
+export {CONNECT_TUFTE_DOCUMENT_ASSET_COMMAND,type ConnectTufteDocumentAsset} from '@lexical-tufte/lexical';
 
 export {INLINE_ACTIONS,EDITOR_SHORTCUTS,type InlineAction} from './inlineActions.js';
 

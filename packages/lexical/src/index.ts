@@ -10,6 +10,7 @@ export {MarginnoteNode,$createMarginnoteNode} from './MarginnoteNode.js';
 export {$createInlineImageNode, InlineImageNode} from './InlineImageNode.js';
 export {$getContainingNote,$splitNoteAtSelection,$mergeNoteWithNext,$moveNote,$insertNotePhrasing} from './noteOperations.js';
 export {registerNoteStructureCommands,INSERT_TUFTE_NOTE_COMMAND,SPLIT_TUFTE_NOTE_COMMAND,MERGE_TUFTE_NOTE_COMMAND,MOVE_TUFTE_NOTE_COMMAND,type TufteNoteKind,type TufteNoteMoveDirection} from './noteStructureCommands.js';
+export {registerDocumentAssetCommands,CONNECT_TUFTE_DOCUMENT_ASSET_COMMAND,type ConnectTufteDocumentAsset} from './documentAssetCommands.js';
 export {SectionNode,FigureNode,CaptionNode,TableLayoutNode,$createSectionNode,$createFigureNode,$createCaptionNode,$createTableLayoutNode,type FigureWidth,type TableLayout} from './LayoutNodes.js';
 export {$collectNoteIds,$reidentifyPastedNotes} from './clipboardNotes.js';
 export {$prepareNoteComposition,registerNoteCompositionGuard} from './noteComposition.js';

@@ -1,3 +1,9 @@
+## 2026-11-12 P3.1.e 문서 내부 자산 연결 명령 공통화 (실행 검증 대기)
+
+- `registerDocumentAssetCommands`와 `CONNECT_TUFTE_DOCUMENT_ASSET_COMMAND`를 구현했다. `TufteDocumentAssetCommandsPlugin`으로 제어형 `TufteEditor.value.assets`와 단독 예제의 로컬 목록을 연결했다.
+- 기존 로컬 자산 선택·연결 버튼은 공통 명령을 호출하며, 오래된 대상 노트·이미지 스냅샷을 거부한다. 외부 `AssetProvider` 검색·revision·URL 갱신 경로는 이번에 변경하지 않았다.
+- 신규 headless 7개 테스트, `pnpm test:document-assets`, 패키지 공개 API 소비 검사 작성. **컴파일·전체 테스트·Playwright 미실행**. [상세](EDITOR_REACT_EXTRACTION.ko.md).
+
 ## 2026-11-12 노트 이미지 속성 편집 공통화 (실행 검증 대기)
 
 - `TufteNoteImageEditorPlugin`·`OPEN_TUFTE_NOTE_IMAGE_EDITOR_COMMAND` 추가, 예제의 직접 핸들러 제거. 기존 UI/접근성/Undo·Redo, 자산 정체성·read-only·호스트 저장 책임을 유지했다.
