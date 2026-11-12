@@ -45,9 +45,9 @@ export function registerNoteStructureCommands(
   }
   return null;
  };
- const selectedNote=():NoteNode|null=>{
+ const selectedNote=(collapsed:boolean):NoteNode|null=>{
   const selection=$getSelection();
-  if(!$isRangeSelection(selection)||!selection.isCollapsed()||editor.isComposing())return null;
+  if(!$isRangeSelection(selection)||(collapsed&&!selection.isCollapsed())||editor.isComposing())return null;
   const anchor=$getContainingNote(selection.anchor.getNode());
   const focus=$getContainingNote(selection.focus.getNode());
   return anchor instanceof NoteNode&&focus?.is(anchor)===true?anchor:null;
@@ -84,7 +84,7 @@ export function registerNoteStructureCommands(
 
   editor.registerCommand(SPLIT_TUFTE_NOTE_COMMAND,()=>{
    if(!editor.isEditable())return report('읽기 전용 문서는 변경할 수 없습니다.');
-   if(!selectedNote())return report('먼저 노트 안으로 이동하세요.');
+   if(!selectedNote(true))return report('먼저 노트 안으로 이동하세요.');
    const id=allocate();
    if(!id)return report('고유한 노트 ID를 생성하지 못했습니다.');
    const second=$splitNoteAtSelection(id);
@@ -95,7 +95,7 @@ export function registerNoteStructureCommands(
 
   editor.registerCommand(MERGE_TUFTE_NOTE_COMMAND,()=>{
    if(!editor.isEditable())return report('읽기 전용 문서는 변경할 수 없습니다.');
-   const note=selectedNote();
+   const note=selectedNote(false);
    if(!note)return report('먼저 노트 안으로 이동하세요.');
    if(!$mergeNoteWithNext(note))return report('이 위치에서 노트 구조를 변경할 수 없습니다.');
    $addUpdateTag(HISTORY_PUSH_TAG);
@@ -106,7 +106,7 @@ export function registerNoteStructureCommands(
    if(!editor.isEditable())return report('읽기 전용 문서는 변경할 수 없습니다.');
    if(direction!=='previous'&&direction!=='next')
     return report('지원하지 않는 노트 이동 방향입니다.');
-   const note=selectedNote();
+   const note=selectedNote(false);
    if(!note)return report('먼저 노트 안으로 이동하세요.');
    if(!$moveNote(note,direction))return report('이 위치에서 노트 구조를 변경할 수 없습니다.');
    $addUpdateTag(HISTORY_PUSH_TAG);
