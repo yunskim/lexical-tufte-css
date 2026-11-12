@@ -266,3 +266,18 @@ pnpm test:browser
 **남은 작업:** 독립 예제의 화면을 완전히 `HostAssetPicker`로 교체하고 외부 URL 자동·수동 갱신 루프를 `HostAssetRefresh`로 바꾸는 최종 UI/컨트롤러 이관은 **미완료**. 현재 예제에는 기존 갱신 컨트롤러만 남기며 공통 갱신 컨트롤러와 동시에 실행하지 않는다. 두 구현의 자동 갱신 대상 범위와 레거시 브라우저 타이밍 계약을 동등하게 만드는 설계·회귀가 필요하다.
 
 **실행 보류:** `pnpm install --frozen-lockfile`, `pnpm check`, `pnpm package:check`, `pnpm test:host-asset-connection`, `pnpm test:host-asset-bridge`, `pnpm test:browser`. 신규 및 누적 수정은 컴파일·실제 브라우저 검증 전이므로 이전 641개 unit/46개 browser 성공을 수락 증거로 사용하지 않는다. CI는 실행하지 않는다.
+
+
+## 2026-11-12 — P3.1.e 외부 이미지 URL 갱신 컨트롤러 통합 (코드 작성, 실행 보류)
+
+독립 예제에 남아 있던 refreshHostAssetURLs 및 자체 만료·재시도 타이머, pageshow/visibility 리스너를 제거했다. 같은 Lexical composer 안에 공통 HostAssetRefresh 하나만 마운트한다. 기존 window.lexicalTufteAssetProvider 전역은 예제의 호스트 주입 호환 경계로만 남긴다.
+
+- HostAssetRefresh에 선택적 legacyTiming, allowManualOverride, buttonLabel, onStatus를 추가했다. 기본 모드와 기존 TufteEditor의 레이블 및 개별 만료 갱신 동작은 유지한다. 독립 예제에서는 이전 수동 버튼 이름, 상위 작업 상태 메시지, 진행 중 수동 갱신 요청의 우선권을 유지한다.
+- legacyTiming에서는 가장 이른 URL 만료 때 연결된 이미지 전체를 확인하고, 자동 재시도는 실패 이미지로 한정한다. 안전한 URL, namespace, revision, 이미지 src fingerprint를 모두 검사한다. 오래된 수동/자동 요청은 AbortController와 generation으로 배제한다.
+- REFRESH_TUFTE_HOST_ASSETS_COMMAND를 공개했다. 독립 예제는 문서 복원 후 requestAnimationFrame에서 이 명령을 보내며, 컨트롤러만 현재 Lexical 트리의 URL을 갱신한다. DAM 업로드·권한·문서 저장은 호스트 책임 그대로다.
+- HostAssetRefresh의 수동 버튼은 예제의 종전 단독 버튼을 대체한다. onStatus는 예제의 접근성 이름이 편집 작업 상태인 상태 영역으로 전달한다. 문서 내부 자산과 외부 자산이 혼합된 예제 선택 다이얼로그는 아직 유지하고, 선택/연결은 이전에 공통화한 connectHostImage를 사용한다.
+- tests/host-asset-single-controller-browser.mjs 신규 작성: 버튼 단 하나, 연결 이후 자동 갱신, 수동 갱신 1회당 추가 resolve 1회, 60초 미만 resume 이벤트 무중복, hostAsset 보존과 문서 복원 후 갱신. 기존 host-asset-provider-browser.mjs의 만료/재시도/수동 우선권/다중 revision/늦은 응답·삭제 검사는 그대로 유지한다. test:host-refresh, test:host-asset-bridge, test:browser에 신규 회귀를 추가하고 tarball JS/TS 공개 API 검사도 보강했다.
+
+**남은 작업:** 독립 예제의 혼합 로컬/외부 자산 다이얼로그를 분리해 공통 HostAssetPicker를 직접 사용하도록 하는 최종 UI 이관, 실제 OS 입력/클립보드·접근성·장기 마운트 및 타 브라우저 게이트. 호스트의 업로드/저장/정본 책임은 변경하지 않는다.
+
+**테스트 실행 보류:** pnpm install --frozen-lockfile, pnpm check, pnpm package:check, pnpm test:host-refresh, pnpm test:host-asset-bridge, pnpm test:browser, 기존 작성한 test:note-image-editor 및 test:document-assets. 컴파일·실제 Playwright·CI를 실행하지 않았다. 직전 unit641/browser46 통과 기록은 이번 코드 검증이 아니다.

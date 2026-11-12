@@ -1,7 +1,6 @@
 import type {AssetProvider,AssetSummary,AssetRevision} from '@lexical-tufte/editor-ports';
 import {
   validateDocument,
-  isSafeURL,
   type TufteDocument} from '@lexical-tufte/document';
 import {useEffect,
   useRef,
@@ -20,7 +19,6 @@ import {
   $isElementNode,
   $createParagraphNode,
   $createTextNode,
-  $getNodeByKey,
   FORMAT_TEXT_COMMAND,
   HISTORY_PUSH_TAG,
   UNDO_COMMAND,
@@ -83,7 +81,7 @@ import {canonicalBlockType,
   $insertNotePhrasing
 } from '@lexical-tufte/lexical';
 import {NODE_SCHEMA} from '@lexical-tufte/document';
-import {ToolbarButton as IconButton, TufteComposer, TufteEditingSurface, INLINE_ACTIONS, ENTER_TUFTE_NOTE_COMMAND, LEAVE_TUFTE_NOTE_COMMAND, INSERT_TUFTE_NOTE_COMMAND, SPLIT_TUFTE_NOTE_COMMAND, MERGE_TUFTE_NOTE_COMMAND, MOVE_TUFTE_NOTE_COMMAND, OPEN_TUFTE_NOTE_IMAGE_EDITOR_COMMAND, CONNECT_TUFTE_DOCUMENT_ASSET_COMMAND, connectHostImage, searchHostImages, listHostImageRevisions, isUsableResolvedImage, nextImageRefreshAt, imageRefreshRetryDelay} from '@lexical-tufte/editor-react';
+import {ToolbarButton as IconButton, TufteComposer, TufteEditingSurface, INLINE_ACTIONS, ENTER_TUFTE_NOTE_COMMAND, LEAVE_TUFTE_NOTE_COMMAND, INSERT_TUFTE_NOTE_COMMAND, SPLIT_TUFTE_NOTE_COMMAND, MERGE_TUFTE_NOTE_COMMAND, MOVE_TUFTE_NOTE_COMMAND, OPEN_TUFTE_NOTE_IMAGE_EDITOR_COMMAND, CONNECT_TUFTE_DOCUMENT_ASSET_COMMAND, connectHostImage, searchHostImages, listHostImageRevisions, HostAssetRefresh, REFRESH_TUFTE_HOST_ASSETS_COMMAND} from '@lexical-tufte/editor-react';
 import './style.css';
 import '@lexical-tufte/editor-react/styles.css';
 
@@ -121,136 +119,13 @@ function EditorUI(){
   const hostResolveGeneration=useRef(0);
   const hostResolveController=useRef<AbortController|null>(null);
   useEffect(()=>()=>{hostResolveGeneration.current++;hostResolveController.current?.abort();},[]);
-  const expiryRefreshTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
-  const expiryRefreshDeadline=useRef<number|null>(null);
-  const retryRefreshTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
-  const refreshFailures=useRef(0);
-  const failedHostKeys=useRef<Set<string>>(new Set());
-  const lastHostRefresh=useRef(0);
-  function clearExpiryRefresh(){
-    if(expiryRefreshTimer.current!==null)clearTimeout(expiryRefreshTimer.current);
-    expiryRefreshTimer.current=null;
-    expiryRefreshDeadline.current=null;
-  }
-  function clearRetryRefresh(){
-    if(retryRefreshTimer.current!==null)clearTimeout(retryRefreshTimer.current);
-    retryRefreshTimer.current=null;
-  }
-  function scheduleExpiryRefresh(expiresAt?:string){
-    if(!expiresAt)return;
-    const deadline=nextImageRefreshAt(expiresAt);
-    if(!Number.isFinite(deadline))return;
-    const delay=Math.max(0,deadline-Date.now());
-    if(expiryRefreshDeadline.current!==null&&expiryRefreshDeadline.current<=deadline)return;
-    clearExpiryRefresh();
-    expiryRefreshDeadline.current=deadline;
-    expiryRefreshTimer.current=setTimeout(()=>{
-      expiryRefreshTimer.current=null;expiryRefreshDeadline.current=null;
-      void refreshHostAssetURLs(false,true);
-    },Math.min(delay,2_147_483_647));
-  }
-  function scheduleRefreshRetry(){
-    refreshFailures.current=Math.min(refreshFailures.current+1,6);
-    const delay=imageRefreshRetryDelay(refreshFailures.current);
-    clearRetryRefresh();
-    retryRefreshTimer.current=setTimeout(()=>{
-      retryRefreshTimer.current=null;
-      void refreshHostAssetURLs(true,true);
-    },delay);
-  }
-  useEffect(()=>()=>{clearExpiryRefresh();clearRetryRefresh();},[]);
-  useEffect(()=>{
-    if(!hostAssets.current||!hostNamespaceValid)return;
-    const onResume=()=>{
-      if(document.visibilityState==='visible'&&Date.now()-lastHostRefresh.current>60_000)
-        void refreshHostAssetURLs();
-    };
-    document.addEventListener('visibilitychange',onResume);
-    window.addEventListener('pageshow',onResume);
-    return()=>{
-      document.removeEventListener('visibilitychange',onResume);
-      window.removeEventListener('pageshow',onResume);
-    };
-  },[editor]);
-  const refreshGeneration=useRef(0);
-  const activeHostRefresh=useRef(false);
-  const restoreRefreshGeneration=useRef(0);
+  // The host-aware React refresh controller owns all URL checks/timers.
+  // Restore asks that single controller to reconcile the committed Lexical tree.
   function scheduleHostRefresh(){
     if(!hostAssets.current||!hostNamespaceValid)return;
-    const generation=++restoreRefreshGeneration.current;
-    // Lexical may commit the restored state after the caller returns.
     requestAnimationFrame(()=>{
-      if(generation!==restoreRefreshGeneration.current)return;
-      void refreshHostAssetURLs();
+      editor.dispatchCommand(REFRESH_TUFTE_HOST_ASSETS_COMMAND,'restore');
     });
-  }
-
-  const [refreshingHostAssets,setRefreshingHostAssets]=useState(false);
-  async function refreshHostAssetURLs(retryOnly=false,automatic=false){
-    if(automatic&&activeHostRefresh.current)return;
-    const provider=hostAssets.current;
-    if(!provider||!hostNamespaceValid){
-      setStatus('외부 이미지 갱신을 위한 호스트 설정이 없습니다.');return;
-    }
-    const generation=++refreshGeneration.current;
-    activeHostRefresh.current=true;
-    if(!retryOnly){failedHostKeys.current.clear();clearExpiryRefresh();}
-    clearRetryRefresh();
-    lastHostRefresh.current=Date.now();
-    const images:Array<{key:string;assetId:string;revisionId?:string;src:string}>=[];
-    editor.getEditorState().read(()=>{
-      const scan=(node:LexicalNode):void=>{
-        if(node instanceof InlineImageNode){
-          const locator=node.getImageProperties().hostAsset;
-          if(locator?.namespace===hostNamespace)
-            images.push({key:node.getKey(),assetId:locator.assetId,revisionId:locator.revisionId,src:node.getImageProperties().src});
-        }
-        if($isElementNode(node))node.getChildren().forEach(scan);
-      };
-      scan($getRoot());
-    });
-    const pending=retryOnly?images.filter(image=>failedHostKeys.current.has(image.key)):images;
-    if(pending.length===0){activeHostRefresh.current=false;failedHostKeys.current.clear();refreshFailures.current=0;setRefreshingHostAssets(false);setStatus('갱신할 외부 이미지가 없습니다.');return;}
-    setRefreshingHostAssets(true);
-    let refreshed=0;
-    let failed=0;
-    try{
-      for(const image of pending){
-        failedHostKeys.current.delete(image.key);
-        let resolved;
-        try{
-          resolved=await provider.resolve({assetId:image.assetId,
-            ...(image.revisionId?{revisionId:image.revisionId}:{})});
-        }catch{
-          if(generation!==refreshGeneration.current)return;
-          failed++;
-          failedHostKeys.current.add(image.key);
-          continue;
-        }
-        if(generation!==refreshGeneration.current)return;
-        if(!isUsableResolvedImage({assetId:image.assetId,...(image.revisionId?{revisionId:image.revisionId}:{})},resolved)){
-          failed++;failedHostKeys.current.add(image.key);continue;
-        }
-        let applied=false;
-        editor.update(()=>{
-          const node=$getNodeByKey(image.key);
-          if(!(node instanceof InlineImageNode))return;
-          const current=node.getImageProperties();
-          if(current.hostAsset?.namespace!==hostNamespace||
-            current.hostAsset.assetId!==image.assetId||
-            current.hostAsset.revisionId!==image.revisionId||
-            current.src!==image.src)return;
-          node.setHostAsset(current.hostAsset,resolved.url,current.alt);
-          applied=true;
-          refreshed++;
-        },{tag:HISTORY_PUSH_TAG,discrete:true});
-        if(applied)scheduleExpiryRefresh(resolved.expiresAt);
-      }
-      if(generation!==refreshGeneration.current)return;
-      if(failed){scheduleRefreshRetry();}else{refreshFailures.current=0;clearRetryRefresh();}
-      setStatus('외부 이미지 URL 갱신: '+refreshed+'/'+pending.length+'개.'+(failed?' 실패 '+failed+'개, 재시도 예약.':''));
-    }catch{if(generation===refreshGeneration.current){scheduleRefreshRetry();setStatus('외부 이미지 URL 갱신 중 오류가 발생했습니다. 재시도합니다.');}}
-    finally{if(generation===refreshGeneration.current){activeHostRefresh.current=false;setRefreshingHostAssets(false);}}
   }
 
   async function connectHostAsset(){
@@ -278,7 +153,6 @@ function EditorUI(){
       });
       if(generation!==hostResolveGeneration.current||controller.signal.aborted)return;
       if(result.ok){
-        scheduleExpiryRefresh(result.expiresAt);
         setStatus('외부 이미지 자산을 연결했습니다.');
         closeAssetChooser();
       }else if(result.reason==='invalid')
@@ -799,8 +673,10 @@ function EditorUI(){
         <button type="button" disabled={!assetChoice||!assetTargetKey} onClick={connectChosenAsset}>선택한 이미지 연결</button>
       </div>
     </div>}
-    {hostAssets.current&&<button type="button" aria-busy={refreshingHostAssets}
-      onClick={()=>void refreshHostAssetURLs()}>외부 이미지 URL 다시 확인</button>}
+    {hostAssets.current&&hostNamespaceValid&&<HostAssetRefresh
+      adapter={hostAssets.current} namespace={hostNamespace!}
+      legacyTiming allowManualOverride buttonLabel="외부 이미지 URL 다시 확인"
+      onStatus={setStatus}/>}
     <section role="group" aria-label="문서 이미지 자산">
       <button type="button" onClick={registerDocumentImage}>문서 이미지 자산 등록</button>
       <button ref={assetChooserTrigger} type="button" onClick={openAssetChooser}>이미지 라이브러리에서 선택</button>

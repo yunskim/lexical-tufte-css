@@ -1,3 +1,9 @@
+## 2026-11-12 P3.1.e 외부 이미지 URL 갱신 단일 컨트롤러 이관 (검증 보류)
+
+- 독립 예제의 자체 URL 갱신 타이머·재시도·복원·visibility 처리 로직을 제거하고 HostAssetRefresh를 하나만 마운트했다. legacyTiming, onStatus, 버튼 이름·수동 갱신 우선권을 선택적 호환 설정으로 유지하며 일반 TufteEditor의 기본 동작은 변경하지 않는다.
+- REFRESH_TUFTE_HOST_ASSETS_COMMAND로 문서 복원 후 갱신을 명시적으로 요청한다. 수동 클릭당 resolve 1회, 단일 버튼, 빠른 resume 무중복, 호스트 자산 참조·복원 검사를 작성했다.
+- 기존 host 브라우저 스위트와 JS/TS 소비자 게이트에 변경을 연결했다. **전체 빌드·타입 검사·테스트는 실행하지 않았다.** 혼합 자산 선택 다이얼로그 최종 분리는 남았다. [상세](EDITOR_REACT_EXTRACTION.ko.md).
+
 ## 2026-11-12 P3.1.e 외부 이미지 자산 연결 및 검색 공통화 (실행 검증 대기)
 
 - `connectHostImage()`에 고정/최신 버전, 기존 이미지 교체/노트 추가, 현재 노트·이미지 ID와 전체 속성 재검증, 취소/이전 요청 차단을 일원화했다. `HostAssetPicker`와 예제의 직접 resolve/mutation 로직은 이 함수를 호출한다.
