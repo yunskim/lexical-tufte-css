@@ -79,15 +79,11 @@ import {canonicalBlockType,
   NoteNode,
   InlineImageNode,
   $createSidenoteNode,
-  $createMarginnoteNode,
   $createInlineImageNode,
-  $splitNoteAtSelection,
-  $mergeNoteWithNext,
-  $moveNote,
   $insertNotePhrasing
 } from '@lexical-tufte/lexical';
 import {NODE_SCHEMA} from '@lexical-tufte/document';
-import {ToolbarButton as IconButton, TufteComposer, TufteEditingSurface, NoteImagePanel, INLINE_ACTIONS, ENTER_TUFTE_NOTE_COMMAND, LEAVE_TUFTE_NOTE_COMMAND, type NoteImageChoice, type ImagePresentation} from '@lexical-tufte/editor-react';
+import {ToolbarButton as IconButton, TufteComposer, TufteEditingSurface, NoteImagePanel, INLINE_ACTIONS, ENTER_TUFTE_NOTE_COMMAND, LEAVE_TUFTE_NOTE_COMMAND, INSERT_TUFTE_NOTE_COMMAND, SPLIT_TUFTE_NOTE_COMMAND, MERGE_TUFTE_NOTE_COMMAND, MOVE_TUFTE_NOTE_COMMAND, type NoteImageChoice, type ImagePresentation} from '@lexical-tufte/editor-react';
 import './style.css';
 import '@lexical-tufte/editor-react/styles.css';
 
@@ -596,24 +592,6 @@ function EditorUI(){
     }catch{setStatus('복구용 사본을 열지 못했습니다.');}
   }
   const textarea=useRef<HTMLTextAreaElement>(null);
-  function insertNote(kind:'sidenote'|'marginnote'='sidenote'){
-    editor.update(()=>{
-      const s=$getSelection();
-      if(!$isRangeSelection(s)||!s.isCollapsed()){setStatus('본문의 삽입 위치 한 곳을 선택하세요.');return;}
-      if(containingNote(s.anchor.getNode())){setStatus('노트 안에 노트를 넣을 수 없습니다.');return;}
-      const note=(kind==='sidenote'?$createSidenoteNode(crypto.randomUUID()):$createMarginnoteNode(crypto.randomUUID())).append($createTextNode('새 노트'));
-      s.insertNodes([note]);note.selectStart();setStatus('새 노트를 삽입했습니다. Escape로 본문에 돌아갑니다.');
-    },{tag:HISTORY_PUSH_TAG,discrete:true});editor.focus();
-  }
-  function noteOperation(operation:'split'|'merge'|'previous'|'next'){
-    editor.update(()=>{
-      const s=$getSelection();if(!$isRangeSelection(s))return;
-      const note=containingNote(s.anchor.getNode());if(!note){setStatus('먼저 노트 안으로 이동하세요.');return;}
-      const ok=operation==='split'?Boolean($splitNoteAtSelection(crypto.randomUUID())):
-        operation==='merge'?$mergeNoteWithNext(note):$moveNote(note,operation);
-      setStatus(ok?'노트 구조를 변경했습니다.':'이 위치에서 노트 구조를 변경할 수 없습니다.');
-    },{tag:HISTORY_PUSH_TAG});editor.focus();
-  }
   function insertPayload(kind:'link'|'image'){
     editor.update(()=>{
       const s=$getSelection();if(!$isRangeSelection(s))return;
@@ -797,18 +775,18 @@ function EditorUI(){
       {(['sans','newthought','numeral','danger'] as const).map(kind=><button key={kind} onMouseDown={preserve} onClick={()=>editor.dispatchCommand(SET_TUFTE_SPAN_KIND_COMMAND,kind)}>인라인 {kind}</button>)}
       {(['sans','newthought','numeral','danger'] as const).map(kind=><button key={'wrap-'+kind} onMouseDown={preserve} onClick={()=>editor.dispatchCommand(WRAP_TUFTE_SPAN_COMMAND,kind)}>선택 텍스트 {kind}</button>)}
       <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(UNWRAP_TUFTE_SPAN_COMMAND,undefined)}>인라인 속성 해제</button>
-      <IconButton name="sidenote" label="노트 삽입" onMouseDown={preserve} onClick={()=>insertNote()}/>
-      <IconButton name="marginnote" label="여백 주석 삽입" onMouseDown={preserve} onClick={()=>insertNote('marginnote')}/>
+      <IconButton name="sidenote" label="노트 삽입" onMouseDown={preserve} onClick={()=>{editor.dispatchCommand(INSERT_TUFTE_NOTE_COMMAND,'sidenote');editor.focus();}}/>
+      <IconButton name="marginnote" label="여백 주석 삽입" onMouseDown={preserve} onClick={()=>{editor.dispatchCommand(INSERT_TUFTE_NOTE_COMMAND,'marginnote');editor.focus();}}/>
       <button onMouseDown={preserve} onClick={()=>{if(!editor.dispatchCommand(ENTER_TUFTE_NOTE_COMMAND,undefined))setStatus('뒤에 있는 노트를 찾지 못했습니다.');}}>다음 노트로</button>
       <button onMouseDown={preserve} onClick={()=>editor.dispatchCommand(LEAVE_TUFTE_NOTE_COMMAND,undefined)}>본문으로</button>
       {INLINE_ACTIONS.map(action=><IconButton key={action.id} name={action.icon} label={action.label} onMouseDown={preserve} onClick={()=>editor.update(()=>{editor.dispatchCommand(FORMAT_TEXT_COMMAND,action.id);},{tag:HISTORY_PUSH_TAG})}/>)}
       <button onMouseDown={preserve} onClick={()=>insertPayload('link')}>노트 링크 삽입</button>
       <button onMouseDown={preserve} onClick={()=>insertPayload('image')}>노트 이미지 삽입</button>
       <button ref={chooserTrigger} type="button" onMouseDown={preserve} onClick={openNoteImageChooser} aria-haspopup="dialog" aria-expanded={imageChooserOpen}>노트 이미지 선택</button>
-      <button onMouseDown={preserve} onClick={()=>noteOperation('split')}>노트 나누기</button>
-      <button onMouseDown={preserve} onClick={()=>noteOperation('merge')}>다음 노트와 합치기</button>
-      <button onMouseDown={preserve} onClick={()=>noteOperation('previous')}>노트 앞으로 이동</button>
-      <button onMouseDown={preserve} onClick={()=>noteOperation('next')}>노트 뒤로 이동</button>
+      <button onMouseDown={preserve} onClick={()=>{editor.dispatchCommand(SPLIT_TUFTE_NOTE_COMMAND,undefined);editor.focus();}}>노트 나누기</button>
+      <button onMouseDown={preserve} onClick={()=>{editor.dispatchCommand(MERGE_TUFTE_NOTE_COMMAND,undefined);editor.focus();}}>다음 노트와 합치기</button>
+      <button onMouseDown={preserve} onClick={()=>{editor.dispatchCommand(MOVE_TUFTE_NOTE_COMMAND,'previous');editor.focus();}}>노트 앞으로 이동</button>
+      <button onMouseDown={preserve} onClick={()=>{editor.dispatchCommand(MOVE_TUFTE_NOTE_COMMAND,'next');editor.focus();}}>노트 뒤로 이동</button>
       <IconButton name="undo" label="실행 취소" onMouseDown={preserve} onClick={()=>editor.dispatchCommand(UNDO_COMMAND,undefined)}/>
       <IconButton name="redo" label="다시 실행" onMouseDown={preserve} onClick={()=>editor.dispatchCommand(REDO_COMMAND,undefined)}/>
     </div>
