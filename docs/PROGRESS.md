@@ -1,3 +1,8 @@
+## 2026-11-12 P3.1.e 독립 예제 외부 자산 공통 정책 적용 (실행 검증 대기)
+
+- 예제의 외부 이미지 연결/수동 URL 갱신 시 응답 검증을 `isUsableResolvedImage()`로 통일하고, 갱신 예약·재시도를 `nextImageRefreshAt()`/`imageRefreshRetryDelay()`로 공유한다. 비동기 이미지 연결은 열었을 때의 노트·이미지/속성·요청 revision을 다시 검사하고 취소/언마운트 generation guard를 적용한다.
+- 기존 자산 선택 UI·스토리지·구형 refresh 동작은 유지했다. 새 `legacy-host-asset-guard-browser.mjs` 및 공통 정책 누락 revision 테스트, targeted `test:host-asset-bridge`와 packed JS 검사 작성. **빌드·테스트 미실행**. [상세](EDITOR_REACT_EXTRACTION.ko.md).
+
 ## 2026-11-12 P3.1.e 문서 내부 자산 연결 명령 공통화 (실행 검증 대기)
 
 - `registerDocumentAssetCommands`와 `CONNECT_TUFTE_DOCUMENT_ASSET_COMMAND`를 구현했다. `TufteDocumentAssetCommandsPlugin`으로 제어형 `TufteEditor.value.assets`와 단독 예제의 로컬 목록을 연결했다.

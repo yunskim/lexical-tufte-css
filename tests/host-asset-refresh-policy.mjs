@@ -17,6 +17,7 @@ assert.equal(isUsableResolvedImage(latest,response,now),true,
 for(const invalid of [
  null,undefined,{},[],{...response,assetId:'other'},
  {...response,revisionId:'rev-2'},{...response,revisionId:' '},
+ (()=>{const {revisionId,...missing}=response;return missing;})(),
  {...response,mediaType:'text/html'},{...response,url:'javascript:alert(1)'},
  {...response,expiresAt:'not-a-date'},
  {...response,expiresAt:new Date(now-1).toISOString()}

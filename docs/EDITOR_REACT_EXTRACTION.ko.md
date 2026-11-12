@@ -238,3 +238,17 @@ pnpm test:browser
 **이번에 옮기지 않은 것:** 예제의 혼합 로컬/호스트 검색 창, prompt 기반 문서 자산 등록과 저장/복구, 기존 외부 URL refresh 호환 로직. 기존 `host-asset-provider-browser.mjs`의 타이머/오류/재시도 계약을 한 번에 변경하지 않기 위해 별도로 정리한다. `HostAssetPicker` 기능을 새로 중복 구현하지 않는다.
 
 **테스트 실행 보류:** `pnpm install --frozen-lockfile`, `pnpm check`, `pnpm package:check`, `pnpm test:document-assets`, `pnpm test:note-image-editor`, `pnpm test:browser`. 직전 2026-11-12 unit641/browser46 통과는 이 변경의 검증 결과가 아니다. CI도 실행하지 않는다.
+
+
+## 2026-11-12 — 독립 예제 외부 자산 연결/URL 갱신의 공통 정책 적용 (코드 작성, 실행 보류)
+
+이전 예제 `examples/editor/src/main.tsx`에는 `HostAssetPicker`/ `HostAssetRefresh`와 중복되는 연결/갱신 로직이 남아 있다. 이 단계에서는 기존 `host-asset-provider-browser.mjs`의 다이얼로그·접근성 이름·재시도·expiry 타이머/복구 흐름을 깨지 않도록 **UI 자체는 이관하지 않고 정책을 먼저 통합**했다.
+
+- `connectHostAsset()`과 `refreshHostAssetURLs()`의 인라인 응답 검증을 공통 `isUsableResolvedImage()`로 교체. `assetId`, 고정 revision, 비어 있거나 빠진 resolved revision, image MIME, 안전한 URL, 만료/잘못된 만료 문자열의 지원/거부 조건을 동일하게 적용한다.
+- 기존 예제의 refresh backoff 계산을 공통 `imageRefreshRetryDelay()`로 교체하고, 만료 예약을 `nextImageRefreshAt()`으로 통일했다. 평상시 60초 조기 갱신 경계는 유지하며 짧은 수명의 URL은 남은 수명의 절반 이후로 예약한다. 기존의 자동 재시도·manual override·visibility/pageshow 제어는 보존한다.
+- 비동기 connect 요청은 선택한 이미지의 key, 노트 ID, 전체 image properties snapshot, 요청 당시 revision/alt를 캡처한다. `resolve()` 후 **같은 Lexical update 안에서 재확인**한 경우에만 `setHostAsset()`을 호출하고, 삭제·문서 교체·속성 수정·readonly·취소된 응답에는 실패 안내를 표시하거나 폐기한다. 비동기 중 취소·언마운트에는 generation guard를 적용한다. 기존 refresh도 시작 때의 `src`를 기억해 최신 이미지 URL을 구형 응답으로 덮어쓰지 않게 했다.
+- 독립 브라우저 회귀 `tests/legacy-host-asset-guard-browser.mjs`는 만료, 누락 revision, revision 불일치, MIME/URL 누락·위험, 자산 ID 불일치, 유효 정상 응답, 연결 도중 문서 통째로 교체 후 늦은 응답 무변경을 검사하도록 작성했다. 기존 공통 정책 검사에는 resolved revision 누락 반례를 추가했다. `pnpm test:host-asset-bridge`와 브라우저 묶음에 연결, packed JS 소비 검사에 세 공통 함수를 명시했다.
+
+**아직 완료하지 않은 이관:** 독립 예제의 혼합 로컬/외부 자산 다이얼로그를 `HostAssetPicker`로 통째로 대체하거나, 예제의 수동/자동 갱신 컨트롤러를 `HostAssetRefresh`로 전환하지 않았다. 기존과 공통 컨트롤러를 동시에 마운트하면 한 자산에 대해 중복 resolve·타이머가 발생하므로, UI/컨트롤러 전환을 함께 수락하는 별도 단계가 필요하다.
+
+**실행 보류:** 이번 변경의 `pnpm check`·`pnpm package:check`·`pnpm test:host-asset-bridge`·전체 `pnpm test:browser`는 실행하지 않았다. 먼저 작성된 노트 이미지/로컬 문서 자산 회귀도 아직 누적 실행 대기다. 이전 641 unit/46 browser 성공 기록을 이번 변경의 수락 증거로 사용하지 않는다.
