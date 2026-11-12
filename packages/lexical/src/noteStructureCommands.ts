@@ -1,5 +1,5 @@
 import {
- $addUpdateTag,$createTextNode,$getSelection,$isElementNode,$isRangeSelection,
+ $addUpdateTag,$createTextNode,$getSelection,$isRangeSelection,
  createCommand,COMMAND_PRIORITY_EDITOR,HISTORY_PUSH_TAG,
  type LexicalCommand,type LexicalEditor,type LexicalNode
 } from 'lexical';
