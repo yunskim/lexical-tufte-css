@@ -85,6 +85,9 @@ export function TufteNoteImageEditorPlugin({
   if(readonly&&snapshotRef.current)close();
  },[readonly]);
 
+ // A host toolbar must not keep aria-expanded=true after editor unmount.
+ useEffect(()=>()=>{if(snapshotRef.current)callbacks.current.onOpenChange?.(false);},[]);
+
  const save=(key:string,attributes:ImagePresentation):boolean=>{
   const chosen=snapshotRef.current;
   if(!chosen||callbacks.current.readonly||!editor.isEditable()){

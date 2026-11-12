@@ -1,3 +1,8 @@
+## 2026-11-12 노트 이미지 속성 편집 공통화 (실행 검증 대기)
+
+- `TufteNoteImageEditorPlugin`·`OPEN_TUFTE_NOTE_IMAGE_EDITOR_COMMAND` 추가, 예제의 직접 핸들러 제거. 기존 UI/접근성/Undo·Redo, 자산 정체성·read-only·호스트 저장 책임을 유지했다.
+- 브라우저 회귀 `reusable-note-image-editor-browser.mjs`를 작성하고 기존 이미지 chooser/dimensions 테스트와 묶어 실행 스크립트에 연결했다. **실제 실행하지 않았다.** [상세](EDITOR_REACT_EXTRACTION.ko.md).
+
 ## 2026-11-12 노트 구조 명령 누적 자동 검증 완료 범위
 
 - `d3eae84` 기준 제품/테스트 수정 없이 frozen/static/build/typecheck·unit641(신규 구조12 포함)·package6·갱신정책·Python16/실제HTTP·revision모델12그룹 통과. browser 최초45/46 → 동일 소스 단독 재실행 후 최종46/46, 공식6폭 pixel 마스크 밖 차이0.

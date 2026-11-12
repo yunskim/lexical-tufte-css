@@ -212,3 +212,15 @@ pnpm test:browser
 ## 2026-11-12 구조 명령·readonly 등록 경계 실행 수락
 
 위 구조 명령 공통화 및 readonly 등록 경계의 실제 검증을 마쳤다. 신규 단위 12개와 브라우저 4개 구조 시나리오를 포함한 전체 unit641/browser46을 최종 통과했다(정의목록 timeout 1건은 동일 소스 재실행 통과). [최신 보고서](VERIFICATION_DEFERRED_2026-11-12.ko.md)에서 수락 범위와 남은 운영/접근성·장시간 게이트를 구분한다. 전체 R2–R7/P3.1.e 체크박스를 완료로 바꾸지 않는다.
+
+
+## 2026-11-12 — P3.1.e 노트 이미지 속성 편집 공통화 (코드·테스트 작성, 실행 보류)
+
+예제 `main.tsx`에 남아 있던 `openNoteImageChooser`·`saveNoteImage` 제어 로직을 새 `TufteNoteImageEditorPlugin`으로 옮겼다. `NoteImagePanel`은 그대로 재사용하며, 호스트는 `OPEN_TUFTE_NOTE_IMAGE_EDITOR_COMMAND`에 포커스 복귀 버튼을 전달해 연다. `onNoteImageEditorOpenChange`는 호스트의 `aria-expanded` UI 표시만 연결하고 Lexical 저장 정본으로 쓰지 않는다.
+
+- 노트/이미지 선택·검색·속성 편집·포커스 복귀·읽기 전용 거부와 IME 조합 중 거부는 공통 플러그인이 담당한다. 노트 key/ID와 이미지 key/전체 속성 fingerprint로 저장 전 재확인하며 외부 문서 교체·대상 변경 시 fail-closed 동작한다.
+- 변경은 `setImagePresentation`으로 alt/width/height만 수정한다. 이미지의 `src/assetId/hostAsset`과 정본 스키마, 자산 검색·업로드·권한·영속 저장 책임은 그대로 유지한다.
+- 기존 예제와 두 인스턴스 제어형 소비자에 동일 명령을 연결했다. 새로운 `tests/reusable-note-image-editor-browser.mjs`로 이미지 ID·자산 참조 및 형제 편집기 불변, Undo/Redo, readonly 거부, 외부 value 교체, unmount/remount를 검사하도록 작성했다.
+- `pnpm test:note-image-editor` 및 전체 브라우저에 등록했고 기존 chooser/dimensions 테스트는 유지했다. 패키지 JS/TS 소비자 검사에 API를 추가했다.
+
+**테스트 실행 보류:** `pnpm install --frozen-lockfile`, `pnpm check`, `pnpm package:check`, `pnpm test:note-image-editor`, `pnpm test:browser`. 이번 변경은 11월 12일 641/641·46/46 통과 **이후**의 코드이며 해당 수치를 소급 적용하지 않는다. CI도 실행하지 않는다.
