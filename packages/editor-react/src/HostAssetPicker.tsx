@@ -1,18 +1,18 @@
 import {useEffect,useId,useRef,useState,type KeyboardEvent} from 'react';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
-import {$getNodeByKey,$getRoot,$getSelection,$isElementNode,$isRangeSelection,$createTextNode,HISTORY_PUSH_TAG,type LexicalNode} from 'lexical';
-import {isUsableResolvedImage} from './hostAssetPolicy.js';
+import {$getRoot,$getSelection,$isElementNode,$isRangeSelection,type LexicalNode} from 'lexical';
+import {connectHostImage,type HostImageTarget} from './hostAssetConnection.js';
+import {searchHostImages,listHostImageRevisions} from './hostAssetCatalog.js';
 import type {AssetProvider,AssetRevision,AssetSummary} from '@lexical-tufte/editor-ports';
-import {InlineImageNode,NoteNode,$createInlineImageNode} from '@lexical-tufte/lexical';
+import {InlineImageNode,NoteNode} from '@lexical-tufte/lexical';
 
 export type HostAssetPickerProps={
  adapter:AssetProvider;
  namespace:string;
 };
 
-type ImageTarget={key:string;noteId:string;src:string;alt:string};
+type ImageTarget={key:string;noteId:string;src:string;alt:string;expectedImage:string};
 const INSERT_TARGET='__insert-into-current-note__';
-const IMAGE_MEDIA=['image/png','image/jpeg','image/webp','image/svg+xml'];
 
 /** Image-only host picker; the host owns credentials, upload, persistence and signed URLs. */
 export function HostAssetPicker({adapter,namespace}:HostAssetPickerProps){
@@ -73,7 +73,7 @@ export function HostAssetPicker({adapter,namespace}:HostAssetPickerProps){
     const containing=node instanceof NoteNode?node:note;
     if(node instanceof InlineImageNode&&containing){
      const properties=node.getImageProperties();
-     found.push({key:node.getKey(),noteId:containing.getNoteId(),src:properties.src,alt:properties.alt});
+     found.push({key:node.getKey(),noteId:containing.getNoteId(),src:properties.src,alt:properties.alt,expectedImage:JSON.stringify(properties)});
     }
     if($isElementNode(node))node.getChildren().forEach(child=>visit(child,containing));
    };
@@ -97,11 +97,8 @@ export function HostAssetPicker({adapter,namespace}:HostAssetPickerProps){
   let active=true;
   setSearchBusy(true);setError('');
   setResults([]);setAssetId('');setRevisions([]);setRevisionId('');
-  adapter.search({text:query,mediaTypes:IMAGE_MEDIA,limit:40},controller.signal)
-   .then(page=>{
-    if(!active)return;
-    setResults(page.items.filter(asset=>typeof asset.mediaType==='string'&&asset.mediaType.startsWith('image/')));
-   })
+  searchHostImages(adapter,query,controller.signal)
+   .then(images=>{if(active)setResults(images);})
    .catch(()=>{if(active)setError('외부 이미지 검색에 실패했습니다.');})
    .finally(()=>{if(active)setSearchBusy(false);});
   return()=>{active=false;controller.abort();};
@@ -112,8 +109,8 @@ export function HostAssetPicker({adapter,namespace}:HostAssetPickerProps){
   const controller=new AbortController();
   let active=true;
   setRevisionsBusy(true);setRevisions([]);setRevisionId('');
-  adapter.revisions(assetId,{limit:40},controller.signal)
-   .then(page=>{if(active)setRevisions(page.items.filter(item=>item.assetId===assetId));})
+  listHostImageRevisions(adapter,assetId,controller.signal)
+   .then(revisions=>{if(active)setRevisions(revisions);})
    .catch(()=>{if(active)setError('이미지 버전을 조회하지 못했습니다.');})
    .finally(()=>{if(active)setRevisionsBusy(false);});
   return()=>{active=false;controller.abort();};
@@ -147,58 +144,37 @@ export function HostAssetPicker({adapter,namespace}:HostAssetPickerProps){
   const requestedAsset=results.find(item=>item.id===assetId);
   if(!requestedAsset||!targetKey){setError('이미지와 연결 대상을 선택하세요.');return;}
   if(!namespace.trim()){setError('호스트 namespace가 없습니다.');return;}
+  const selectedTarget=targets.find(item=>item.key===targetKey);
+  const target:HostImageTarget|null=targetKey===INSERT_TARGET?
+   noteKey&&noteIdentity?{kind:'append',noteKey,noteId:noteIdentity}:null:
+   selectedTarget?{kind:'replace',imageKey:selectedTarget.key,
+    noteId:selectedTarget.noteId,expectedImage:selectedTarget.expectedImage}:null;
+  if(!target){setError('대상 노트 또는 이미지가 변경되었습니다. 다시 선택하세요.');return;}
   const controller=new AbortController();
   pendingResolve.current=controller;
   const request=++generation.current;
-  const target=targetKey,section=noteKey;
-  const capturedNoteId=noteIdentity;
-  const capturedTargetNoteId=targets.find(item=>item.key===target)?.noteId;
-  const requestedRevision=revisionId;
-  const selectedAlt=alt;
   const fromAdapter=adapter,fromNamespace=namespace;
   setResolving(true);setError('');
   try{
-   const requestLocator={assetId,...(requestedRevision?{revisionId:requestedRevision}:{})};
-   const resolved=await adapter.resolve(requestLocator,controller.signal);
+   const result=await connectHostImage({
+    editor,adapter:fromAdapter,namespace:fromNamespace,
+    locator:{assetId,...(revisionId?{revisionId}:{})},
+    target,alt,signal:controller.signal,
+    isCurrent:()=>mounted.current&&request===generation.current&&
+     currentConfig.current.adapter===fromAdapter&&currentConfig.current.namespace===fromNamespace
+   });
    if(!mounted.current||request!==generation.current||controller.signal.aborted||
     currentConfig.current.adapter!==fromAdapter||currentConfig.current.namespace!==fromNamespace)return;
-   if(!isUsableResolvedImage(requestLocator,resolved)){
-    setError('외부 자산 URL·미디어 유형·버전 또는 만료 시간이 유효하지 않습니다.');return;
-   }
-   const locator={namespace:fromNamespace,assetId,...(requestedRevision?{revisionId:resolved.revisionId}:{})};
-   let applied=false;
-   editor.update(()=>{
-    if(request!==generation.current||!editor.isEditable())return;
-    if(target===INSERT_TARGET){
-     const note=section?$getNodeByKey(section):null;
-     if(!(note instanceof NoteNode)||note.getNoteId()!==capturedNoteId)return;
-     // Append inside the captured note, not at the dialog's current DOM focus.
-     note.append($createInlineImageNode(resolved.url,selectedAlt,undefined,undefined,undefined,locator),$createTextNode(' '));
-     applied=true;
-    }else{
-     const image=$getNodeByKey(target);
-     if(!(image instanceof InlineImageNode))return;
-     let containingNoteId:string|null=null;
-     for(let node:LexicalNode|null=image.getParent();node;node=node.getParent()){
-      if(node instanceof NoteNode){containingNoteId=node.getNoteId();break;}
-     }
-     if(!capturedTargetNoteId||containingNoteId!==capturedTargetNoteId)return;
-     image.setHostAsset(locator,resolved.url,selectedAlt);
-     applied=true;
-    }
-    queueMicrotask(()=>{
-     if(!mounted.current||request!==generation.current)return;
-     if(applied){setStatus('외부 이미지 자산을 연결했습니다.');close();}
-     else setError('대상 노트 또는 이미지가 변경되었습니다. 다시 선택하세요.');
-    });
-   },{tag:HISTORY_PUSH_TAG,discrete:true});
-  }catch{
-   if(mounted.current&&request===generation.current&&!controller.signal.aborted)
+   if(result.ok){setStatus('외부 이미지 자산을 연결했습니다.');close();}
+   else if(result.reason==='invalid')
+    setError('외부 자산 URL·미디어 유형·버전 또는 만료 시간이 유효하지 않습니다.');
+   else if(result.reason==='stale')
+    setError('대상 노트 또는 이미지가 변경되었습니다. 다시 선택하세요.');
+   else if(result.reason==='unavailable')
     setError('외부 이미지 URL을 확인하지 못했습니다.');
   }finally{
    if(mounted.current&&request===generation.current){
-    pendingResolve.current=null;
-    setResolving(false);
+    pendingResolve.current=null;setResolving(false);
    }
   }
  };

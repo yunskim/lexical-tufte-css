@@ -40,7 +40,8 @@
     "test:note-structures": "pnpm build && node --test packages/lexical/test/note-structure-commands.test.mjs && node tests/reusable-note-structure-browser.mjs && node tests/note-editing-browser.mjs",
     "test:note-image-editor": "pnpm build && node tests/reusable-note-image-editor-browser.mjs && node tests/note-image-chooser-browser.mjs && node tests/note-image-dimensions-browser.mjs",
     "test:document-assets": "pnpm build && node --test packages/lexical/test/document-asset-commands.test.mjs && node tests/managed-note-assets-browser.mjs",
-    "test:host-asset-bridge": "pnpm build && node tests/host-asset-refresh-policy.mjs && node tests/legacy-host-asset-guard-browser.mjs && node tests/host-asset-provider-browser.mjs && node tests/controlled-host-assets-browser.mjs && node tests/controlled-host-refresh-browser.mjs"
+    "test:host-asset-bridge": "pnpm build && node tests/host-asset-refresh-policy.mjs && node --test tests/host-asset-connection.test.mjs && node tests/legacy-host-asset-guard-browser.mjs && node tests/host-asset-provider-browser.mjs && node tests/controlled-host-assets-browser.mjs && node tests/controlled-host-refresh-browser.mjs",
+    "test:host-asset-connection": "pnpm build && node --test tests/host-asset-connection.test.mjs && node tests/controlled-host-assets-browser.mjs && node tests/legacy-host-asset-guard-browser.mjs"
   },
   "devDependencies": {
     "playwright": "1.51.1"

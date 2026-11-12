@@ -22,6 +22,8 @@ export {HostAssetPicker,type HostAssetPickerProps} from './HostAssetPicker.js';
 
 export {HostAssetRefresh,type HostAssetRefreshProps} from './HostAssetRefresh.js';
 export {isUsableResolvedImage,nextImageRefreshAt,imageRefreshRetryDelay} from './hostAssetPolicy.js';
+export {connectHostImage,type ConnectHostImageOptions,type HostImageConnectionResult,type HostImageTarget} from './hostAssetConnection.js';
+export {searchHostImages,listHostImageRevisions,HOST_IMAGE_MEDIA_TYPES} from './hostAssetCatalog.js';
 
 export {ToolbarButton,type ToolbarButtonProps} from './ToolbarButton.js';
 export {TufteNoteInteractionPlugin,TufteNoteStructurePlugin,ENTER_TUFTE_NOTE_COMMAND,LEAVE_TUFTE_NOTE_COMMAND,type TufteNoteInteractionPluginProps} from './TufteNoteInteractionPlugin.js';

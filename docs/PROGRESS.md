@@ -1,3 +1,9 @@
+## 2026-11-12 P3.1.e 외부 이미지 자산 연결 및 검색 공통화 (실행 검증 대기)
+
+- `connectHostImage()`에 고정/최신 버전, 기존 이미지 교체/노트 추가, 현재 노트·이미지 ID와 전체 속성 재검증, 취소/이전 요청 차단을 일원화했다. `HostAssetPicker`와 예제의 직접 resolve/mutation 로직은 이 함수를 호출한다.
+- `searchHostImages()`·`listHostImageRevisions()`·`HOST_IMAGE_MEDIA_TYPES`로 공통 검색·revision 필터를 공유한다. headless 7개 회귀, tarball JS/TS 소비 검사, `test:host-asset-connection` 및 기존 host bridge 묶음을 작성/확대했다.
+- 기존 독립 예제의 혼합 다이얼로그와 별도 URL 갱신 컨트롤러는 아직 유지된다. 두 갱신기를 중복 마운트하지 않았다. **현재 빌드·테스트·Playwright 실행 미완료**. [상세](EDITOR_REACT_EXTRACTION.ko.md).
+
 ## 2026-11-12 P3.1.e 독립 예제 외부 자산 공통 정책 적용 (실행 검증 대기)
 
 - 예제의 외부 이미지 연결/수동 URL 갱신 시 응답 검증을 `isUsableResolvedImage()`로 통일하고, 갱신 예약·재시도를 `nextImageRefreshAt()`/`imageRefreshRetryDelay()`로 공유한다. 비동기 이미지 연결은 열었을 때의 노트·이미지/속성·요청 revision을 다시 검사하고 취소/언마운트 generation guard를 적용한다.

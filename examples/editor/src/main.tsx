@@ -83,7 +83,7 @@ import {canonicalBlockType,
   $insertNotePhrasing
 } from '@lexical-tufte/lexical';
 import {NODE_SCHEMA} from '@lexical-tufte/document';
-import {ToolbarButton as IconButton, TufteComposer, TufteEditingSurface, INLINE_ACTIONS, ENTER_TUFTE_NOTE_COMMAND, LEAVE_TUFTE_NOTE_COMMAND, INSERT_TUFTE_NOTE_COMMAND, SPLIT_TUFTE_NOTE_COMMAND, MERGE_TUFTE_NOTE_COMMAND, MOVE_TUFTE_NOTE_COMMAND, OPEN_TUFTE_NOTE_IMAGE_EDITOR_COMMAND, CONNECT_TUFTE_DOCUMENT_ASSET_COMMAND, isUsableResolvedImage, nextImageRefreshAt, imageRefreshRetryDelay} from '@lexical-tufte/editor-react';
+import {ToolbarButton as IconButton, TufteComposer, TufteEditingSurface, INLINE_ACTIONS, ENTER_TUFTE_NOTE_COMMAND, LEAVE_TUFTE_NOTE_COMMAND, INSERT_TUFTE_NOTE_COMMAND, SPLIT_TUFTE_NOTE_COMMAND, MERGE_TUFTE_NOTE_COMMAND, MOVE_TUFTE_NOTE_COMMAND, OPEN_TUFTE_NOTE_IMAGE_EDITOR_COMMAND, CONNECT_TUFTE_DOCUMENT_ASSET_COMMAND, connectHostImage, searchHostImages, listHostImageRevisions, isUsableResolvedImage, nextImageRefreshAt, imageRefreshRetryDelay} from '@lexical-tufte/editor-react';
 import './style.css';
 import '@lexical-tufte/editor-react/styles.css';
 
@@ -119,7 +119,8 @@ function EditorUI(){
   const [hostRevisionId,setHostRevisionId]=useState<string|null>(null);
   const [hostResolving,setHostResolving]=useState(false);
   const hostResolveGeneration=useRef(0);
-  useEffect(()=>()=>{hostResolveGeneration.current++;},[]);
+  const hostResolveController=useRef<AbortController|null>(null);
+  useEffect(()=>()=>{hostResolveGeneration.current++;hostResolveController.current?.abort();},[]);
   const expiryRefreshTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
   const expiryRefreshDeadline=useRef<number|null>(null);
   const retryRefreshTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
@@ -254,40 +255,44 @@ function EditorUI(){
 
   async function connectHostAsset(){
     const provider=hostAssets.current;
-    const target=assetTargetKey;
-    const id=hostAssetId;
-    if(!provider||!target||!id||hostResolving)return;
+    const targetKey=assetTargetKey,assetId=hostAssetId;
+    if(!provider||!targetKey||!assetId||hostResolving)return;
     if(!hostNamespaceValid){setHostError('호스트 자산 namespace가 설정되지 않았습니다.');return;}
-    const selected=assetTargets.find(item=>item.key===target);
+    const selected=assetTargets.find(item=>item.key===targetKey);
     if(!selected){setHostError('연결 대상 이미지가 변경되었습니다.');return;}
-    const requestedRevision=hostRevisionId,requestedAlt=assetAlt;
-    const locator={assetId:id,...(requestedRevision?{revisionId:requestedRevision}:{})};
+    const revisionId=hostRevisionId;
+    const requestedAlt=assetAlt;
+    const controller=new AbortController();
     const generation=++hostResolveGeneration.current;
+    hostResolveController.current=controller;
     setHostResolving(true);setHostError('');
     try{
-      const resolved=await provider.resolve(locator);
-      if(generation!==hostResolveGeneration.current)return;
-      if(!isUsableResolvedImage(locator,resolved)){
-        setHostError('외부 자산 URL 또는 버전이 유효하지 않습니다.');return;
+      const result=await connectHostImage({
+        editor,adapter:provider,namespace:hostNamespace!,
+        locator:{assetId,...(revisionId?{revisionId}:{})},
+        target:{kind:'replace',imageKey:selected.key,noteId:selected.noteId,
+          expectedImage:selected.expectedImage},
+        alt:requestedAlt,signal:controller.signal,
+        isCurrent:()=>generation===hostResolveGeneration.current&&
+          hostAssets.current===provider
+      });
+      if(generation!==hostResolveGeneration.current||controller.signal.aborted)return;
+      if(result.ok){
+        scheduleExpiryRefresh(result.expiresAt);
+        setStatus('외부 이미지 자산을 연결했습니다.');
+        closeAssetChooser();
+      }else if(result.reason==='invalid')
+        setHostError('외부 자산 URL 또는 버전이 유효하지 않습니다.');
+      else if(result.reason==='stale')
+        setHostError('연결 대상 이미지가 변경되었습니다.');
+      else if(result.reason==='unavailable')
+        setHostError('외부 자산 URL 해석에 실패했습니다.');
+    }finally{
+      if(generation===hostResolveGeneration.current){
+        hostResolveController.current=null;
+        setHostResolving(false);
       }
-      let applied=false;
-      editor.update(()=>{
-        if(generation!==hostResolveGeneration.current||!editor.isEditable())return;
-        const node=$getNodeByKey(target);
-        if(!(node instanceof InlineImageNode))return;
-        const note=containingNote(node);
-        if(!note||note.getNoteId()!==selected.noteId||
-          JSON.stringify(node.getImageProperties())!==selected.expectedImage)return;
-        node.setHostAsset({namespace:hostNamespace!,assetId:id,
-          ...(requestedRevision?{revisionId:resolved.revisionId}:{})},resolved.url,requestedAlt);
-        applied=true;
-      },{tag:HISTORY_PUSH_TAG,discrete:true});
-      if(!applied){setHostError('연결 대상 이미지가 변경되었습니다.');return;}
-      scheduleExpiryRefresh(resolved.expiresAt);
-      setStatus('외부 이미지 자산을 연결했습니다.');
-      closeAssetChooser();
-    }catch{if(generation===hostResolveGeneration.current)setHostError('외부 자산 URL 해석에 실패했습니다.');}
-    finally{if(generation===hostResolveGeneration.current)setHostResolving(false);}
+    }
   }
   const [assetChooserOpen,setAssetChooserOpen]=useState(false);
   const [assetQuery,setAssetQuery]=useState('');
@@ -299,8 +304,8 @@ function EditorUI(){
     const controller=new AbortController();
     let current=true;
     setHostLoading(true);setHostError('');
-    provider.search({text:assetQuery,mediaTypes:['image/png','image/jpeg','image/webp','image/svg+xml'],limit:40},controller.signal)
-      .then(page=>{if(current)setHostResults(page.items.filter(item=>item.mediaType.startsWith('image/')));})
+    searchHostImages(provider,assetQuery,controller.signal)
+      .then(items=>{if(current)setHostResults(items);})
       .catch(()=>{if(current)setHostError('외부 이미지 검색에 실패했습니다.');})
       .finally(()=>{if(current)setHostLoading(false);});
     return()=>{current=false;controller.abort();};
@@ -311,8 +316,8 @@ function EditorUI(){
     const controller=new AbortController();
     let current=true;
     setHostRevisions([]);setHostRevisionId(null);
-    provider.revisions(hostAssetId,{limit:40},controller.signal)
-      .then(page=>{if(current)setHostRevisions(page.items);})
+    listHostImageRevisions(provider,hostAssetId,controller.signal)
+      .then(items=>{if(current)setHostRevisions(items);})
       .catch(()=>{if(current)setHostError('외부 자산 버전을 조회하지 못했습니다.');});
     return()=>{current=false;controller.abort();};
   },[assetChooserOpen,hostAssetId]);
@@ -357,6 +362,8 @@ function EditorUI(){
     (asset.id+' '+asset.mimeType+' '+asset.src).toLocaleLowerCase().includes(assetQuery.toLocaleLowerCase()));
   function closeAssetChooser(){
     hostResolveGeneration.current++;
+    hostResolveController.current?.abort();
+    hostResolveController.current=null;
     setHostResolving(false);
     setAssetChooserOpen(false);setAssetChoice(null);setAssetTargetKey(null);setAssetAlt('');
     queueMicrotask(()=>assetChooserTrigger.current?.focus());

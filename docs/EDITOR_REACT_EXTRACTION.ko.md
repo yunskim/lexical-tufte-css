@@ -252,3 +252,17 @@ pnpm test:browser
 **아직 완료하지 않은 이관:** 독립 예제의 혼합 로컬/외부 자산 다이얼로그를 `HostAssetPicker`로 통째로 대체하거나, 예제의 수동/자동 갱신 컨트롤러를 `HostAssetRefresh`로 전환하지 않았다. 기존과 공통 컨트롤러를 동시에 마운트하면 한 자산에 대해 중복 resolve·타이머가 발생하므로, UI/컨트롤러 전환을 함께 수락하는 별도 단계가 필요하다.
 
 **실행 보류:** 이번 변경의 `pnpm check`·`pnpm package:check`·`pnpm test:host-asset-bridge`·전체 `pnpm test:browser`는 실행하지 않았다. 먼저 작성된 노트 이미지/로컬 문서 자산 회귀도 아직 누적 실행 대기다. 이전 641 unit/46 browser 성공 기록을 이번 변경의 수락 증거로 사용하지 않는다.
+
+
+## 2026-11-12 — P3.1.e 외부 자산 연결·검색 구현 공유 (코드 작성, 실행 보류)
+
+이전 단계에서 독립 예제와 공통 `HostAssetPicker`의 URL·revision·갱신 정책을 통일했다. 이번에는 두 UI가 직접 소유하던 **비동기 연결 작업과 검색·revision 조회 구현**을 공통 함수로 옮겼다. 독립 예제의 혼합 로컬/외부 이미지 다이얼로그와 접근성 이름은 변경하지 않았다.
+
+- 새 `packages/editor-react/src/hostAssetConnection.ts`의 `connectHostImage(options)`는 선택한 `AssetProvider`와 namespace, locator, 명시적 `replace(imageKey/noteId/expectedImage)` 또는 `append(noteKey/noteId)` 대상, alt, AbortSignal, 현재 요청 확인 함수를 받는다. 외부 URL 조회 후 안전한 이미지·revision/만료 검증을 거쳐 동일 Lexical update에서 readonly·IME·대상 키·노트 ID·이미지 속성 스냅샷을 다시 확인한다. 성공한 경우에만 `HISTORY_PUSH_TAG`로 정본을 수정한다. 반환 결과는 `ok`와 `invalid/stale/unavailable/cancelled`를 구분하며 UI는 각자 메시지/닫기 동작을 처리한다.
+- `HostAssetPicker`와 `examples/editor/src/main.tsx`의 별도 `resolve() → setHostAsset()` 구현을 삭제하고 이 함수를 사용하게 했다. 후자는 generation 및 AbortController를 유지하여 취소·언마운트·대상 교체 후의 늦은 응답을 무시한다. 공통 선택기는 노트에 새 이미지를 추가하거나 기존 이미지를 교체하는 동일 함수를 호출하며, 기존 이미지의 **전체 속성 스냅샷**까지 확인한다.
+- 새 `packages/editor-react/src/hostAssetCatalog.ts`에 `searchHostImages()`, `listHostImageRevisions()`, `HOST_IMAGE_MEDIA_TYPES`를 제공한다. 두 UI는 같은 mediaTypes·limit, 이미지 MIME 필터 및 잘못된 자산에 속한 revision 제외 규칙을 사용한다. 호스트 DAM 검색·인증·업로드·권한·저장 구현은 추가하지 않았다.
+- `tests/host-asset-connection.test.mjs`의 headless 7개 시나리오: 고정/최신 revision, 새 이미지 삽입과 기존 교체, 잘못된 응답/만료/위험 URL, 이전 이미지 스냅샷·노트 변경·없어진 대상, pending 중 이미지 변경, abort·이전 세대·provider 장애, readonly·잘못된 namespace. 기존 `controlled-host-assets-browser.mjs`·`legacy-host-asset-guard-browser.mjs`를 `test:host-asset-connection`에 연결했으며 기존 host bridge 묶음과 packed JS/TS 소비 검사도 확장했다.
+
+**남은 작업:** 독립 예제의 화면을 완전히 `HostAssetPicker`로 교체하고 외부 URL 자동·수동 갱신 루프를 `HostAssetRefresh`로 바꾸는 최종 UI/컨트롤러 이관은 **미완료**. 현재 예제에는 기존 갱신 컨트롤러만 남기며 공통 갱신 컨트롤러와 동시에 실행하지 않는다. 두 구현의 자동 갱신 대상 범위와 레거시 브라우저 타이밍 계약을 동등하게 만드는 설계·회귀가 필요하다.
+
+**실행 보류:** `pnpm install --frozen-lockfile`, `pnpm check`, `pnpm package:check`, `pnpm test:host-asset-connection`, `pnpm test:host-asset-bridge`, `pnpm test:browser`. 신규 및 누적 수정은 컴파일·실제 브라우저 검증 전이므로 이전 641개 unit/46개 browser 성공을 수락 증거로 사용하지 않는다. CI는 실행하지 않는다.
