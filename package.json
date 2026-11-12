@@ -16,7 +16,7 @@
     "test": "pnpm -r --if-present test",
     "test:recovery-python": "node tests/recovery-python-http.mjs",
     "test:contextual-ui": "pnpm build && node tests/contextual-ui-browser.mjs",
-    "test:browser": "pnpm build && node tests/note-browser.mjs && node tests/note-editing-browser.mjs && node tests/note-dom-browser.mjs && node tests/layout-browser.mjs && node tests/server-browser.mjs && node tests/publication-browser.mjs && node tests/all-nodes-browser.mjs && node tests/text-format-browser.mjs && node tests/font-proof-browser.mjs && node tests/section-commands-browser.mjs && node tests/recovery-browser.mjs && node tests/contextual-ui-browser.mjs && node tests/inline-span-browser.mjs && node tests/inline-span-html-browser.mjs && node tests/list-kind-browser.mjs && node tests/list-tab-focus-browser.mjs && node tests/definition-pairs-browser.mjs && node tests/quotation-editing-browser.mjs && node tests/controlled-editor-browser.mjs && node tests/controlled-host-assets-browser.mjs && node tests/controlled-host-refresh-browser.mjs && node tests/reusable-note-interactions-browser.mjs && node tests/reusable-note-paste-browser.mjs && node tests/reusable-note-clipboard-identity-browser.mjs",
+    "test:browser": "pnpm build && node tests/note-browser.mjs && node tests/note-editing-browser.mjs && node tests/note-dom-browser.mjs && node tests/layout-browser.mjs && node tests/server-browser.mjs && node tests/publication-browser.mjs && node tests/all-nodes-browser.mjs && node tests/text-format-browser.mjs && node tests/font-proof-browser.mjs && node tests/section-commands-browser.mjs && node tests/recovery-browser.mjs && node tests/contextual-ui-browser.mjs && node tests/inline-span-browser.mjs && node tests/inline-span-html-browser.mjs && node tests/list-kind-browser.mjs && node tests/list-tab-focus-browser.mjs && node tests/definition-pairs-browser.mjs && node tests/quotation-editing-browser.mjs && node tests/controlled-editor-browser.mjs && node tests/controlled-host-assets-browser.mjs && node tests/controlled-host-refresh-browser.mjs && node tests/reusable-note-interactions-browser.mjs && node tests/reusable-note-paste-browser.mjs && node tests/reusable-note-clipboard-identity-browser.mjs && node tests/reusable-note-structure-browser.mjs",
     "dev:editor": "pnpm --filter @lexical-tufte/editor-react... build && pnpm --filter @lexical-tufte/editor-prototype dev",
     "font:check": "node scripts/check-font-proof.mjs",
     "package:check": "pnpm build && node scripts/pack-and-check.mjs",
@@ -36,7 +36,8 @@
     "test:host-refresh": "pnpm build && node tests/host-asset-refresh-policy.mjs && node tests/controlled-host-refresh-browser.mjs",
     "test:note-interactions": "pnpm build && node tests/reusable-note-interactions-browser.mjs",
     "test:note-paste": "pnpm build && node tests/reusable-note-paste-browser.mjs",
-    "test:note-clipboard": "pnpm build && node tests/reusable-note-paste-browser.mjs && node tests/reusable-note-clipboard-identity-browser.mjs"
+    "test:note-clipboard": "pnpm build && node tests/reusable-note-paste-browser.mjs && node tests/reusable-note-clipboard-identity-browser.mjs",
+    "test:note-structures": "pnpm build && node --test packages/lexical/test/note-structure-commands.test.mjs && node tests/reusable-note-structure-browser.mjs && node tests/note-editing-browser.mjs"
   },
   "devDependencies": {
     "playwright": "1.51.1"
