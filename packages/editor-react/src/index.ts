@@ -22,3 +22,4 @@ export {isUsableResolvedImage,nextImageRefreshAt,imageRefreshRetryDelay} from '.
 
 export {ToolbarButton,type ToolbarButtonProps} from './ToolbarButton.js';
 export {TufteNoteInteractionPlugin,ENTER_TUFTE_NOTE_COMMAND,LEAVE_TUFTE_NOTE_COMMAND,type TufteNoteInteractionPluginProps} from './TufteNoteInteractionPlugin.js';
+export {INSERT_TUFTE_NOTE_COMMAND,SPLIT_TUFTE_NOTE_COMMAND,MERGE_TUFTE_NOTE_COMMAND,MOVE_TUFTE_NOTE_COMMAND,type TufteNoteKind,type TufteNoteMoveDirection} from '@lexical-tufte/lexical';
