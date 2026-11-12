@@ -1,3 +1,10 @@
+## 2026-11-12 P3.1.e 노트 구조 명령 공통화 (검증 대기)
+
+- 기존 예제의 insert/split/merge/move 함수와 버튼 종속을 제거하고, `packages/lexical/src/noteStructureCommands.ts`에 호스트 중립 명령 네 개 및 등록/해제 함수를 추가했다. `TufteNoteInteractionPlugin`에서 모든 편집기 인스턴스에 연결하고 외부 노트 편집기 명령으로 export했다.
+- ID 고유성·잘못된 부모/중첩/조합/readonly 거부, 구조 변경의 History push, 기존 노트 저수준 대수·rich payload 보존을 적용했다. `TufteEditor.editorRef`를 선택적으로 제공해 호스트 툴바가 명령을 dispatch하도록 했다.
+- headless 10개 시나리오와 두 제어형 편집기의 실제 구조 명령·undo/redo·격리/readonly/remount 브라우저 테스트를 작성했다. 패키지 공개 JS/TS 소비 검사 확대 및 `pnpm test:note-structures`/전체 브라우저에 등록.
+- **실제 컴파일·테스트 실행 미실행**. [P3.1.e 이관 현황](EDITOR_REACT_EXTRACTION.ko.md)과 [계획](PLAN.ko.md)에 다음 Work 검증 순서를 기록했다. 11월 11일 45/45 결과는 이번 코드에 소급하지 않는다. CI 지시대로 생략.
+
 ## 2026-11-11 공통 노트 상호작용·클립보드 누적 실행
 
 - `d4d724f` + 테스트 fixture 수정으로 frozen/static/build/typecheck·unit629·package6·갱신정책·Python16/실제HTTP·revision모델12그룹 통과. browser 최초42/45 → 실패3개 수정 후 최종45/45. 공식6폭 pixel 마스크 밖 차이0.
