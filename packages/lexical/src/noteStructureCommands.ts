@@ -39,7 +39,8 @@ export function registerNoteStructureCommands(
  const allocate=():string|null=>{
   const used=$collectNoteIds();
   for(let attempts=0;attempts<100;attempts++){
-   const id=createId();
+   let id:string;
+   try{id=createId();}catch{return null;}
    if(isIdentifier(id)&&!used.has(id))return id;
   }
   return null;
@@ -53,6 +54,7 @@ export function registerNoteStructureCommands(
  };
  const registrations=[
   editor.registerCommand(INSERT_TUFTE_NOTE_COMMAND,kind=>{
+   if(!editor.isEditable())return report('읽기 전용 문서는 변경할 수 없습니다.');
    if(kind!=='sidenote'&&kind!=='marginnote')
     return report('지원하지 않는 노트 종류입니다.');
    const selection=$getSelection();
@@ -81,6 +83,7 @@ export function registerNoteStructureCommands(
   },COMMAND_PRIORITY_EDITOR),
 
   editor.registerCommand(SPLIT_TUFTE_NOTE_COMMAND,()=>{
+   if(!editor.isEditable())return report('읽기 전용 문서는 변경할 수 없습니다.');
    if(!selectedNote())return report('먼저 노트 안으로 이동하세요.');
    const id=allocate();
    if(!id)return report('고유한 노트 ID를 생성하지 못했습니다.');
@@ -91,6 +94,7 @@ export function registerNoteStructureCommands(
   },COMMAND_PRIORITY_EDITOR),
 
   editor.registerCommand(MERGE_TUFTE_NOTE_COMMAND,()=>{
+   if(!editor.isEditable())return report('읽기 전용 문서는 변경할 수 없습니다.');
    const note=selectedNote();
    if(!note)return report('먼저 노트 안으로 이동하세요.');
    if(!$mergeNoteWithNext(note))return report('이 위치에서 노트 구조를 변경할 수 없습니다.');
@@ -99,6 +103,7 @@ export function registerNoteStructureCommands(
   },COMMAND_PRIORITY_EDITOR),
 
   editor.registerCommand(MOVE_TUFTE_NOTE_COMMAND,direction=>{
+   if(!editor.isEditable())return report('읽기 전용 문서는 변경할 수 없습니다.');
    if(direction!=='previous'&&direction!=='next')
     return report('지원하지 않는 노트 이동 방향입니다.');
    const note=selectedNote();
