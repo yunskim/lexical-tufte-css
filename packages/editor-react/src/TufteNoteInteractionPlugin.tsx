@@ -31,6 +31,19 @@ export interface TufteNoteInteractionPluginProps {
 }
 
 /**
+ * This is mounted regardless of readonly. Host-dispatched structural commands
+ * must be handled with an explicit readonly rejection rather than silently
+ * falling through when keyboard/clipboard interactions are disabled.
+ */
+export function TufteNoteStructurePlugin({onNotice}:TufteNoteInteractionPluginProps){
+ const [editor]=useLexicalComposerContext();
+ const noticeRef=useRef(onNotice);
+ noticeRef.current=onNotice;
+ useEffect(()=>registerNoteStructureCommands(editor,message=>noticeRef.current?.(message)),[editor]);
+ return null;
+}
+
+/**
  * Note navigation, image selection, clipboard re-identification and IME guards.
  * LexicalComposer owns the state. Registration/unregistration is scoped to one
  * editor instance, with the latest host callback read via ref.
@@ -67,7 +80,6 @@ export function TufteNoteInteractionPlugin({onNotice}:TufteNoteInteractionPlugin
     setStatus('본문으로 돌아왔습니다.');return true;
   }
   useEffect(()=>{
-    const noteStructure=registerNoteStructureCommands(editor,setStatus);
     const selectNoteImage=editor.registerCommand(CLICK_COMMAND,event=>{
       if(!(event.target instanceof HTMLImageElement))return false;
       const node=$getNearestNodeFromDOMNode(event.target);
@@ -156,7 +168,7 @@ export function TufteNoteInteractionPlugin({onNotice}:TufteNoteInteractionPlugin
       event?.preventDefault();s.insertLineBreak();return true;
     },COMMAND_PRIORITY_HIGH);
     const typing=registerNoteEdgeTypingGuard(editor);
-    return()=>{noteStructure();selectNoteImage();escape();down();enterCommand();leaveCommand();typing();copying();cutting();pasting();plainPaste();backspace();forwardDelete();composing();enter();};
+    return()=>{selectNoteImage();escape();down();enterCommand();leaveCommand();typing();copying();cutting();pasting();plainPaste();backspace();forwardDelete();composing();enter();};
   },[editor]);
 
  return null;

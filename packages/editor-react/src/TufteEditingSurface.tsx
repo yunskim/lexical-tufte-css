@@ -5,7 +5,7 @@ import {LexicalErrorBoundary} from '@lexical/react/LexicalErrorBoundary';
 import {TablePlugin} from '@lexical/react/LexicalTablePlugin';
 import {SelectionToolbar} from './SelectionToolbar.js';
 import {BlockContextMenu} from './BlockContextMenu.js';
-import {TufteNoteInteractionPlugin} from './TufteNoteInteractionPlugin.js';
+import {TufteNoteInteractionPlugin,TufteNoteStructurePlugin} from './TufteNoteInteractionPlugin.js';
 
 /** All editable React plugins share the same nearest LexicalComposer. */
 export interface TufteEditingSurfaceProps {
@@ -26,6 +26,7 @@ export function TufteEditingSurface({
   />
   <HistoryPlugin/>
   <TablePlugin/>
+  <TufteNoteStructurePlugin onNotice={onNotice}/>
   {!readonly&&<TufteNoteInteractionPlugin onNotice={onNotice}/>}
   {!readonly&&<SelectionToolbar/>}
   {!readonly&&<BlockContextMenu/>}

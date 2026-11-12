@@ -196,3 +196,15 @@ pnpm test:browser
 ## 2026-11-03 공통 자산 선택기·갱신 실제 검증 완료 범위
 
 `558bdcd` 이후 예제 Window 선언과 신규 브라우저 fixture를 수정하고 build/typecheck·unit629·package6·정책검사·browser42/42·Python16/HTTP를 실행해 통과했다. 최초 신규 2개 실패와 최종 재실행을 구분한 [최신 보고서](VERIFICATION_HOST_ASSETS_2026-11-03.ko.md)를 따른다. 위 절의 실행 대기/40개 통과는 당시 이력이다. 실제 자산 선택·revision/삽입·URL 회전·만료 경계·재시도·늦은 응답 차단의 관찰된 범위는 확인됐으며, 실제 DAM/업로드/권한·장시간 수명/접근성 수락과 R4–R7/P3.1.e 전체 게이트는 계속 남는다.
+
+
+## 2026-11-12 — readonly 상태에서 구조 명령 수명 분리 (실행 검증 대기)
+
+읽기 전용인 `TufteEditor`에서 기존 상호작용 플러그인을 언마운트하면 외부 `editorRef` 구조 명령도 등록 해제되어, 변경은 없지만 `onNotice` 거부 안내가 누락되었다. 이 등록 경계를 분리했다.
+
+- `TufteNoteStructurePlugin`은 `TufteEditingSurface` 인스턴스에서 항상 등록한다. 편집 불가능할 때 실제 명령 구현의 `editor.isEditable()` 검사를 통과하지 못하므로 정본 변경 없이 거부 안내를 반환한다.
+- 탐색·클립보드·IME·키보드 입력 상호작용은 기존처럼 편집 가능 상태에만 설치한다. 공개 `TufteNoteStructurePlugin` export와 패키지 소비 테스트도 추가했다.
+- 브라우저 회귀에는 readonly 외부 툴바 호출의 단일 거부 메시지 및 unmount/remount 뒤 단일 명령 등록 검사를 추가했다.
+- 노트 삽입·분리·합치기·이동의 저수준 변환 알고리즘과 Lexical JSON 스키마는 변경하지 않았다.
+
+**추가된 변경의 실행 검증은 아직 완료되지 않았다.** Work에서 `pnpm install --frozen-lockfile`, `pnpm check`, `pnpm package:check`, `pnpm test:note-structures`, `pnpm test:browser`를 수행하고 실패를 수리한다.

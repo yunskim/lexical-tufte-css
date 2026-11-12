@@ -94,7 +94,10 @@ try{
   await page.getByRole('button',{name:'첫 번째 읽기 전용 전환'}).click();
   await page.waitForFunction(()=>document.querySelector('[data-testid="first-editor"] [contenteditable]')?.getAttribute('contenteditable')==='false');
   const locked=await read(page,'first');
+  const beforeReadonlyNotice=Number((await page.getByTestId('first-notice-count').textContent()).match(/\d+/)?.[0]);
   await page.getByRole('button',{name:'첫 번째 노트 삽입'}).click();
+  await page.waitForFunction(()=>document.querySelector('[data-testid="first-notice"]')?.textContent?.includes('읽기 전용 문서는 변경할 수 없습니다.'));
+  assert.equal(Number((await page.getByTestId('first-notice-count').textContent()).match(/\d+/)?.[0]),beforeReadonlyNotice+1,'Readonly commands must produce exactly one rejection notice');
   assert.deepEqual(await read(page,'first'),locked,'Readonly editor must reject external structural commands');
   await page.getByRole('button',{name:'첫 번째 읽기 전용 전환'}).click();
   await page.waitForFunction(()=>document.querySelector('[data-testid="first-editor"] [contenteditable]')?.getAttribute('contenteditable')==='true');
@@ -189,8 +192,13 @@ try{
   await page.getByRole('button',{name:'첫 번째 편집기 마운트 전환'}).click();
   await first.waitFor();
   await setCaret(first.locator('p').first().locator(':scope > [data-lexical-text="true"]').first(),2);
+  const previousNotices=Number((await page.getByTestId('first-notice-count').textContent()).match(/\d+/)?.[0]);
   await page.getByRole('button',{name:'첫 번째 노트 삽입'}).click();
   await waitNotes(page,notes(initial).length+1);
+  await page.waitForFunction(expected=>{
+   const current=document.querySelector('[data-testid="first-notice-count"]')?.textContent?.match(/\d+/);
+   return current&&Number(current[0])===expected;
+  },previousNotices+1);
   assert.deepEqual(await read(page,'second'),sibling);
  });
 
