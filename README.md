@@ -71,6 +71,12 @@ pnpm test:browser
 
 `packages/document`는 문서·메타데이터·자산·33개 노드 계약과 validator를 제공합니다. `packages/render`는 공유 검증 뒤 현재 `p1-v1` 출력 지원 범위를 검사합니다. 두 패키지는 DOM/React/Lexical runtime 없이 실행됩니다. 노드별 편집·발행 구현은 P2.2부터 확장합니다.
 
+## 2026-11-12 노트 구조 명령 공통화 (검증 대기)
+
+`@lexical-tufte/lexical`의 `registerNoteStructureCommands`가 노트 삽입·분리·합치기·앞뒤 이동을 호스트 중립 명령으로 제공합니다. `@lexical-tufte/editor-react`에서도 같은 명령을 export하며, 선택적 `TufteEditor.editorRef`를 사용하면 독립 호스트 툴바에서 실행할 수 있습니다. 기존 프로토타입도 공통 명령을 소비합니다.
+
+추가 회귀: `packages/lexical/test/note-structure-commands.test.mjs` 및 `tests/reusable-note-structure-browser.mjs`. 실행 명령은 `pnpm test:note-structures`입니다. **이 변경의 실제 빌드·타입·브라우저 테스트는 아직 실행하지 않았습니다.** 아래 2026-11-11의 45/45 결과는 이전 기준 소스에 대한 증거입니다.
+
 ## 2026-11-11 재사용 편집기 및 클립보드 검증
 
 `@lexical-tufte/editor-react`에 노트 키보드·클립보드·IME 공통 플러그인, 호스트 툴바의 노트 진입·복귀 명령과 `ToolbarButton`을 이관했습니다. 두 제어형 편집기의 노트 알림·readonly/remount·plain-text paste·복사/이동 ID 보존·중첩 노트 거부를 실제 Chromium에서 검증했습니다.
