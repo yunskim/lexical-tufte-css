@@ -1,4 +1,4 @@
-import type {AssetProvider,AssetSummary,AssetRevision} from '@lexical-tufte/editor-ports';
+import type {AssetProvider} from '@lexical-tufte/editor-ports';
 import {
   validateDocument,
   type TufteDocument} from '@lexical-tufte/document';
@@ -81,7 +81,7 @@ import {canonicalBlockType,
   $insertNotePhrasing
 } from '@lexical-tufte/lexical';
 import {NODE_SCHEMA} from '@lexical-tufte/document';
-import {ToolbarButton as IconButton, TufteComposer, TufteEditingSurface, INLINE_ACTIONS, ENTER_TUFTE_NOTE_COMMAND, LEAVE_TUFTE_NOTE_COMMAND, INSERT_TUFTE_NOTE_COMMAND, SPLIT_TUFTE_NOTE_COMMAND, MERGE_TUFTE_NOTE_COMMAND, MOVE_TUFTE_NOTE_COMMAND, OPEN_TUFTE_NOTE_IMAGE_EDITOR_COMMAND, CONNECT_TUFTE_DOCUMENT_ASSET_COMMAND, connectHostImage, searchHostImages, listHostImageRevisions, HostAssetRefresh, REFRESH_TUFTE_HOST_ASSETS_COMMAND} from '@lexical-tufte/editor-react';
+import {ToolbarButton as IconButton, TufteComposer, TufteEditingSurface, INLINE_ACTIONS, ENTER_TUFTE_NOTE_COMMAND, LEAVE_TUFTE_NOTE_COMMAND, INSERT_TUFTE_NOTE_COMMAND, SPLIT_TUFTE_NOTE_COMMAND, MERGE_TUFTE_NOTE_COMMAND, MOVE_TUFTE_NOTE_COMMAND, OPEN_TUFTE_NOTE_IMAGE_EDITOR_COMMAND, CONNECT_TUFTE_DOCUMENT_ASSET_COMMAND, HostAssetPicker, HostAssetRefresh, REFRESH_TUFTE_HOST_ASSETS_COMMAND} from '@lexical-tufte/editor-react';
 import './style.css';
 import '@lexical-tufte/editor-react/styles.css';
 
@@ -111,16 +111,8 @@ function EditorUI(){
   const hostAssets=useRef<AssetProvider|null>(hostConfig.current.lexicalTufteAssetProvider??null);
   const hostNamespace=hostConfig.current.lexicalTufteAssetNamespace;
   const hostNamespaceValid=typeof hostNamespace==='string'&&hostNamespace.trim().length>0;
-  const [hostResults,setHostResults]=useState<AssetSummary[]>([]);
-  const [hostRevisions,setHostRevisions]=useState<AssetRevision[]>([]);
-  const [hostAssetId,setHostAssetId]=useState<string|null>(null);
-  const [hostRevisionId,setHostRevisionId]=useState<string|null>(null);
-  const [hostResolving,setHostResolving]=useState(false);
-  const hostResolveGeneration=useRef(0);
-  const hostResolveController=useRef<AbortController|null>(null);
-  useEffect(()=>()=>{hostResolveGeneration.current++;hostResolveController.current?.abort();},[]);
-  // The host-aware React refresh controller owns all URL checks/timers.
-  // Restore asks that single controller to reconcile the committed Lexical tree.
+  // External DAM selection and mutation live in the reusable HostAssetPicker.
+  // Only this host's storage/restore invokes the common URL refresh command.
   function scheduleHostRefresh(){
     if(!hostAssets.current||!hostNamespaceValid)return;
     requestAnimationFrame(()=>{
@@ -128,73 +120,8 @@ function EditorUI(){
     });
   }
 
-  async function connectHostAsset(){
-    const provider=hostAssets.current;
-    const targetKey=assetTargetKey,assetId=hostAssetId;
-    if(!provider||!targetKey||!assetId||hostResolving)return;
-    if(!hostNamespaceValid){setHostError('호스트 자산 namespace가 설정되지 않았습니다.');return;}
-    const selected=assetTargets.find(item=>item.key===targetKey);
-    if(!selected){setHostError('연결 대상 이미지가 변경되었습니다.');return;}
-    const revisionId=hostRevisionId;
-    const requestedAlt=assetAlt;
-    const controller=new AbortController();
-    const generation=++hostResolveGeneration.current;
-    hostResolveController.current=controller;
-    setHostResolving(true);setHostError('');
-    try{
-      const result=await connectHostImage({
-        editor,adapter:provider,namespace:hostNamespace!,
-        locator:{assetId,...(revisionId?{revisionId}:{})},
-        target:{kind:'replace',imageKey:selected.key,noteId:selected.noteId,
-          expectedImage:selected.expectedImage},
-        alt:requestedAlt,signal:controller.signal,
-        isCurrent:()=>generation===hostResolveGeneration.current&&
-          hostAssets.current===provider
-      });
-      if(generation!==hostResolveGeneration.current||controller.signal.aborted)return;
-      if(result.ok){
-        setStatus('외부 이미지 자산을 연결했습니다.');
-        closeAssetChooser();
-      }else if(result.reason==='invalid')
-        setHostError('외부 자산 URL 또는 버전이 유효하지 않습니다.');
-      else if(result.reason==='stale')
-        setHostError('연결 대상 이미지가 변경되었습니다.');
-      else if(result.reason==='unavailable')
-        setHostError('외부 자산 URL 해석에 실패했습니다.');
-    }finally{
-      if(generation===hostResolveGeneration.current){
-        hostResolveController.current=null;
-        setHostResolving(false);
-      }
-    }
-  }
   const [assetChooserOpen,setAssetChooserOpen]=useState(false);
   const [assetQuery,setAssetQuery]=useState('');
-  const [hostLoading,setHostLoading]=useState(false);
-  const [hostError,setHostError]=useState('');
-  useEffect(()=>{
-    const provider=hostAssets.current;
-    if(!provider||!assetChooserOpen)return;
-    const controller=new AbortController();
-    let current=true;
-    setHostLoading(true);setHostError('');
-    searchHostImages(provider,assetQuery,controller.signal)
-      .then(items=>{if(current)setHostResults(items);})
-      .catch(()=>{if(current)setHostError('외부 이미지 검색에 실패했습니다.');})
-      .finally(()=>{if(current)setHostLoading(false);});
-    return()=>{current=false;controller.abort();};
-  },[assetChooserOpen,assetQuery]);
-  useEffect(()=>{
-    const provider=hostAssets.current;
-    if(!provider||!assetChooserOpen||!hostAssetId)return;
-    const controller=new AbortController();
-    let current=true;
-    setHostRevisions([]);setHostRevisionId(null);
-    listHostImageRevisions(provider,hostAssetId,controller.signal)
-      .then(items=>{if(current)setHostRevisions(items);})
-      .catch(()=>{if(current)setHostError('외부 자산 버전을 조회하지 못했습니다.');});
-    return()=>{current=false;controller.abort();};
-  },[assetChooserOpen,hostAssetId]);
   const [assetChoice,setAssetChoice]=useState<string|null>(null);
   const [assetTargetKey,setAssetTargetKey]=useState<string|null>(null);
   const [assetAlt,setAssetAlt]=useState('');
@@ -235,10 +162,6 @@ function EditorUI(){
   const matchingAssets=documentAssets.filter(asset=>
     (asset.id+' '+asset.mimeType+' '+asset.src).toLocaleLowerCase().includes(assetQuery.toLocaleLowerCase()));
   function closeAssetChooser(){
-    hostResolveGeneration.current++;
-    hostResolveController.current?.abort();
-    hostResolveController.current=null;
-    setHostResolving(false);
     setAssetChooserOpen(false);setAssetChoice(null);setAssetTargetKey(null);setAssetAlt('');
     queueMicrotask(()=>assetChooserTrigger.current?.focus());
   }
@@ -651,32 +574,16 @@ function EditorUI(){
           <img src={asset.src} alt="" width="72" height="54" loading="lazy"/>
           {asset.id} · {asset.mimeType} · {asset.width??'?'}×{asset.height??'?'}</label>
         </li>)}</ul>
-        {hostAssets.current&&<section aria-label="외부 이미지 자산">
-          <h3>호스트 이미지</h3>
-          {hostLoading&&<p role="status">검색 중…</p>}
-          {hostError&&<p role="alert">{hostError}</p>}
-          <ul>{hostResults.map(item=><li key={item.id}>
-            <label><input type="radio" name="host-asset" checked={hostAssetId===item.id}
-              onChange={()=>{setHostAssetId(item.id);setHostRevisionId(null);setAssetChoice(null);}}/>
-              {item.title} · {item.mediaType}</label>
-          </li>)}</ul>
-          {hostAssetId&&<label>버전
-            <select value={hostRevisionId??''} onChange={event=>setHostRevisionId(event.target.value||null)}>
-              <option value="">최신 버전</option>
-              {hostRevisions.map(revision=><option key={revision.id} value={revision.id}>{revision.id}</option>)}
-            </select>
-          </label>}
-        </section>}
-        {hostAssets.current&&<button type="button" disabled={!hostAssetId||!assetTargetKey||hostResolving||!hostNamespaceValid}
-          onClick={()=>void connectHostAsset()}>{hostResolving?'외부 이미지 확인 중…':'선택한 외부 이미지 연결'}</button>}
         <button type="button" onClick={closeAssetChooser}>취소</button>
         <button type="button" disabled={!assetChoice||!assetTargetKey} onClick={connectChosenAsset}>선택한 이미지 연결</button>
       </div>
     </div>}
-    {hostAssets.current&&hostNamespaceValid&&<HostAssetRefresh
-      adapter={hostAssets.current} namespace={hostNamespace!}
-      legacyTiming allowManualOverride buttonLabel="외부 이미지 URL 다시 확인"
-      onStatus={setStatus}/>}
+    {hostAssets.current&&hostNamespaceValid&&<>
+      <HostAssetPicker adapter={hostAssets.current} namespace={hostNamespace!} preferExistingTarget/>
+      <HostAssetRefresh adapter={hostAssets.current} namespace={hostNamespace!}
+        legacyTiming allowManualOverride buttonLabel="외부 이미지 URL 다시 확인"
+        onStatus={setStatus}/>
+    </>}
     <section role="group" aria-label="문서 이미지 자산">
       <button type="button" onClick={registerDocumentImage}>문서 이미지 자산 등록</button>
       <button ref={assetChooserTrigger} type="button" onClick={openAssetChooser}>이미지 라이브러리에서 선택</button>

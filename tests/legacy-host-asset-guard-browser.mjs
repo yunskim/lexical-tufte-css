@@ -65,18 +65,18 @@ try{
  await button('노트 이미지 삽입').click();
  const original=await page.locator('[data-note-id="seed-note"] img').first().getAttribute('src');
  assert.equal(original,'/fixture.svg');
- const chooser=()=>page.getByRole('dialog',{name:'문서 이미지 선택'});
+ const chooser=()=>page.getByRole('dialog',{name:'호스트 이미지 자산'});
  async function openHost(){
-  await button('이미지 라이브러리에서 선택').click();
+  await button('호스트 이미지 자산 선택').click();
   await chooser().waitFor();
   await chooser().getByRole('radio',{name:/Remote image/}).check();
   await chooser().getByRole('combobox',{name:'버전'}).selectOption('rev-1');
-  await chooser().getByRole('textbox',{name:/대체텍스트/}).fill('검증된 외부 이미지');
+  await chooser().getByRole('textbox',{name:/대체 텍스트/}).fill('검증된 외부 이미지');
  }
  await openHost();
  for(const mode of ['expired','missing-revision','revision-mismatch','missing-media','unsafe-url','wrong-asset']){
   await page.evaluate(value=>{window.__legacyMode=value;},mode);
-  await chooser().getByRole('button',{name:'선택한 외부 이미지 연결'}).click();
+  await chooser().getByRole('button',{name:'외부 이미지 연결'}).click();
   await chooser().getByRole('alert').getByText(/유효하지 않습니다/).waitFor();
   assert.equal(await chooser().count(),1,mode+' must not close the dialog');
   assert.equal(await page.locator('[data-note-id="seed-note"] img').first().getAttribute('src'),
@@ -84,7 +84,7 @@ try{
  }
  // A validated response still connects after the rejected candidates.
  await page.evaluate(()=>{window.__legacyMode='normal';});
- await chooser().getByRole('button',{name:'선택한 외부 이미지 연결'}).click();
+ await chooser().getByRole('button',{name:'외부 이미지 연결'}).click();
  await chooser().waitFor({state:'hidden'});
  await button('저장').click();
  const saved=await page.evaluate(()=>JSON.parse(localStorage.getItem('lexical-tufte-p1-document')));
@@ -102,7 +102,7 @@ try{
  // The old request must not restore or rebind the original target.
  await openHost();
  await page.evaluate(()=>{window.__legacyMode='deferred';window.__legacyPending=[];});
- await chooser().getByRole('button',{name:'선택한 외부 이미지 연결'}).click();
+ await chooser().getByRole('button',{name:'외부 이미지 연결'}).click();
  await page.waitForFunction(()=>window.__legacyPending.length===1);
  await button('레이아웃 예제 불러오기').evaluate(node=>node.click());
  const replacement=await page.locator('[data-note-id="seed-note"] img').count();

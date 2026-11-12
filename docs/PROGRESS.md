@@ -1,3 +1,9 @@
+## 2026-11-12 P3.1.e 로컬·호스트 이미지 선택 창 분리 (실행 검증 대기)
+
+- 독립 예제의 기존 혼합 창에서 호스트 이미지 검색·revision·연결 UI 및 독자 상태/effect를 삭제했다. 로컬 자산 창은 유지하며 외부 자산은 공통 `HostAssetPicker`가 처리한다.
+- `preferExistingTarget`으로 독립 예제의 단일 이미지 자동 교체 동작만 보존하고, 일반 제어형 `TufteEditor` 기본값은 유지한다. 공통 `HostAssetRefresh`는 계속 한 번만 마운트한다.
+- 호스트 브라우저 회귀 3개를 새 UI 선택자로 변경, 로컬/호스트 검색 격리 및 정본 자산 참조를 검증하는 신규 `asset-picker-boundaries-browser.mjs` 작성. `test:asset-pickers` 스크립트와 `test:browser`를 업데이트했다. **빌드/테스트/CI 미실행**. [상세](EDITOR_REACT_EXTRACTION.ko.md).
+
 ## 2026-11-12 P3.1.e 외부 이미지 URL 갱신 단일 컨트롤러 이관 (검증 보류)
 
 - 독립 예제의 자체 URL 갱신 타이머·재시도·복원·visibility 처리 로직을 제거하고 HostAssetRefresh를 하나만 마운트했다. legacyTiming, onStatus, 버튼 이름·수동 갱신 우선권을 선택적 호환 설정으로 유지하며 일반 TufteEditor의 기본 동작은 변경하지 않는다.

@@ -281,3 +281,18 @@ pnpm test:browser
 **남은 작업:** 독립 예제의 혼합 로컬/외부 자산 다이얼로그를 분리해 공통 HostAssetPicker를 직접 사용하도록 하는 최종 UI 이관, 실제 OS 입력/클립보드·접근성·장기 마운트 및 타 브라우저 게이트. 호스트의 업로드/저장/정본 책임은 변경하지 않는다.
 
 **테스트 실행 보류:** pnpm install --frozen-lockfile, pnpm check, pnpm package:check, pnpm test:host-refresh, pnpm test:host-asset-bridge, pnpm test:browser, 기존 작성한 test:note-image-editor 및 test:document-assets. 컴파일·실제 Playwright·CI를 실행하지 않았다. 직전 unit641/browser46 통과 기록은 이번 코드 검증이 아니다.
+
+## 2026-11-12 — P3.1.e 독립 예제 자산 선택 UI 분리 (코드 작성, 테스트 보류)
+
+이번 단계에서 독립 예제의 혼합 이미지 다이얼로그를 분리했다. **문서 내부 자산**은 기존의 `문서 이미지 선택` 다이얼로그와 `TufteDocumentAssetCommandsPlugin`을 사용하고, **외부 호스트 자산**은 공통 `HostAssetPicker`를 직접 마운트한다. 공통 `HostAssetRefresh`는 이전 단계처럼 하나만 유지한다.
+
+- `examples/editor/src/main.tsx`에서 호스트 검색 결과·revision 선택·요청 오류·pending resolve 상태, search/revision effect, 외부 자산 연결 버튼·DOM을 제거했다. 창을 열어도 `AssetProvider.search()`/ `revisions()`/ `resolve()`가 호출되지 않는 것이 목표이며, 기존 문서 내부 자산 등록·검색·교체·저장/복구는 그대로 둔다.
+- 유효한 `AssetProvider`와 namespace를 제공한 호스트에서만 공통 `HostAssetPicker`의 `호스트 이미지 자산 선택` 버튼과 별도 `호스트 이미지 자산` 다이얼로그가 나타난다. 독립 예제의 주입 방식은 전역 설정을 읽는 호환층일 뿐이며 공통 패키지에 브라우저 전역이나 업로드·인증 구현을 추가하지 않았다.
+- `HostAssetPicker.preferExistingTarget?:boolean`은 **독립 예제 전용** 선택 정책이다. 이미 노트 이미지가 하나 존재하면 그 이미지를 초기 연결 대상으로 선택한다. 여러 이미지가 있으면 사용자가 교체할 대상을 지정해야 한다. 제어형 `TufteEditor`와 공통 선택기의 기본값은 변경하지 않았으며, 현재 노트에 새 이미지를 추가하는 라디오는 계속 제공한다.
+- 기존 `tests/host-asset-provider-browser.mjs`·`tests/legacy-host-asset-guard-browser.mjs`·`tests/host-asset-single-controller-browser.mjs`를 새 공통 호스트 창의 접근성 이름·버튼·대상 그룹에 맞춰 업데이트했다. **문서 내부 자산 수락 검사** `tests/managed-note-assets-browser.mjs`는 변경하지 않았다.
+- 신규 `tests/asset-picker-boundaries-browser.mjs`는 로컬 창과 호스트 창이 서로 별도인지, 로컬 검색·연결에는 외부 검색이 발생하지 않는지, 로컬 자산을 연결했다가 외부 revision 자산으로 교체할 때 노트 이미지가 하나만 남고 `TufteDocument.assets`는 유지되는지 확인한다. `pnpm test:asset-pickers`와 `test:browser`에 연결했다. 패키지 소비자 타입 검사에도 `preferExistingTarget`을 추가했다.
+
+**현재 구현과 검증을 구분한다.** 소스에서 외부 검색 UI 중복이 제거된 사실은 확인했으나, 이번 UI 교체 및 누적 코드의 컴파일·typecheck·Playwright·CI는 아직 실행하지 않았다. 이전 성공 기록으로 이번 변경의 수락을 대체하지 않는다.
+
+**다음 고려 단계:** P3.1.e R6–R7 실환경 수락(IME/키보드, screen reader, 모바일 터치, 복수 브라우저, 장시간 mount/unmount)과 남은 독립 예제 호스트 저장·복구 경계 정리. `Lexical JSON` 정본, Markdown export, 외부 DAM 어댑터 경계는 그대로 유지한다.
+

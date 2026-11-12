@@ -9,13 +9,16 @@ import {InlineImageNode,NoteNode} from '@lexical-tufte/lexical';
 export type HostAssetPickerProps={
  adapter:AssetProvider;
  namespace:string;
+ /** Standalone compatibility: when there is one existing image, replace it
+  *  instead of implicitly inserting another image in the selected note. */
+ preferExistingTarget?:boolean;
 };
 
 type ImageTarget={key:string;noteId:string;src:string;alt:string;expectedImage:string};
 const INSERT_TARGET='__insert-into-current-note__';
 
 /** Image-only host picker; the host owns credentials, upload, persistence and signed URLs. */
-export function HostAssetPicker({adapter,namespace}:HostAssetPickerProps){
+export function HostAssetPicker({adapter,namespace,preferExistingTarget=false}:HostAssetPickerProps){
  const [editor]=useLexicalComposerContext();
  const instanceId=useId();
  const titleId=instanceId+'-title',searchId=instanceId+'-search',altId=instanceId+'-alt';
@@ -83,8 +86,10 @@ export function HostAssetPicker({adapter,namespace}:HostAssetPickerProps){
   setTargets(found);
   setNoteKey(currentNote);
   setNoteIdentity(currentNoteId);
-  setTargetKey(currentNote?INSERT_TARGET:found.length===1?found[0].key:'');
-  setAlt(currentNote?'':found.length===1?found[0].alt:'');
+  const defaultImage=found.length===1?found[0]:null;
+  const preferReplace=preferExistingTarget&&defaultImage!==null;
+  setTargetKey(preferReplace&&defaultImage?defaultImage.key:currentNote?INSERT_TARGET:defaultImage?.key??'');
+  setAlt(preferReplace&&defaultImage?defaultImage.alt:currentNote?'':defaultImage?.alt??'');
   setQuery('');setAssetId('');setRevisionId('');setResults([]);setRevisions([]);
   setError('');setStatus('');
   setOpen(true);

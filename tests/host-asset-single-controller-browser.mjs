@@ -49,12 +49,12 @@ try{
  await editable.focus();await page.keyboard.press('Control+Home');
  await page.keyboard.press('Alt+ArrowDown');
  await button('노트 이미지 삽입').click();
- await button('이미지 라이브러리에서 선택').click();
- const dialog=page.getByRole('dialog',{name:'문서 이미지 선택'});
+ await button('호스트 이미지 자산 선택').click();
+ const dialog=page.getByRole('dialog',{name:'호스트 이미지 자산'});
  await dialog.waitFor();
  await dialog.getByRole('radio',{name:/Fixture host image/}).check();
  await dialog.getByRole('combobox',{name:'버전'}).selectOption('revision-one');
- await dialog.getByRole('button',{name:'선택한 외부 이미지 연결'}).click();
+ await dialog.getByRole('button',{name:'외부 이미지 연결'}).click();
  await dialog.waitFor({state:'hidden'});
  // First resolve is the chooser, second the single reactive refresh.
  await page.waitForFunction(()=>window.__singleRefreshCalls.length>=2);
