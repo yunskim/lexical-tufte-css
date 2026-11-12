@@ -1,7 +1,8 @@
-import {useState} from 'react';
+import {useRef,useState} from 'react';
+import {UNDO_COMMAND,REDO_COMMAND,type LexicalEditor} from 'lexical';
 import {createRoot} from 'react-dom/client';
 import type {JsonNode,TufteDocument} from '@lexical-tufte/document';
-import {TufteEditor} from '@lexical-tufte/editor-react';
+import {TufteEditor,INSERT_TUFTE_NOTE_COMMAND,SPLIT_TUFTE_NOTE_COMMAND,MERGE_TUFTE_NOTE_COMMAND,MOVE_TUFTE_NOTE_COMMAND} from '@lexical-tufte/editor-react';
 import fixture from '../../../fixtures/tufte/server-document.json';
 import '@lexical-tufte/editor-react/styles.css';
 import './style.css';
@@ -23,6 +24,7 @@ function withText(text:string,identity:'first'|'second'):TufteDocument{
 }
 
 function ControlledExample(){
+ const firstEditorRef=useRef<LexicalEditor|null>(null);
  const [first,setFirst]=useState(()=>withText('첫 번째 편집기','first'));
  const [second,setSecond]=useState(()=>withText('두 번째 편집기','second'));
  const [readonly,setReadonly]=useState(false);
@@ -50,6 +52,16 @@ function ControlledExample(){
   </div>
   <section data-testid="first-editor">
    <h2>첫 번째</h2>
+   <div className="actions" role="toolbar" aria-label="첫 번째 편집기 노트 구조 명령">
+    <button onMouseDown={event=>event.preventDefault()} onClick={()=>firstEditorRef.current?.dispatchCommand(INSERT_TUFTE_NOTE_COMMAND,'sidenote')}>첫 번째 노트 삽입</button>
+    <button onMouseDown={event=>event.preventDefault()} onClick={()=>firstEditorRef.current?.dispatchCommand(INSERT_TUFTE_NOTE_COMMAND,'marginnote')}>첫 번째 여백 주석 삽입</button>
+    <button onMouseDown={event=>event.preventDefault()} onClick={()=>firstEditorRef.current?.dispatchCommand(SPLIT_TUFTE_NOTE_COMMAND,undefined)}>첫 번째 노트 나누기</button>
+    <button onMouseDown={event=>event.preventDefault()} onClick={()=>firstEditorRef.current?.dispatchCommand(MERGE_TUFTE_NOTE_COMMAND,undefined)}>첫 번째 노트 합치기</button>
+    <button onMouseDown={event=>event.preventDefault()} onClick={()=>firstEditorRef.current?.dispatchCommand(MOVE_TUFTE_NOTE_COMMAND,'previous')}>첫 번째 노트 앞으로</button>
+    <button onMouseDown={event=>event.preventDefault()} onClick={()=>firstEditorRef.current?.dispatchCommand(MOVE_TUFTE_NOTE_COMMAND,'next')}>첫 번째 노트 뒤로</button>
+    <button onMouseDown={event=>event.preventDefault()} onClick={()=>firstEditorRef.current?.dispatchCommand(UNDO_COMMAND,undefined)}>첫 번째 실행 취소</button>
+    <button onMouseDown={event=>event.preventDefault()} onClick={()=>firstEditorRef.current?.dispatchCommand(REDO_COMMAND,undefined)}>첫 번째 다시 실행</button>
+   </div>
    <p data-testid="first-changes">변경 알림 {firstChanges}회</p>
    <p data-testid="first-notice" role="status">{firstNotice}</p>
    <p data-testid="first-notice-count">노트 명령 알림 {firstNoticeCount}회</p>
@@ -57,7 +69,7 @@ function ControlledExample(){
    <pre data-testid="first-document-json" hidden>{JSON.stringify(first)}</pre>
    <p data-testid="first-readonly">읽기 전용 {readonly?'예':'아니오'}</p>
    {showFirst&&<TufteEditor value={first} onChange={document=>{setFirst(document);setFirstChanges(n=>n+1);}} onError={report} onNotice={reportFirstNotice}
-    readonly={readonly} ariaLabel="첫 번째 Tufte 편집기"/>}
+    readonly={readonly} editorRef={firstEditorRef} ariaLabel="첫 번째 Tufte 편집기"/>}
   </section>
   <section data-testid="second-editor">
    <h2>두 번째</h2>
