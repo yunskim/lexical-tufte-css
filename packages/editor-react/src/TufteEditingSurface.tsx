@@ -6,6 +6,7 @@ import {TablePlugin} from '@lexical/react/LexicalTablePlugin';
 import {SelectionToolbar} from './SelectionToolbar.js';
 import {BlockContextMenu} from './BlockContextMenu.js';
 import {TufteNoteInteractionPlugin,TufteNoteStructurePlugin} from './TufteNoteInteractionPlugin.js';
+import {TufteNoteImageEditorPlugin} from './TufteNoteImageEditorPlugin.js';
 
 /** All editable React plugins share the same nearest LexicalComposer. */
 export interface TufteEditingSurfaceProps {
@@ -14,10 +15,11 @@ export interface TufteEditingSurfaceProps {
  ariaDescribedBy?:string;
  readonly?:boolean;
  onNotice?:(message:string)=>void;
+ onNoteImageEditorOpenChange?:(open:boolean)=>void;
 }
 
 export function TufteEditingSurface({
- className='editor',ariaLabel,ariaDescribedBy,readonly=false,onNotice
+ className='editor',ariaLabel,ariaDescribedBy,readonly=false,onNotice,onNoteImageEditorOpenChange
 }:TufteEditingSurfaceProps){
  return <>
   <RichTextPlugin
@@ -27,6 +29,7 @@ export function TufteEditingSurface({
   <HistoryPlugin/>
   <TablePlugin/>
   <TufteNoteStructurePlugin onNotice={onNotice}/>
+  <TufteNoteImageEditorPlugin readonly={readonly} onNotice={onNotice} onOpenChange={onNoteImageEditorOpenChange}/>
   {!readonly&&<TufteNoteInteractionPlugin onNotice={onNotice}/>}
   {!readonly&&<SelectionToolbar/>}
   {!readonly&&<BlockContextMenu/>}

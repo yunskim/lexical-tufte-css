@@ -2,7 +2,7 @@ import {useRef,useState} from 'react';
 import {UNDO_COMMAND,REDO_COMMAND,type LexicalEditor} from 'lexical';
 import {createRoot} from 'react-dom/client';
 import type {JsonNode,TufteDocument} from '@lexical-tufte/document';
-import {TufteEditor,INSERT_TUFTE_NOTE_COMMAND,SPLIT_TUFTE_NOTE_COMMAND,MERGE_TUFTE_NOTE_COMMAND,MOVE_TUFTE_NOTE_COMMAND} from '@lexical-tufte/editor-react';
+import {TufteEditor,INSERT_TUFTE_NOTE_COMMAND,SPLIT_TUFTE_NOTE_COMMAND,MERGE_TUFTE_NOTE_COMMAND,MOVE_TUFTE_NOTE_COMMAND,OPEN_TUFTE_NOTE_IMAGE_EDITOR_COMMAND} from '@lexical-tufte/editor-react';
 import fixture from '../../../fixtures/tufte/server-document.json';
 import '@lexical-tufte/editor-react/styles.css';
 import './style.css';
@@ -32,6 +32,7 @@ function ControlledExample(){
  const [showSecond,setShowSecond]=useState(true);
  const [firstChanges,setFirstChanges]=useState(0);
  const [secondChanges,setSecondChanges]=useState(0);
+ const [firstImageOpen,setFirstImageOpen]=useState(false);
  const [firstNotice,setFirstNotice]=useState('');
  const [secondNotice,setSecondNotice]=useState('');
  const [firstNoticeCount,setFirstNoticeCount]=useState(0);
@@ -53,6 +54,7 @@ function ControlledExample(){
   <section data-testid="first-editor">
    <h2>첫 번째</h2>
    <div className="actions" role="toolbar" aria-label="첫 번째 편집기 노트 구조 명령">
+    <button type="button" onMouseDown={event=>event.preventDefault()} onClick={event=>firstEditorRef.current?.dispatchCommand(OPEN_TUFTE_NOTE_IMAGE_EDITOR_COMMAND,event.currentTarget)} aria-haspopup="dialog" aria-expanded={firstImageOpen}>첫 번째 노트 이미지 속성</button>
     <button onMouseDown={event=>event.preventDefault()} onClick={()=>firstEditorRef.current?.dispatchCommand(INSERT_TUFTE_NOTE_COMMAND,'sidenote')}>첫 번째 노트 삽입</button>
     <button onMouseDown={event=>event.preventDefault()} onClick={()=>firstEditorRef.current?.dispatchCommand(INSERT_TUFTE_NOTE_COMMAND,'marginnote')}>첫 번째 여백 주석 삽입</button>
     <button onMouseDown={event=>event.preventDefault()} onClick={()=>firstEditorRef.current?.dispatchCommand(SPLIT_TUFTE_NOTE_COMMAND,undefined)}>첫 번째 노트 나누기</button>
@@ -69,7 +71,7 @@ function ControlledExample(){
    <pre data-testid="first-document-json" hidden>{JSON.stringify(first)}</pre>
    <p data-testid="first-readonly">읽기 전용 {readonly?'예':'아니오'}</p>
    {showFirst&&<TufteEditor value={first} onChange={document=>{setFirst(document);setFirstChanges(n=>n+1);}} onError={report} onNotice={reportFirstNotice}
-    readonly={readonly} editorRef={firstEditorRef} ariaLabel="첫 번째 Tufte 편집기"/>}
+    readonly={readonly} editorRef={firstEditorRef} onNoteImageEditorOpenChange={setFirstImageOpen} ariaLabel="첫 번째 Tufte 편집기"/>}
   </section>
   <section data-testid="second-editor">
    <h2>두 번째</h2>

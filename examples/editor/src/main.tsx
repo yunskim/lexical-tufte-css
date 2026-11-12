@@ -83,7 +83,7 @@ import {canonicalBlockType,
   $insertNotePhrasing
 } from '@lexical-tufte/lexical';
 import {NODE_SCHEMA} from '@lexical-tufte/document';
-import {ToolbarButton as IconButton, TufteComposer, TufteEditingSurface, NoteImagePanel, INLINE_ACTIONS, ENTER_TUFTE_NOTE_COMMAND, LEAVE_TUFTE_NOTE_COMMAND, INSERT_TUFTE_NOTE_COMMAND, SPLIT_TUFTE_NOTE_COMMAND, MERGE_TUFTE_NOTE_COMMAND, MOVE_TUFTE_NOTE_COMMAND, type NoteImageChoice, type ImagePresentation} from '@lexical-tufte/editor-react';
+import {ToolbarButton as IconButton, TufteComposer, TufteEditingSurface, INLINE_ACTIONS, ENTER_TUFTE_NOTE_COMMAND, LEAVE_TUFTE_NOTE_COMMAND, INSERT_TUFTE_NOTE_COMMAND, SPLIT_TUFTE_NOTE_COMMAND, MERGE_TUFTE_NOTE_COMMAND, MOVE_TUFTE_NOTE_COMMAND, OPEN_TUFTE_NOTE_IMAGE_EDITOR_COMMAND} from '@lexical-tufte/editor-react';
 import './style.css';
 import '@lexical-tufte/editor-react/styles.css';
 
@@ -104,7 +104,6 @@ function EditorUI(){
   const [json,setJson]=useState('');
   const [managedJson,setManagedJson]=useState('');
   const [imageChooserOpen,setImageChooserOpen]=useState(false);
-  const [noteImages,setNoteImages]=useState<NoteImageChoice[]>([]);
   // Local document catalog. External AssetProvider remains read-only.
   const [documentAssets,setDocumentAssets]=useState<Array<{id:string;src:string;mimeType:string;width?:number;height?:number}>>([]);
   // The embedding host may provide this capability; the standalone example
@@ -435,7 +434,6 @@ function EditorUI(){
     setStatus('문서 이미지 자산을 등록했습니다.');
   }
 
-  const chooserNoteKey=useRef<string|null>(null);
   const chooserTrigger=useRef<HTMLButtonElement>(null);
   useEffect(()=>registerSectionCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
   useEffect(()=>registerInlineCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
@@ -602,47 +600,6 @@ function EditorUI(){
       }else $insertNotePhrasing(s,[$createInlineImageNode('/fixture.svg','프로토타입의 파란 막대 그림'),$createTextNode(' ')]);
     });editor.focus();
   }
-  function openNoteImageChooser(){
-    let noteKey:string|null=null;
-    const images:NoteImageChoice[]=[];
-    editor.getEditorState().read(()=>{
-      const selection=$getSelection();
-      if(!$isRangeSelection(selection))return;
-      const note=containingNote(selection.anchor.getNode());
-      if(!note)return;
-      noteKey=note.getKey();
-      const inspect=(node:LexicalNode):void=>{
-        if(node instanceof InlineImageNode){
-          images.push({key:node.getKey(),...node.getImageProperties()});
-        }else if($isElementNode(node))node.getChildren().forEach(inspect);
-      };
-      note.getChildren().forEach(inspect);
-    });
-    if(!noteKey){setStatus('먼저 노트 안으로 이동해 이미지를 선택하세요.');return;}
-    if(!images.length){setStatus('현재 노트에 이미지가 없습니다. 이미지를 삽입한 후 다시 선택하세요.');return;}
-    chooserNoteKey.current=noteKey;
-    setNoteImages(images);setImageChooserOpen(true);
-  }
-  function closeNoteImageChooser(){
-    setImageChooserOpen(false);
-    chooserTrigger.current?.focus();
-  }
-  function saveNoteImage(imageKey:string,properties:ImagePresentation):boolean{
-    const noteKey=chooserNoteKey.current;
-    let valid=false;
-    editor.getEditorState().read(()=>{
-      const node=$getNodeByKey(imageKey),note=noteKey?$getNodeByKey(noteKey):null;
-      valid=node instanceof InlineImageNode&&note instanceof NoteNode&&containingNote(node)?.is(note)===true;
-    });
-    if(!valid){setStatus('선택한 노트 또는 이미지가 변경되었습니다. 다시 선택하세요.');return false;}
-    editor.update(()=>{
-      const node=$getNodeByKey(imageKey),note=noteKey?$getNodeByKey(noteKey):null;
-      if(!(node instanceof InlineImageNode)||!(note instanceof NoteNode)||!containingNote(node)?.is(note))return;
-      node.setImagePresentation(properties.alt,properties.width,properties.height);
-    },{tag:HISTORY_PUSH_TAG,discrete:true});
-    setStatus('선택한 노트 이미지의 대체 텍스트와 표시 크기를 수정했습니다.');
-    return true;
-  }
   function exportDocument(){
     const managed=exportEditorToDocument(editor,documentBase());
     setManagedJson(managed.ok?JSON.stringify(managed.value,null,2):'');
@@ -782,7 +739,7 @@ function EditorUI(){
       {INLINE_ACTIONS.map(action=><IconButton key={action.id} name={action.icon} label={action.label} onMouseDown={preserve} onClick={()=>editor.update(()=>{editor.dispatchCommand(FORMAT_TEXT_COMMAND,action.id);},{tag:HISTORY_PUSH_TAG})}/>)}
       <button onMouseDown={preserve} onClick={()=>insertPayload('link')}>노트 링크 삽입</button>
       <button onMouseDown={preserve} onClick={()=>insertPayload('image')}>노트 이미지 삽입</button>
-      <button ref={chooserTrigger} type="button" onMouseDown={preserve} onClick={openNoteImageChooser} aria-haspopup="dialog" aria-expanded={imageChooserOpen}>노트 이미지 선택</button>
+      <button ref={chooserTrigger} type="button" onMouseDown={preserve} onClick={event=>editor.dispatchCommand(OPEN_TUFTE_NOTE_IMAGE_EDITOR_COMMAND,event.currentTarget)} aria-haspopup="dialog" aria-expanded={imageChooserOpen}>노트 이미지 선택</button>
       <button onMouseDown={preserve} onClick={()=>{editor.dispatchCommand(SPLIT_TUFTE_NOTE_COMMAND,undefined);editor.focus();}}>노트 나누기</button>
       <button onMouseDown={preserve} onClick={()=>{editor.dispatchCommand(MERGE_TUFTE_NOTE_COMMAND,undefined);editor.focus();}}>다음 노트와 합치기</button>
       <button onMouseDown={preserve} onClick={()=>{editor.dispatchCommand(MOVE_TUFTE_NOTE_COMMAND,'previous');editor.focus();}}>노트 앞으로 이동</button>
@@ -790,10 +747,9 @@ function EditorUI(){
       <IconButton name="undo" label="실행 취소" onMouseDown={preserve} onClick={()=>editor.dispatchCommand(UNDO_COMMAND,undefined)}/>
       <IconButton name="redo" label="다시 실행" onMouseDown={preserve} onClick={()=>editor.dispatchCommand(REDO_COMMAND,undefined)}/>
     </div>
-    {imageChooserOpen&&<NoteImagePanel images={noteImages} onClose={closeNoteImageChooser} onSave={saveNoteImage}/>}
     <p id="help">본문에서 Alt+↓: 다음 노트로 이동 · 노트에서 Escape: 본문으로 이동</p>
     <main>
-      <TufteEditingSurface ariaLabel="본문과 사이드노트 편집" ariaDescribedBy="help" onNotice={setStatus}/>
+      <TufteEditingSurface ariaLabel="본문과 사이드노트 편집" ariaDescribedBy="help" onNotice={setStatus} onNoteImageEditorOpenChange={setImageChooserOpen}/>
     </main>
     <p role="status" aria-label="편집 작업 상태">{status}</p><p role="status" aria-label="자동 복구 저장 상태">{autoSaveState}</p>
     {structureIssues.length>0&&<aside role="alert" aria-label="문서 구조 복구"><p>문서 구조를 수정하세요. 내용은 자동 삭제하지 않으며 HTML 생성은 차단됩니다.</p><ul>{structureIssues.map((issue,i)=><li key={`${issue.key}-${i}`}><button onClick={()=>focusStructureIssue(editor,issue.key)}>{issue.message}</button> <code>{issue.path}</code></li>)}</ul><button onClick={()=>editor.dispatchCommand(UNDO_COMMAND,undefined)}>구조 변경 실행 취소</button><button onClick={recoverStructure} disabled={!checkpoint.current}>마지막 정상 구조로 복구</button></aside>}

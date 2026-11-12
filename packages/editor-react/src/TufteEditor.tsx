@@ -22,6 +22,8 @@ export interface TufteEditorProps {
  onError?:(error:Error)=>void;
  /** Optional UI notice for navigation/clipboard actions; never stored in Lexical JSON. */
  onNotice?:(message:string)=>void;
+ /** Report the built-in note image dialog state to an external toolbar. */
+ onNoteImageEditorOpenChange?:(open:boolean)=>void;
  assetAdapter?:AssetProvider;
  assetNamespace?:string;
  readonly?:boolean;
@@ -152,7 +154,7 @@ const defaultTheme={
  * stay with the host; the editor never creates an HTTP client.
  */
 export function TufteEditor({
- value,onChange,onError,onNotice,assetAdapter,assetNamespace,
+ value,onChange,onError,onNotice,onNoteImageEditorOpenChange,assetAdapter,assetNamespace,
  readonly=false,editorRef,className='editor',ariaLabel='Tufte 문서 편집'
 }:TufteEditorProps){
  const instanceId=useId();
@@ -166,7 +168,7 @@ export function TufteEditor({
   <TufteComposer initialConfig={{namespace,onError:handleError,editable:!readonly,theme:defaultTheme}}>
    {assetAdapter&&assetNamespace?.trim()&&<HostAssetRefresh adapter={assetAdapter} namespace={assetNamespace}/>}
    {!readonly&&assetAdapter&&assetNamespace?.trim()&&<HostAssetPicker adapter={assetAdapter} namespace={assetNamespace}/>}
-   <TufteEditingSurface className={className} ariaLabel={ariaLabel} readonly={readonly} onNotice={onNotice}/>
+   <TufteEditingSurface className={className} ariaLabel={ariaLabel} readonly={readonly} onNotice={onNotice} onNoteImageEditorOpenChange={onNoteImageEditorOpenChange}/>
    <DocumentBinding value={value} onChange={onChange} onError={onError} readonly={readonly}/>
    <EditorHandle editorRef={editorRef}/>
   </TufteComposer>
