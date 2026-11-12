@@ -139,11 +139,31 @@ try{
   const body=first.locator('p').first();
   await setCaret(first.locator('[data-note-id="first-server-note"] [data-lexical-text="true"]').first(),2);
   await page.getByRole('button',{name:'첫 번째 노트 앞으로'}).click();
-  const noteAfterMove=await read(page,'first');
-  assert.equal(noteAfterMove.lexicalState.root.children[0].children[0].children[0].noteId,'first-server-note');
+  await page.waitForFunction(()=>{
+   const value=document.querySelector('[data-testid="first-document-json"]')?.textContent;
+   return value&&JSON.parse(value).lexicalState.root.children[0].children[0].children[0]?.noteId==='first-server-note';
+  });
+  assert.equal((await read(page,'first')).lexicalState.root.children[0].children[0].children[0].noteId,'first-server-note');
+  await page.getByRole('button',{name:'첫 번째 실행 취소'}).click();
+  await page.waitForFunction(expected=>{
+   const value=document.querySelector('[data-testid="first-document-json"]')?.textContent;
+   return value&&JSON.stringify(JSON.parse(value))===JSON.stringify(expected);
+  },initial);
+  assert.deepEqual(await read(page,'first'),initial,'Undo restores note order');
+  await setCaret(first.locator('[data-note-id="first-server-note"] [data-lexical-text="true"]').first(),2);
   await page.getByRole('button',{name:'첫 번째 노트 뒤로'}).click();
-  await page.waitForFunction(()=>document.querySelector('[data-testid="first-document-json"]')?.textContent?.includes('"first-server-note"'));
-  assert.deepEqual(await read(page,'first'),initial,'Moving forward and backward preserves canonical structure');
+  await page.waitForFunction(()=>{
+   const value=document.querySelector('[data-testid="first-document-json"]')?.textContent;
+   if(!value)return false;
+   const children=JSON.parse(value).lexicalState.root.children[0].children[0].children;
+   return children.at(-1)?.noteId==='first-server-note';
+  });
+  await page.getByRole('button',{name:'첫 번째 실행 취소'}).click();
+  await page.waitForFunction(expected=>{
+   const value=document.querySelector('[data-testid="first-document-json"]')?.textContent;
+   return value&&JSON.stringify(JSON.parse(value))===JSON.stringify(expected);
+  },initial);
+  assert.deepEqual(await read(page,'first'),initial,'Undo restores the second move as well');
 
   await setCaret(first.locator('[data-note-id="first-server-note"] [data-lexical-text="true"]').first(),2);
   const nestedBefore=await read(page,'first');
