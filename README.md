@@ -71,17 +71,17 @@ pnpm test:browser
 
 `packages/document`는 문서·메타데이터·자산·33개 노드 계약과 validator를 제공합니다. `packages/render`는 공유 검증 뒤 현재 `p1-v1` 출력 지원 범위를 검사합니다. 두 패키지는 DOM/React/Lexical runtime 없이 실행됩니다. 노드별 편집·발행 구현은 P2.2부터 확장합니다.
 
-## 2026-11-12 노트 구조 명령 공통화 (검증 대기)
+## 2026-11-12 노트 구조 명령 공통화 및 실행 검증
 
 `@lexical-tufte/lexical`의 `registerNoteStructureCommands`가 노트 삽입·분리·합치기·앞뒤 이동을 호스트 중립 명령으로 제공합니다. `@lexical-tufte/editor-react`에서도 같은 명령을 export하며, 선택적 `TufteEditor.editorRef`를 사용하면 독립 호스트 툴바에서 실행할 수 있습니다. 기존 프로토타입도 공통 명령을 소비합니다.
 
-추가 회귀: `packages/lexical/test/note-structure-commands.test.mjs` 및 `tests/reusable-note-structure-browser.mjs`. 실행 명령은 `pnpm test:note-structures`입니다. **이 변경의 실제 빌드·타입·브라우저 테스트는 아직 실행하지 않았습니다.** 아래 2026-11-11의 45/45 결과는 이전 기준 소스에 대한 증거입니다.
+추가 회귀: `packages/lexical/test/note-structure-commands.test.mjs` 및 `tests/reusable-note-structure-browser.mjs`. 실행 명령은 `pnpm test:note-structures`입니다. **`d3eae84` 기준 빌드·타입·단위 641개(신규 구조 명령 12개 포함)·패키지 6개·브라우저 46/46·Python 16개 및 HTTP 연동을 실제 실행해 통과했습니다.** 제품 코드와 테스트는 수정하지 않았습니다. 정의목록 클릭 timeout 1건은 동일 소스 단독 재실행에서 통과했지만 원인은 미확정입니다. 신규 기능의 readonly 거부 안내·Undo/Redo·두 편집기 격리·remount 검사도 통과했습니다. [최신 검증 보고서](docs/VERIFICATION_DEFERRED_2026-11-12.ko.md) · [파일별 결과/소스 해시](docs/verification/deferred-20261112.json). 실제 OS/운영·장시간 수명과 전체 제품 게이트는 남아 있습니다.
 
 ## 2026-11-11 재사용 편집기 및 클립보드 검증
 
 `@lexical-tufte/editor-react`에 노트 키보드·클립보드·IME 공통 플러그인, 호스트 툴바의 노트 진입·복귀 명령과 `ToolbarButton`을 이관했습니다. 두 제어형 편집기의 노트 알림·readonly/remount·plain-text paste·복사/이동 ID 보존·중첩 노트 거부를 실제 Chromium에서 검증했습니다.
 
-**최신 실제 통합 검증 (2026-11-11):** [검증 보고서](docs/VERIFICATION_DEFERRED_2026-11-11.ko.md) · [최초 실패/수정/최종 실행과 소스 해시](docs/verification/deferred-20261111.json)
+**이전 통합 검증 (2026-11-11):** [검증 보고서](docs/VERIFICATION_DEFERRED_2026-11-11.ko.md) · [최초 실패/수정/최종 실행과 소스 해시](docs/verification/deferred-20261111.json)
 
 - frozen 설치, audit/lint/inventory/font, 전체 빌드·TypeScript 타입 검사 **통과**.
 - 단위 테스트 **629/629**, 패키지 소비자 **6개 tarball**, Python **16개**, TS→Python HTTP→SQLite 및 발행 revision 모델 **12그룹** 통과.

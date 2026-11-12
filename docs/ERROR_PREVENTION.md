@@ -834,3 +834,7 @@ E144: 클릭 이미지가 실제 Lexical NodeSelection인지 연결하고 native
 - E149/M127/M130: `End`는 논리 노트 끝을 뜻하지 않는다. 노트 TextNode 끝의 Range와 실제 선택의 note ID를 검사하고, 본문 paste 목적지는 노트 자손을 제외한 직접 자식 TextNode로 선택한다. DOM 개수와 분리해 controlled JSON의 linebreak·rich payload·copy/cut identity·중첩 거절/형제 불변성을 검사한다.
 - E150/M055/M057: CJK subset 메트릭과 혼합 텍스트의 라틴 공백 fallback을 구분한다. 실패에 실제 CDP font/폭을 확보하고 기준값을 덮어쓰지 않는다. Linux DejaVu 참조 환경은 해당 browser process의 FONTCONFIG_FILE로 고정하고 명시적 사용자 환경은 존중한다. 다른 OS 및 한글 시스템 fallback 수락을 이 성공으로 대체하지 않는다.
 - 실행 시작/종료에 E139–E148/M127–M131을 점검했다. 빌드 선행·공식 shell smoke·같은 Python 환경·실제 Undo/DOM·가상시계 경계를 유지했고, E148의 버튼/키보드·독립 콜백·cleanup은 실제 브라우저에서 수락했다. 다음 공통 편집기 이관에도 적용한다.
+
+## M133 — 클릭 중 timeout의 최초 증거와 동일 소스 단독 재실행 구분
+
+E151: visible/enabled/stable 확인 후 실제 click 단계에서 timeout이 나면 전수 실행의 첫 로그·소스·제한을 보존한다. 나머지 결과를 먼저 회수하고 동일 코드/시간 제한으로 한 번 단독 재실행해 재현성을 구분한다. 단독 성공만으로 원인을 환경 탓으로 확정하거나 오류 자체를 해결 처리하지 않는다. 재발 시 click trace/브라우저 이벤트·선택/페이지 오류와 실행 자원을 함께 확보해 원인을 좁힌다. 이번 실행에서 E139–E150/M127–M132의 빌드 선행·공식 shell·같은 Python·실제 selection/Undo·타이머·폰트 참조 조건을 재점검했다.

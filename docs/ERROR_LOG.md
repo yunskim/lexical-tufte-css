@@ -1049,3 +1049,9 @@ revision 검증 이후 Backspace의 DOM 이미지 감소 대기에서30초 timeo
 같은 실행의 `font-proof-browser.mjs`가 serif td 폭 기준 비교에서 실패했다. CDP는 CJK custom font가 실제 사용됐고, 공백은 LiberationSerif였음을 보였다(폭 77px, 기존 기준 78.640625px). 별도 DejaVu-only fontconfig에서 기존 8개 문자 샘플/6개 의미 위치 기준을 모두 통과했다(serif td 79px, 기존 허용 오차 0.5px 내). CJK subset 변경 증거는 없었다.
 
 `tests/fixtures/fontconfig-dejavu.conf`를 추가해 Linux에서 DejaVu가 설치돼 있고 사용자가 FONTCONFIG_FILE을 지정하지 않은 경우 이 폰트 검사 browser 프로세스에만 적용한다. 전역 OS 설정·기준값·픽셀 허용 오차·glyph 단언은 변경하지 않았다. 일반 명령 재실행을 통과했다. `knownKoreanFallback:false`는 남으며 실제 배포 OS의 한글 실패 fallback 수락으로 확대하지 않는다. M055/M057/M132.
+
+## E151 — 정의목록 삽입 버튼 클릭의 간헐 timeout (원인 미확정)
+
+2026-11-12 `d3eae84` 전수 실행에서 `definition-pairs-browser.mjs:32`의 정의목록 삽입 버튼 클릭이 6초 제한을 넘었다. locator는 visible/enabled/stable 및 scroll 완료를 확인한 뒤 performing click에서 멈췄다. 파일 전체는 44.02초 후 실패했다. 다른 45개 브라우저 파일은 통과했다.
+
+전체 실행 종료 후 동일 소스·동일 6초 제한으로 단독 실행해 4.86초에 파일 전체를 통과했다. 정의 쌍 이동·단일 Undo/Redo·저장/재열기·삭제 거절·DOM 재열기 등의 기존 단언은 바꾸지 않았다. 환경/스케줄링 지연 가능성은 추정이며 근본 원인을 확정하지 않는다. 제품 수정이나 timeout 완화 없이 재현되지 않았다는 결과만 기록하고 간헐 실패 자체는 해결 처리하지 않는다. [첫 실패·단독 재실행 증거](verification/deferred-20261112.json). M133.

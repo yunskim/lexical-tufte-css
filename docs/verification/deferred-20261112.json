@@ -1,0 +1,1183 @@
+{
+  "date": "2026-11-12",
+  "sourceCommit": "d3eae8423ca3faf7f533435e331a21f1975d145b",
+  "productCodeChanged": false,
+  "testsChanged": false,
+  "unitCounts": {
+    "editor-ports": 2,
+    "document": 58,
+    "render": 72,
+    "blog": 77,
+    "lexical": 432
+  },
+  "unitTotal": 641,
+  "newStructureUnitScenarios": 12,
+  "packages": 6,
+  "pythonTests": 16,
+  "httpSQLite": "PASS",
+  "revisionModelGroups": 12,
+  "hostAssetRefreshPolicy": "PASS",
+  "initialBrowserResults": [
+    {
+      "file": "reusable-note-structure-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 6.06
+    },
+    {
+      "file": "reusable-note-interactions-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 2.48
+    },
+    {
+      "file": "reusable-note-paste-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 2.11
+    },
+    {
+      "file": "reusable-note-clipboard-identity-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 2.28
+    },
+    {
+      "file": "note-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 3.59
+    },
+    {
+      "file": "note-editing-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 14.75
+    },
+    {
+      "file": "all-nodes-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 7.46
+    },
+    {
+      "file": "contextual-ui-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 3.5
+    },
+    {
+      "file": "controlled-editor-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 7.93
+    },
+    {
+      "file": "controlled-host-assets-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 12.61
+    },
+    {
+      "file": "controlled-host-refresh-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 11.84
+    },
+    {
+      "file": "definition-pairs-browser.mjs",
+      "exitCode": 1,
+      "timeout": false,
+      "seconds": 44.02
+    },
+    {
+      "file": "font-proof-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 15.96
+    },
+    {
+      "file": "full-page-pixel-parity-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 4.95
+    },
+    {
+      "file": "host-asset-provider-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 29.38
+    },
+    {
+      "file": "inline-span-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 55.89
+    },
+    {
+      "file": "inline-span-html-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 2.39
+    },
+    {
+      "file": "layout-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 3.04
+    },
+    {
+      "file": "list-kind-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 9.35
+    },
+    {
+      "file": "list-tab-focus-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 4.56
+    },
+    {
+      "file": "managed-note-assets-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 3.79
+    },
+    {
+      "file": "note-dom-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 2.4
+    },
+    {
+      "file": "note-export-parity-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 1.88
+    },
+    {
+      "file": "note-image-chooser-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 3.03
+    },
+    {
+      "file": "note-image-dimensions-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 3.58
+    },
+    {
+      "file": "p22d2-semantic-dom-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 1.12
+    },
+    {
+      "file": "publication-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 3.24
+    },
+    {
+      "file": "quotation-editing-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 13.03
+    },
+    {
+      "file": "recovery-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 3.03
+    },
+    {
+      "file": "section-commands-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 12.5
+    },
+    {
+      "file": "server-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 2.58
+    },
+    {
+      "file": "text-format-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 11.33
+    },
+    {
+      "file": "upstream-dom-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 0.72
+    },
+    {
+      "file": "upstream-full-document-editor-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 10.08
+    },
+    {
+      "file": "upstream-full-document-roundtrip-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 21.61
+    },
+    {
+      "file": "upstream-full-document-visual-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 31.29
+    },
+    {
+      "file": "upstream-full-page-baseline-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 1.03
+    },
+    {
+      "file": "upstream-geometry-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 1.38
+    },
+    {
+      "file": "upstream-newthought-sidenote-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 0.83
+    },
+    {
+      "file": "upstream-same-content-epigraphs-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 0.57
+    },
+    {
+      "file": "upstream-same-content-figures-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 1.02
+    },
+    {
+      "file": "upstream-same-content-final-sections-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 0.62
+    },
+    {
+      "file": "upstream-same-content-fundamentals-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 0.57
+    },
+    {
+      "file": "upstream-same-content-getting-started-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 0.67
+    },
+    {
+      "file": "upstream-same-content-opening-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 0.52
+    },
+    {
+      "file": "upstream-same-content-sidenotes-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 2.12
+    }
+  ],
+  "browserResults": [
+    {
+      "file": "reusable-note-structure-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 6.06
+    },
+    {
+      "file": "reusable-note-interactions-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 2.48
+    },
+    {
+      "file": "reusable-note-paste-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 2.11
+    },
+    {
+      "file": "reusable-note-clipboard-identity-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 2.28
+    },
+    {
+      "file": "note-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 3.59
+    },
+    {
+      "file": "note-editing-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 14.75
+    },
+    {
+      "file": "all-nodes-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 7.46
+    },
+    {
+      "file": "contextual-ui-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 3.5
+    },
+    {
+      "file": "controlled-editor-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 7.93
+    },
+    {
+      "file": "controlled-host-assets-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 12.61
+    },
+    {
+      "file": "controlled-host-refresh-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 11.84
+    },
+    {
+      "file": "definition-pairs-browser.mjs",
+      "exitCode": 0,
+      "seconds": 4.86,
+      "sourceChanged": false,
+      "timeoutChanged": false
+    },
+    {
+      "file": "font-proof-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 15.96
+    },
+    {
+      "file": "full-page-pixel-parity-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 4.95
+    },
+    {
+      "file": "host-asset-provider-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 29.38
+    },
+    {
+      "file": "inline-span-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 55.89
+    },
+    {
+      "file": "inline-span-html-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 2.39
+    },
+    {
+      "file": "layout-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 3.04
+    },
+    {
+      "file": "list-kind-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 9.35
+    },
+    {
+      "file": "list-tab-focus-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 4.56
+    },
+    {
+      "file": "managed-note-assets-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 3.79
+    },
+    {
+      "file": "note-dom-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 2.4
+    },
+    {
+      "file": "note-export-parity-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 1.88
+    },
+    {
+      "file": "note-image-chooser-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 3.03
+    },
+    {
+      "file": "note-image-dimensions-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 3.58
+    },
+    {
+      "file": "p22d2-semantic-dom-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 1.12
+    },
+    {
+      "file": "publication-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 3.24
+    },
+    {
+      "file": "quotation-editing-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 13.03
+    },
+    {
+      "file": "recovery-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 3.03
+    },
+    {
+      "file": "section-commands-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 12.5
+    },
+    {
+      "file": "server-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 2.58
+    },
+    {
+      "file": "text-format-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 11.33
+    },
+    {
+      "file": "upstream-dom-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 0.72
+    },
+    {
+      "file": "upstream-full-document-editor-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 10.08
+    },
+    {
+      "file": "upstream-full-document-roundtrip-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 21.61
+    },
+    {
+      "file": "upstream-full-document-visual-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 31.29
+    },
+    {
+      "file": "upstream-full-page-baseline-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 1.03
+    },
+    {
+      "file": "upstream-geometry-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 1.38
+    },
+    {
+      "file": "upstream-newthought-sidenote-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 0.83
+    },
+    {
+      "file": "upstream-same-content-epigraphs-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 0.57
+    },
+    {
+      "file": "upstream-same-content-figures-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 1.02
+    },
+    {
+      "file": "upstream-same-content-final-sections-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 0.62
+    },
+    {
+      "file": "upstream-same-content-fundamentals-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 0.57
+    },
+    {
+      "file": "upstream-same-content-getting-started-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 0.67
+    },
+    {
+      "file": "upstream-same-content-opening-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 0.52
+    },
+    {
+      "file": "upstream-same-content-sidenotes-browser.mjs",
+      "exitCode": 0,
+      "timeout": false,
+      "seconds": 2.12
+    }
+  ],
+  "browserPassed": 46,
+  "retests": [
+    {
+      "file": "definition-pairs-browser.mjs",
+      "exitCode": 0,
+      "seconds": 4.86,
+      "sourceChanged": false,
+      "timeoutChanged": false
+    }
+  ],
+  "visual": {
+    "widths": [
+      375,
+      759,
+      760,
+      761,
+      1024,
+      1440
+    ],
+    "unmaskedMismatchPixels": 0,
+    "mask": "one verified iframe"
+  },
+  "sourceHashes": {
+    "examples/editor/src/controlledDemo.tsx": "1c12223e4cbf09b614fe6735e9c2495a3efa7f05857317ebe6b5fda1adf4fcec",
+    "examples/editor/src/main.tsx": "989acc99a50a6060ba25b8c39e7ca4590beef71f6f16a772d026c695a294376d",
+    "packages/editor-react/src/BlockContextMenu.tsx": "00a2bd8f6886bf79de42e798ca04796901ac21610f01fc8d73f823883c39f2f9",
+    "packages/editor-react/src/HostAssetPicker.tsx": "58de75738791c1bab483ef6fe58cb8bc2bf1936338838e5bd1e70a379eb24ddf",
+    "packages/editor-react/src/HostAssetRefresh.tsx": "66f19aac3f524982a157cb0d7c63b062acd815f5db39e3fa8a8aea0dd61a67ed",
+    "packages/editor-react/src/NoteImagePanel.tsx": "5ca32f6e7c3717802caca60334f870d31bd6c0bb9d174b14d85416f5e1da01bd",
+    "packages/editor-react/src/SelectionToolbar.tsx": "7c6475255fd5978583024141e208c23b87c86b8b19238e8e8caf7e124cec866c",
+    "packages/editor-react/src/ToolbarButton.tsx": "5d3ad56414bfb2c6a9eeceb2bbcabad974e92d66ec0b3bd8d3873ff22977180b",
+    "packages/editor-react/src/TufteComposer.tsx": "2b5c4ee733abf733fb6813e31db444eece7db4121cf37d89d230138c5605f035",
+    "packages/editor-react/src/TufteEditingSurface.tsx": "357444f9567c3e80668c7393181a6521203a5817a899a40eeabe18b0fc4a1234",
+    "packages/editor-react/src/TufteEditor.tsx": "97453d697b2f01d493492fde25741a73110617d5fb96cbf3fdd42522ffdf91d6",
+    "packages/editor-react/src/TufteNoteInteractionPlugin.tsx": "020b0265ea43198b194d4e4c7ad840f2362021c8d698aca6189c3f9b4d5f2713",
+    "packages/editor-react/src/blockMenuCapabilities.ts": "ee286b6b3c836dfe00b2c3c60a723638d0ab78027ce0436f29ba36a5fe2ca6e8",
+    "packages/editor-react/src/hostAssetPolicy.ts": "6367a3098e7d9488e15a86cfd1f2008c61d351147e9114523585f7b1b0a1bace",
+    "packages/editor-react/src/index.ts": "61d3bb624253502efb2c1f21522d0957e07704841924d3fff018806adf8020d8",
+    "packages/editor-react/src/inlineActions.ts": "f218f818b85c1e4d4de9b03d7a9393b64cb1ab27a9efcf57863aa7076926d76e",
+    "packages/editor-react/src/styles.css": "17a8db3c9d1f07c26b8c8f957cade18e4d0471eae0122ad60560b547f7165e17",
+    "packages/editor-react/src/toolbar.tsx": "56a63bc46933d058d32223ea5f12bce6541ccd9e97e9c0c89bf1e9e65cbd7e7c",
+    "packages/lexical/src/noteStructureCommands.ts": "eca426da8cb817995d7eced4cfb3b276f1ce6bd9c4fb27e4becb1316885a5f2e",
+    "packages/lexical/test/note-structure-commands.test.mjs": "295efa1edc89063c4e433eef5a4dce43e7f1cc2c95ffbce332165b80dec8ccf5",
+    "scripts/check-package-tarballs.mjs": "fd2393e4e4f642f57a3a16d34eb5b56cb6e989b6a129e608a687e7f4967719fe",
+    "tests/all-nodes-browser.mjs": "6a2df97b87e6bc698588a357f8c56bca0d4195a72ebc8972da64c09007b474b2",
+    "tests/contextual-ui-browser.mjs": "a073fdbdbb5a9ad394380b05bdfefd47b86c704a54b41fd44b6faceb7721c7a3",
+    "tests/controlled-editor-browser.mjs": "ce43f4c06186a915e1ff7ce7e635efa0dcf80e885430635feb4d79698b86a616",
+    "tests/controlled-host-assets-browser.mjs": "4cef7120594d5864add93b383911f8f51f0fe98e2a3d52aa11c4080e82f06283",
+    "tests/controlled-host-refresh-browser.mjs": "ab0daf184fe1b86be888fe5927079c3387787ac90d2041c82c43cbc6e9f6c621",
+    "tests/definition-pairs-browser.mjs": "cb74d91ba80752e2afe060ed92c39d34d2eb496a1bf9fb787ff1e917ebeb191f",
+    "tests/fixtures/fontconfig-dejavu.conf": "d601b701cc39d4334e684e68490dd0b1b902e6420f8c9c9ede779ab04b07d317",
+    "tests/font-proof-browser.mjs": "cdd7af58a2e50a0d51cbb0cc0b5cb217e8bef3ba56315b9db12cfaba4fa00121",
+    "tests/full-page-pixel-parity-browser.mjs": "c6072c5302c6fbf60a40f3e5b80599bac5b5a1c1373a39c9822ef21e045ea04a",
+    "tests/host-asset-provider-browser.mjs": "340e625ed274fe2516f140e35f4498438b50b5d6a892c8aa9890cc5d53ec7bb9",
+    "tests/inline-span-browser.mjs": "73f3b56b8b03a7abadb908903a77e8c3c4d83b7157fe689c168dbc5fdd2a29e8",
+    "tests/inline-span-html-browser.mjs": "cd73da10af1d8fad8b8cd1bcab365f179545fad4c1e32557986998cfc7f1f4a6",
+    "tests/layout-browser.mjs": "2ea9a87dc0813ab6fcc46d1e59879d034b0bf293662571f6d1c95e0b7388f321",
+    "tests/list-kind-browser.mjs": "86f8cd09549630825c808cd6de3d8ecd349f7c0e4937796b31e5af6a7b4f7ae0",
+    "tests/list-tab-focus-browser.mjs": "b7080b0f91687ee8d909c1d897c9cbc1da2c8bfedfa39ae9a9650bde0c4cde59",
+    "tests/managed-note-assets-browser.mjs": "69371a67611a5299f405495e9cbfb6cd18451b205093ff623fcf45f1099fbd0a",
+    "tests/note-browser.mjs": "03be42898797815692d0f2bc5a63055482f2a6fc2122ab8878afad23ff4be566",
+    "tests/note-dom-browser.mjs": "e835aad0cfbe845059aaf821929cfe0559f4c5586b5bc1047f7dfad5543a0c11",
+    "tests/note-editing-browser.mjs": "b827f1a90da52cb9eb7e97984305a76d7535f20efb96379d9ed3104869b9ac42",
+    "tests/note-export-parity-browser.mjs": "11e81b1a73d0d2f754d285c577f7af6c03b0ca21a13287c86e2f46bba2f529b1",
+    "tests/note-image-chooser-browser.mjs": "3d25136c98bd2a15e269b2e7f9013def701ccb8dfc9c47776ec14a73591af6d3",
+    "tests/note-image-dimensions-browser.mjs": "b33391b811214987c17afcf3c92d9e0ef683ae55307cbcc30c97e5f67288a407",
+    "tests/p22d2-semantic-dom-browser.mjs": "4171a5523e566b28dca2af3d6445a19254ad5107cb55ab6ce3a5f7d5c9e14e12",
+    "tests/publication-browser.mjs": "2bfbfae603d81bd0fd95135dacbfe9b3710e8fb89c68d17df43598a79c180dd0",
+    "tests/quotation-editing-browser.mjs": "eba92e41356d95a714099dd2156343344f355cb95c444c034e9f6037565ab130",
+    "tests/recovery-browser.mjs": "abc1fda60125e1203de02e66ce34a1a6ec9212ddadf0f0115a84b59078c79967",
+    "tests/reusable-note-clipboard-identity-browser.mjs": "dfcd0d0ef13317bc385713c60eddeb5c88796deaa99139bec9319b0d9688aaeb",
+    "tests/reusable-note-interactions-browser.mjs": "71276117aaac4eec25c4aabaae210bb3025c916c8999069fe6d36f7b266870e3",
+    "tests/reusable-note-paste-browser.mjs": "84356113268c54be2c5fd87dec6a2215c406fc5176d436e58e088191ce2db987",
+    "tests/reusable-note-structure-browser.mjs": "2656eebc9781e1f001acf8efae3b99f9c6f20766bc0199c3c98ac8b71ea211e4",
+    "tests/section-commands-browser.mjs": "c63b74ae5c263bc7c5cf614b029c12b78143ff2e19e27a8834f034acebd433c0",
+    "tests/server-browser.mjs": "a14c9f7f09f0c22c0d69a9e17c8f3c98fed42dbeda12e23638e91a9d151f36e0",
+    "tests/text-format-browser.mjs": "6541e2f3cfc3c816dc1febfaa1c79bf45c2aad6e972259efdcc4b64820f25210",
+    "tests/upstream-dom-browser.mjs": "f6f6b985a0993d2d6769c37e4373697411f9ae5b19fc4124be4e9db77cb07681",
+    "tests/upstream-full-document-editor-browser.mjs": "913fc4eb8d153a8ff580df0b78dfa42bc7c9c594f2d3623a739f702e03385d0c",
+    "tests/upstream-full-document-roundtrip-browser.mjs": "e39293eae68a6bcec5e7796311e9f3b93cd40c0a81e0f74b53b6f9b96196c8cf",
+    "tests/upstream-full-document-visual-browser.mjs": "4c119437185d03459469f3b8e8ccf7c2ca941d08e12ade79d03a7a3d3d570c1c",
+    "tests/upstream-full-page-baseline-browser.mjs": "fe07d45db93d7214af270e4148f5bde1ce3e9a9b3d5a18ff2170b72e40d6d2a2",
+    "tests/upstream-geometry-browser.mjs": "afb359d8fe4fe9c582ea7981b0b6c17270989618e45f7e2713b65a4d8595d92a",
+    "tests/upstream-newthought-sidenote-browser.mjs": "a87228b7afc0e65a9d5b1fb7ebc91f3dd3c020362d46bcf86318f9c228521dd0",
+    "tests/upstream-same-content-epigraphs-browser.mjs": "7e50e4948173b0ff3562c74899f8d70ead78b02568789e04e6a910b0363dbeec",
+    "tests/upstream-same-content-figures-browser.mjs": "0a59aa78bb7881ceb2d8be58c423c2f0f3318998acf11af86a3aa9767ec6e029",
+    "tests/upstream-same-content-final-sections-browser.mjs": "6f3c1ecd88c7d1b88488d922fabe918f5e574de8e5644fbfe740ed9fa2fe009e",
+    "tests/upstream-same-content-fundamentals-browser.mjs": "3392aa027f0097713fa6c7156c1aa0f53e1a38ace3aaeab5e666fdc3947394ba",
+    "tests/upstream-same-content-getting-started-browser.mjs": "e426b5295e23713a718b4291b71637ccc6617ff5c16d611fa516dadd37e371d5",
+    "tests/upstream-same-content-opening-browser.mjs": "992dcd4367174aaa3c74b4cda4529b90d87e641d3d3a66c1722a07537b0eceb7",
+    "tests/upstream-same-content-sidenotes-browser.mjs": "954c8103988f1509435e96ed4c220cfd7daf3640c852b3155da113de4bf1b948"
+  },
+  "logs": {
+    "asset-sync.log": {
+      "sha256": "eb08802abb14aec1d8af21561330f42636b0eeada04ac23167fcf5cd7eaa5b69",
+      "bytes": 894,
+      "tail": [
+        "Pinned upstream visual asset img/exports-imports.png (804996 bytes)",
+        "Pinned upstream visual asset img/rhino.png (527896 bytes)",
+        "Pinned upstream visual asset img/napoleons-march.png (399321 bytes)",
+        "Pinned upstream visual asset img/imagequilt-chinese-calligraphy.png (424264 bytes)",
+        "Pinned upstream visual asset img/imagequilt-animal-sounds.png (204461 bytes)",
+        "Pinned upstream visual asset et-book/et-book-roman-line-figures/et-book-roman-line-figures.woff (44016 bytes)",
+        "Pinned upstream visual asset et-book/et-book-display-italic-old-style-figures/et-book-display-italic-old-style-figures.woff (43780 bytes)",
+        "Pinned upstream visual asset et-book/et-book-bold-line-figures/et-book-bold-line-figures.woff (45364 bytes)",
+        "Pinned upstream visual asset et-book/et-book-roman-old-style-figures/et-book-roman-old-style-figures.woff (43900 bytes)",
+        "All nine pinned visual assets downloaded and Git-blob verified."
+      ]
+    },
+    "browser/all-nodes-browser.mjs.log": {
+      "sha256": "85e730a38c4d22f1cbab86bc533121f9855751ca2b80b65560fc7527cd7b2c46",
+      "bytes": 168,
+      "tail": [
+        "R02/R03.d browser: history boundary and actual React editor loads all 33 types, edits definition text, saves/reopens without losing code tokens, note IDs or structure."
+      ]
+    },
+    "browser/contextual-ui-browser.mjs.log": {
+      "sha256": "acb046ad3909544ac14d647e186cee4964328326bdfe4578c0ae36a8a42b5cb7",
+      "bytes": 142,
+      "tail": [
+        "Contextual UI: formatting, selection snapshot restoration, Escape and Tab focus targets, schema-filtered inserts, undo and 375px bounds PASS."
+      ]
+    },
+    "browser/controlled-editor-browser.mjs.log": {
+      "sha256": "3c8a99b7676701f451d6495bc83ba9e677af54ae482098516e2a4a6f83cbe3c5",
+      "bytes": 117,
+      "tail": [
+        "Controlled TufteEditor: two instances, single onChange, external replacement + undo boundary, readonly, remount PASS"
+      ]
+    },
+    "browser/controlled-host-assets-browser.mjs.log": {
+      "sha256": "c56ef015fbf9f5cc4b2b9113fb85e40030f55a50f02fe51b2181607d43ea47cd",
+      "bytes": 167,
+      "tail": [
+        "Host image picker: search/filter, pinned revision, canonical host locator, undo/redo, invalid URLs, cancelled stale response, note insert and two-host isolation PASS."
+      ]
+    },
+    "browser/controlled-host-refresh-browser.mjs.log": {
+      "sha256": "1cd087f05e8685b4ebec466fb3ce3aa191a8298c49816a060984d193ae0dfe0d",
+      "bytes": 131,
+      "tail": [
+        "Host refresh: expiry boundary, timer replacement, retry, manual recovery, external replacement, unmount, namespace isolation PASS."
+      ]
+    },
+    "browser/definition-pairs-browser.mjs.log": {
+      "sha256": "8ef37e8a5c2e22df834fa1aa2aaaeb926b1472ceb5fd9f07dffcf321d3d62358",
+      "bytes": 823,
+      "tail": [
+        "\u001b[2m    - element is visible, enabled and stable\u001b[22m",
+        "\u001b[2m    - scrolling into view if needed\u001b[22m",
+        "\u001b[2m    - done scrolling\u001b[22m",
+        "\u001b[2m    - performing click action\u001b[22m",
+        "",
+        "    at /workspace/scratch/259060c11b99/lexical-tufte-css/tests/definition-pairs-browser.mjs:32:26 {",
+        "  name: 'TimeoutError'",
+        "}",
+        "",
+        "Node.js v24.22.1"
+      ]
+    },
+    "browser/font-proof-browser.mjs.log": {
+      "sha256": "a7d1a7b4a645ad817ac5c2601a4e06008a90844d6f4fc209aa73c8bd2f2ef078",
+      "bytes": 1362,
+      "tail": [
+        "{\"test\":\"R13 Source Han Serif/Sans renamed proof subsets, disjoint ranges, actual custom fonts, Latin isolation, source table advances and browser reference metrics, self CSP and blocked-font fallback\",\"originalComparison\":false,\"knownKoreanFallback\":false,\"fallbackFonts\":[{\"familyName\":\"DejaVu Serif\",\"postScriptName\":\"DejaVuSerif\",\"isCustomFont\":false,\"glyphCount\":36}],\"fontRequests\":8,\"delayedSwap\":{\"delayMs\":150,\"before\":{\"width\":504,\"height\":38.390625},\"after\":{\"width\":828,\"height\":38.390625}},\"woff2Bytes\":45172,\"metrics\":[{\"selector\":\"#serif-hangul\",\"width\":828,\"height\":38.390625},{\"selector\":\"#serif-hanja\",\"width\":336,\"height\":38.390625},{\"selector\":\"#serif-punct\",\"width\":293,\"height\":38.390625},{\"selector\":\"#serif-jamo\",\"width\":92,\"height\":38.390625},{\"selector\":\"#sans-hangul\",\"width\":792,\"height\":38.390625},{\"selector\":\"#sans-hanja\",\"width\":336,\"height\":38.390625},{\"selector\":\"#sans-punct\",\"width\":298,\"height\":38.390625},{\"selector\":\"#sans-jamo\",\"width\":88,\"height\":38.390625},{\"selector\":\"#serif .sidenote\",\"width\":666,\"height\":38.390625},{\"selector\":\"#serif figcaption\",\"width\":586,\"height\":38.390625},{\"selector\":\"#serif td\",\"width\":79,\"height\":40.390625},{\"selector\":\"#sans .sidenote\",\"width\":666,\"height\":38.390625},{\"selector\":\"#sans figcaption\",\"width\":586,\"height\":38.390625},{\"selector\":\"#sans td\",\"width\":76,\"height\":40.390625}]}"
+      ]
+    },
+    "browser/full-page-pixel-parity-browser.mjs.log": {
+      "sha256": "97833aaf9e806e649fb45c3daa294444ed0906b8094d7e78d13aa0f801bee1b8",
+      "bytes": 63,
+      "tail": [
+        "Full-page pixel comparator offline regressions: cases written."
+      ]
+    },
+    "browser/host-asset-provider-browser.mjs.log": {
+      "sha256": "45c164708733640dcc3114c2a755ce0e6ba6dfa8b3ebc755224288cb03174faf",
+      "bytes": 83,
+      "tail": [
+        "Host asset search, revisions, resolve, persistence and reload regressions written."
+      ]
+    },
+    "browser/inline-span-browser.mjs.log": {
+      "sha256": "3e82a821e4d30db4e0394c41b6edcd3c45c6cd342945f4fdbd53aa7828e9465d",
+      "bytes": 217,
+      "tail": [
+        "P2.2.b.1 1440px: real selection, wrap/unwrap undo/redo, save/reopen and composition cancellation/guard PASS.",
+        "P2.2.b.1 375px: real selection, wrap/unwrap undo/redo, save/reopen and composition cancellation/guard PASS."
+      ]
+    },
+    "browser/inline-span-html-browser.mjs.log": {
+      "sha256": "c2b97c4b792c48a808a76d86413f7626e0b6307166fb405ddf426a6d6ea2de78",
+      "bytes": 141,
+      "tail": [
+        "P2.2.b.1 inline HTML: four kinds, rich link text, direction/alignment, native and publisher roundtrips; unsupported Tufte attributes reject."
+      ]
+    },
+    "browser/layout-browser.mjs.log": {
+      "sha256": "bfe3fe2116b3ebaeb57ae2cd05ddc159cc4da26b77ca662d408075e64237fedc",
+      "bytes": 147,
+      "tail": [
+        "P1.4 layout: caption/cell editing, JSON roundtrip, direct-child publication structure and reference CSS geometry passed at 1440/761/760/759/375px."
+      ]
+    },
+    "browser/list-kind-browser.mjs.log": {
+      "sha256": "15c4c1c405ab871c7e0f9732e16ec7bb84ce4ad1c51833b1b4772b3aa97e13ed",
+      "bytes": 124,
+      "tail": [
+        "P2.2.b list browser: ul/ol conversion, structural indent/outdent, safe unwrap, history, save/reopen, renderer, reject PASS."
+      ]
+    },
+    "browser/list-tab-focus-browser.mjs.log": {
+      "sha256": "b3d073dd38f17793b93873704f5190cd6593ac0495ca957d8b2b9cd118e5863f",
+      "bytes": 173,
+      "tail": [
+        "K4 1440px: ul/ol depth19/20, reject focus, payload and external button navigation PASS",
+        "K4 375px: ul/ol depth19/20, reject focus, payload and external button navigation PASS"
+      ]
+    },
+    "browser/managed-note-assets-browser.mjs.log": {
+      "sha256": "e1386bbc1e87bc57cef55e8e409791735ee385664de3bdbe92f4697c8e0f5c00",
+      "bytes": 110,
+      "tail": [
+        "Managed image catalog, same-envelope save/restore, publication, duplicate and corruption regressions written."
+      ]
+    },
+    "browser/note-browser.mjs.log": {
+      "sha256": "ea308fc1f545bf643dc89b2a0190e29a067ed7cedca63ee7a3b66b6d2703ae54",
+      "bytes": 138,
+      "tail": [
+        "P1.1 Chromium: insertion, keyboard entry/exit, bold/italic/code/link/image, nested rejection, JSON save/reload and HTML structure passed."
+      ]
+    },
+    "browser/note-dom-browser.mjs.log": {
+      "sha256": "b1e3d6c38aff1c5570195530692acf72a20f8e7eba9e20ab9a880b4221cc1c2b",
+      "bytes": 148,
+      "tail": [
+        "P1.3 DOM: both note kinds, editing/publication separation, label-input-payload adjacency, JSON immutability and upstream mobile CSS toggles passed."
+      ]
+    },
+    "browser/note-editing-browser.mjs.log": {
+      "sha256": "7bbbe929d9ffcf9e137cbf3594577bc515d752629b7c8c2e044d26711bc4827b",
+      "bytes": 1728,
+      "tail": [
+        "  },",
+        "  {",
+        "    \"name\": \"committed Korean composition undoes without a leftover marker\",",
+        "    \"status\": \"passed\"",
+        "  },",
+        "  {",
+        "    \"name\": \"Delete at note end exits without deleting payload\",",
+        "    \"status\": \"passed\"",
+        "  }",
+        "]"
+      ]
+    },
+    "browser/note-export-parity-browser.mjs.log": {
+      "sha256": "1e68ffc10d91409d14879233c64e03965f5cc958499d782040fe5971a7317b1d",
+      "bytes": 145,
+      "tail": [
+        "Note HTML parity: rich notes, figure notes and newthought split-parent/negative cases agree between Lexical and publisher (IDs normalized only)."
+      ]
+    },
+    "browser/note-image-chooser-browser.mjs.log": {
+      "sha256": "fe35d72fb5bd3e67a55e0157d2dfffe940138db46795dbccc2e1bfaa424994f3",
+      "bytes": 111,
+      "tail": [
+        "Wagtail-style note image chooser: mobile grid, second-image selection, metadata, JSON/HTML and cancel covered."
+      ]
+    },
+    "browser/note-image-dimensions-browser.mjs.log": {
+      "sha256": "b4453e50271770e99ddc48d4f442e27c67b34ae6e1d6671f05b6d403d58d0b1f",
+      "bytes": 82,
+      "tail": [
+        "Note image properties UI: valid, invalid, restore and cleared dimensions covered."
+      ]
+    },
+    "browser/p22d2-semantic-dom-browser.mjs.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "tail": []
+    },
+    "browser/publication-browser.mjs.log": {
+      "sha256": "5b37f55c5dedbaad42113d8a8fbfb6a1b14bcd152d93367d4b6af0844630f053",
+      "bytes": 193,
+      "tail": [
+        "Publication regression: real definition/cite editing, strict document export, code/ImageQuilt, 5 embed ratios and both Tufte wrappers at 5 widths under enforced CSP (no inline styles/scripts)."
+      ]
+    },
+    "browser/quotation-editing-browser.mjs.log": {
+      "sha256": "c9b7f710d7a6bf6bd6c3fe41855d564ec5efdf334b4544ca8830846d4ad18540",
+      "bytes": 65,
+      "tail": [
+        "Quotation editing UI 1440px PASS",
+        "Quotation editing UI 375px PASS"
+      ]
+    },
+    "browser/recovery-browser.mjs.log": {
+      "sha256": "8a7b9067c2149c25021b422d5865fe9d5c4d8855594394dde950d7fffceffd09",
+      "bytes": 139,
+      "tail": [
+        "Recovery actual UI: early pagehide flush, two-tab isolation, exact damaged-JSON download, cleanup cancellation and explicit deletion PASS."
+      ]
+    },
+    "browser/reusable-note-clipboard-identity-browser.mjs.log": {
+      "sha256": "04bc3d55338c9d025eaba835f1422e4a5ab910d42ddd69d79d5bb2b80168dd31",
+      "bytes": 127,
+      "tail": [
+        "Reusable note clipboard: copied IDs unique, cut/paste ID preserved, nested note paste refused, two-editor state isolation PASS"
+      ]
+    },
+    "browser/reusable-note-interactions-browser.mjs.log": {
+      "sha256": "a5392dcd5744dd2dbcd44981cec32022a8ef81907d77fd57c621e15705c81ea9",
+      "bytes": 130,
+      "tail": [
+        "Reusable note interactions: Alt+Down/Escape navigation, notices, per-editor isolation, readonly/remount callback cardinality PASS"
+      ]
+    },
+    "browser/reusable-note-paste-browser.mjs.log": {
+      "sha256": "4a7731c34746446c6d9e717286a5e3359cbdf9ac35fba6d871744445f43a987c",
+      "bytes": 117,
+      "tail": [
+        "Reusable note paste: plain text CRLF, canonical linebreak, link/image and ID preservation, two-editor isolation PASS"
+      ]
+    },
+    "browser/reusable-note-structure-browser.mjs.log": {
+      "sha256": "894cf1044b38abe03e3377706110af22c400a3e638193f86df02b9230f8b73d0",
+      "bytes": 383,
+      "tail": [
+        "Reusable note structure commands: [{\"name\":\"host-owned insert and undo/redo preserve other editor\",\"status\":\"passed\"},{\"name\":\"split and merge rich notes preserve payload/identities\",\"status\":\"passed\"},{\"name\":\"move and reject unsupported context without mutation\",\"status\":\"passed\"},{\"name\":\"unmount clears host editorRef and remount re-registers commands once\",\"status\":\"passed\"}]"
+      ]
+    },
+    "browser/section-commands-browser.mjs.log": {
+      "sha256": "7390a1b6f861903338bc65574c727590a51222decaa33d6b14a8c73faf06e799",
+      "bytes": 156,
+      "tail": [
+        "P2.2.a actual React commands: explicit section wrap/add/split/merge, h2/h3/paragraph, note rejection, undo/redo, save/reopen and authoritative render PASS."
+      ]
+    },
+    "browser/server-browser.mjs.log": {
+      "sha256": "32ed579cb7488fa866ea1b85063ac7ff2d7ff89e549268779758ae2383ae7772",
+      "bytes": 107,
+      "tail": [
+        "Server/browser semantic and geometry parity: 5 widths; no-JS mobile toggles and article namespaces passed."
+      ]
+    },
+    "browser/text-format-browser.mjs.log": {
+      "sha256": "2e8122698430c69772c62b70ed180fb8b1eae734836bfa964d3770cc4268af5a",
+      "bytes": 133,
+      "tail": [
+        "R10: body/note/link format bits, combinations, toggle off/on, undo/redo, edit, reopen, combined CSS and semantic publication passed."
+      ]
+    },
+    "browser/upstream-dom-browser.mjs.log": {
+      "sha256": "f42c9b689143c776d0f325d1aa426f2c3f1f87b96d05c1a97635683733a3d071",
+      "bytes": 1660,
+      "tail": [
+        "P2.2.e DOM comparison: {\"upstream\":{\"sections\":9,\"notes\":7,\"epigraphs\":3,\"fullwidthFigures\":2},\"published\":{\"sections\":1,\"notes\":2,\"epigraphs\":0,\"fullwidthFigures\":1},\"comparisonLimitation\":\"Independent server fixture does not contain an upstream newthought/sidenote pairing\",\"upstreamSectionOutline\":[{\"index\":1,\"heading\":null,\"directChildren\":[\"p\",\"p\",\"p\",\"p\"],\"notes\":0,\"figures\":0,\"tables\":0},{\"index\":2,\"heading\":\"Getting Started\",\"directChildren\":[\"h2\",\"p\",\"pre\",\"p\"],\"notes\":0,\"figures\":0,\"tables\":0},{\"index\":3,\"heading\":\"Fundamentals\",\"directChildren\":[\"h2\",\"h3\",\"p\",\"p\",\"blockquote\",\"p\",\"p\",\"h3\",\"p\",\"p\",\"p\",\"p\",\"p\",\"p\"],\"notes\":3,\"figures\":0,\"tables\":0},{\"index\":4,\"heading\":\"Epigraphs\",\"directChildren\":[\"h2\",\"div\",\"p\"],\"notes\":0,\"figures\":0,\"tables\":0},{\"index\":5,\"heading\":\"Sidenotes: Footnotes and Marginal Notes\",\"directChildren\":[\"h2\",\"p\",\"p\",\"p\",\"pre\",\"p\",\"p\",\"p\",\"p\",\"p\",\"pre\",\"p\"],\"notes\":2,\"figures\":0,\"tables\":0},{\"index\":6,\"heading\":\"Figures\",\"directChildren\":[\"h2\",\"p\",\"p\",\"figure\",\"p\",\"p\",\"figure\",\"p\",\"pre\",\"figure\",\"p\"],\"notes\":2,\"figures\":3,\"tables\":0},{\"index\":7,\"heading\":\"Code\",\"directChildren\":[\"h2\",\"p\",\"p\",\"pre\"],\"notes\":0,\"figures\":0,\"tables\":0},{\"index\":8,\"heading\":\"ImageQuilts\",\"directChildren\":[\"h2\",\"p\",\"p\",\"figure\",\"p\",\"figure\"],\"notes\":0,\"figures\":2,\"tables\":0},{\"index\":9,\"heading\":\"Epilogue\",\"directChildren\":[\"h2\",\"p\"],\"notes\":0,\"figures\":0,\"tables\":0}],\""
+      ]
+    },
+    "browser/upstream-full-document-editor-browser.mjs.log": {
+      "sha256": "a577eb05499e38c136fc832ebe0c601f1c748137ec3a7b8006e2d371168b2683",
+      "bytes": 132,
+      "tail": [
+        "Nine-section real React editor: load, keyboard input, undo/redo, save/reload, immutable eight sections and pure publication parity."
+      ]
+    },
+    "browser/upstream-full-document-roundtrip-browser.mjs.log": {
+      "sha256": "e8dd0d52fbf7e0388446b5f42b108c06888ca7c15985f2e6d787430c3a16bb4c",
+      "bytes": 173,
+      "tail": [
+        "All-nine-section document: pinned DOM/7 notes, safe iframe/code exceptions, v1->v2 strict Lexical persistence/reopen, one isolated edit, and six iframe CSS viewport checks."
+      ]
+    },
+    "browser/upstream-full-document-visual-browser.mjs.log": {
+      "sha256": "6b0365da6d5fd56efc7bc4259a43ce70e297559b4ace2c1f15cbd0ef796c9304",
+      "bytes": 708,
+      "tail": [
+        "Pinned full-page pixel parity 375px: exact outside iframe, 9 sections, 5 images, 4 ET Book faces, 7 notes.",
+        "Pinned full-page pixel parity 759px: exact outside iframe, 9 sections, 5 images, 4 ET Book faces, 7 notes.",
+        "Pinned full-page pixel parity 760px: exact outside iframe, 9 sections, 5 images, 4 ET Book faces, 7 notes.",
+        "Pinned full-page pixel parity 761px: exact outside iframe, 9 sections, 5 images, 4 ET Book faces, 7 notes.",
+        "Pinned full-page pixel parity 1024px: exact outside iframe, 9 sections, 5 images, 4 ET Book faces, 7 notes.",
+        "Pinned full-page pixel parity 1440px: exact outside iframe, 9 sections, 5 images, 4 ET Book faces, 7 notes.",
+        "Full-page RGBA parity asserted beyond one verified iframe mask."
+      ]
+    },
+    "browser/upstream-full-page-baseline-browser.mjs.log": {
+      "sha256": "bd4eda65eff6993aec1df52b39cf0b266a240bc9c96fd3969eba28696a24e94d",
+      "bytes": 2712,
+      "tail": [
+        "Upstream full-page reference 1440px: {\"sections\":9,\"notes\":7,\"epigraphs\":3,\"fullwidthFigures\":2,\"invalidNotes\":0,\"hasNewthoughtNote\":true,\"sectionHeadings\":[null,\"Getting Started\",\"Fundamentals\",\"Epigraphs\",\"Sidenotes: Footnotes and Marginal Notes\",\"Figures\",\"Code\",\"ImageQuilts\",\"Epilogue\"],\"articleChildren\":[\"h1\",\"p\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\"],\"viewportWidth\":1440,\"documentWidth\":1440}",
+        "Upstream full-page reference 1024px: {\"sections\":9,\"notes\":7,\"epigraphs\":3,\"fullwidthFigures\":2,\"invalidNotes\":0,\"hasNewthoughtNote\":true,\"sectionHeadings\":[null,\"Getting Started\",\"Fundamentals\",\"Epigraphs\",\"Sidenotes: Footnotes and Marginal Notes\",\"Figures\",\"Code\",\"ImageQuilts\",\"Epilogue\"],\"articleChildren\":[\"h1\",\"p\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\"],\"viewportWidth\":1024,\"documentWidth\":1024}",
+        "Upstream full-page reference 761px: {\"sections\":9,\"notes\":7,\"epigraphs\":3,\"fullwidthFigures\":2,\"invalidNotes\":0,\"hasNewthoughtNote\":true,\"sectionHeadings\":[null,\"Getting Started\",\"Fundamentals\",\"Epigraphs\",\"Sidenotes: Footnotes and Marginal Notes\",\"Figures\",\"Code\",\"ImageQuilts\",\"Epilogue\"],\"articleChildren\":[\"h1\",\"p\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\"],\"viewportWidth\":761,\"documentWidth\":761}",
+        "Upstream full-page reference 760px: {\"sections\":9,\"notes\":7,\"epigraphs\":3,\"fullwidthFigures\":2,\"invalidNotes\":0,\"hasNewthoughtNote\":true,\"sectionHeadings\":[null,\"Getting Started\",\"Fundamentals\",\"Epigraphs\",\"Sidenotes: Footnotes and Marginal Notes\",\"Figures\",\"Code\",\"ImageQuilts\",\"Epilogue\"],\"articleChildren\":[\"h1\",\"p\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\"],\"viewportWidth\":760,\"documentWidth\":760}",
+        "Upstream full-page reference 759px: {\"sections\":9,\"notes\":7,\"epigraphs\":3,\"fullwidthFigures\":2,\"invalidNotes\":0,\"hasNewthoughtNote\":true,\"sectionHeadings\":[null,\"Getting Started\",\"Fundamentals\",\"Epigraphs\",\"Sidenotes: Footnotes and Marginal Notes\",\"Figures\",\"Code\",\"ImageQuilts\",\"Epilogue\"],\"articleChildren\":[\"h1\",\"p\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\"],\"viewportWidth\":759,\"documentWidth\":759}",
+        "Upstream full-page reference 375px: {\"sections\":9,\"notes\":7,\"epigraphs\":3,\"fullwidthFigures\":2,\"invalidNotes\":0,\"hasNewthoughtNote\":true,\"sectionHeadings\":[null,\"Getting Started\",\"Fundamentals\",\"Epigraphs\",\"Sidenotes: Footnotes and Marginal Notes\",\"Figures\",\"Code\",\"ImageQuilts\",\"Epilogue\"],\"articleChildren\":[\"h1\",\"p\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\",\"section\"],\"viewportWidth\":375,\"documentWidth\":375}"
+      ]
+    },
+    "browser/upstream-geometry-browser.mjs.log": {
+      "sha256": "23d0caed662ca062af28ed4d61b3456e8cbb09cdaf133e3cc9669fd516f7e71f",
+      "bytes": 5165,
+      "tail": [
+        "Tufte geometry 1440px: [{\"name\":\"upstream\",\"article\":{\"x\":180,\"y\":8,\"width\":1260,\"height\":9244.796875},\"section\":{\"x\":180,\"y\":255.5,\"width\":1260,\"height\":705},\"firstParagraph\":{\"x\":180,\"y\":291.5,\"width\":693,\"height\":120},\"note\":{\"x\":942.296875,\"y\":2073.65625,\"width\":346.5,\"height\":21.5},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1},{\"name\":\"published\",\"article\":{\"x\":180,\"y\":8,\"width\":1260,\"height\":2134.5},\"section\":{\"x\":180,\"y\":255.5,\"width\":1260,\"height\":1812},\"firstParagraph\":{\"x\":180,\"y\":291.5,\"width\":693,\"height\":32},\"note\":{\"x\":942.296875,\"y\":296,\"width\":346.5,\"height\":21.5},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1}]",
+        "Tufte geometry 1024px: [{\"name\":\"upstream\",\"article\":{\"x\":128,\"y\":8,\"width\":896,\"height\":10990.046875},\"section\":{\"x\":128,\"y\":255.5,\"width\":896,\"height\":885},\"firstParagraph\":{\"x\":128,\"y\":291.5,\"width\":492.796875,\"height\":150},\"note\":{\"x\":670.078125,\"y\":2543.65625,\"width\":246.390625,\"height\":21.5},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1},{\"name\":\"published\",\"article\":{\"x\":128,\"y\":8,\"width\":896,\"height\":2134.5},\"section\":{\"x\":128,\"y\":255.5,\"width\":896,\"height\":1812},\"firstParagraph\":{\"x\":128,\"y\":291.5,\"width\":492.796875,\"height\":32},\"note\":{\"x\":670.078125,\"y\":296,\"width\":246.390625,\"height\":21.5},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1}]",
+        "Tufte geometry 761px: [{\"name\":\"upstream\",\"article\":{\"x\":95.125,\"y\":8,\"width\":665.875,\"height\":13027.59375},\"section\":{\"x\":95.125,\"y\":255.5,\"width\":665.875,\"height\":1155},\"firstParagraph\":{\"x\":95.125,\"y\":291.5,\"width\":366.21875,\"height\":210},\"note\":{\"x\":497.953125,\"y\":3113.65625,\"width\":183.109375,\"height\":21.5},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1},{\"name\":\"published\",\"article\":{\"x\":95.125,\"y\":8,\"width\":665.875,\"height\":2134.5},\"section\":{\"x\":95.125,\"y\":255.5,\"width\":665.875,\"height\":1812},\"firstParagraph\":{\"x\":95.125,\"y\":291.5,\"width\":366.21875,\"height\":32},\"note\":{\"x\":497.953125,\"y\":296,\"width\":183.109375,\"height\":42.9375},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1}]",
+        "Tufte geometry 760px: [{\"name\":\"upstream\",\"article\":{\"x\":60.796875,\"y\":8,\"width\":638.390625,\"height\":9423.140625},\"section\":{\"x\":60.796875,\"y\":255.5,\"width\":638.390625,\"height\":705},\"firstParagraph\":{\"x\":60.796875,\"y\":291.5,\"width\":638.390625,\"height\":120},\"note\":{\"x\":0,\"y\":0,\"width\":0,\"height\":0},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1},{\"name\":\"published\",\"article\":{\"x\":60.796875,\"y\":8,\"width\":638.390625,\"height\":3197.5},\"section\":{\"x\":60.796875,\"y\":255.5,\"width\":638.390625,\"height\":2875},\"firstParagraph\":{\"x\":60.796875,\"y\":291.5,\"width\":638.390625,\"height\":32},\"note\":{\"x\":0,\"y\":0,\"width\":0,\"height\":0},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1}]",
+        "Tufte geometry 759px: [{\"name\":\"upstream\",\"article\":{\"x\":60.71875,\"y\":8,\"width\":637.546875,\"height\":9422.65625},\"section\":{\"x\":60.71875,\"y\":255.5,\"width\":637.546875,\"height\":705},\"firstParagraph\":{\"x\":60.71875,\"y\":291.5,\"width\":637.546875,\"height\":120},\"note\":{\"x\":0,\"y\":0,\"width\":0,\"height\":0},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1},{\"name\":\"published\",\"article\":{\"x\":60.71875,\"y\":8,\"width\":637.546875,\"height\":3197.5},\"section\":{\"x\":60.71875,\"y\":255.5,\"width\":637.546875,\"height\":2875},\"firstParagraph\":{\"x\":60.71875,\"y\":291.5,\"width\":637.546875,\"height\":32},\"note\":{\"x\":0,\"y\":0,\"width\":0,\"height\":0},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1}]",
+        "Tufte geometry 375px: [{\"name\":\"upstream\",\"article\":{\"x\":30,\"y\":8,\"width\":315,\"height\":14620.234375},\"section\":{\"x\":30,\"y\":255.5,\"width\":315,\"height\":1305},\"firstParagraph\":{\"x\":30,\"y\":291.5,\"width\":315,\"height\":240},\"note\":{\"x\":0,\"y\":0,\"width\":0,\"height\":0},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1},{\"name\":\"published\",\"article\":{\"x\":30,\"y\":8,\"width\":315,\"height\":3275.5},\"section\":{\"x\":30,\"y\":303.5,\"width\":315,\"height\":2905},\"firstParagraph\":{\"x\":30,\"y\":339.5,\"width\":315,\"height\":62},\"note\":{\"x\":0,\"y\":0,\"width\":0,\"height\":0},\"bodyOverflow\":false,\"bodyFont\":\"et-book, Palatino, \\\"Palatino Linotype\\\", \\\"Palatino LT STD\\\", \\\"Book Antiqua\\\", Georgia, serif\",\"sectionWidthRatio\":1}]"
+      ]
+    },
+    "browser/upstream-newthought-sidenote-browser.mjs.log": {
+      "sha256": "02ac853f7789de63ff8329b25369c625c7aab0d81335f475243ab024838d9100",
+      "bytes": 97,
+      "tail": [
+        "Newthought/sidenote split-parent DOM and focusable mobile checkbox preserve Tufte CSS adjacency."
+      ]
+    },
+    "browser/upstream-same-content-epigraphs-browser.mjs.log": {
+      "sha256": "9392144922f7b983c71de03768e5ed78cb7f9249960673f59c56cc67d42e74da",
+      "bytes": 137,
+      "tail": [
+        "Same-content upstream Epigraphs: three blockquotes, direct text/paragraphs, footers, cite, em/code. Only structural indentation omitted."
+      ]
+    },
+    "browser/upstream-same-content-figures-browser.mjs.log": {
+      "sha256": "10e159b95d98382bda19e9bad6977208ee72f9c2590d2fc21cbd8e8c9733f65b",
+      "bytes": 143,
+      "tail": [
+        "Figures: 11 complete blocks, two rich notes, strict DOM except modern iframe/code, and 375/759/760/761/1024/1440px iframe CSS geometry parity."
+      ]
+    },
+    "browser/upstream-same-content-final-sections-browser.mjs.log": {
+      "sha256": "dde6932b05ce965e7483cae4c34729eaf5ab9926104015d898bcc4ec51b8ffd6",
+      "bytes": 142,
+      "tail": [
+        "Same-content upstream sections 7–9: code, imagequilts and epilogue; strict DOM parity, no omitted nodes or inline whitespace normalization."
+      ]
+    },
+    "browser/upstream-same-content-fundamentals-browser.mjs.log": {
+      "sha256": "8534ed7de271c6101f52419a71ba851f8b486d0b6da1683d9994a2f925a8c686",
+      "bytes": 155,
+      "tail": [
+        "Pinned Fundamentals same-content: 14 blocks including quote[cite], p.sans and three real notes, exact DOM except generated note IDs and block indentation."
+      ]
+    },
+    "browser/upstream-same-content-getting-started-browser.mjs.log": {
+      "sha256": "443c9a02c83e85b53ab54313eb7a995c4902f0630488aae22b1e5e8f1b7b24f9",
+      "bytes": 99,
+      "tail": [
+        "Same-content Getting Started section: heading, paragraphs, inline code, links, pre/code preserved."
+      ]
+    },
+    "browser/upstream-same-content-opening-browser.mjs.log": {
+      "sha256": "ea45882015ab1712ab8e0b34c329649f818355e8ba644cb65c7a6e8d7de81779",
+      "bytes": 79,
+      "tail": [
+        "Same-content upstream opening section: 4 paragraphs, text and links preserved."
+      ]
+    },
+    "browser/upstream-same-content-sidenotes-browser.mjs.log": {
+      "sha256": "dce51c3af4be98f1b660261a57ee354078c76b7cc07941dd50fa9b0c4a3df318",
+      "bytes": 222,
+      "tail": [
+        "Pinned same-content Sidenotes section: twelve source blocks, exact rich text and code, two note control sets and 375/760/761/1440px responsive toggles; generated IDs and two source-only control whitespace gaps normalized."
+      ]
+    },
+    "browser-install.log": {
+      "sha256": "05c5508b025445a31d3fb774242f49975ae1e5eee0cb243044e268bad7e66944",
+      "bytes": 7074,
+      "tail": [
+        "|■■■■■■■■■■■■■■■■                                                                |  20% of 2.3 MiB",
+        "|■■■■■■■■■■■■■■■■■■■■■■■■                                                        |  30% of 2.3 MiB",
+        "|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                                |  40% of 2.3 MiB",
+        "|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                        |  50% of 2.3 MiB",
+        "|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                                |  60% of 2.3 MiB",
+        "|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                        |  70% of 2.3 MiB",
+        "|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■                |  80% of 2.3 MiB",
+        "|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■        |  90% of 2.3 MiB",
+        "|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■| 100% of 2.3 MiB",
+        "FFMPEG playwright build v1011 downloaded to /home/agent/.cache/ms-playwright/ffmpeg-1011"
+      ]
+    },
+    "check.log": {
+      "sha256": "b4cfb7dd52ccdaad2c88ce521a897b819922c5e06c6783acbacea513ae1b53fa",
+      "bytes": 77708,
+      "tail": [
+        "packages/lexical test: ✔ R05 stale recovery location does not mutate or throw (1.144441ms)",
+        "packages/lexical test: ℹ tests 432",
+        "packages/lexical test: ℹ suites 0",
+        "packages/lexical test: ℹ pass 432",
+        "packages/lexical test: ℹ fail 0",
+        "packages/lexical test: ℹ cancelled 0",
+        "packages/lexical test: ℹ skipped 0",
+        "packages/lexical test: ℹ todo 0",
+        "packages/lexical test: ℹ duration_ms 6679.659382",
+        "packages/lexical test: Done"
+      ]
+    },
+    "definition-pairs-browser.mjs.retest.log": {
+      "sha256": "dcbe607645e2be7795a46c293ae808b2ddbfdb655d426b860595e4adb5b21a22",
+      "bytes": 117,
+      "tail": [
+        "P2.2.b definition browser: pair move/delete, final-pair rejection, JSON save/reopen, canonical HTML, undo/redo PASS."
+      ]
+    },
+    "environment.log": {
+      "sha256": "c2b6900a65c8dc01413e28cbaf5905df68aa27032f1e17734f8e69137ebe1aba",
+      "bytes": 707,
+      "tail": [
+        "packaging==26.3",
+        "pluggy==1.7.0",
+        "pydantic==2.14.3",
+        "pydantic_core==2.50.4",
+        "Pygments==2.21.0",
+        "pytest==9.2.0",
+        "starlette==1.10.0",
+        "typing-inspection==0.4.5",
+        "typing_extensions==4.16.0",
+        "uvicorn==0.54.0"
+      ]
+    },
+    "http.log": {
+      "sha256": "34ec031e9067e8b718f3ebfd97d72270893a0bace86b16fa302ecea8a64612a7",
+      "bytes": 111,
+      "tail": [
+        "Actual TypeScript client -> Python HTTP -> SQLite: save/read/list/checksum/CAS/denied access/CSRF/delete PASS."
+      ]
+    },
+    "install.log": {
+      "sha256": "48e7f7fae1fa833d4374ebb7347774f01026f63482f977d1fbe748351f9d31c9",
+      "bytes": 929,
+      "tail": [
+        "Done in 907ms using pnpm v11.25.0",
+        "",
+        "   ╭──────────────────────────────────────────────────────────────────────╮",
+        "   │                                                                      │",
+        "   │                 Update available! 11.25.0 → 12.18.0.                 │",
+        "   │                 Changelog: https://pnpm.io/v/12.18.0                 │",
+        "   │   To update, run: curl -fsSL https://get.pnpm.io/install.sh | sh -   │",
+        "   │                                                                      │",
+        "   ╰──────────────────────────────────────────────────────────────────────╯",
+        ""
+      ]
+    },
+    "package.log": {
+      "sha256": "f6a486d6cddc73f0c5fcb219cbdef87fdaa0e06671db3f2fd0a20d923a3fbab0",
+      "bytes": 220,
+      "tail": [
+        "Checking packed JS imports and editor roundtrip (15s limit).",
+        "R13 six tarballs: full LICENSE/notices/OFL, packed JS imports, fresh declarations, strict editor roundtrip, renderer/blog and SQL exports PASS. No publishing."
+      ]
+    },
+    "policy.log": {
+      "sha256": "811b3b93bdc3ec8c0c57ec558b2ccc692f5b3d136215093aec02f139278cb31d",
+      "bytes": 106,
+      "tail": [
+        "Host asset policy: provider response validation, pin/latest, expiry margin, short TTL, capped retry PASS."
+      ]
+    },
+    "python-install.log": {
+      "sha256": "176090fddbcbf226e349d5fc559b61bbc1cf810be152b5a99b5b124e696c3c3e",
+      "bytes": 7027,
+      "tail": [
+        "  Building editable for lexical-tufte-recovery-server (pyproject.toml): started",
+        "  Building editable for lexical-tufte-recovery-server (pyproject.toml): finished with status 'done'",
+        "  Created wheel for lexical-tufte-recovery-server: filename=lexical_tufte_recovery_server-0.1.0-0.editable-py3-none-any.whl size=3111 sha256=671118b5efb8b67bbb706da66c567b44238d0e55b0ae41612972f3825c89e34a",
+        "  Stored in directory: /tmp/pip-ephem-wheel-cache-6m4l_vpd/wheels/49/9c/d7/5a5cbfcff69cac9c09e21800ad552fceb435d9c71a30942e82",
+        "Successfully built lexical-tufte-recovery-server",
+        "Installing collected packages: typing-extensions, pygments, pluggy, packaging, iniconfig, idna, h11, click, certifi, annotated-types, annotated-doc, uvicorn, typing-inspection, pytest, pydantic-core, opentelemetry-api, httpcore, anyio, starlette, pydantic, httpx, fastapi, lexical-tufte-recovery-server",
+        "Successfully installed annotated-doc-0.0.6 annotated-types-0.8.0 anyio-4.16.0 certifi-2026.10.23 click-8.5.1 fastapi-0.162.5 h11-0.16.0 httpcore-1.0.9 httpx-0.28.1 idna-3.20 iniconfig-2.3.1 lexical-tufte-recovery-server-0.1.0 opentelemetry-api-1.45.2 packaging-26.3 pluggy-1.7.0 pydantic-2.14.3 pydantic-core-2.50.4 pygments-2.21.0 pytest-9.2.0 starlette-1.10.0 typing-extensions-4.16.0 typing-inspection-0.4.5 uvicorn-0.54.0",
+        "",
+        "[notice] A new release of pip is available: 25.0.1 -> 26.3",
+        "[notice] To update, run: python -m pip install --upgrade pip"
+      ]
+    },
+    "python.log": {
+      "sha256": "9c2275899dfde1e4f77619694eada0cd348afaee00a4ed65eb543d1c0ae37d70",
+      "bytes": 1201,
+      "tail": [
+        "apps/recovery-server/tests/test_security.py ...                          [ 93%]",
+        "apps/recovery-server/tests/test_shared_contract.py .                     [100%]",
+        "",
+        "=============================== warnings summary ===============================",
+        "../../../../tmp/tufte-structure-venv/lib/python3.12/site-packages/fastapi/testclient.py:1",
+        "  /tmp/tufte-structure-venv/lib/python3.12/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.",
+        "    from starlette.testclient import TestClient as TestClient  # noqa",
+        "",
+        "-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html",
+        "======================== 16 passed, 1 warning in 1.38s ========================="
+      ]
+    },
+    "revision.log": {
+      "sha256": "0335599f3a53a5ca42eae6a88f038e8925de7b8552d77628ece28183ba0f090a",
+      "bytes": 97,
+      "tail": [
+        "Publish revision model: 12 assertions groups passed (pure proposal model, NOT production store)."
+      ]
+    }
+  },
+  "limitations": [
+    "CI excluded by instruction",
+    "no actual OS IME/screenreader/touch or Firefox/WebKit",
+    "no actual DAM/auth/upload/production network acceptance",
+    "no long-duration listener/timer/clipboard leak measurement",
+    "Korean system fallback not accepted; font reference uses Linux DejaVu fixture"
+  ]
+}

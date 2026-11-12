@@ -4,6 +4,10 @@
 상태: P0·P1·P2.1 완료. Chromium 자동 회귀와 조합 이벤트 검증 범위이며, OS별 실제 IME 및 제품 전체 검증은 후속 단계.
 저장소: https://github.com/yunskim/lexical-tufte-css (public, GPL-3.0; 사용자가 생성한 설정 유지).
 
+## 2026-11-12 누적 테스트 실행 결과
+
+`d3eae84`에서 소스 수정 없이 build/typecheck·unit641(구조 명령12 포함)·package6·browser46/46·Python16/실제HTTP·revision모델12그룹을 통과했다. 공식6폭 pixel 마스크 밖 차이0. 공통 구조 명령의 실제 호스트 소비·Undo/Redo·형제 JSON 보존·readonly 거부·remount와 headless 거부 경계를 확인했다. [실행 보고서](VERIFICATION_DEFERRED_2026-11-12.ko.md)에 소스/파일별 증거를 기록한다. 아래 같은 날짜의 검증 대기 문구는 당시 이력이다. R2–R7/P3.1.e 전체, 실제 OS/운영·장시간 수락은 남으며 CI 미실행.
+
 ## 2026-11-12 — P3.1.e 노트 구조 명령 공통화 (실행 검증 대기)
 
 `examples/editor/src/main.tsx`의 노트 삽입·나누기·합치기·이동 버튼이 직접 호출하던 편집 조작을 **호스트 중립** `packages/lexical/src/noteStructureCommands.ts`의 등록형 Lexical 명령으로 이관했다. 저수준 노트 변환 알고리즘은 기존 `noteOperations.ts`를 그대로 재사용한다. 기존 프로토타입은 동일한 공개 명령을 dispatch하며, `TufteNoteInteractionPlugin`이 인스턴스별로 등록·해제한다.

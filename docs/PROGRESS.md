@@ -1,3 +1,9 @@
+## 2026-11-12 노트 구조 명령 누적 자동 검증 완료 범위
+
+- `d3eae84` 기준 제품/테스트 수정 없이 frozen/static/build/typecheck·unit641(신규 구조12 포함)·package6·갱신정책·Python16/실제HTTP·revision모델12그룹 통과. browser 최초45/46 → 동일 소스 단독 재실행 후 최종46/46, 공식6폭 pixel 마스크 밖 차이0.
+- 실제 호스트 툴바의 insert/split/merge/move·ID/rich payload·Undo/Redo·형제 JSON 보존, readonly 단일 거부 안내 및 remount 단일 명령 등록을 확인했다. [최신 보고서](VERIFICATION_DEFERRED_2026-11-12.ko.md), [소스/환경/로그 증거](verification/deferred-20261112.json).
+- E139–E150/M127–M132를 재점검했고 E151/M133의 정의목록 클릭 timeout은 원인 미확정으로 남기고 동일 소스 재실행 통과를 구분했다. 실제 OS/운영·장시간 수명 및 R2–R7/P3.1.e 전체 수락은 남긴다. CI 미실행. 아래 검증 대기 절은 당시 이력이다.
+
 ## 2026-11-12 P3.1.e 노트 구조 명령 공통화 (검증 대기)
 
 - 기존 예제의 insert/split/merge/move 함수와 버튼 종속을 제거하고, `packages/lexical/src/noteStructureCommands.ts`에 호스트 중립 명령 네 개 및 등록/해제 함수를 추가했다. `TufteNoteInteractionPlugin`에서 모든 편집기 인스턴스에 연결하고 외부 노트 편집기 명령으로 export했다.

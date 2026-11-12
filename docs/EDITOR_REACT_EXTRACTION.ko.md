@@ -191,7 +191,7 @@ pnpm test:browser
 
 ## 검증 상태
 
-최신 실제 실행은 [2026-11-11 보고서](VERIFICATION_DEFERRED_2026-11-11.ko.md)를 따른다. `d4d724f` + 테스트 fixture 수정으로 frozen/build/typecheck·unit629·package6·browser45/45·Python16/HTTP를 통과했다. E148의 예제 버튼과 공통 노트 탐색·알림·readonly/remount·copy/cut/paste identity를 관찰된 범위에서 수락했다. 아래/위 절의 미실행 문구와 과거 수치는 당시 이력이다. 실제 OS·운영/장시간 수명 수락 및 R2/R3/R4–R7/P3.1.e 전체 게이트는 유지한다.
+최신 실제 실행은 [2026-11-12 보고서](VERIFICATION_DEFERRED_2026-11-12.ko.md)를 따른다. `d3eae84`에서 제품/테스트 수정 없이 build/typecheck·unit641·package6·browser46/46·Python16/HTTP를 통과했다. 공통 구조 명령의 호스트 툴바 소비·ID/rich payload·Undo/Redo·readonly 단일 거부·remount를 관찰된 범위에서 수락했다. 아래/위 절의 실행 대기 및 과거 수치는 당시 이력이다. 실제 OS·운영/장시간 수명과 R2–R7/P3.1.e 전체 게이트는 유지한다.
 
 ## 2026-11-03 공통 자산 선택기·갱신 실제 검증 완료 범위
 
@@ -208,3 +208,7 @@ pnpm test:browser
 - 노트 삽입·분리·합치기·이동의 저수준 변환 알고리즘과 Lexical JSON 스키마는 변경하지 않았다.
 
 **추가된 변경의 실행 검증은 아직 완료되지 않았다.** Work에서 `pnpm install --frozen-lockfile`, `pnpm check`, `pnpm package:check`, `pnpm test:note-structures`, `pnpm test:browser`를 수행하고 실패를 수리한다.
+
+## 2026-11-12 구조 명령·readonly 등록 경계 실행 수락
+
+위 구조 명령 공통화 및 readonly 등록 경계의 실제 검증을 마쳤다. 신규 단위 12개와 브라우저 4개 구조 시나리오를 포함한 전체 unit641/browser46을 최종 통과했다(정의목록 timeout 1건은 동일 소스 재실행 통과). [최신 보고서](VERIFICATION_DEFERRED_2026-11-12.ko.md)에서 수락 범위와 남은 운영/접근성·장시간 게이트를 구분한다. 전체 R2–R7/P3.1.e 체크박스를 완료로 바꾸지 않는다.
