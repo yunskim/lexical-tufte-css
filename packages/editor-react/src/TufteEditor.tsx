@@ -1,4 +1,5 @@
-import {createContext,useContext,useEffect,useId,useRef} from 'react';
+import {createContext,useContext,useEffect,useId,useImperativeHandle,useRef,type Ref} from 'react';
+import type {LexicalEditor} from 'lexical';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {canonicalizeDocument,type TufteDocument} from '@lexical-tufte/document';
 import type {AssetProvider} from '@lexical-tufte/editor-ports';
@@ -24,6 +25,8 @@ export interface TufteEditorProps {
  assetAdapter?:AssetProvider;
  assetNamespace?:string;
  readonly?:boolean;
+ /** Optional advanced-host editor handle; automatically cleared on unmount. */
+ editorRef?:Ref<LexicalEditor>;
  className?:string;
  ariaLabel?:string;
 }
@@ -129,6 +132,12 @@ function DocumentBinding({value,onChange,onError,readonly}:DocumentBindingProps)
  return null;
 }
 
+function EditorHandle({editorRef}:{editorRef?:Ref<LexicalEditor>}){
+ const [editor]=useLexicalComposerContext();
+ useImperativeHandle(editorRef,()=>editor,[editor]);
+ return null;
+}
+
 const defaultTheme={
  text:{
   bold:'text-bold',italic:'text-italic',code:'text-code',
@@ -144,7 +153,7 @@ const defaultTheme={
  */
 export function TufteEditor({
  value,onChange,onError,onNotice,assetAdapter,assetNamespace,
- readonly=false,className='editor',ariaLabel='Tufte 문서 편집'
+ readonly=false,editorRef,className='editor',ariaLabel='Tufte 문서 편집'
 }:TufteEditorProps){
  const instanceId=useId();
  const namespace='tufte-editor-'+instanceId;
@@ -159,6 +168,7 @@ export function TufteEditor({
    {!readonly&&assetAdapter&&assetNamespace?.trim()&&<HostAssetPicker adapter={assetAdapter} namespace={assetNamespace}/>}
    <TufteEditingSurface className={className} ariaLabel={ariaLabel} readonly={readonly} onNotice={onNotice}/>
    <DocumentBinding value={value} onChange={onChange} onError={onError} readonly={readonly}/>
+   <EditorHandle editorRef={editorRef}/>
   </TufteComposer>
  </AssetContext.Provider>;
 }
