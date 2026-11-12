@@ -8,7 +8,7 @@ import {$createLinkNode} from '@lexical/link';
 import {registerHistory,createEmptyHistoryState} from '@lexical/history';
 import {createFixtureEditor} from './all-nodes-fixture.mjs';
 import {
- $createSectionNode,$createSidenoteNode,$createMarginnoteNode,$createInlineImageNode,
+ $createSectionNode,$createSidenoteNode,$createMarginnoteNode,$createInlineImageNode,$createTufteHeadingNode,
  registerNoteStructureCommands,INSERT_TUFTE_NOTE_COMMAND,SPLIT_TUFTE_NOTE_COMMAND,
  MERGE_TUFTE_NOTE_COMMAND,MOVE_TUFTE_NOTE_COMMAND,exportCanonicalEditorState
 } from '../dist/index.js';
@@ -73,6 +73,31 @@ test('reusable note commands fail closed on nested, heading and noncollapsed sel
  dispose();
 });
 
+test('note insertion rejects headings, links and non-phrasing parents without allocating IDs',()=>{
+ let allocations=0;
+ const {editor,notices,dispose}=setup(()=>{
+  const title=$createTextNode('heading'),linked=$createTextNode('linked');
+  $getRoot().append($createSectionNode().append(
+   $createTufteHeadingNode('h2').append(title),
+   $createParagraphNode().append($createLinkNode('/reference').append(linked))
+  ));
+  title.select(2,2);
+ },()=>{allocations++;return 'new-id';});
+ const original=snapshot(editor);
+ run(editor,INSERT_TUFTE_NOTE_COMMAND,'sidenote');
+ assert.deepEqual(snapshot(editor),original);
+ assert.match(notices.at(-1),/이 위치에는 노트를 삽입할 수 없습니다/);
+ editor.update(()=>{
+  const link=$getRoot().getFirstChild().getLastChild().getFirstChild();
+  link.getFirstChild().select(2,2);
+ },{discrete:true});
+ run(editor,INSERT_TUFTE_NOTE_COMMAND,'marginnote');
+ assert.deepEqual(snapshot(editor),original);
+ assert.match(notices.at(-1),/이 위치에는 노트를 삽입할 수 없습니다/);
+ assert.equal(allocations,0);
+ dispose();
+});
+
 test('ID factory retries collisions and rejects an exhausted allocator without mutation',()=>{
  let count=0;
  const {editor,notices,dispose}=setup(()=>{
@@ -126,8 +151,12 @@ test('moving a note changes sibling order but never its identity or text',()=>{
  run(editor,MOVE_TUFTE_NOTE_COMMAND,'previous');
  assert.equal(content(editor)[0].noteId,'move-me');
  assert.deepEqual(ids(editor),['move-me']);
+ assert.equal(content(editor)[0].children[0].text,'payload');
  run(editor,MOVE_TUFTE_NOTE_COMMAND,'next');
- assert.deepEqual(snapshot(editor),before);
+ assert.deepEqual(ids(editor),['move-me']);
+ assert.equal(content(editor).find(node=>node.noteId==='move-me').children[0].text,'payload');
+ assert.equal(content(editor).filter(node=>node.type==='text').map(node=>node.text).join(''),'leftright');
+ assert.equal(before.root.children[0].children[0].children.filter(node=>node.type==='text').map(node=>node.text).join(''),'leftright');
  dispose();
 });
 
