@@ -168,6 +168,27 @@ pnpm test:browser
 
 후속은 예제에 남은 삽입 버튼·명령 등록을 호스트 정책과 공통 편집기 동작으로 분류하고, 프런트엔드 독립 소비자에 필요한 공개 UI만 이관하는 것이다. P3.1.e·R2/R3/R5 전체 완료 체크박스는 유지하지 않는다.
 
+## 2026-11-12 — P3.1.e 노트 구조 명령 공통화 (실행 검증 대기)
+
+`examples/editor/src/main.tsx`의 노트 삽입·나누기·합치기·이동 버튼이 직접 호출하던 편집 조작을 **호스트 중립** `packages/lexical/src/noteStructureCommands.ts`의 등록형 Lexical 명령으로 이관했다. 저수준 노트 변환 알고리즘은 기존 `noteOperations.ts`를 그대로 재사용한다. 기존 프로토타입은 동일한 공개 명령을 dispatch하며, `TufteNoteInteractionPlugin`이 인스턴스별로 등록·해제한다.
+
+- 공개 API: `INSERT_TUFTE_NOTE_COMMAND`(sidenote/marginnote), `SPLIT_TUFTE_NOTE_COMMAND`, `MERGE_TUFTE_NOTE_COMMAND`, `MOVE_TUFTE_NOTE_COMMAND`(previous/next), `registerNoteStructureCommands(editor,onNotice?,createId?)`. Lexical·React 패키지 양쪽에 적절한 export를 연결했다.
+- **거부 불변식:** readonly·IME 조합·비접힌 선택·노트 중첩·제목/링크 등 미지원 부모는 문서 수정을 거부한다. 고유 ID 발급 시 기존 note ID와 충돌하는 값·잘못된 ID·생성 실패를 걸러낸다. 분할·합치기의 원래 타입/위치 거부 조건을 유지한다.
+- **선택·히스토리:** 명령은 하나의 Lexical transaction 안에서 동작하며 성공 시 `HISTORY_PUSH_TAG`를 설정한다. 선택된 노트 ID와 링크·이미지 등의 rich inline payload는 기존 `noteOperations` 경계로 보존한다. 성공/거부 결과는 기존 `onNotice`에만 전달하며 정본 JSON에 메시지를 저장하지 않는다.
+- **호스트 툴바:** 제어형 `TufteEditor`에 선택적 `editorRef`(LexicalEditor)를 추가했다. 외부 호스트가 선택적으로 명령을 dispatch할 수 있으며 unmount 시 ref는 null이 된다. 기본 편집기 UI와 호스트 저장 API는 변경하지 않는다.
+- **회귀 코드:** `packages/lexical/test/note-structure-commands.test.mjs`에 삽입 종류·중첩/heading/link 거부·ID 충돌·실패·readonly·split/merge rich payload·move·unregister·Undo/Redo 수락을 작성했다. `tests/reusable-note-structure-browser.mjs`는 두 제어형 편집기 중 첫 번째만 조작하는 호스트 툴바에서 삽입·분리·합치기·이동·Undo/Redo·readonly·unmount/remount·JSON/인접 문서 보존을 확인한다.
+- `scripts/check-package-tarballs.mjs`에서 공개 명령·등록 함수·editorRef 타입 소비를 검증하도록 확대했다. 신규 `pnpm test:note-structures` 명령과 전체 `test:browser`에 신규 파일을 등록했다.
+
+```bash
+pnpm install --frozen-lockfile
+pnpm check
+pnpm package:check
+pnpm test:note-structures
+pnpm test:browser
+```
+
+**검증 상태:** GitHub 코드 작성·API 연결과 테스트 작성 완료. **이번 변경의 실제 `pnpm` 빌드·타입·단위·Playwright 실행은 아직 수행하지 않았다.** 11월 11일 [기존 누적 45/45 브라우저 결과](VERIFICATION_DEFERRED_2026-11-11.ko.md)는 이 변경 전 소스에만 해당한다. Work에서 실패 증거와 재실행 결과를 분리해 기록한다. CI는 사용자 방침대로 실행하지 않는다. R2–R7/P3.1.e 전체 완료 판정은 유지한다.
+
 ## 검증 상태
 
 최신 실제 실행은 [2026-11-11 보고서](VERIFICATION_DEFERRED_2026-11-11.ko.md)를 따른다. `d4d724f` + 테스트 fixture 수정으로 frozen/build/typecheck·unit629·package6·browser45/45·Python16/HTTP를 통과했다. E148의 예제 버튼과 공통 노트 탐색·알림·readonly/remount·copy/cut/paste identity를 관찰된 범위에서 수락했다. 아래/위 절의 미실행 문구와 과거 수치는 당시 이력이다. 실제 OS·운영/장시간 수명 수락 및 R2/R3/R4–R7/P3.1.e 전체 게이트는 유지한다.
