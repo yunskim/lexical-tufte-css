@@ -71,12 +71,16 @@ function Demo(){
  const [firstChanges,setFirstChanges]=useState(0);
  const [showFirst,setShowFirst]=useState(true);
  const [second,setSecond]=useState(()=>documentFor('beta'));
+ const [secondReadonly,setSecondReadonly]=useState(false);
+ const [showSecond,setShowSecond]=useState(true);
  const [errors,setErrors]=useState<string[]>([]);
  return <main>
   <h1>호스트 중립 이미지 자산 연결 예제</h1>
   <div className="actions">
    <button type="button" onClick={()=>setFirst(documentFor('alpha'))}>Alpha 문서 교체</button>
    <button type="button" onClick={()=>setShowFirst(visible=>!visible)}>Alpha 마운트 전환</button>
+   <button type="button" onClick={()=>setSecondReadonly(value=>!value)}>Beta 읽기 전용 전환</button>
+   <button type="button" onClick={()=>setShowSecond(visible=>!visible)}>Beta 마운트 전환</button>
   </div>
   <section data-testid="host-first">
    <h2>Alpha 편집기</h2>
@@ -87,8 +91,8 @@ function Demo(){
   </section>
   <section data-testid="host-second">
    <h2>Beta 편집기</h2>
-   <TufteEditor value={second} onChange={setSecond} onError={error=>setErrors(values=>[...values,error.message])}
-    assetAdapter={secondAdapter} assetNamespace="beta" ariaLabel="Beta 편집기"/>
+   {showSecond&&<TufteEditor value={second} onChange={setSecond} onError={error=>setErrors(values=>[...values,error.message])}
+    readonly={secondReadonly} assetAdapter={secondAdapter} assetNamespace="beta" ariaLabel="Beta 편집기"/>}
    <pre data-testid="host-second-json" hidden>{JSON.stringify(second)}</pre>
   </section>
   <p role="alert" data-testid="host-errors">{errors.join(' | ')}</p>

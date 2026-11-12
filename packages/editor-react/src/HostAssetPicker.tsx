@@ -57,7 +57,14 @@ export function HostAssetPicker({adapter,namespace,preferExistingTarget=false}:H
   abortResolve();
   setOpen(false);
   setError('');
-  queueMicrotask(()=>trigger.current?.focus());
+  queueMicrotask(()=>{
+   // Other editors can have their own modal open while this one closes.
+   // Never steal focus from a sibling modal; only restore our own trigger
+   // when this was the last active modal.
+   const anotherModal=[...document.querySelectorAll('[role="dialog"][aria-modal="true"]')]
+    .some(element=>element!==dialog.current);
+   if(!anotherModal)trigger.current?.focus();
+  });
  };
  useEffect(()=>{mounted.current=true;return()=>{mounted.current=false;generation.current++;pendingResolve.current?.abort();};},[]);
 

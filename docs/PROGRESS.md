@@ -1,3 +1,9 @@
+## 2026-11-12 P3.1.e R7 복수 편집기와 비동기 요청 격리 회귀 보강 (미실행)
+
+- 호스트 통합 예제에 Beta readonly 및 마운트 전환 테스트 조작면을 추가했다. Alpha/Beta 외부 자산 모달 동시 오픈·서로 다른 pending resolve, Alpha 취소/언마운트 후 Beta 성공, Beta readonly 중 늦은 응답 거부, Tab 포커스 순환·Escape/복귀를 검증하는 새 브라우저 테스트 코드를 작성했다.
+- 공통 `HostAssetPicker`는 다른 편집기의 모달이 열려 있으면 닫는 창의 트리거로 포커스를 빼앗지 않도록 수정했다. 동시 모달 포커스 유지 회귀도 추가했다.
+- `pnpm test:editor-lifecycle` 추가, `test:host-assets-controlled`·`test:browser`에 회귀 등록. **빌드·Playwright·CI 실행 보류**. R7 OS IME·실제 클립보드·screen reader·모바일 터치·타 브라우저는 별도 수락 필요. [세부 매트릭스](EDITOR_REACT_EXTRACTION.ko.md).
+
 ## 2026-11-12 P3.1.e 로컬·호스트 이미지 선택 창 분리 (실행 검증 대기)
 
 - 독립 예제의 기존 혼합 창에서 호스트 이미지 검색·revision·연결 UI 및 독자 상태/effect를 삭제했다. 로컬 자산 창은 유지하며 외부 자산은 공통 `HostAssetPicker`가 처리한다.

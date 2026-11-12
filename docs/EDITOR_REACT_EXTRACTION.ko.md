@@ -296,3 +296,29 @@ pnpm test:browser
 
 **다음 고려 단계:** P3.1.e R6–R7 실환경 수락(IME/키보드, screen reader, 모바일 터치, 복수 브라우저, 장시간 mount/unmount)과 남은 독립 예제 호스트 저장·복구 경계 정리. `Lexical JSON` 정본, Markdown export, 외부 DAM 어댑터 경계는 그대로 유지한다.
 
+
+
+## 2026-11-12 — P3.1.e R7 복수 편집기/비동기 요청/접근성 수락 경계 추가 (실행 보류)
+
+### 구현 및 회귀 시나리오
+- `examples/editor/src/hostAssetDemo.tsx`: 기존 Alpha 마운트 전환과 함께 **Beta 읽기 전용 전환** 및 **Beta 마운트 전환**을 추가했다. 각각의 `TufteEditor` props를 변경할 뿐 외부 DAM/provider, 정본, React 패키지 계약은 그대로다.
+- `tests/controlled-host-picker-concurrency-browser.mjs`: 두 제어형 편집기의 자산 선택 창이 동시에 열리고 **두 provider.resolve()가 모두 지연**된 상태를 재현한다. Alpha 요청 취소+컴포넌트 언마운트, AbortSignal을 무시하는 늦은 응답, 그동안 유지되는 Beta 요청, Beta 성공 저장의 namespace/alt/노트 독립성을 검사한다. 이후 Beta에서 새로운 요청을 보낸 뒤 readonly 전환으로 선택기가 제거되는지, 늦게 도착한 성공 응답이 반영되지 않는지 확인한다. 다시 readonly 해제 후 `Tab` 순환, `Escape`로 닫기, 원래 호스트 버튼으로 포커스 복귀와 다른 편집기 상태 불변을 확인한다.
+- `pnpm test:editor-lifecycle`: 기존 controlled editor, 재사용 노트 이미지 속성, 신규 동시 선택기, 기존 controlled 호스트 URL 갱신을 한 번에 묶는 **검증용 명령**을 추가했다. 기존 `test:host-assets-controlled` 및 `test:browser`에도 신규 파일을 포함했다. 테스트가 작성되었다고 실행 통과한 것은 아니다.
+
+한쪽 자산 선택 창을 닫을 때 다른 편집기에서 열려 있는 모달이 감지되면 트리거 포커스 복귀를 건너뛰도록 공통 `HostAssetPicker`를 보강했다. 모달이 하나일 때는 기존 트리거 포커스 복귀를 그대로 유지한다. 동시 모달 테스트에 Beta 포커스 불변 검사 추가.
+
+### R7 수락 매트릭스
+
+| 항목 | 자동화 코드/근거 | 현재 판정 |
+| --- | --- | --- |
+| 두 제어형 편집기와 문서 독립성 | `controlled-editor-browser.mjs`, `controlled-host-assets-browser.mjs` | 기존 코드 보유, 이번 변경 후 재실행 대기 |
+| 외부 자산 선택 창 동시 열기, 요청 취소, 늦은 완료, namespace 분리 | 신규 `controlled-host-picker-concurrency-browser.mjs` | 코드 작성, 실행 보류 |
+| readonly 중 비동기 결과 무효화, 재활성화 | 신규 `controlled-host-picker-concurrency-browser.mjs` | 코드 작성, 실행 보류 |
+| 키보드 Tab 순환, Escape, 포커스 복귀 | 신규 `controlled-host-picker-concurrency-browser.mjs` | Chromium 자동화 작성, 실행 보류 |
+| 외부 문서 교체 및 언마운트 중 refresh 결과 폐기 | `controlled-host-refresh-browser.mjs` | 기존 코드 보유, 변경 후 재실행 대기 |
+| 노트 이미지 속성 변경·Undo/Redo·stale selection | `reusable-note-image-editor-browser.mjs` | 기존 신규 코드 보유, 실행 보류 |
+| 실제 한글 IME 조합, macOS/iOS/Windows 클립보드 | OS 실제 조작 필요 | 자동화로 대체 불가, 미수락 |
+| VoiceOver/NVDA·모바일 터치, Firefox/WebKit | 별도 실환경/엔진별 실행 필요 | 미수락 |
+| 장시간(반복) 마운트/언마운트, 실제 DAM 오류/권한 | 운영 수준 테스트 필요 | 미수락 |
+
+**누적 테스트 실행은 사용자가 한꺼번에 진행한다.** `pnpm install --frozen-lockfile`, `pnpm check`, `pnpm package:check`, `pnpm test:editor-lifecycle`, `pnpm test:asset-pickers`, `pnpm test:host-asset-bridge`, `pnpm test:browser`를 아직 실행하지 않았다. CI도 실행하지 않았다. 기존 2026-11-12 통과 기록을 이번 변경의 검증으로 해석하지 않는다.
