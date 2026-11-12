@@ -172,6 +172,37 @@ test('split and merge preserve rich link and image payload and keep first note i
  dispose();
 });
 
+test('merge accepts a text range wholly within one note but rejects a cross-note range',()=>{
+ const {editor,notices,dispose}=setup(()=>{
+  const a=$createTextNode('first'),b=$createTextNode('second');
+  $getRoot().append($createSectionNode().append($createParagraphNode().append(
+   $createSidenoteNode('first-id').append(a),
+   $createSidenoteNode('second-id').append(b)
+  )));
+  a.select(1,3);
+ });
+ run(editor,MERGE_TUFTE_NOTE_COMMAND);
+ assert.deepEqual(ids(editor),['first-id']);
+ const merged=content(editor)[0];
+ assert.equal(merged.children.map(node=>node.text??'').join(''),'firstsecond');
+ dispose();
+
+ const second=setup(()=>{
+  const a=$createTextNode('first'),b=$createTextNode('second');
+  $getRoot().append($createSectionNode().append($createParagraphNode().append(
+   $createSidenoteNode('first-id').append(a),
+   $createSidenoteNode('second-id').append(b)
+  )));
+  a.select(1,1);
+  $getSelection().setTextNodeRange(a,1,b,2);
+ });
+ const before=snapshot(second.editor);
+ run(second.editor,MERGE_TUFTE_NOTE_COMMAND);
+ assert.deepEqual(snapshot(second.editor),before);
+ assert.match(second.notices.at(-1),/먼저 노트 안으로 이동하세요/);
+ second.dispose();
+});
+
 test('moving a note changes sibling order but never its identity or text',()=>{
  const {editor,dispose}=setup(()=>{
   const note=$createMarginnoteNode('move-me').append($createTextNode('payload'));
