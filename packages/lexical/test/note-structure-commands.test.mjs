@@ -117,6 +117,37 @@ test('ID factory retries collisions and rejects an exhausted allocator without m
  reject();
 });
 
+test('readonly structural commands refuse mutation even when a host dispatches directly',()=>{
+ const {editor,notices,dispose}=setup(()=>{
+  const body=$createTextNode('body');
+  $getRoot().append($createSectionNode().append($createParagraphNode().append(body)));
+  body.select(2,2);
+ });
+ const before=snapshot(editor);
+ editor.setEditable(false);
+ run(editor,INSERT_TUFTE_NOTE_COMMAND,'sidenote');
+ run(editor,SPLIT_TUFTE_NOTE_COMMAND);
+ run(editor,MERGE_TUFTE_NOTE_COMMAND);
+ run(editor,MOVE_TUFTE_NOTE_COMMAND,'previous');
+ assert.deepEqual(snapshot(editor),before);
+ assert.equal(notices.length,4);
+ assert.ok(notices.every(message=>message.includes('읽기 전용')));
+ dispose();
+});
+
+test('a failing external ID factory is rejected without mutating content',()=>{
+ const {editor,notices,dispose}=setup(()=>{
+  const text=$createTextNode('body');
+  $getRoot().append($createSectionNode().append($createParagraphNode().append(text)));
+  text.select(2,2);
+ },()=>{throw new Error('identifier provider unavailable');});
+ const before=snapshot(editor);
+ run(editor,INSERT_TUFTE_NOTE_COMMAND,'sidenote');
+ assert.deepEqual(snapshot(editor),before);
+ assert.match(notices.at(-1),/고유한 노트 ID/);
+ dispose();
+});
+
 test('split and merge preserve rich link and image payload and keep first note identity',()=>{
  const {editor,notices,dispose}=setup(()=>{
   const first=$createTextNode('alpha beta');
