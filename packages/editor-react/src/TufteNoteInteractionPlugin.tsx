@@ -10,7 +10,7 @@ import {
  COMMAND_PRIORITY_HIGH,createCommand,type LexicalNode
 } from 'lexical';
 import {
- NoteNode,InlineImageNode,$insertNotePhrasing,$reidentifyPastedNotes,
+ NoteNode,InlineImageNode,$insertNotePhrasing,$reidentifyPastedNotes,registerNoteStructureCommands,
  registerNoteCompositionGuard,registerNoteEdgeTypingGuard
 } from '@lexical-tufte/lexical';
 
@@ -67,6 +67,7 @@ export function TufteNoteInteractionPlugin({onNotice}:TufteNoteInteractionPlugin
     setStatus('본문으로 돌아왔습니다.');return true;
   }
   useEffect(()=>{
+    const noteStructure=registerNoteStructureCommands(editor,setStatus);
     const selectNoteImage=editor.registerCommand(CLICK_COMMAND,event=>{
       if(!(event.target instanceof HTMLImageElement))return false;
       const node=$getNearestNodeFromDOMNode(event.target);
@@ -155,7 +156,7 @@ export function TufteNoteInteractionPlugin({onNotice}:TufteNoteInteractionPlugin
       event?.preventDefault();s.insertLineBreak();return true;
     },COMMAND_PRIORITY_HIGH);
     const typing=registerNoteEdgeTypingGuard(editor);
-    return()=>{selectNoteImage();escape();down();enterCommand();leaveCommand();typing();copying();cutting();pasting();plainPaste();backspace();forwardDelete();composing();enter();};
+    return()=>{noteStructure();selectNoteImage();escape();down();enterCommand();leaveCommand();typing();copying();cutting();pasting();plainPaste();backspace();forwardDelete();composing();enter();};
   },[editor]);
 
  return null;
