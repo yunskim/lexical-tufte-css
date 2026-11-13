@@ -3,6 +3,7 @@ import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$getRoot,$getSelection,$isElementNode,$isRangeSelection,type LexicalNode} from 'lexical';
 import {connectHostImage,type HostImageTarget} from './hostAssetConnection.js';
 import {searchHostImages,listHostImageRevisions} from './hostAssetCatalog.js';
+import {isImeKeyboardEvent} from './imeKeyboard.js';
 import type {AssetProvider,AssetRevision,AssetSummary} from '@lexical-tufte/editor-ports';
 import {InlineImageNode,NoteNode} from '@lexical-tufte/lexical';
 
@@ -26,6 +27,7 @@ export function HostAssetPicker({adapter,namespace,preferExistingTarget=false}:H
  const dialog=useRef<HTMLDivElement>(null);
  const searchInput=useRef<HTMLInputElement>(null);
  const pendingResolve=useRef<AbortController|null>(null);
+ const dialogComposing=useRef(false);
  const generation=useRef(0);
  const [open,setOpen]=useState(false);
  const [query,setQuery]=useState('');
@@ -57,18 +59,24 @@ export function HostAssetPicker({adapter,namespace,preferExistingTarget=false}:H
   abortResolve();
   setOpen(false);
   setError('');
+  dialogComposing.current=false;
+  const closingDialog=dialog.current;
   queueMicrotask(()=>{
    // Other editors can have their own modal open while this one closes.
    // Never steal focus from a sibling modal; only restore our own trigger
    // when this was the last active modal.
    const anotherModal=[...document.querySelectorAll('[role="dialog"][aria-modal="true"]')]
-    .some(element=>element!==dialog.current);
-   if(!anotherModal)trigger.current?.focus();
+    .some(element=>element!==closingDialog);
+   if(!anotherModal)trigger.current?.focus({preventScroll:true});
   });
  };
  useEffect(()=>{mounted.current=true;return()=>{mounted.current=false;generation.current++;pendingResolve.current?.abort();};},[]);
 
  const openPicker=()=>{
+  if(!editor.isEditable())return;
+  if(editor.isComposing()){
+   setStatus('조합 입력이 끝난 후 외부 이미지 자산을 선택하세요.');return;
+  }
   const found:ImageTarget[]=[];
   let currentNote:string|null=null;
   let currentNoteId:string|null=null;
@@ -153,6 +161,9 @@ export function HostAssetPicker({adapter,namespace,preferExistingTarget=false}:H
 
  const connect=async()=>{
   if(resolving)return;
+  if(editor.isComposing()||dialogComposing.current){
+   setError('조합 입력 중에는 외부 이미지를 연결할 수 없습니다.');return;
+  }
   const requestedAsset=results.find(item=>item.id===assetId);
   if(!requestedAsset||!targetKey){setError('이미지와 연결 대상을 선택하세요.');return;}
   if(!namespace.trim()){setError('호스트 namespace가 없습니다.');return;}
@@ -192,6 +203,7 @@ export function HostAssetPicker({adapter,namespace,preferExistingTarget=false}:H
  };
 
  const keys=(event:KeyboardEvent<HTMLElement>)=>{
+  if(dialogComposing.current||editor.isComposing()||isImeKeyboardEvent(event.nativeEvent))return;
   if(event.key==='Escape'){event.preventDefault();close();return;}
   if(event.key!=='Tab')return;
   const focusable=[...(dialog.current?.querySelectorAll<HTMLElement>(
@@ -211,7 +223,9 @@ export function HostAssetPicker({adapter,namespace,preferExistingTarget=false}:H
   {status&&<p role="status">{status}</p>}
   {open&&<div className="note-image-backdrop">
    <div ref={dialog} className="note-image-dialog host-asset-dialog" role="dialog"
-    aria-modal="true" aria-labelledby={titleId} onKeyDown={keys}>
+    aria-modal="true" aria-labelledby={titleId} onKeyDown={keys}
+    onCompositionStart={()=>{dialogComposing.current=true;abortResolve();}}
+    onCompositionEnd={()=>{dialogComposing.current=false;}}>
     <header className="note-image-dialog-head">
      <div><h2 id={titleId}>호스트 이미지 자산</h2><p>현재 문서의 노트 이미지에 연결하거나 선택한 노트 끝에 추가합니다.</p></div>
      <button type="button" onClick={close}>닫기</button>

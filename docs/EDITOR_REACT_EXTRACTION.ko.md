@@ -336,3 +336,17 @@ pnpm test:browser
 **수락 한계:** Chromium 모바일 터치 에뮬레이션은 실제 iOS Safari/WebKit, Android Chrome 실기기 터치, 소프트 키보드·한글 IME, VoiceOver/TalkBack, OS clipboard 등과 동일하지 않다. 특히 스크린 리더의 가상 커서·포커스 이동과 모바일 실환경의 가상 키보드에 따른 `visualViewport` 변화는 별도 수동 검증 항목으로 유지한다. 10회 테스트는 누수의 징후를 잡는 회귀이지 장시간 메모리 사용량 측정이나 운영 수준 무누수 보증이 아니다.
 
 **누적 실행 보류:** `pnpm check`, `pnpm package:check`, `pnpm test:editor-stress`, `pnpm test:mobile-editor`, `pnpm test:editor-lifecycle`, `pnpm test:browser`. 외부 DAM 실서버, 기존 Python/SQLite 복구 수락, iOS Safari/Firefox 검증은 이 단계에서 수행하지 않았다.
+
+
+## 2026-11-13 — P3.1.e R7 IME 조합 및 모달 포커스 복귀 강화 (실행 보류)
+
+- `packages/editor-react/src/imeKeyboard.ts`에 키 이벤트의 `isComposing`, `keyCode === 229`, `key === 'Process'`를 합친 내부 판별기 `isImeKeyboardEvent()`를 추가했다. 브라우저마다 조합 중 `Escape`·`Enter`가 일반 단축키처럼 보고되는 경우를 함께 다룬다. 공통 패키지 공개 인덱스 export는 늘리지 않았다.
+- `TufteNoteInteractionPlugin`: `Escape` 노트 이탈, `Alt+ArrowDown` 노트 진입, 노트 경계 `Backspace`·`Delete`, `Enter` 줄바꿈과 외부 명령 `ENTER/LEAVE_TUFTE_NOTE_COMMAND` 모두 조합 중에는 DOM/선택 변경을 실행하지 않는다. 이미지 클릭으로 노드 선택을 바꾸는 경로도 Lexical 조합 중에는 건너뛴다.
+- `HostAssetPicker`: Lexical 조합 또는 readonly 중 외부 선택기 열기를 거부하며, 검색·대체 텍스트 입력 중 `compositionstart`/`compositionend`를 구분한다. 조합 중 `Escape`·`Tab` 처리를 건너뛰고 비동기 연결을 시도하지 않는다. 입력 조합이 시작되면 진행 중 연결을 중단하고 기존 generation guard가 이전 응답을 무시한다. 닫기 시 **호출 당시의 모달 노드**를 보존해 형제 모달과 정확히 구분하고, 호스트 버튼에 `focus({preventScroll:true})`로 포커스를 복원한다.
+- `NoteImagePanel`: 대체 텍스트·검색 입력의 조합 중 `Escape`·`Tab`을 특별키로 해석하지 않고 조합 중 form submit을 보류한다. `TufteNoteImageEditorPlugin`에서도 조합 중 이미지 속성 저장을 거부하며, 다른 편집기의 열린 모달이 있으면 원래 버튼으로 포커스를 빼앗지 않는다. 단독 모달의 포커스 복원에도 `preventScroll`을 사용한다. `SelectionToolbar`의 `Alt+Shift+F` 접근 단축키와 서식 클릭은 Lexical 조합 중 무효화한다.
+- 신규 `tests/ime-key-policy.test.mjs`는 IME flag/229/Process/일반 키를 구분한다. 신규 `tests/editor-ime-keyboard-browser.mjs`는 실제 React 컴포넌트에 **합성 `KeyboardEvent`/ `CompositionEvent`**를 전달해 조합 중 호스트 모달이 닫히지 않고 외부 연결이 거부되는지, 조합 종료 후 정상 `Escape`로 닫히는지, 편집기 노트 진입 상태가 조합 `Escape`로 바뀌지 않는지, 이미지 속성 form이 조합 중 저장하지 않는지, 형제 문서가 불변인지 확인한다. `tests/mobile-editor-touch-browser.mjs`에는 터치 취소 후 트리거 포커스 복귀를 추가했다.
+- `pnpm test:ime-policy`·`pnpm test:ime-focus`를 추가했으며 `test:note-interactions`·`test:editor-lifecycle`·`test:browser`에 해당 브라우저 회귀를 등록했다.
+
+**수락 범위:** 합성 조합 키 이벤트 회귀는 실제 macOS·Windows·iOS·Android의 한글 IME 조합 과정을 대체하지 않는다. `focus({preventScroll:true})` 역시 실제 모바일 화면의 가상 키보드와 `visualViewport` 이동을 보증하지 않는다. 실제 OS IME, iOS Safari/WebKit, 스크린 리더, 실기기 클립보드/터치는 계속 수동 수락 항목이다.
+
+**검증 미실행:** `pnpm check`, `pnpm package:check`, `pnpm test:ime-focus`, `pnpm test:editor-lifecycle`, `pnpm test:browser` 및 CI. 작성된 코드가 실제 TypeScript 빌드나 브라우저에서 통과했다고 주장하지 않는다. 기존 2026-11-12 테스트 성공은 이 변경의 증거가 아니다.

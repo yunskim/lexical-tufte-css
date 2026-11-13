@@ -3,6 +3,7 @@ import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
 import {$getSelection,$isRangeSelection,FORMAT_TEXT_COMMAND} from 'lexical';
 import {ToolbarIcon} from './toolbar.js';
 import {INLINE_ACTIONS,EDITOR_SHORTCUTS} from './inlineActions.js';
+import {isImeKeyboardEvent} from './imeKeyboard.js';
 
 export function SelectionToolbar(){
  const [editor]=useLexicalComposerContext();
@@ -31,7 +32,7 @@ export function SelectionToolbar(){
   };
   const onKeyDown=(event:KeyboardEvent)=>{
    if(event.altKey&&event.shiftKey&&event.key.toLowerCase()==='f'&&!event.ctrlKey&&!event.metaKey){
-    if(!editor.getRootElement()?.contains(document.activeElement)||editor.isComposing())return;
+    if(!editor.getRootElement()?.contains(document.activeElement)||editor.isComposing()||isImeKeyboardEvent(event))return;
     const selection=window.getSelection();
     if(!selection||selection.isCollapsed||selection.rangeCount===0||dismissed.current)return;
     update();
@@ -50,7 +51,7 @@ export function SelectionToolbar(){
  },[editor]);
  if(!position)return null;
  return <div ref={toolbarRef} className="selection-toolbar" role="toolbar" aria-label="선택 영역 서식" style={{top:position.top,left:position.left}} onMouseDown={e=>e.preventDefault()} onKeyDown={e=>{if(e.key==='Escape'){e.preventDefault();dismissed.current=true;setPosition(null);editor.focus();}}}>
-  {INLINE_ACTIONS.map(action=><button key={action.id} type="button" aria-label={action.label} title={EDITOR_SHORTCUTS[action.label]?`${action.label} (${EDITOR_SHORTCUTS[action.label]})`:action.label} onMouseDown={e=>e.preventDefault()} onClick={()=>editor.dispatchCommand(FORMAT_TEXT_COMMAND,action.id)}><ToolbarIcon name={action.icon}/></button>)}
+  {INLINE_ACTIONS.map(action=><button key={action.id} type="button" aria-label={action.label} title={EDITOR_SHORTCUTS[action.label]?`${action.label} (${EDITOR_SHORTCUTS[action.label]})`:action.label} onMouseDown={e=>e.preventDefault()} onClick={()=>{if(!editor.isComposing())editor.dispatchCommand(FORMAT_TEXT_COMMAND,action.id);}}><ToolbarIcon name={action.icon}/></button>)}
  </div>;
 }
 

@@ -1,4 +1,5 @@
 import {useEffect,useId,useRef,useState,type FormEvent,type KeyboardEvent} from 'react';
+import {isImeKeyboardEvent} from './imeKeyboard.js';
 
 /** Current-note images, not the document asset catalog; the host identity remains in Lexical. */
 export type NoteImageChoice={
@@ -30,6 +31,7 @@ export function NoteImagePanel({images,onClose,onSave}:Props){
  const [height,setHeight]=useState(images[0]?.height?.toString()??'');
  const [error,setError]=useState('');
  const search=useRef<HTMLInputElement>(null);
+ const composing=useRef(false);
  const selected=images.find(image=>image.key===selectedKey);
  const visible=images.map((image,index)=>({image,index})).filter(({image})=>
   [image.alt,image.src,image.assetId??''].some(value=>value.toLocaleLowerCase().includes(query.toLocaleLowerCase()))
@@ -44,6 +46,7 @@ export function NoteImagePanel({images,onClose,onSave}:Props){
  }
  function submit(event:FormEvent<HTMLFormElement>){
   event.preventDefault();
+  if(composing.current)return;
   if(!selected){setError('수정할 이미지를 다시 선택하세요.');return;}
   const w=pixel(width),h=pixel(height);
   if(w===null||h===null){setError('너비와 높이는 빈 값 또는 양의 정수여야 합니다.');return;}
@@ -51,6 +54,7 @@ export function NoteImagePanel({images,onClose,onSave}:Props){
   else setError('이미지 위치가 변경되었습니다. 다시 선택해 주세요.');
  }
  function keys(event:KeyboardEvent<HTMLElement>){
+  if(composing.current||isImeKeyboardEvent(event.nativeEvent))return;
   if(event.key==='Escape'){event.preventDefault();onClose();return;}
   if(event.key!=='Tab')return;
   const focusable=[...event.currentTarget.querySelectorAll<HTMLElement>(
@@ -65,7 +69,9 @@ export function NoteImagePanel({images,onClose,onSave}:Props){
  }
  return <div className="note-image-backdrop">
   <section role="dialog" aria-modal="true" aria-labelledby={fields.title} aria-describedby={fields.description}
-   className="note-image-dialog" onKeyDown={keys}>
+   className="note-image-dialog" onKeyDown={keys}
+   onCompositionStart={()=>{composing.current=true;}}
+   onCompositionEnd={()=>{composing.current=false;}}>
    <header className="note-image-dialog-head">
     <div><h2 id={fields.title}>노트 이미지 선택</h2>
      <p id={fields.description}>현재 노트에서 이미지를 선택하고 표시 속성을 수정합니다.</p></div>

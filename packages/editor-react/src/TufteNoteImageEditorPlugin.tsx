@@ -42,7 +42,12 @@ export function TufteNoteImageEditorPlugin({
   callbacks.current.onOpenChange?.(false);
   const target=focusTarget.current;
   focusTarget.current=null;
-  if(target?.isConnected)queueMicrotask(()=>{if(target.isConnected)target.focus();});
+  const closingDialog=document.activeElement?.closest('[role="dialog"][aria-modal="true"]')??null;
+  if(target?.isConnected)queueMicrotask(()=>{
+   const sibling=[...document.querySelectorAll('[role="dialog"][aria-modal="true"]')]
+    .some(modal=>modal!==closingDialog);
+   if(!sibling&&target.isConnected)target.focus({preventScroll:true});
+  });
  };
 
  useEffect(()=>editor.registerCommand(OPEN_TUFTE_NOTE_IMAGE_EDITOR_COMMAND,target=>{
@@ -92,6 +97,9 @@ export function TufteNoteImageEditorPlugin({
   const chosen=snapshotRef.current;
   if(!chosen||callbacks.current.readonly||!editor.isEditable()){
    report('읽기 전용 문서는 변경할 수 없습니다.');return false;
+  }
+  if(editor.isComposing()){
+   report('조합 입력 중에는 이미지 속성을 변경할 수 없습니다.');return false;
   }
   const matches=()=>{
    const note=$getNodeByKey(chosen.noteKey),image=$getNodeByKey(key);

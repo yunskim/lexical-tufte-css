@@ -1,5 +1,6 @@
 import {useEffect,useRef} from 'react';
 import {useLexicalComposerContext} from '@lexical/react/LexicalComposerContext';
+import {isImeKeyboardEvent} from './imeKeyboard.js';
 import {
  $getRoot,$getNearestNodeFromDOMNode,$createNodeSelection,
  $getSelection,$isRangeSelection,$isNodeSelection,$isElementNode,$isTextNode,
@@ -54,6 +55,7 @@ export function TufteNoteInteractionPlugin({onNotice}:TufteNoteInteractionPlugin
  noticeRef.current=onNotice;
  const setStatus=(message:string)=>noticeRef.current?.(message);
   function enterNote():boolean {
+    if(editor.isComposing())return false;
     const selection=$getSelection();
     if(!$isRangeSelection(selection)||!selection.isCollapsed())return false;
     const anchor=selection.anchor.getNode();
@@ -69,6 +71,7 @@ export function TufteNoteInteractionPlugin({onNotice}:TufteNoteInteractionPlugin
     setStatus('노트 안입니다. Escape로 본문에 돌아갑니다.');return true;
   }
   function leaveNote():boolean {
+    if(editor.isComposing())return false;
     const selection=$getSelection();
     if(!$isRangeSelection(selection))return false;
     const note=containingNote(selection.anchor.getNode());if(!note)return false;
@@ -81,17 +84,19 @@ export function TufteNoteInteractionPlugin({onNotice}:TufteNoteInteractionPlugin
   }
   useEffect(()=>{
     const selectNoteImage=editor.registerCommand(CLICK_COMMAND,event=>{
-      if(!(event.target instanceof HTMLImageElement))return false;
+      if(editor.isComposing()||!(event.target instanceof HTMLImageElement))return false;
       const node=$getNearestNodeFromDOMNode(event.target);
       if(!(node instanceof InlineImageNode)||!containingNote(node))return false;
       const selection=$createNodeSelection();selection.add(node.getKey());$setSelection(selection);
       event.preventDefault();editor.focus();return true;
     },COMMAND_PRIORITY_HIGH);
     const escape=editor.registerCommand(KEY_ESCAPE_COMMAND,event=>{
-      if(!leaveNote())return false;event?.preventDefault();return true;
+      if(isImeKeyboardEvent(event)||editor.isComposing()||!leaveNote())return false;
+      event?.preventDefault();return true;
     },COMMAND_PRIORITY_HIGH);
     const down=editor.registerCommand(KEY_ARROW_DOWN_COMMAND,event=>{
-      if(!event.altKey||!enterNote())return false;event.preventDefault();return true;
+      if(isImeKeyboardEvent(event)||editor.isComposing()||!event.altKey||!enterNote())return false;
+      event.preventDefault();return true;
     },COMMAND_PRIORITY_HIGH);
     const enterCommand=editor.registerCommand(
       ENTER_TUFTE_NOTE_COMMAND,()=>enterNote(),COMMAND_PRIORITY_HIGH
@@ -149,6 +154,7 @@ export function TufteNoteInteractionPlugin({onNotice}:TufteNoteInteractionPlugin
       event.preventDefault();$insertNotePhrasing(s,nodes);return true;
     },COMMAND_PRIORITY_HIGH);
     function exitAtEdge(event:KeyboardEvent|null,backward:boolean){
+      if(editor.isComposing()||isImeKeyboardEvent(event))return false;
       const s=$getSelection();if(!$isRangeSelection(s)||!s.isCollapsed())return false;
       const node=s.anchor.getNode(),note=containingNote(node);
       if(!note||!$isTextNode(node))return false;
@@ -164,7 +170,7 @@ export function TufteNoteInteractionPlugin({onNotice}:TufteNoteInteractionPlugin
     const composing=registerNoteCompositionGuard(editor);
     const enter=editor.registerCommand(KEY_ENTER_COMMAND,event=>{
       const s=$getSelection();if(!$isRangeSelection(s)||!containingNote(s.anchor.getNode()))return false;
-      if(event?.isComposing)return false;
+      if(editor.isComposing()||isImeKeyboardEvent(event))return false;
       event?.preventDefault();s.insertLineBreak();return true;
     },COMMAND_PRIORITY_HIGH);
     const typing=registerNoteEdgeTypingGuard(editor);

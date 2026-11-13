@@ -98,6 +98,9 @@ try{
  await trigger.tap();await picker.waitFor();await assertFits();
  await picker.getByRole('button',{name:'취소'}).tap();
  await picker.waitFor({state:'hidden'});
+ await page.waitForFunction(()=>document.activeElement?.textContent?.trim()==='호스트 이미지 자산 선택');
+ assert.equal(await trigger.evaluate(button=>document.activeElement===button),true,
+  'Touch cancellation should restore focus to its opener without a scroll jump');
  assert.equal(await alpha.getByTestId('host-first-json').textContent(),snapshot);
  assert.equal(await trigger.getAttribute('aria-expanded'),'false');
  const pointerTypes=await page.evaluate(()=>window.__touchPointers.map(event=>event.type));
