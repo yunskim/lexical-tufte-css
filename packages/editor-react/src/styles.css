@@ -73,3 +73,27 @@
 .host-asset-fields input[type=radio]{width:auto;flex:0 0 auto;}
 .host-asset-fields [role=alert]{color:#a32626;}
 @media(prefers-color-scheme:dark){.host-asset-fields [role=alert]{color:#ffaaa0;}}
+
+
+/* Coarse-pointer targets: the common note/host dialogs remain usable in a
+   390px mobile viewport. Do not enlarge mouse/keyboard desktop layouts. */
+@media (pointer:coarse){
+ .note-image-dialog-head button,.note-image-dialog .note-image-actions button{
+  min-height:44px;min-width:44px;
+ }
+ .host-asset-fields fieldset label{
+  min-height:44px;align-items:center;gap:.65rem;
+ }
+ .host-asset-fields input[type=radio]{
+  min-width:20px;min-height:20px;
+ }
+ .host-asset-fields select,.host-asset-fields input[type=search],
+ .host-asset-fields input[type=text]{
+  min-height:44px;
+ }
+}
+@media (pointer:coarse) and (max-width:640px){
+ .host-asset-fields{padding:.75rem;gap:.65rem;}
+ .note-image-dialog-head{padding:.75rem;gap:.5rem;}
+ .note-image-dialog-head h2{overflow-wrap:anywhere;}
+}

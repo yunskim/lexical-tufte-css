@@ -322,3 +322,17 @@ pnpm test:browser
 | 장시간(반복) 마운트/언마운트, 실제 DAM 오류/권한 | 운영 수준 테스트 필요 | 미수락 |
 
 **누적 테스트 실행은 사용자가 한꺼번에 진행한다.** `pnpm install --frozen-lockfile`, `pnpm check`, `pnpm package:check`, `pnpm test:editor-lifecycle`, `pnpm test:asset-pickers`, `pnpm test:host-asset-bridge`, `pnpm test:browser`를 아직 실행하지 않았다. CI도 실행하지 않았다. 기존 2026-11-12 통과 기록을 이번 변경의 검증으로 해석하지 않는다.
+
+
+## 2026-11-13 — P3.1.e R7 반복 마운트/모바일 터치 수락 테스트 보강 (실행 보류)
+
+기존 재사용 편집기의 비동기 취소·언마운트 처리에는 단발 회귀가 있었지만, **반복 마운트 중 누적되는 콜백/타이머**와 **좁은 화면의 실제 touch pointer 조작** 검사는 없었다. 이번 단계에서는 다음 코드를 작성했다.
+
+- `tests/controlled-editor-remount-stress-browser.mjs`: 실제 `host-assets.html`의 Alpha/Beta 제어형 편집기에서 **Alpha를 10회 반복 마운트/언마운트**한다. 각 회차마다 공통 `HostAssetPicker`에서 external `resolve()`를 지연시키고, 대기 중 언마운트한 뒤 AbortSignal을 무시하는 늦은 성공 응답을 전달한다. 매 회차 Alpha/Beta 정본 불변, 잔류 모달·버튼 부재, 재마운트 뒤 picker/refresh 버튼 한 개, pending 요청 완전 소진을 확인한다. 전체 회차 동안 검색·조회 호출 횟수가 누적 중복되지 않고 `pageshow` 이후 URL 갱신 타이머가 살아나지 않아야 한다. 마지막 정상 연결 1회만 `onChange`가 발생해야 한다.
+- `tests/mobile-editor-touch-browser.mjs`: Chromium을 `isMobile:true`, `hasTouch:true`, 390×844 CSS px, DPR 2로 에뮬레이션한다. `locator.tap()`으로 외부 이미지 대화상자를 열고, 라디오 대상·검색 결과를 터치 선택하며, revision/alt를 지정하고 연결 버튼을 터치한다. 모달이 뷰포트 밖으로 넘치지 않는지, 라디오 라벨과 주 동작 버튼이 약 44px 이상인지, `pointerdown.pointerType`이 실제로 `touch`인지, 원격 자산 참조·한 편집기만 변경되는지, 터치로 본문 커서 위치를 선택한 뒤 브라우저 `insertText`로 Lexical 입력 이벤트를 처리하는지, 재오픈 뒤 터치 취소로 정본이 불변인지 검사한다. `insertText`는 실제 모바일 가상 키보드나 한글 조합 입력을 재현하지 않는다.
+- `packages/editor-react/src/styles.css`에 `@media (pointer:coarse)` 한정의 최소 44px 버튼·선택 라벨·입력 컨트롤 영역을 추가했다. 640px 이하의 헤더 패딩/텍스트 감싸기 및 검색 필드 간격을 조정했다. 데스크톱 정밀 포인터 레이아웃과 정본 데이터 형식은 변경하지 않았다.
+- `pnpm test:editor-stress`, `pnpm test:mobile-editor` 실행 항목을 추가하고 `test:editor-lifecycle`, `test:host-assets-controlled`, `test:browser`에 연결했다. 작성된 스크립트는 Playwright 브라우저를 필요로 한다. **작성과 등록만 마쳤으며 브라우저·타입 검사·CI 실행은 하지 않았다.**
+
+**수락 한계:** Chromium 모바일 터치 에뮬레이션은 실제 iOS Safari/WebKit, Android Chrome 실기기 터치, 소프트 키보드·한글 IME, VoiceOver/TalkBack, OS clipboard 등과 동일하지 않다. 특히 스크린 리더의 가상 커서·포커스 이동과 모바일 실환경의 가상 키보드에 따른 `visualViewport` 변화는 별도 수동 검증 항목으로 유지한다. 10회 테스트는 누수의 징후를 잡는 회귀이지 장시간 메모리 사용량 측정이나 운영 수준 무누수 보증이 아니다.
+
+**누적 실행 보류:** `pnpm check`, `pnpm package:check`, `pnpm test:editor-stress`, `pnpm test:mobile-editor`, `pnpm test:editor-lifecycle`, `pnpm test:browser`. 외부 DAM 실서버, 기존 Python/SQLite 복구 수락, iOS Safari/Firefox 검증은 이 단계에서 수행하지 않았다.

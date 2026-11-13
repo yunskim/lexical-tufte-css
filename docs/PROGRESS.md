@@ -1,3 +1,9 @@
+## 2026-11-13 P3.1.e R7 반복 마운트와 모바일 touch 회귀 (검증 대기)
+
+- 외부 자산 `resolve()` 대기 중 Alpha 편집기 10회 언마운트/재마운트 + 늦은 응답 폐기, 두 편집기 정본 격리, picker/refresh 중복 등록 부재, 최종 1회 정상 저장에 대한 브라우저 회귀를 작성했다.
+- Chromium 390px 모바일 touch 모드에서 자산 picker 열기·검색·라디오 선택·revision/alt·연결·취소, 모달 범위, 터치 영역 44px, touch pointer, 터치 커서 선택 후 브라우저 `insertText` 입력을 추가했다(실제 OS 키보드/IME 아님). 공통 CSS에 coarse pointer 접근성 크기 규칙 반영.
+- `test:editor-stress`, `test:mobile-editor`와 일괄 브라우저 게이트 연결. **빌드·타입 검사·Playwright/CI 전부 미실행.** 실제 iOS Safari, OS IME/클립보드/스크린리더 등은 수락 대기. [세부 기록](EDITOR_REACT_EXTRACTION.ko.md).
+
 ## 2026-11-12 P3.1.e R7 복수 편집기와 비동기 요청 격리 회귀 보강 (미실행)
 
 - 호스트 통합 예제에 Beta readonly 및 마운트 전환 테스트 조작면을 추가했다. Alpha/Beta 외부 자산 모달 동시 오픈·서로 다른 pending resolve, Alpha 취소/언마운트 후 Beta 성공, Beta readonly 중 늦은 응답 거부, Tab 포커스 순환·Escape/복귀를 검증하는 새 브라우저 테스트 코드를 작성했다.
