@@ -18,6 +18,8 @@ type Tracked={
  signature:string;
  nextAt:number;
  failures:number;
+ /** Keep legacy expiry independent from a failure's retry timer. */
+ expiryAt?:number;
 };
 
 const MAX_TIMER_MS=2_147_483_647;
@@ -112,7 +114,8 @@ export function HostAssetRefresh({adapter,namespace,legacyTiming=false,allowManu
    for(const item of items){
     const old=tracked.get(item.key);
     if(!old||old.signature!==item.signature){next=now;break;}
-    next=Math.min(next,old.nextAt);
+    next=Math.min(next,old.nextAt,
+     legacyTiming&&old.expiryAt!==undefined?old.expiryAt:Number.POSITIVE_INFINITY);
    }
    if(Number.isFinite(next)){
     timer=setTimeout(()=>{timer=null;void refresh(false);},
@@ -135,13 +138,15 @@ export function HostAssetRefresh({adapter,namespace,legacyTiming=false,allowManu
    const now=Date.now();
    const dueCandidates=all.filter(item=>{
     const old=tracked.get(item.key);
-    return manual||forceAll||!old||old.signature!==item.signature||old.nextAt<=now;
+    return manual||forceAll||!old||old.signature!==item.signature||old.nextAt<=now||
+     legacyTiming&&old.expiryAt!==undefined&&old.expiryAt<=now;
    });
    // The standalone legacy example renewed every linked image on the
    // earliest expiry, but only retried failed locators after a provider error.
    const expireDue=dueCandidates.some(item=>{
     const old=tracked.get(item.key);
-    return !old||old.signature!==item.signature||old.failures===0;
+    return !old||old.signature!==item.signature||old.failures===0||
+     old.expiryAt!==undefined&&old.expiryAt<=now;
    });
    const due=legacyTiming&&!manual&&!forceAll&&expireDue?all:dueCandidates;
    if(!due.length){
@@ -174,9 +179,14 @@ export function HostAssetRefresh({adapter,namespace,legacyTiming=false,allowManu
      if(!isUsableResolvedImage(item.locator,resolved)){
       const previous=tracked.get(item.key);
       const failures=previous?.signature===item.signature?previous.failures+1:1;
+      const failedAt=Date.now();
+      const expiryAt=legacyTiming&&previous?.signature===item.signature&&
+       previous.expiryAt!==undefined&&previous.expiryAt>failedAt?
+       previous.expiryAt:undefined;
       tracked.set(item.key,{
        signature:item.signature,failures,
-       nextAt:Date.now()+imageRefreshRetryDelay(failures)
+       nextAt:failedAt+imageRefreshRetryDelay(failures),
+       ...(expiryAt!==undefined?{expiryAt}:{})
       });
       failed++;
       continue;
@@ -187,9 +197,17 @@ export function HostAssetRefresh({adapter,namespace,legacyTiming=false,allowManu
      // No visible change: record expiry without a Lexical update, so neither
      // React onChange nor Undo is disturbed by a redundant resolve.
      if(safeResolved.url===item.src){
+      const previous=tracked.get(item.key);
+      const newExpiryAt=nextImageRefreshAt(safeResolved.expiresAt);
+      // Automatic retries preserve an earlier expiry deadline. Explicit
+      // manual refreshes replace it, as the standalone example requires.
+      const expiryAt=legacyTiming&&!manual&&previous?.signature===item.signature&&
+       previous.failures>0&&previous.expiryAt!==undefined&&
+       previous.expiryAt>Date.now()?
+       Math.min(newExpiryAt,previous.expiryAt):newExpiryAt;
       tracked.set(item.key,{
        signature:item.signature,failures:0,
-       nextAt:nextImageRefreshAt(safeResolved.expiresAt)
+       nextAt:expiryAt,expiryAt
       });
       succeeded++;
       continue;
@@ -216,9 +234,14 @@ export function HostAssetRefresh({adapter,namespace,legacyTiming=false,allowManu
      if(updateFailed){
       const previous=tracked.get(item.key);
       const failures=previous?.signature===item.signature?previous.failures+1:1;
+      const failedAt=Date.now();
+      const expiryAt=legacyTiming&&previous?.signature===item.signature&&
+       previous.expiryAt!==undefined&&previous.expiryAt>failedAt?
+       previous.expiryAt:undefined;
       tracked.set(item.key,{
        signature:item.signature,failures,
-       nextAt:Date.now()+imageRefreshRetryDelay(failures)
+       nextAt:failedAt+imageRefreshRetryDelay(failures),
+       ...(expiryAt!==undefined?{expiryAt}:{})
       });
       failed++;
       continue;
@@ -226,9 +249,15 @@ export function HostAssetRefresh({adapter,namespace,legacyTiming=false,allowManu
 
      if(applied){
       const updated={locator:item.locator,src:safeResolved.url};
+      const previous=tracked.get(item.key);
+      const newExpiryAt=nextImageRefreshAt(safeResolved.expiresAt);
+      const expiryAt=legacyTiming&&!manual&&previous?.signature===item.signature&&
+       previous.failures>0&&previous.expiryAt!==undefined&&
+       previous.expiryAt>Date.now()?
+       Math.min(newExpiryAt,previous.expiryAt):newExpiryAt;
       tracked.set(item.key,{
        signature:fingerprint(updated),failures:0,
-       nextAt:nextImageRefreshAt(safeResolved.expiresAt)
+       nextAt:expiryAt,expiryAt
       });
       succeeded++;
      }else{

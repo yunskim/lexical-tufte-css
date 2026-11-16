@@ -91,6 +91,8 @@ try{
  });
  await button('불러오기').click();
  await page.waitForFunction(prev=>window.__singleRefreshCalls.length>prev,before+1);
+ await page.getByRole('status',{name:'편집 작업 상태'})
+  .getByText(/외부 이미지 URL 갱신: 1\/1개/).waitFor();
  assert.equal(await manual.count(),1,'Restore must not mount another controller');
  assert.deepEqual(errors,[]);
  console.log('Standalone host URL refresh: single controller, manual one-resolve, cooldown, restore and locator retention PASS.');

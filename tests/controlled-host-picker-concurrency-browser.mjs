@@ -74,13 +74,13 @@ try{
  // Cancelling and unmounting Alpha must not affect Beta's pending request.
  await secondDialog.getByRole('button',{name:'취소'}).focus();
  await firstDialog.getByRole('button',{name:'취소'}).evaluate(node=>node.click());
- assert.equal(await firstDialog.count(),0);
+ await firstDialog.waitFor({state:'hidden'});
  assert.equal(await secondDialog.count(),1);
  assert.equal(await secondDialog.getByRole('button',{name:'취소'})
   .evaluate(element=>document.activeElement===element),true,
   'Closing Alpha must not steal focus from Beta while its modal stays open');
  await page.getByRole('button',{name:'Alpha 마운트 전환'}).evaluate(node=>node.click());
- assert.equal(await firstTrigger.count(),0);
+ await firstTrigger.waitFor({state:'detached'});
  await page.evaluate(()=>{
   const harness=window.__hostAssetHarness;
   const pending=harness.deferred.shift();
@@ -126,7 +126,7 @@ try{
  const beforeReadonly=await read('second');
  await page.getByRole('button',{name:'Beta 읽기 전용 전환'}).evaluate(node=>node.click());
  await secondDialog.waitFor({state:'hidden'});
- assert.equal(await secondTrigger.count(),0);
+ await secondTrigger.waitFor({state:'detached'});
  await page.evaluate(()=>{
   const harness=window.__hostAssetHarness;
   const pending=harness.deferred.shift();

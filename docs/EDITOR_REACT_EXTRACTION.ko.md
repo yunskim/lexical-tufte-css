@@ -370,3 +370,21 @@ pnpm test:browser
 ### 수락 판단
 
 **코드 작성·커밋 전 단계의 소스 검토만 진행했으며 테스트/빌드는 실행하지 않는다.** `pnpm check:editor-boundaries`, `pnpm check`, `pnpm package:check`, `pnpm test:document-commands`, `pnpm test:editor-lifecycle`, `pnpm test:browser`를 누적 일괄 검증 대상으로 유지한다. 테스트 통과와 P3.1.e 완료 체크는 실제 실행 이후에만 판정한다. R7 실기기 IME, 보조기술, 모바일 WebKit/Firefox, 운영 DAM과 장시간 메모리/복구 기능은 별도로 남는다.
+
+
+## 2026-11-16 — P3.1.e 누적 브라우저 fixture·선택자·타이밍 정합성 보완 (실행 보류)
+
+### 소스/테스트 대조에서 확인한 사항
+
+- `test:browser`의 파일 참조, 신규 편집기·외부 자산 관련 묶음 스크립트와 저장소 트리를 정적으로 대조했다. 이 시점의 `package.json`에서 **누락된 테스트 경로와 같은 스크립트 내 중복 경로는 확인되지 않았다**. 이 확인은 파일 존재·스크립트 문자열 점검이며 실제 Playwright 실행이나 테스트 통과가 아니다.
+- 독립 예제에는 `레이아웃 예제 불러오기` 버튼이 실제 존재하고, `seed-note`가 포함된다. 호스트 제어형 fixture는 `server-note`를 각각 `alpha-server-note`, `beta-server-note`로 접두화하며, 일반 제어형 예제는 `first-server-note`로 접두화한다. 공통 자산 선택기는 `호스트 이미지 자산`, 독립 로컬 다이얼로그는 `문서 이미지 선택`로 유지되는 점도 확인했다.
+- `tests/legacy-host-asset-guard-browser.mjs`의 교체 지연 응답 오류 문구가 이전 UI 문자열인 `연결 대상 이미지가 변경되었습니다`를 요구하고 있었다. 실제 공통 `HostAssetPicker`의 `대상 노트 또는 이미지가 변경되었습니다`에 맞게 변경했다.
+- `tests/controlled-host-picker-concurrency-browser.mjs`는 `evaluate(node=>node.click())` 직후 React 상태 변경을 기다리지 않고 DOM 개수를 확인했다. 삭제·언마운트 검사를 각각 `waitFor({state:'hidden'})` / `waitFor({state:'detached'})`로 변경했다. `tests/host-asset-single-controller-browser.mjs`의 문서 복원 후에는 resolve 호출만 기다리는 대신 갱신 상태 알림도 확인하도록 보강했다.
+
+### 자동 재시도와 만료 예약 독립성
+
+- `tests/host-asset-provider-browser.mjs`는 과거 예제에서 **60초 전 URL 만료 예약**과 **5초 후 실패 재시도 예약**이 별개이며, 실패 후 자동 재시도가 성공해도 기존 만료 확인을 취소하지 않는 것을 요구한다. 공통화된 `HostAssetRefresh`는 `Tracked.nextAt` 하나로 양쪽을 덮어써 이 동작을 잃을 수 있었다.
+- `HostAssetRefresh`에 선택적 `Tracked.expiryAt`를 추가했다. `legacyTiming`일 때 실패한 요청의 `nextAt`은 재시도 시간, `expiryAt`은 남아 있는 원래 만료 시간이다. 타이머는 둘 중 이른 시간을 선택하며, **자동 재시도가 성공**해도 미래의 원래 만료 예약을 보존한다. **수동 갱신 성공**은 새 만료 시점으로 예약을 교체한다. 이미 지나간 만료 시각은 실패 시 보존하지 않아 즉시 무한 재시도하지 않도록 한다. 제어형 `TufteEditor`의 기본 `legacyTiming=false` 일정 처리 흐름은 유지한다. 기존 `host-asset-provider-browser.mjs`의 독립 일정 시나리오를 실행 검증 대상으로 둔다.
+- 새 `scripts/check-editor-regression-contracts.mjs`는 스크립트가 지목하는 브라우저 테스트 파일 존재와 중복, 공통/독립 UI 레이블, 실제 JSON fixture 노트 ID와 namespace 접두화, stale 오류 문구, legacy 만료 상태와 기존 회귀의 존속을 정적으로 검사하도록 작성했다. `pnpm check:editor-regression-contracts`를 추가하고 전체 `pnpm check` 앞부분에 연결했다.
+
+**미실행·유의:** 빌드, 타입 검사, 신규 정적 검사 실행, Playwright, CI를 모두 수행하지 않았다. 이번 소스 변경은 별도 런타임 검증이 필요하다. 기존 테스트 중 상세 비동기 타이밍을 검증하는 `host-asset-provider-browser.mjs`는 특히 회귀 우선순위를 높게 둔다. 실제 OS/IME·WebKit·Firefox·스크린 리더·장기 작동 검증은 여전히 별개다.

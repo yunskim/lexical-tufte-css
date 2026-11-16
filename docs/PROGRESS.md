@@ -1,3 +1,11 @@
+## 2026-11-16 P3.1.e 누적 테스트/fixture 계약·legacy refresh 일정 보완 (실행 대기)
+
+- `test:browser`/편집기 관련 스크립트의 파일 참조를 GitHub 트리와 대조해 누락·스크립트 내 중복이 없음을 정적 확인했다. 실제 빌드/브라우저 실행은 하지 않았다.
+- `legacy-host-asset-guard-browser.mjs`의 오래된 stale 오류 문구를 공통 자산 선택기 UI에 맞게 정정했다. 동시 모달 취소·언마운트는 React 상태 변경 완료까지 기다리도록 수정하고, 복원 URL 갱신의 상태 알림 확인을 추가했다.
+- `HostAssetRefresh` legacy 호환 모드에서 실패 재시도 `nextAt`과 원래 만료 예약 `expiryAt`을 분리했다. 자동 재시도 성공은 기존 만료 확인 예약을 남기고, 수동 갱신은 새 만료로 갱신한다. 원래 `host-asset-provider-browser.mjs` 회귀 기대를 보존하기 위한 수정이다.
+- `scripts/check-editor-regression-contracts.mjs` 및 `check:editor-regression-contracts`를 추가해 테스트 경로/fixture ID/버튼·다이얼로그 이름/오류 문구/legacy 일정 검사 코드를 연결했다.
+- **컴파일·검사·Playwright·CI 미실행**. 변경 성공 여부는 다음 일괄 테스트에서 판정. [기록](EDITOR_REACT_EXTRACTION.ko.md).
+
 ## 2026-11-16 P3.1.e 공통 문서 명령 플러그인 및 예제 역의존 차단 (검증 대기)
 
 - 발견: 제어형 `TufteEditor`가 `BlockContextMenu`의 섹션/목록/정의목록/인용문/그림/inline 명령 등록을 빠뜨리고, 독립 예제만 7개 효과(effect)로 등록하고 있었다.

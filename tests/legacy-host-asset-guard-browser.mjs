@@ -114,7 +114,7 @@ try{
    mediaType:'image/svg+xml',url:'/obsolete.svg',
    expiresAt:new Date(Date.now()+3600_000).toISOString()});
  });
- await chooser().getByRole('alert').getByText(/연결 대상 이미지가 변경되었습니다/).waitFor();
+ await chooser().getByRole('alert').getByText(/대상 노트 또는 이미지가 변경되었습니다/).waitFor();
  assert.equal(await page.locator('img[src="/obsolete.svg"]').count(),0,
   'Late provider completion must not restore a replaced node');
  await chooser().getByRole('button',{name:'취소'}).click();
