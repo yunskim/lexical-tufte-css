@@ -350,3 +350,23 @@ pnpm test:browser
 **수락 범위:** 합성 조합 키 이벤트 회귀는 실제 macOS·Windows·iOS·Android의 한글 IME 조합 과정을 대체하지 않는다. `focus({preventScroll:true})` 역시 실제 모바일 화면의 가상 키보드와 `visualViewport` 이동을 보증하지 않는다. 실제 OS IME, iOS Safari/WebKit, 스크린 리더, 실기기 클립보드/터치는 계속 수동 수락 항목이다.
 
 **검증 미실행:** `pnpm check`, `pnpm package:check`, `pnpm test:ime-focus`, `pnpm test:editor-lifecycle`, `pnpm test:browser` 및 CI. 작성된 코드가 실제 TypeScript 빌드나 브라우저에서 통과했다고 주장하지 않는다. 기존 2026-11-12 테스트 성공은 이 변경의 증거가 아니다.
+
+
+## 2026-11-16 — P3.1.e 문서 명령 등록 공통화 및 패키지 경계 검사 (실행 보류)
+
+### 발견한 구조적 문제
+
+기존 `examples/editor/src/main.tsx`는 `registerSectionCommands`, `registerInlineCommands`, `registerDefinitionCommands`, `registerQuotationCommands`, `registerFigureCommands`, `registerListCommands`, `registerListKeyboardCommands` 7개를 자체적으로 등록했다. 그러나 재사용형 `TufteEditor`가 마운트하는 `TufteEditingSurface`에는 해당 등록이 없었다. 따라서 재사용 편집기의 `BlockContextMenu` 및 외부 호스트 `editorRef.dispatchCommand(...)`가 명령을 발행해도 이를 처리하는 리스너가 없어 일부 기능이 작동하지 않을 수 있었다. 노트 구조 등록과 문서 내부 자산 등록은 이미 재사용형 컴포넌트에서 처리 중이었다.
+
+### 이번 코드 변경
+
+- 새로운 `packages/editor-react/src/TufteDocumentCommandsPlugin.tsx`가 7개 문서 명령 등록의 단일 소유자가 된다. 섹션/inline/정의목록/인용문/figure/목록의 **6개 변경 명령 군**은 공통으로 등록하고, 목록 키보드 조작은 편집 가능할 때만 등록한다. UI 알림은 현재 `onNotice` ref에 연결하며 Lexical JSON에는 저장하지 않는다.
+- 플러그인은 공개 변경 명령 31종에 `COMMAND_PRIORITY_HIGH` 보호 리스너를 추가한다. `readonly` 또는 `!editor.isEditable()` 상태에서는 호스트가 직접 변경 명령을 발행하더라도 단 한 번의 읽기 전용 안내 후 작업을 소비한다. 플러그인 해제 시 모든 명령을 역순으로 정리한다. 등록 도중 예외가 나더라도 이미 등록한 리스너를 정리한다.
+- `TufteEditingSurface`에서 위 플러그인을 **한 번만** 마운트하며 `readonly` 및 `onNotice`를 전달한다. 독립 예제 `main.tsx`의 별도 7개 effect 등록과 그 import를 제거했다. 따라서 독립 예제와 제어형 `TufteEditor`는 동일한 명령 처리 코드 경로를 공유한다. 호스트의 저장, 복구, 자산 업로드/인증, 문서 revision 책임은 재사용 패키지로 이동하지 않았다.
+- `TufteDocumentCommandsPlugin`와 props 타입을 `@lexical-tufte/editor-react` 공개 API로 내보냈다. 패키지 tarball JS/TS 소비 검사에 런타임 컴포넌트 및 타입 import를 추가했다. `TufteComposer`의 사라진 향후 facade 설명도 현재 구조에 맞게 고쳤다.
+- `examples/editor/src/controlledDemo.tsx`에 호스트 발행용 섹션·목록·정의목록·인용문·그림·span 명령 버튼을 추가했다. 새로운 `tests/controlled-document-commands-browser.mjs`는 재사용 `TufteEditor`에서 5종 정상 삽입, 별도 편집기의 문서 불변, 호스트 value 복원, 읽기 전용 외부 명령 거부, 재마운트 후 유효하지 않은 span 명령의 단일 진단과 정본 불변을 검사한다.
+- `scripts/check-editor-react-boundaries.mjs`는 공통 패키지가 독립 예제 모듈·호스트 전역·`localStorage`에 의존하지 않는지, 공유 문서 명령 플러그인이 한 번만 마운트되는지, 예제에 중복 명령 등록이 없는지, workspace dependency 경계와 공개 export가 유지되는지 정적으로 확인하도록 작성했다. `pnpm check:editor-boundaries` 및 전체 `pnpm check`에 추가하고, 신규 `pnpm test:document-commands`·기존 `test:browser`·`test:editor-lifecycle`·`test:controlled-editor`에 브라우저 회귀를 등록했다.
+
+### 수락 판단
+
+**코드 작성·커밋 전 단계의 소스 검토만 진행했으며 테스트/빌드는 실행하지 않는다.** `pnpm check:editor-boundaries`, `pnpm check`, `pnpm package:check`, `pnpm test:document-commands`, `pnpm test:editor-lifecycle`, `pnpm test:browser`를 누적 일괄 검증 대상으로 유지한다. 테스트 통과와 P3.1.e 완료 체크는 실제 실행 이후에만 판정한다. R7 실기기 IME, 보조기술, 모바일 WebKit/Firefox, 운영 DAM과 장시간 메모리/복구 기능은 별도로 남는다.

@@ -1,3 +1,10 @@
+## 2026-11-16 P3.1.e 공통 문서 명령 플러그인 및 예제 역의존 차단 (검증 대기)
+
+- 발견: 제어형 `TufteEditor`가 `BlockContextMenu`의 섹션/목록/정의목록/인용문/그림/inline 명령 등록을 빠뜨리고, 독립 예제만 7개 효과(effect)로 등록하고 있었다.
+- 수정: 31개 변경 명령의 readonly 우회 거부를 포함한 `TufteDocumentCommandsPlugin`을 `TufteEditingSurface`에 1회 마운트하고, 독립 예제의 중복 등록을 삭제했다. 키보드 목록 명령은 editable일 때만 등록한다.
+- 제어형 예제에 구조 명령 호스트 버튼과 `controlled-document-commands-browser.mjs` 회귀를 작성했다. 예제 역의존 및 호스트 스토리지 직접 접근 금지 등 정적 경계 검사, tarball JS/TS API 확인을 추가했다.
+- **빌드/타입 검사/Playwright/CI는 실행 보류**. P3.1.e 전체 수락은 미완료. [상세](EDITOR_REACT_EXTRACTION.ko.md).
+
 ## 2026-11-13 P3.1.e R7 IME 이벤트·모달 포커스 경계 (검증 대기)
 
 - `isImeKeyboardEvent`를 만들어 IME `isComposing`/229/`Process`를 함께 식별한다. 노트 이동·경계 삭제·Enter, 호스트 자산 선택/연결, 이미지 속성 편집, 선택 서식 단축키에 조합 보호 조건을 추가했다.

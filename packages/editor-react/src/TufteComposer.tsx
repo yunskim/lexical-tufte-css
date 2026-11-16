@@ -8,8 +8,8 @@ type InitialConfig=ComponentProps<typeof LexicalComposer>['initialConfig'];
  * Host-neutral Lexical composer for the canonical Tufte node schema.
  * The host supplies namespace, initial document state and error handling.
  *
- * This is the low-level composition boundary, not the controlled
- * value/onChange TufteEditor facade (which will be implemented separately).
+ * This is the low-level composition boundary. TufteEditor provides the
+ * separate controlled value/onChange facade on top of it.
  */
 export type TufteComposerProps={
  initialConfig:Omit<InitialConfig,'nodes'>;

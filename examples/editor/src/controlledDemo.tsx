@@ -3,6 +3,9 @@ import {UNDO_COMMAND,REDO_COMMAND,type LexicalEditor} from 'lexical';
 import {createRoot} from 'react-dom/client';
 import type {JsonNode,TufteDocument} from '@lexical-tufte/document';
 import {TufteEditor,INSERT_TUFTE_NOTE_COMMAND,SPLIT_TUFTE_NOTE_COMMAND,MERGE_TUFTE_NOTE_COMMAND,MOVE_TUFTE_NOTE_COMMAND,OPEN_TUFTE_NOTE_IMAGE_EDITOR_COMMAND} from '@lexical-tufte/editor-react';
+import {INSERT_TUFTE_SECTION_COMMAND,INSERT_TUFTE_LIST_COMMAND,
+ INSERT_TUFTE_DEFINITION_LIST_COMMAND,INSERT_TUFTE_QUOTATION_COMMAND,
+ INSERT_TUFTE_FIGURE_COMMAND,SET_TUFTE_SPAN_KIND_COMMAND} from '@lexical-tufte/lexical';
 import fixture from '../../../fixtures/tufte/server-document.json';
 import '@lexical-tufte/editor-react/styles.css';
 import './style.css';
@@ -63,6 +66,14 @@ function ControlledExample(){
     <button onMouseDown={event=>event.preventDefault()} onClick={()=>firstEditorRef.current?.dispatchCommand(MOVE_TUFTE_NOTE_COMMAND,'next')}>첫 번째 노트 뒤로</button>
     <button onMouseDown={event=>event.preventDefault()} onClick={()=>firstEditorRef.current?.dispatchCommand(UNDO_COMMAND,undefined)}>첫 번째 실행 취소</button>
     <button onMouseDown={event=>event.preventDefault()} onClick={()=>firstEditorRef.current?.dispatchCommand(REDO_COMMAND,undefined)}>첫 번째 다시 실행</button>
+   </div>
+   <div className="actions" role="toolbar" aria-label="첫 번째 문서 구조 명령">
+    <button type="button" onMouseDown={event=>event.preventDefault()} onClick={()=>firstEditorRef.current?.dispatchCommand(INSERT_TUFTE_SECTION_COMMAND,undefined)}>첫 번째 섹션 추가</button>
+    <button type="button" onMouseDown={event=>event.preventDefault()} onClick={()=>firstEditorRef.current?.dispatchCommand(INSERT_TUFTE_LIST_COMMAND,'bullet')}>첫 번째 목록 삽입</button>
+    <button type="button" onMouseDown={event=>event.preventDefault()} onClick={()=>firstEditorRef.current?.dispatchCommand(INSERT_TUFTE_DEFINITION_LIST_COMMAND,undefined)}>첫 번째 정의목록 삽입</button>
+    <button type="button" onMouseDown={event=>event.preventDefault()} onClick={()=>firstEditorRef.current?.dispatchCommand(INSERT_TUFTE_QUOTATION_COMMAND,'quote')}>첫 번째 인용문 삽입</button>
+    <button type="button" onMouseDown={event=>event.preventDefault()} onClick={()=>firstEditorRef.current?.dispatchCommand(INSERT_TUFTE_FIGURE_COMMAND,{src:'/fixture.svg',alt:'구조 명령 테스트 이미지'})}>첫 번째 그림 삽입</button>
+    <button type="button" onMouseDown={event=>event.preventDefault()} onClick={()=>firstEditorRef.current?.dispatchCommand(SET_TUFTE_SPAN_KIND_COMMAND,'sans')}>첫 번째 span 종류 변경</button>
    </div>
    <p data-testid="first-changes">변경 알림 {firstChanges}회</p>
    <p data-testid="first-notice" role="status">{firstNotice}</p>

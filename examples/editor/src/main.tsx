@@ -32,13 +32,11 @@ import {canonicalBlockType,
   parseCanonicalEditorState,
   loadDocumentIntoEditor,
   exportEditorToDocument,
-  registerFigureCommands,
   INSERT_TUFTE_FIGURE_COMMAND,
   SET_TUFTE_FIGURE_WIDTH_COMMAND,
   INSERT_TUFTE_FIGURE_MARGINNOTE_COMMAND,
   REMOVE_TUFTE_FIGURE_MARGINNOTE_COMMAND,
   UPDATE_TUFTE_FIGURE_MARGINNOTE_COMMAND,
-  registerQuotationCommands,
   APPEND_TUFTE_EPIGRAPH_ITEM_COMMAND,
   MOVE_TUFTE_EPIGRAPH_ITEM_COMMAND,
   SET_TUFTE_QUOTE_CITE_COMMAND,
@@ -47,24 +45,19 @@ import {canonicalBlockType,
   INSERT_TUFTE_QUOTATION_COMMAND,
   APPEND_TUFTE_SECTION_CITE_COMMAND,
   APPEND_TUFTE_ATTRIBUTION_COMMAND,
-  registerListKeyboardCommands,
-  registerListCommands,
   INSERT_TUFTE_LIST_COMMAND,
   APPEND_TUFTE_LIST_ITEM_COMMAND,
   SET_TUFTE_LIST_KIND_COMMAND,
   CHANGE_TUFTE_LIST_INDENT_COMMAND,
   UNWRAP_TUFTE_LIST_COMMAND,
-  registerInlineCommands,
   SET_TUFTE_SPAN_KIND_COMMAND,
   WRAP_TUFTE_SPAN_COMMAND,
   UNWRAP_TUFTE_SPAN_COMMAND,
-  registerDefinitionCommands,
   INSERT_TUFTE_DEFINITION_LIST_COMMAND,
   APPEND_TUFTE_DEFINITION_PAIR_COMMAND,
   REMOVE_TUFTE_DEFINITION_PAIR_COMMAND,
   MOVE_TUFTE_DEFINITION_PAIR_COMMAND,
   REMOVE_TUFTE_DEFINITION_LIST_COMMAND,
-  registerSectionCommands,
   WRAP_TUFTE_ROOT_COMMAND,
   INSERT_TUFTE_SECTION_COMMAND,
   SPLIT_TUFTE_SECTION_COMMAND,
@@ -236,13 +229,7 @@ function EditorUI(){
   }
 
   const chooserTrigger=useRef<HTMLButtonElement>(null);
-  useEffect(()=>registerSectionCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
-  useEffect(()=>registerInlineCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
-  useEffect(()=>registerDefinitionCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
-  useEffect(()=>registerQuotationCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
-  useEffect(()=>registerFigureCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
-  useEffect(()=>registerListCommands(editor,diagnostic=>setStatus(diagnostic.message)),[editor]);
-  useEffect(()=>registerListKeyboardCommands(editor),[editor]);
+  // Document commands are registered exactly once by TufteEditingSurface.
   const [structureIssues,setStructureIssues]=useState<StructureIssue[]>([]);
   const checkpoint=useRef<EditorState|null>(null);
   useEffect(()=>{

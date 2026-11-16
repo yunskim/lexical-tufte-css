@@ -7,6 +7,7 @@ import {SelectionToolbar} from './SelectionToolbar.js';
 import {BlockContextMenu} from './BlockContextMenu.js';
 import {TufteNoteInteractionPlugin,TufteNoteStructurePlugin} from './TufteNoteInteractionPlugin.js';
 import {TufteNoteImageEditorPlugin} from './TufteNoteImageEditorPlugin.js';
+import {TufteDocumentCommandsPlugin} from './TufteDocumentCommandsPlugin.js';
 import {TufteDocumentAssetCommandsPlugin} from './TufteDocumentAssetCommandsPlugin.js';
 import type {AssetRef} from '@lexical-tufte/document';
 
@@ -31,6 +32,7 @@ export function TufteEditingSurface({
   />
   <HistoryPlugin/>
   <TablePlugin/>
+  <TufteDocumentCommandsPlugin readonly={readonly} onNotice={onNotice}/>
   <TufteNoteStructurePlugin onNotice={onNotice}/>
   <TufteDocumentAssetCommandsPlugin assets={documentAssets} onNotice={onNotice}/>
   <TufteNoteImageEditorPlugin readonly={readonly} onNotice={onNotice} onOpenChange={onNoteImageEditorOpenChange}/>
