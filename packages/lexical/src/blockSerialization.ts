@@ -31,5 +31,10 @@ export function parseCanonicalEditorState(editor:LexicalEditor,state:unknown):Ed
  if(!state||typeof state!=='object'||Array.isArray(state)||!('root' in state)||
   !state.root||typeof state.root!=='object'||Array.isArray(state.root))
   throw Error('Expected canonical editor state root');
- return editor.parseEditorState(JSON.stringify(mapState(state,true)));
+ return editor.parseEditorState(serializeRuntimeEditorState(state));
+}
+
+/** Encode canonical document nodes using the types registered by the editor. */
+export function serializeRuntimeEditorState(state:{root:unknown}):string{
+ return JSON.stringify(mapState(state,true));
 }

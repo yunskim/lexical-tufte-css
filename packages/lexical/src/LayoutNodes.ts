@@ -22,8 +22,11 @@ export class FigureNode extends ElementNode {
  constructor(width:FigureWidth='body',key?:NodeKey){super(key);this.__width=width;}
  getWidth():FigureWidth{return this.getLatest().__width;}
  setWidth(width:FigureWidth):this{this.getWritable().__width=width;return this;}
- createDOM():HTMLElement{const e=document.createElement('figure');e.dataset.tufteEditor='figure';return e;}
- updateDOM():false{return false;}
+ createDOM():HTMLElement{const e=document.createElement('figure');e.dataset.tufteEditor='figure';e.dataset.width=this.getWidth();return e;}
+ updateDOM(previous:FigureNode,element:HTMLElement):false{
+  if(previous.__width!==this.__width)element.dataset.width=this.getWidth();
+  return false;
+ }
  exportDOM():DOMExportOutput{const e=document.createElement('figure');if(this.getWidth()==='fullwidth')e.className='fullwidth';return {element:e};}
  exportJSON():SerializedFigure{return {...super.exportJSON(),type:'tufte-figure',version:1,width:this.getWidth()};}
  static importJSON(s:SerializedFigure):FigureNode{if(s.version!==1||!['body','fullwidth'].includes(s.width))throw Error('Unsupported figure');return $createFigureNode(s.width).updateFromJSON(s);}

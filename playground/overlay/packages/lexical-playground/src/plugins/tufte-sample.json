@@ -1,0 +1,3002 @@
+{
+  "schemaVersion": 1,
+  "id": "upstream-complete-demo",
+  "locale": "en-US",
+  "title": "Tufte CSS",
+  "titleId": "tufte-css",
+  "subtitle": "Dave Liepmann",
+  "assets": [],
+  "lexicalState": {
+    "root": {
+      "type": "root",
+      "version": 1,
+      "children": [
+        {
+          "type": "tufte-section",
+          "version": 1,
+          "children": [
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Tufte CSS provides tools to style web articles using the ideas demonstrated by Edward Tufte’s books and handouts. Tufte’s style is known for its simplicity, extensive use of sidenotes, tight integration of graphics with text, and carefully chosen typography."
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Tufte CSS was created by "
+                },
+                {
+                  "type": "link",
+                  "version": 1,
+                  "children": [
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "Dave Liepmann"
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "url": "http://www.daveliepmann.com",
+                  "rel": null,
+                  "target": null,
+                  "title": null
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " and is now an Edward Tufte project. The original idea was cribbed from "
+                },
+                {
+                  "type": "link",
+                  "version": 1,
+                  "children": [
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "Tufte-LaTeX"
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "url": "https://tufte-latex.github.io/tufte-latex/",
+                  "rel": null,
+                  "target": null,
+                  "title": null
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " and "
+                },
+                {
+                  "type": "link",
+                  "version": 1,
+                  "children": [
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "R Markdown’s Tufte Handout format"
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "url": "http://rmarkdown.rstudio.com/tufte_handout_format.html",
+                  "rel": null,
+                  "target": null,
+                  "title": null
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": ". We give hearty thanks to all the people who have contributed to those projects."
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "If you see anything that Tufte CSS could improve, we welcome your contribution in the form of an issue or pull request on the GitHub project: "
+                },
+                {
+                  "type": "link",
+                  "version": 1,
+                  "children": [
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "tufte-css"
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "url": "https://github.com/edwardtufte/tufte-css",
+                  "rel": null,
+                  "target": null,
+                  "title": null
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": ". Please note the "
+                },
+                {
+                  "type": "link",
+                  "version": 1,
+                  "children": [
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "contribution guidelines"
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "url": "https://github.com/edwardtufte/tufte-css#contributing",
+                  "rel": null,
+                  "target": null,
+                  "title": null
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "."
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Finally, a reminder about the goal of this project. The web is not print. Webpages are not books. Therefore, the goal of Tufte CSS is not to say “websites should look like this interpretation of Tufte’s books” but rather “here are some techniques Tufte developed that we’ve found useful in print; maybe you can find a way to make them useful on the web”. Tufte CSS is merely a sketch of one way to implement this particular set of ideas. It should be a starting point, not a design goal, because any project should present their information as best suits their particular circumstances."
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            }
+          ],
+          "direction": null,
+          "format": "",
+          "indent": 0
+        },
+        {
+          "type": "tufte-section",
+          "version": 1,
+          "children": [
+            {
+              "type": "heading",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Getting Started"
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "tag": "h2",
+              "id": "getting-started"
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "To use Tufte CSS, copy "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "tufte.css"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " and the "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "et-book"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " directory of font files to your project directory, then add the following to your HTML document’s "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "head"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " block:"
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            },
+            {
+              "type": "tufte-code",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "<link rel=\"stylesheet\" href=\"tufte.css\"/>"
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "width": "body",
+              "language": null
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Now you just have to use the provided CSS rules, and the Tufte CSS conventions described in this document. For best results, View Source and Inspect Element frequently."
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            }
+          ],
+          "direction": null,
+          "format": "",
+          "indent": 0
+        },
+        {
+          "type": "tufte-section",
+          "version": 1,
+          "children": [
+            {
+              "type": "heading",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Fundamentals"
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "tag": "h2",
+              "id": "fundamentals"
+            },
+            {
+              "type": "heading",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Sections and Headings"
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "tag": "h3",
+              "id": "fundamentals--sections-and-headers"
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Organize your document with an "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "article"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " element inside your "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "body"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " tag. Inside that, use "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "section"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " tags around each logical grouping of text and headings."
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Tufte CSS uses "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "h1"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " for the document title, "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "p"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " with class "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "subtitle"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " for the document subtitle, "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "h2"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " for section headings, and "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "h3"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " for low-level headings. More specific headings are not supported. If you feel the urge to reach for a heading of level 4 or greater, consider redesigning your document:"
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            },
+            {
+              "type": "quote",
+              "version": 1,
+              "children": [
+                {
+                  "type": "paragraph",
+                  "version": 1,
+                  "children": [
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "[It is] notable that the Feynman lectures (3 volumes) write about all of physics in 1800 pages, using only 2 levels of hierarchical headings: chapters and A-level heads in the text. It also uses the methodology of "
+                    },
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "detail": 0,
+                      "format": 2,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "sentences"
+                    },
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": " which then cumulate sequentially into "
+                    },
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "detail": 0,
+                      "format": 2,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "paragraphs"
+                    },
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": ", rather than the grunts of bullet points. Undergraduate Caltech physics is very complicated material, but it didn’t require an elaborate hierarchy to organize."
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "textFormat": 0,
+                  "textStyle": ""
+                },
+                {
+                  "type": "tufte-attribution",
+                  "version": 1,
+                  "children": [
+                    {
+                      "type": "link",
+                      "version": 1,
+                      "children": [
+                        {
+                          "type": "text",
+                          "version": 1,
+                          "detail": 0,
+                          "format": 0,
+                          "mode": "normal",
+                          "style": "",
+                          "text": "Edward Tufte, forum post, ‘Book design: advice and examples’ thread"
+                        }
+                      ],
+                      "direction": null,
+                      "format": "",
+                      "indent": 0,
+                      "url": "http://www.edwardtufte.com/bboard/q-and-a-fetch-msg?msg_id=0000hB",
+                      "rel": null,
+                      "target": null,
+                      "title": null
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "cite": "http://www.edwardtufte.com/bboard/q-and-a-fetch-msg?msg_id=0000hB"
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "As a bonus, this excerpt regarding the use of headings provides an example of block quotes. In Tufte CSS they are just lightly styled, semantically correct HTML using "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "blockquote"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " and "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "footer"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " elements. See page 20 of "
+                },
+                {
+                  "type": "link",
+                  "version": 1,
+                  "children": [
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "The Visual Display of Quantitative Information"
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "url": "https://www.edwardtufte.com/tufte/books_vdqi",
+                  "rel": null,
+                  "target": null,
+                  "title": null
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " for an example in print."
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "tufte-span",
+                  "version": 1,
+                  "children": [
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "In his later books"
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "kind": "newthought"
+                },
+                {
+                  "type": "tufte-sidenote",
+                  "version": 1,
+                  "children": [
+                    {
+                      "type": "link",
+                      "version": 1,
+                      "children": [
+                        {
+                          "type": "text",
+                          "version": 1,
+                          "detail": 0,
+                          "format": 2,
+                          "mode": "normal",
+                          "style": "",
+                          "text": "Beautiful Evidence"
+                        }
+                      ],
+                      "direction": null,
+                      "format": "",
+                      "indent": 0,
+                      "url": "https://www.edwardtufte.com/book/beautiful-evidence/",
+                      "rel": null,
+                      "target": null,
+                      "title": null
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "noteId": "sn-in-his-later-books"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": ", Tufte starts each section with a bit of vertical space, a non-indented paragraph, and the first few words of the sentence set in small caps. For this we use a span with the class "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "newthought"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": ", as demonstrated at the beginning of this paragraph. Vertical spacing is accomplished separately through "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "<section>"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " tags. Be consistent: though we do so in this paragraph for the purpose of demonstration, do not alternate use of header elements and the "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "newthought"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " technique. Pick one approach and stick to it."
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            },
+            {
+              "type": "heading",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Text"
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "tag": "h3",
+              "id": "fundamentals--text"
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Although paper handouts obviously have a pure white background, the web is better served by the use of slightly off-white and off-black colors. Tufte CSS uses "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "#fffff8"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " and "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "#111111"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " because they are nearly indistinguishable from their ‘pure’ cousins, but dial down the harsh contrast. We stick to the greyscale for text, reserving color for specific, careful use in figures and images."
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "In print, Tufte has used the proprietary Monotype Bembo"
+                },
+                {
+                  "type": "tufte-sidenote",
+                  "version": 1,
+                  "children": [
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "See Tufte’s comment in the "
+                    },
+                    {
+                      "type": "link",
+                      "version": 1,
+                      "children": [
+                        {
+                          "type": "text",
+                          "version": 1,
+                          "detail": 0,
+                          "format": 0,
+                          "mode": "normal",
+                          "style": "",
+                          "text": "Tufte book fonts"
+                        }
+                      ],
+                      "direction": null,
+                      "format": "",
+                      "indent": 0,
+                      "url": "http://www.edwardtufte.com/bboard/q-and-a-fetch-msg?msg_id=0000Vt",
+                      "rel": null,
+                      "target": null,
+                      "title": null
+                    },
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": " thread."
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "noteId": "sn-proprietary-monotype-bembo"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " font. A similar effect is achieved in digital formats with the now open-source "
+                },
+                {
+                  "type": "link",
+                  "version": 1,
+                  "children": [
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "ETBook"
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "url": "https://github.com/edwardtufte/et-book",
+                  "rel": null,
+                  "target": null,
+                  "title": null
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": ", which Tufte CSS supplies with a "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "@font-face"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " reference to a .ttf file. In case ETBook somehow doesn’t work, Tufte CSS shifts gracefully to other serif fonts like Palatino and Georgia."
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Also notice how Tufte CSS includes separate font files for bold (strong) and italic (emphasis), instead of relying on the browser to mechanically transform the text. This is typographic best practice."
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "If you prefer sans-serifs, use the "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "sans"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " class. It relies on Gill Sans, Tufte’s sans-serif font of choice."
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": "",
+              "tufteClass": "sans"
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Links in Tufte CSS match the body text in color and do not change on mouseover or when clicked. Here is a "
+                },
+                {
+                  "type": "link",
+                  "version": 1,
+                  "children": [
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "dummy example"
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "url": "#",
+                  "rel": null,
+                  "target": null,
+                  "title": null
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " that goes nowhere. These links are underlined, since this is the most widely recognized indicator of clickable text. "
+                },
+                {
+                  "type": "tufte-marginnote",
+                  "version": 1,
+                  "children": [
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "Blue text, while also a widely recognizable clickable-text indicator, is crass and distracting. Luckily, it is also rendered unnecessary by the use of underlining."
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "noteId": "mn-blue-links"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "\n        "
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "As always, these design choices are merely one approach that Tufte CSS provides by default. Other approaches can also be made to work. The goal is to make sentences readable without interference from links, as well as to make links immediately identifiable even by casual web users."
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            }
+          ],
+          "direction": null,
+          "format": "",
+          "indent": 0
+        },
+        {
+          "type": "tufte-section",
+          "version": 1,
+          "children": [
+            {
+              "type": "heading",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Epigraphs"
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "tag": "h2",
+              "id": "epigraphs"
+            },
+            {
+              "type": "tufte-epigraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "quote",
+                  "version": 1,
+                  "children": [
+                    {
+                      "type": "paragraph",
+                      "version": 1,
+                      "children": [
+                        {
+                          "type": "text",
+                          "version": 1,
+                          "detail": 0,
+                          "format": 0,
+                          "mode": "normal",
+                          "style": "",
+                          "text": "The English language . . . becomes ugly and inaccurate because our thoughts are foolish, but the slovenliness of our language makes it easier for us to have foolish thoughts."
+                        }
+                      ],
+                      "direction": null,
+                      "format": "",
+                      "indent": 0,
+                      "textFormat": 0,
+                      "textStyle": ""
+                    },
+                    {
+                      "type": "tufte-attribution",
+                      "version": 1,
+                      "children": [
+                        {
+                          "type": "text",
+                          "version": 1,
+                          "detail": 0,
+                          "format": 0,
+                          "mode": "normal",
+                          "style": "",
+                          "text": "George Orwell, “Politics and the English Language”"
+                        }
+                      ],
+                      "direction": null,
+                      "format": "",
+                      "indent": 0
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0
+                },
+                {
+                  "type": "quote",
+                  "version": 1,
+                  "children": [
+                    {
+                      "type": "paragraph",
+                      "version": 1,
+                      "children": [
+                        {
+                          "type": "text",
+                          "version": 1,
+                          "detail": 0,
+                          "format": 0,
+                          "mode": "normal",
+                          "style": "",
+                          "text": "For a successful technology, reality must take precedence over public relations, for Nature cannot be fooled."
+                        }
+                      ],
+                      "direction": null,
+                      "format": "",
+                      "indent": 0,
+                      "textFormat": 0,
+                      "textStyle": ""
+                    },
+                    {
+                      "type": "tufte-attribution",
+                      "version": 1,
+                      "children": [
+                        {
+                          "type": "text",
+                          "version": 1,
+                          "detail": 0,
+                          "format": 0,
+                          "mode": "normal",
+                          "style": "",
+                          "text": "Richard P. Feynman, "
+                        },
+                        {
+                          "type": "tufte-cite",
+                          "version": 1,
+                          "children": [
+                            {
+                              "type": "text",
+                              "version": 1,
+                              "detail": 0,
+                              "format": 0,
+                              "mode": "normal",
+                              "style": "",
+                              "text": "“What Do You Care What Other People Think?”"
+                            }
+                          ],
+                          "direction": null,
+                          "format": "",
+                          "indent": 0
+                        }
+                      ],
+                      "direction": null,
+                      "format": "",
+                      "indent": 0
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0
+                },
+                {
+                  "type": "quote",
+                  "version": 1,
+                  "children": [
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "I do not paint things, I paint only the differences between things."
+                    },
+                    {
+                      "type": "tufte-attribution",
+                      "version": 1,
+                      "children": [
+                        {
+                          "type": "text",
+                          "version": 1,
+                          "detail": 0,
+                          "format": 0,
+                          "mode": "normal",
+                          "style": "",
+                          "text": "Henri Matisse, "
+                        },
+                        {
+                          "type": "tufte-cite",
+                          "version": 1,
+                          "children": [
+                            {
+                              "type": "text",
+                              "version": 1,
+                              "detail": 0,
+                              "format": 0,
+                              "mode": "normal",
+                              "style": "",
+                              "text": "Henri Matisse Dessins: thèmes et variations"
+                            }
+                          ],
+                          "direction": null,
+                          "format": "",
+                          "indent": 0
+                        },
+                        {
+                          "type": "text",
+                          "version": 1,
+                          "detail": 0,
+                          "format": 0,
+                          "mode": "normal",
+                          "style": "",
+                          "text": " (Paris, 1943), 37"
+                        }
+                      ],
+                      "direction": null,
+                      "format": "",
+                      "indent": 0
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "If you’d like to introduce your page or a section of your page with some quotes, use epigraphs. Modeled after chapter epigraphs in Tufte’s books (particularly "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 2,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Beautiful Evidence"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "), these are "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "blockquote"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " elements with a bit of specialized styling. Quoted text is italicized. The source goes in a "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "footer"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " element inside the "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "blockquote"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": ". We have provided three examples in the epigraph of this section, demonstrating shorter and longer quotes, with and without a paragraph tag, and showing how multiple quotes within an epigraph fit together with the use of a wrapper class."
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            }
+          ],
+          "direction": null,
+          "format": "",
+          "indent": 0
+        },
+        {
+          "type": "tufte-section",
+          "version": 1,
+          "children": [
+            {
+              "type": "heading",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Sidenotes: Footnotes and Marginal Notes"
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "tag": "h2",
+              "id": "sidenotes"
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "One of the most distinctive features of Tufte’s style is his extensive use of sidenotes."
+                },
+                {
+                  "type": "tufte-sidenote",
+                  "version": 1,
+                  "children": [
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "This is a sidenote."
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "noteId": "sn-extensive-use-of-sidenotes"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " Sidenotes are like footnotes, except they don’t force the reader to jump their eye to the bottom of the page, but instead display off to the side in the margin. Perhaps you have noticed their use in this document already. You are very astute."
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Sidenotes are a great example of the web not being like print. On sufficiently large viewports, Tufte CSS uses the margin for sidenotes, margin notes, and small figures. On smaller viewports, elements that would go in the margin are hidden until the user toggles them into view. The goal is to present related but not necessary information such as asides or citations "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 2,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "as close as possible"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " to the text that references them. At the same time, this secondary information should stay out of the way of the eye, not interfering with the progression of ideas in the main text."
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Sidenotes consist of two elements: a superscript reference number that goes inline with the text, and a sidenote with content. To add the former, just put a label and dummy checkbox into the text where you want the reference to go, like so:"
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            },
+            {
+              "type": "tufte-code",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "<label for=\"sn-demo\"\n       class=\"margin-toggle sidenote-number\">\n</label>\n<input type=\"checkbox\"\n       id=\"sn-demo\"\n       class=\"margin-toggle\"/>"
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "width": "body",
+              "language": null
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "You must manually assign a reference "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "id"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " to each side or margin note, replacing “sn-demo” in the "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "for"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " and the "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "id"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " attribute values with an appropriate descriptor. It is useful to use prefixes like "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "sn-"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " for sidenotes and "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "mn-"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " for margin notes."
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Immediately adjacent to that sidenote reference in the main text goes the sidenote content itself, in a "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "span"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " with class "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "sidenote"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": ". This tag is also inserted directly in the middle of the body text, but is either pushed into the margin or hidden by default. Make sure to position your sidenotes correctly by keeping the sidenote-number label close to the sidenote itself."
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "For optimal readibility of sidenotes, enclose the main text in the "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "section"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " tag."
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "If you want a sidenote without footnote-style numberings, then you want a margin note.\n          "
+                },
+                {
+                  "type": "tufte-marginnote",
+                  "version": 1,
+                  "children": [
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "\n            This is a margin note. Notice there isn’t a number preceding the note.\n          "
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "noteId": "mn-demo"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " On large screens, a margin note is just a sidenote that omits the reference number. This lessens the distracting effect taking away from the flow of the main text, but can increase the cognitive load of matching a margin note to its referent text. However, on small screens, a margin note is like a sidenote except its viewability-toggle is a symbol rather than a reference number. This document currently uses the symbol ⊕ ("
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "&#8853;"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "), but it’s up to you."
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Margin notes are created just like sidenotes, but with the "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "marginnote"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " class for the content and the "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "margin-toggle"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " class for the label and dummy checkbox. For instance, here is the code for the margin note used in the previous paragraph:"
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            },
+            {
+              "type": "tufte-code",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "<label for=\"mn-demo\" class=\"margin-toggle\">&#8853;</label>\n<input type=\"checkbox\" id=\"mn-demo\" class=\"margin-toggle\"/>\n<span class=\"marginnote\">\n  This is a margin note. Notice there isn’t a number preceding the note.\n</span>"
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "width": "body",
+              "language": null
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Figures in the margin are created as margin notes, as demonstrated in the next section."
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            }
+          ],
+          "direction": null,
+          "format": "",
+          "indent": 0
+        },
+        {
+          "type": "tufte-section",
+          "version": 1,
+          "children": [
+            {
+              "type": "heading",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Figures"
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "tag": "h2",
+              "id": "figures"
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Tufte emphasizes tight integration of graphics with text. Data, graphs, and figures are kept with the text that discusses them. In print, this means they are not relegated to a separate page. On the web, that means readability of graphics and their accompanying text without extra clicks, tab-switching, or scrolling."
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Figures should try to use the "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "figure"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " element, which by default are constrained to the main column. Don’t wrap figures in a paragraph tag. Any label or margin note goes in a regular margin note inside the figure. For example, most of the time one should introduce a figure directly into the main flow of discussion, like so:"
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            },
+            {
+              "type": "tufte-figure",
+              "version": 1,
+              "children": [
+                {
+                  "type": "tufte-marginnote",
+                  "version": 1,
+                  "children": [
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "From Edward Tufte, "
+                    },
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "detail": 0,
+                      "format": 2,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "Visual Display of Quantitative Information"
+                    },
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": ", page 92."
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "noteId": "mn-exports-imports"
+                },
+                {
+                  "type": "tufte-inline-image",
+                  "version": 1,
+                  "src": "/tufte-sample/img/exports-imports.png",
+                  "alt": "Exports and Imports to and from Denmark & Norway from 1700 to 1780"
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "width": "body"
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "tufte-marginnote",
+                  "version": 1,
+                  "children": [
+                    {
+                      "type": "tufte-inline-image",
+                      "version": 1,
+                      "src": "/tufte-sample/img/rhino.png",
+                      "alt": "Image of a Rhinoceros"
+                    },
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "F.J. Cole, “The History of Albrecht Dürer’s Rhinoceros in Zooological Literature,” "
+                    },
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "detail": 0,
+                      "format": 2,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "Science, Medicine, and History: Essays on the Evolution of Scientific Thought and Medical Practice"
+                    },
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": " (London, 1953), ed. E. Ashworth Underwood, 337-356. From page 71 of Edward Tufte’s "
+                    },
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "detail": 0,
+                      "format": 2,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "Visual Explanations"
+                    },
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "."
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "noteId": "mn-figure-1"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " But tight integration of graphics with text is central to Tufte’s work even when those graphics are ancillary to the main body of a text. In many of those cases, a margin figure may be most appropriate. To place figures in the margin, just wrap an image (or whatever) in a margin note inside a "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "p"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " tag, as seen to the right of this paragraph."
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "If you need a full-width figure, give it the "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "fullwidth"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " class. Make sure that’s inside an "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "article"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": ", and it will take up (almost) the full width of the screen. This approach is demonstrated below using Edward Tufte’s English translation of the Napoleon’s March data visualization. From "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 2,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Beautiful Evidence"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": ", page 122-124."
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            },
+            {
+              "type": "tufte-figure",
+              "version": 1,
+              "children": [
+                {
+                  "type": "tufte-inline-image",
+                  "version": 1,
+                  "src": "/tufte-sample/img/napoleons-march.png",
+                  "alt": "Figurative map of the successive losses of the French Army in the Russian campaign, 1812-1813"
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "width": "fullwidth"
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "One obstacle to creating elegant figures on the web is the difficulty of handling different screen sizes, especially on the fly. Embedded "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "iframe"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " elements are particularly troublesome. For these instances we provide a helper class, "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "iframe-wrapper"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": ", the most common use for which is probably YouTube videos, e.g."
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            },
+            {
+              "type": "tufte-code",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "<figure class=\"iframe-wrapper\">\n  <iframe src=\"https://www.youtube-nocookie.com/embed/YslQ2625TR4\" title=\"YouTube video: Tufte CSS example\" loading=\"lazy\" referrerpolicy=\"strict-origin-when-cross-origin\" sandbox=\"allow-scripts allow-same-origin allow-presentation\" width=\"960\" height=\"540\" allowfullscreen></iframe>\n</figure>"
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "width": "body",
+              "language": null
+            },
+            {
+              "type": "tufte-embed",
+              "version": 1,
+              "provider": "youtube",
+              "src": "https://www.youtube-nocookie.com/embed/YslQ2625TR4",
+              "title": "YouTube video: Tufte CSS example",
+              "wrapper": "figure",
+              "width": "body",
+              "aspectRatio": 1.7777777777777777,
+              "layout": "tufte"
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "You can use this class on a "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "div"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " instead of a "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "figure"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": ", with slightly different results but the same general effect. Experiment and choose depending on your application."
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            }
+          ],
+          "direction": null,
+          "format": "",
+          "indent": 0
+        },
+        {
+          "type": "tufte-section",
+          "version": 1,
+          "children": [
+            {
+              "type": "heading",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Code"
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "tag": "h2",
+              "id": "code"
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Technical jargon, programming language terms, and code samples are denoted with the "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "code"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " class, as I’ve been using in this document to denote HTML. Code needs to be monospace for formatting purposes and to aid in code analysis, but it must maintain its readability. To those ends, Tufte CSS follows GitHub’s font selection, which shifts gracefully along the monospace spectrum from the elegant but rare Consolas all the way to good old reliable Courier."
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Extended code examples should live in a "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "code"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " element within a "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "pre"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " element. This adds control over indentation and overflow as well:"
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            },
+            {
+              "type": "tufte-code",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": ";; Some code examples in Clojure. This is a comment.\n\n;; applying a function to every item in the collection\n(map tufte-css blog-posts)\n;;;; if unfamiliar, see http://www.lispcast.com/annotated-map\n\n;; side-effecty loop (unformatted, causing text overflow) - from https://clojuredocs.org/clojure.core/doseq\n(doseq [[[a b] [c d]] (map list (sorted-map :1 1 :2 2) (sorted-map :3 3 :4 4))] (prn (* b d)))\n\n;; that same side-effecty loop, formatted\n(doseq [[[a b] [c d]] (map list\n                           (sorted-map :1 1 :2 2)\n                           (sorted-map :3 3 :4 4))]\n  (prn (* b d)))\n\n;; If this proselytizing has worked, check out:\n;; http://howistart.org/posts/clojure/1"
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "width": "body",
+              "language": null
+            }
+          ],
+          "direction": null,
+          "format": "",
+          "indent": 0
+        },
+        {
+          "type": "tufte-section",
+          "version": 1,
+          "children": [
+            {
+              "type": "heading",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "ImageQuilts"
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "tag": "h2",
+              "id": "imagequilts"
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Tufte CSS provides support for Edward Tufte and Adam Schwartz’s "
+                },
+                {
+                  "type": "link",
+                  "version": 1,
+                  "children": [
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "ImageQuilts"
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "url": "http://imagequilts.com/",
+                  "rel": null,
+                  "target": null,
+                  "title": null
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": ". See the "
+                },
+                {
+                  "type": "link",
+                  "version": 1,
+                  "children": [
+                    {
+                      "type": "text",
+                      "version": 1,
+                      "detail": 0,
+                      "format": 0,
+                      "mode": "normal",
+                      "style": "",
+                      "text": "ET forum announcement thread"
+                    }
+                  ],
+                  "direction": null,
+                  "format": "",
+                  "indent": 0,
+                  "url": "http://www.edwardtufte.com/bboard/q-and-a-fetch-msg?msg_id=0003wk",
+                  "rel": null,
+                  "target": null,
+                  "title": null
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": " for more on quilts. Some have ragged edges, others straight. Include these images just as you would any other "
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 16,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "figure"
+                },
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "."
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "This is an ImageQuilt surveying Chinese calligraphy, placed in a full-width figure to accomodate its girth:"
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            },
+            {
+              "type": "tufte-figure",
+              "version": 1,
+              "children": [
+                {
+                  "type": "tufte-inline-image",
+                  "version": 1,
+                  "src": "/tufte-sample/img/imagequilt-chinese-calligraphy.png",
+                  "alt": "Image of Chinese Calligraphy"
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "width": "fullwidth"
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Here is an ImageQuilt of 47 animal sounds over and over, in a figure constrained to the main text region. This quilt has ragged edges, but the image itself is of course still rectangular."
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            },
+            {
+              "type": "tufte-figure",
+              "version": 1,
+              "children": [
+                {
+                  "type": "tufte-inline-image",
+                  "version": 1,
+                  "src": "/tufte-sample/img/imagequilt-animal-sounds.png",
+                  "alt": "Image of animal sounds"
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "width": "body"
+            }
+          ],
+          "direction": null,
+          "format": "",
+          "indent": 0
+        },
+        {
+          "type": "tufte-section",
+          "version": 1,
+          "children": [
+            {
+              "type": "heading",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Epilogue"
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "tag": "h2",
+              "id": "epilogue"
+            },
+            {
+              "type": "paragraph",
+              "version": 1,
+              "children": [
+                {
+                  "type": "text",
+                  "version": 1,
+                  "detail": 0,
+                  "format": 0,
+                  "mode": "normal",
+                  "style": "",
+                  "text": "Many thanks go to Edward Tufte for leading the way with his work. It is only through his kind and careful editing that this project accomplishes what it does. All errors of implementation are of course mine."
+                }
+              ],
+              "direction": null,
+              "format": "",
+              "indent": 0,
+              "textFormat": 0,
+              "textStyle": ""
+            }
+          ],
+          "direction": null,
+          "format": "",
+          "indent": 0
+        }
+      ],
+      "direction": null,
+      "format": "",
+      "indent": 0
+    }
+  }
+}
