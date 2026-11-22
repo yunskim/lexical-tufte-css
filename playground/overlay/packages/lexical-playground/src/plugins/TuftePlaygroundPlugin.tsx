@@ -4,8 +4,11 @@ import {
   TufteNoteInteractionPlugin,
   TufteNoteStructurePlugin,
 } from '@lexical-tufte/editor-react';
-import {replaceEditorDocumentState} from '@lexical-tufte/lexical';
-import {useState} from 'react';
+import {
+  registerCodeCommands,
+  replaceEditorDocumentState,
+} from '@lexical-tufte/lexical';
+import {useEffect, useState} from 'react';
 
 import '@lexical-tufte/editor-react/styles.css';
 import {tufteSampleEditorState} from './tufteSampleState';
@@ -14,6 +17,12 @@ import './TuftePlayground.css';
 export default function TuftePlaygroundPlugin() {
   const [editor] = useLexicalComposerContext();
   const [notice, setNotice] = useState('');
+
+  useEffect(
+    () =>
+      registerCodeCommands(editor, diagnostic => setNotice(diagnostic.message)),
+    [editor],
+  );
 
   function loadSample() {
     if (!editor.isEditable()) {

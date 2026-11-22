@@ -8,6 +8,13 @@ sources="$cache/sources"
 lexical="$sources/lexical-0.52.0"
 upstream="b2af316af8ab328a86ff27885f2ce94f18dce571"
 
+for argument in "$@"; do
+  case "$argument" in
+    --) break ;;
+    -h|--help) exec bash "$playground/run-vite.sh" --help ;;
+  esac
+done
+
 mkdir -p "$sources"
 if [[ ! -f "$lexical/package.json" ]]; then
   staging="$(mktemp -d "$sources/.lexical.XXXXXX")"
@@ -32,4 +39,4 @@ public_subdir="$lexical/packages/lexical-playground/public/tufte-sample"
 cp -R "$assets/img" "$assets/et-book" "$public_subdir/"
 
 export TUFTE_PLAYGROUND_SOURCE_DIR="$repository"
-exec bash "$cache/run-vite.sh"
+exec bash "$cache/run-vite.sh" "$@"

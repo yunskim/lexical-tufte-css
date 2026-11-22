@@ -169,12 +169,17 @@
 }
 .tufte-document [data-tufte-editor="table-layout"] { overflow-x: auto; }
 .tufte-document [data-embed-provider] {
-  aspect-ratio: 16 / 9;
   background: #f0eee4;
-  display: grid;
   font-size: 0.9em;
   margin-block: 1rem;
-  place-items: center;
+}
+.tufte-document [data-embed-provider] > iframe {
+  border: 0;
+  display: block;
+}
+.tufte-document [data-embed-provider] > a {
+  display: inline-block;
+  margin: 0.35em 0.6em;
 }
 
 @container (min-width: 761px) {
@@ -182,6 +187,7 @@
   .tufte-document [data-tufte-editor="section"] > pre:not(.fullwidth),
   .tufte-document [data-tufte-editor="section"] > .epigraph > blockquote,
   .tufte-document figure[data-width="body"],
+  .tufte-document [data-tufte-editor="table-layout"][data-layout="body"],
   .tufte-document [data-embed-provider] {
     width: 55%;
   }
@@ -195,6 +201,7 @@
     display: none;
   }
   .tufte-document figure[data-width="fullwidth"] { width: 90%; }
+  .tufte-document [data-embed-provider][data-width="fullwidth"] { width: 90%; }
 }
 
 .tufte-playground-actions {

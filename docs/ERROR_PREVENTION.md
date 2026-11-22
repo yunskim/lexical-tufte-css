@@ -838,3 +838,7 @@ E144: 클릭 이미지가 실제 Lexical NodeSelection인지 연결하고 native
 ## M133 — 클릭 중 timeout의 최초 증거와 동일 소스 단독 재실행 구분
 
 E151: visible/enabled/stable 확인 후 실제 click 단계에서 timeout이 나면 전수 실행의 첫 로그·소스·제한을 보존한다. 나머지 결과를 먼저 회수하고 동일 코드/시간 제한으로 한 번 단독 재실행해 재현성을 구분한다. 단독 성공만으로 원인을 환경 탓으로 확정하거나 오류 자체를 해결 처리하지 않는다. 재발 시 click trace/브라우저 이벤트·선택/페이지 오류와 실행 자원을 함께 확보해 원인을 좁힌다. 이번 실행에서 E139–E150/M127–M132의 빌드 선행·공식 shell·같은 Python·실제 selection/Undo·타이머·폰트 참조 조건을 재점검했다.
+
+## M134 — YouTube 입력 URL 변환과 편집기 재생 검증
+
+E152: `TufteBlockMenu.tsx`에서 승인된 YouTube 호스트의 영상 ID를 확인한 뒤 저장용 임베드 URL로 변환한다. 문서의 URL 검증 규칙을 유지한다. `packages/lexical/src/EmbedNode.ts`에서 편집기와 HTML 내보내기의 iframe 생성 코드를 공유한다. 브라우저에서 삽입 버튼의 상태, 생성된 URL, 재생 시간 진행을 확인한다. 서버가 이전 모듈을 반환하면 새 서버에서 수정된 필드와 DOM을 확인한다.

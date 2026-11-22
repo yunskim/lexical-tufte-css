@@ -61,7 +61,6 @@ const $figure: ResolveTarget = node => $ancestor(node, 'tufte-figure');
 const $quote: ResolveTarget = node => $ancestor(node, 'quote');
 const $section: ResolveTarget = node => $ancestor(node, 'tufte-section');
 const $paragraph: ResolveTarget = node => $ancestor(node, 'paragraph');
-const $listItem: ResolveTarget = node => $ancestor(node, 'listitem');
 const $heading: ResolveTarget = node => $ancestor(node, 'heading');
 const $clicked: ResolveTarget = node => node;
 
@@ -242,14 +241,14 @@ export function createTufteContextOptions(editor: LexicalEditor) {
     ]);
   }
 
-  function insertNotes($container: ResolveTarget) {
+  function insertNotes() {
     return (['sidenote', 'marginnote'] as const).map(kind =>
       command(
         kind === 'sidenote' ? '사이드노트 삽입' : '마진노트 삽입',
         INSERT_TUFTE_NOTE_COMMAND,
         kind,
         node => {
-          const parent = $container(node);
+          const parent = $ancestor(node, 'paragraph', 'listitem');
           if (
             !parent ||
             $getContainingNote(node) ||
@@ -300,14 +299,13 @@ export function createTufteContextOptions(editor: LexicalEditor) {
     register,
     items: [
       new NodeContextMenuSeparator(),
+      ...insertNotes(),
       noteGroup('사이드노트', 'tufte-sidenote'),
       noteGroup('마진노트', 'tufte-marginnote'),
       new NodeContextMenuGroup('문단', [
-        ...insertNotes($paragraph),
         changeBlock($paragraph, 'h2'),
         changeBlock($paragraph, 'h3'),
       ]),
-      new NodeContextMenuGroup('목록 항목', insertNotes($listItem)),
       new NodeContextMenuGroup('제목', [
         changeBlock($heading, 'paragraph'),
         changeBlock($heading, 'h2'),

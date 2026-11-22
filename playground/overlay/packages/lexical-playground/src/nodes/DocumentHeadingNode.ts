@@ -20,6 +20,10 @@ const idState = createState('id', {
 
 /** The title and subtitle are editable peers of the document's sections. */
 export class DocumentHeadingNode extends ParagraphNode {
+  getKind(): DocumentHeadingKind {
+    return $getState(this, kindState);
+  }
+
   $config() {
     return this.config('document-heading', {
       extends: ParagraphNode,

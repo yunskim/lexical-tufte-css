@@ -19,10 +19,37 @@ export class EmbedNode extends DecoratorNode<null>{
  decorate():null{return null;}
  isInline():false{return false;}
  createDOM():HTMLElement{
-  const e=document.createElement('div');e.contentEditable='false';e.dataset.embedProvider=this.__provider;
-  e.textContent=this.__title;return e;
+  const e=document.createElement('div');e.contentEditable='false';e.dataset.embedProvider=this.__provider;e.dataset.width=this.__width;
+  if(!isEmbedURL(this.__src,this.__provider)){
+   e.textContent=this.__title;
+   return e;
+  }
+  const frame=this.createFrame(e.ownerDocument);
+  frame.style.aspectRatio=String(this.__aspectRatio);
+  frame.style.height='auto';
+  frame.style.width='100%';
+  const link=e.ownerDocument.createElement('a');
+  const platform=this.__provider==='youtube'?'YouTube':'Vimeo';
+  const videoId=new URL(this.__src).pathname.split('/').pop();
+  link.href=this.__provider==='youtube'
+   ?`https://www.youtube.com/watch?v=${videoId}`
+   :`https://vimeo.com/${videoId}`;
+  link.target='_blank';
+  link.rel='noopener noreferrer';
+  link.textContent=`${platform}에서 열기`;
+  link.setAttribute('aria-label',`${this.__title} · ${link.textContent}`);
+  e.append(frame,link);
+  return e;
  }
- updateDOM(previous:EmbedNode):boolean{return previous.__src!==this.__src||previous.__title!==this.__title||previous.__provider!==this.__provider;}
+ updateDOM(previous:EmbedNode):boolean{return previous.__src!==this.__src||previous.__title!==this.__title||previous.__provider!==this.__provider||previous.__width!==this.__width||previous.__aspectRatio!==this.__aspectRatio;}
+ private createFrame(doc:Document):HTMLIFrameElement{
+  const frame=doc.createElement('iframe');
+  frame.src=this.__src;frame.title=this.__title;frame.loading='lazy';frame.referrerPolicy='strict-origin-when-cross-origin';
+  frame.setAttribute('sandbox','allow-scripts allow-same-origin allow-presentation');
+  frame.setAttribute('allowfullscreen','');
+  frame.width='960';frame.height=String(Math.round(960/this.__aspectRatio));
+  return frame;
+ }
  exportDOM():DOMExportOutput{
   const n=this.getLatest(),outer=document.createElement(n.__wrapper);
   outer.className=(n.__width==='fullwidth'?'fullwidth ':'')+(n.__layout==='tufte'?'iframe-wrapper':'tufte-embed');
@@ -32,11 +59,7 @@ export class EmbedNode extends DecoratorNode<null>{
    spacer.setAttribute('viewBox',`0 0 960 ${960/n.__aspectRatio}`);spacer.setAttribute('width','960');spacer.setAttribute('height',String(960/n.__aspectRatio));
    spacer.setAttribute('aria-hidden','true');spacer.setAttribute('focusable','false');outer.append(spacer);
   }
-  const frame=document.createElement('iframe');frame.src=n.__src;frame.title=n.__title;frame.loading='lazy';frame.referrerPolicy='strict-origin-when-cross-origin';
-  frame.setAttribute('sandbox','allow-scripts allow-same-origin allow-presentation');
-  frame.setAttribute('allowfullscreen','');
-  frame.width='960';frame.height=String(Math.round(960/n.__aspectRatio));
-  outer.append(frame);return {element:outer};
+  outer.append(n.createFrame(outer.ownerDocument));return {element:outer};
  }
  exportJSON():SerializedEmbed{
   const n=this.getLatest();return {...super.exportJSON(),type:'tufte-embed',version:1,provider:n.__provider,src:n.__src,title:n.__title,wrapper:n.__wrapper,width:n.__width,aspectRatio:n.__aspectRatio,...(n.__layout?{layout:n.__layout}:{})};
